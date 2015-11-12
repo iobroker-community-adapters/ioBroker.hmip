@@ -1,0 +1,52 @@
+{
+  "name": "iobroker.hm-ip-cloud-accesspoint",
+  "version": "0.0.1",
+  "description": "ioBroker Adapter to use the Homatic Cloud Ip AccessPoint Rest API",
+  "author": {
+    "name": "@@Author@@",
+    "email": "@@email@@"
+  },
+  "contributors": [
+    {
+      "name": "@@Author@@",
+      "email": "@@email@@"
+    }
+  ],
+  "homepage": "https://github.com/ioBroker/ioBroker.template",
+  "license": "MIT",
+  "keywords": [
+    "ioBroker",
+    "template",
+    "Smart Home",
+    "home automation"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ioBroker/ioBroker.template"
+  },
+  "dependencies": {
+    "@iobroker/adapter-core": "^1.0.3",
+    "delay": "^4.1.0",
+    "js-sha512": "^0.8.0",
+    "request-promise-native": "^1.0.5",
+    "uuid": "^3.3.2",
+    "ws": "^6.1.2"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "gulp": "^4.0.0",
+    "mocha": "^5.2.0",
+    "@vitalets/google-translate-api": "github:vitalets/google-translate-api",
+    "configstore": "^4.0.0",
+    "request": "^2.88.0",
+    "safe-eval": "^0.4.1"
+  },
+  "main": "main.js",
+  "scripts": {
+    "test": "node node_modules/mocha/bin/mocha --exit"
+  },
+  "bugs": {
+    "url": "https://github.com/ioBroker/ioBroker.template/issues"
+  },
+  "readmeFilename": "README.md"
+}

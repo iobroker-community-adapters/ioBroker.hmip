@@ -1,0 +1,46 @@
+{
+    "common": {
+        "name": "hm-ip-cloud-accesspoint",
+        "version": "0.1.0",
+        "news": {
+            "0.0.1": {
+                "en": "initial adapter"
+            }
+        },
+        "title": "HomeMaticIP Cloud AccessPoint",
+        "titleLang": {
+            "en": "HomeMaticIP Cloud AccessPoint"
+        },
+        "desc": {
+            "en": "HomeMaticIP Cloud AccessPoint"
+        },
+        "authors": [
+            "jogibear9988 <jochen.kuehner@gmx.de>"
+        ],
+        "platform": "Javascript/Node.js",
+        "mode": "daemon",
+        "compact": true,
+        "icon": "template.png",
+        "materialize": true,
+        "enabled": true,
+        "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.template/master/admin/template.png",
+        "keywords": [
+            "hardware",
+            "homematic",
+            "hm"
+        ],
+        "readme": "https://github.com/ioBroker/ioBroker.template/blob/master/README.md",
+        "loglevel": "info",
+        "type": "general",
+        "license": "MIT",
+        "messagebox": false
+    },
+    "native": {
+        "authToken": "",
+        "clientAuthToken": "",
+        "clientId": "",
+        "accessPointSgtin": "",
+        "pin": null
+    },
+    "objects": []
+}
