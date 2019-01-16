@@ -46,7 +46,6 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             this.log.info('state change - ' + o.native.parameter + ' - ' + o.native.id);
             switch (o.native.parameter) {
                 case 'switchState':
-
                     this._api.deviceControlSetSwitchState(o.native.id, state.val, o.native.channel)
                     break;
             }
@@ -183,8 +182,19 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.display', { type: 'state', common: { name: 'display', type: 'string', role: 'indicator', read: true, write: false }, native: {} }));
                 break;
             }
+            case 'PUSH_BUTTON':
+            case 'PUSH_BUTTON_6': {
+                let max = 1;
+                if (device.type == 'PUSH_BUTTON_6')
+                    max = 6;
+                for (let i = 1; i <= max; i++) {
+                    promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + i + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: i, parameter: 'switchState' } }));
+                }
+                break;
+            }
+            
             default: {
-                this.log.info("device - not implemented device :" + JSON.stringify(device));
+                this.log.debug("device - not implemented device :" + JSON.stringify(device));
                 break;
             }
         }
