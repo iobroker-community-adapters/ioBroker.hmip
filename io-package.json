@@ -1,10 +1,10 @@
 {
     "common": {
-        "name": "hm-ip-cloud-accesspoint",
-        "version": "0.1.0",
+        "name": "hmip",
+        "version": "0.0.1",
         "news": {
             "0.0.1": {
-                "en": "initial adapter"
+                "en": "initial release"
             }
         },
         "title": "HomeMaticIP Cloud AccessPoint",
@@ -23,15 +23,15 @@
         "icon": "template.png",
         "materialize": true,
         "enabled": true,
-        "extIcon": "https://raw.githubusercontent.com/ioBroker/ioBroker.template/master/admin/template.png",
+        "extIcon": "https://github.com/iobroker-community-adapters/ioBroker.hmip/master/admin/homematic.png",
         "keywords": [
             "hardware",
             "homematic",
             "hm"
         ],
-        "readme": "https://github.com/ioBroker/ioBroker.template/blob/master/README.md",
+        "readme": "https://github.com/iobroker-community-adapters/ioBroker.hmip/blob/master/README.md",
         "loglevel": "info",
-        "type": "general",
+        "type": "hardware",
         "license": "MIT",
         "messagebox": false
     },
