@@ -124,7 +124,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         this.subscribeStates('*');
     }
 
-    async _deviceChanged(device) { 
+    async _deviceChanged(device) {
         await Promise.all(this._updateDeviceStates(device));
     }
 
@@ -141,6 +141,16 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 break;
             }
             case 'TEMPERATURE_HUMIDITY_SENSOR_DISPLAY': {
+                    promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.temperatureOffset', device.functionalChannels['1'].temperatureOffset));
+                    promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.actualTemperature', device.functionalChannels['1'].actualTemperature));
+                    promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.setPointTemperature', device.functionalChannels['1'].setPointTemperature));
+                    promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.display', device.functionalChannels['1'].display));
+               
+                break;
+            }
+            default: {
+                this.log.info("not implemented device :" + JSON.stringify(device));
+                break;
             }
         }
         return promises;
@@ -161,13 +171,22 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.info.label', { type: 'state', common: { name: 'type', type: 'string', role: 'indicator', read: true, write: false }, native: {} }));
         switch (device.type) {
             case 'PLUGABLE_SWITCH_MEASURING': {
-                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: 1, parameter: 'switchState'  } }));
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: 1, parameter: 'switchState' } }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.energyCounter', { type: 'state', common: { name: 'energyCounter', type: 'number', role: 'indicator', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.currentPowerConsumption', { type: 'state', common: { name: 'currentPowerConsumption', type: 'number', role: 'indicator', read: true, write: false }, native: {} }));
                 break;
             }
             case 'TEMPERATURE_HUMIDITY_SENSOR_DISPLAY': {
-            }
+                    promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.temperatureOffset', { type: 'state', common: { name: 'temperatureOffset', type: 'number', role: 'indicator', read: true, write: false }, native: {} }));
+                    promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'indicator', read: true, write: false }, native: {} }));
+                    promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'indicator', read: true, write: false }, native: {} }));
+                    promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.display', { type: 'state', common: { name: 'display', type: 'string', role: 'indicator', read: true, write: false }, native: {} }));   
+                    break;
+                }
+                default: {
+                    this.log.info("not implemented device :" + JSON.stringify(device));
+                    break;
+                }
         }
         return promises;
     }
