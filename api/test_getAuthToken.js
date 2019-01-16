@@ -6,7 +6,7 @@ if (!process.argv || !process.argv[0])
 const delay = require('delay');
 
 const apiClass = require('./hm-cloud-api.js');
-const api = new apiClass(process.argv[0]);
+const api = new apiClass(process.argv[0], process.argv[1]);
 
 console.log("------ test start --------");
 
