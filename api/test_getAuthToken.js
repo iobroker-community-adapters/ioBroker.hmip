@@ -1,9 +1,12 @@
 // node --inspect-brk testterminal.js
 
+if (!process.argv || !process.argv[0])
+    console.log("run like this ./test_getAuthToken.js ApGtin [PIN]");
+
 const delay = require('delay');
 
 const apiClass = require('./hm-cloud-api.js');
-const api = new apiClass(process.arg[0]);
+const api = new apiClass(process.argv[0]);
 
 console.log("------ test start --------");
 
