@@ -16,7 +16,7 @@ class HmCloudAPI {
         this.deviceChanged = null;
     }
 
-    parseConfigData(configDataOrApId, pin)
+    parseConfigData(configDataOrApId, pin, deviceId)
     {
         if (typeof configDataOrApId === 'string') {
             this._apSgtin = configDataOrApId.replace(/[^a-fA-F0-9 ]/g, '');
@@ -26,7 +26,7 @@ class HmCloudAPI {
 
             this._urlREST = '';
             this._urlWebSocket = '';
-            this._deviceId = uuidv4();
+            this._deviceId = deviceId || uuidv4();
             this._pin = pin;
         } else {
             this._authToken = configDataOrApId.authToken;
@@ -34,6 +34,7 @@ class HmCloudAPI {
             this._clientId = configDataOrApId.clientId;
             this._apSgtin = configDataOrApId.apSgtin.replace(/[^a-fA-F0-9 ]/g, '');
             this._pin = configDataOrApId.pin;
+            this._deviceId = configDataOrApId.deviceId || uuidv4();
         }
 
         this._clientCharacteristics = {
@@ -58,7 +59,8 @@ class HmCloudAPI {
             'clientAuthToken': this._clientAuthToken,
             'clientId': this._clientId,
             'apSgtin': this._apSgtin,
-            'pin': this._pin
+            'pin': this._pin,
+            'deviceId': this._deviceId 
         }
     }
 

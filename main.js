@@ -90,6 +90,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     async _ready() {
         this.log.debug('ready');
+        this.setState('info.connection', false, true);
+
         if (this.config.accessPointSgtin && this.config.authToken && this.config.clientAuthToken && this.config.clientId) {
             try {
                 await this._startupHomematic();
@@ -125,6 +127,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
         this.log.debug('subscribeStates');
         this.subscribeStates('*');
+
+        this.setState('info.connection', true, true);
     }
 
     async _deviceChanged(device) {
