@@ -15,7 +15,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         super({ ...options, name: adapterName });
 
         this._api = new apiClass();
-        this._api.deviceChanged = this._deviceChanged;
+        this._api.deviceChanged = this._deviceChanged.bind(this);
 
         this.on('unload', this._unload);
         this.on('objectChange', this._objectChange);
@@ -39,11 +39,14 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     async _stateChange(id, state) {
-        let o = await this.getObjectAsync(id);
+        if (!id || !state || state.ack) return;
 
+        let o = await this.getObjectAsync(id);
         if (o.native.parameter) {
+            this.log.info('state change - ' + o.native.parameter + ' - ' + o.native.id);
             switch (o.native.parameter) {
                 case 'switchState':
+
                     this._api.deviceControlSetSwitchState(o.native.id, state.val, o.native.channel)
                     break;
             }
@@ -53,7 +56,6 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     async _message(msg) {
         switch (msg.command) {
             case 'requestToken':
-                console.log('message - requestToken');
                 try {
                     this._api.parseConfigData(this.config.accessPointSgtin, this.config.pin);
                     await this._api.getHomematicHosts();
@@ -111,8 +113,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         this.log.debug('createObjectsForDevices');
         await this._createObjectsForDevices();
         this.log.debug('connectWebsocket');
-        await this._api.connectWebsocket();
-
+        this._api.connectWebsocket();
         this.log.debug('updateDeviceStates');
         let promises = [];
         for (let d in this._api.devices) {
@@ -130,26 +131,25 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _updateDeviceStates(device) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.info.type', device.type));
-        promises.push(this.setStateAsync('devices.' + device.id + '.info.modelType', device.modelType));
-        promises.push(this.setStateAsync('devices.' + device.id + '.info.label', device.label));
+        promises.push(this.setStateAsync('devices.' + device.id + '.info.type', device.type, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.info.modelType', device.modelType, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.info.label', device.label, true));
         switch (device.type) {
             case 'PLUGABLE_SWITCH_MEASURING': {
-                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.on', device.functionalChannels['1'].on));
-                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.energyCounter', device.functionalChannels['1'].energyCounter));
-                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.currentPowerConsumption', device.functionalChannels['1'].currentPowerConsumption));
+                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.on', device.functionalChannels['1'].on, true));
+                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.energyCounter', device.functionalChannels['1'].energyCounter, true));
+                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.currentPowerConsumption', device.functionalChannels['1'].currentPowerConsumption, true));
                 break;
             }
             case 'TEMPERATURE_HUMIDITY_SENSOR_DISPLAY': {
-                    promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.temperatureOffset', device.functionalChannels['1'].temperatureOffset));
-                    promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.actualTemperature', device.functionalChannels['1'].actualTemperature));
-                    promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.setPointTemperature', device.functionalChannels['1'].setPointTemperature));
-                    promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.display', device.functionalChannels['1'].display));
-               
+                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.temperatureOffset', device.functionalChannels['1'].temperatureOffset, true));
+                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.actualTemperature', device.functionalChannels['1'].actualTemperature, true));
+                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.setPointTemperature', device.functionalChannels['1'].setPointTemperature, true));
+                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.display', device.functionalChannels['1'].display, true));
                 break;
             }
             default: {
-                this.log.info("not implemented device :" + JSON.stringify(device));
+                //this.log.info("state - not implemented device :" + JSON.stringify(device.type));
                 break;
             }
         }
@@ -177,16 +177,16 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 break;
             }
             case 'TEMPERATURE_HUMIDITY_SENSOR_DISPLAY': {
-                    promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.temperatureOffset', { type: 'state', common: { name: 'temperatureOffset', type: 'number', role: 'indicator', read: true, write: false }, native: {} }));
-                    promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'indicator', read: true, write: false }, native: {} }));
-                    promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'indicator', read: true, write: false }, native: {} }));
-                    promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.display', { type: 'state', common: { name: 'display', type: 'string', role: 'indicator', read: true, write: false }, native: {} }));   
-                    break;
-                }
-                default: {
-                    this.log.info("not implemented device :" + JSON.stringify(device));
-                    break;
-                }
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.temperatureOffset', { type: 'state', common: { name: 'temperatureOffset', type: 'number', role: 'indicator', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'indicator', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'indicator', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.display', { type: 'state', common: { name: 'display', type: 'string', role: 'indicator', read: true, write: false }, native: {} }));
+                break;
+            }
+            default: {
+                this.log.info("device - not implemented device :" + JSON.stringify(device));
+                break;
+            }
         }
         return promises;
     }

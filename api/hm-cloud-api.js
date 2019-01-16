@@ -115,39 +115,38 @@ class HmCloudAPI {
 
     // =========== Event Handling ===========
 
-    async connectWebsocket() {
-        this._ws = new webSocket(this._urlWebSocket, {
+    connectWebsocket() {
+         this._ws = new webSocket(this._urlWebSocket, {
             headers: {
                 'AUTHTOKEN': this._authToken, 'CLIENTAUTH': this._clientAuthToken
             },
             perMessageDeflate: false
         });
 
-        this._ws.on('open', () => {
-            console.log('opened');
+        this._ws.on('open', () => {          
         });
 
         this._ws.on('close', () => {
-            console.log('closed');
         });
 
         this._ws.on('message', (d) => {
             let dString = d.toString('utf8');
             let data = JSON.parse(dString);
-            console.log(dString);
             this._parseEventdata(data);
         });
     }
 
     _parseEventdata(data) {
-        for (let i in data) {
-            switch (data[i].pushEventType) {
+        for (let i in data.events) {
+            switch (data.events[i].pushEventType) {
                 case 'DEVICE_CHANGED':
-                    this._parseDeviceChangedEvent(data[i].device);
+                    this._parseDeviceChangedEvent(data.events[i].device);
                     break;
                 case 'GROUP_CHANGED':
-                    this._parseDeviceChangedEvent(data[i].group);
+                    this._parseDeviceChangedEvent(data.events[i].group);
                     break;
+                default:
+                   break;
             }
         }
     }
@@ -155,7 +154,7 @@ class HmCloudAPI {
     _parseDeviceChangedEvent(ev) {
         this.devices[ev.id] = ev;
         if (this.deviceChanged)
-            this.deviceChanged(ev);
+            this.deviceChanged(ev); 
     }
 
     _parseGroupChangedEvent(ev) {
