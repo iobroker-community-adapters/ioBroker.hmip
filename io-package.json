@@ -33,7 +33,7 @@
         "loglevel": "info",
         "type": "hardware",
         "license": "MIT",
-        "messagebox": false
+        "messagebox": true
     },
     "native": {
         "authToken": "",

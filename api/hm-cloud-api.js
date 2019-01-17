@@ -19,8 +19,8 @@ class HmCloudAPI {
     parseConfigData(configDataOrApId, pin, deviceId)
     {
         if (typeof configDataOrApId === 'string') {
-            this._apSgtin = configDataOrApId.replace(/[^a-fA-F0-9 ]/g, '');
-            this._clientAuthToken = sha512(this._apSgtin + "jiLpVitHvWnIGD1yo7MA").toUpperCase();
+            this._accessPointSgtin = configDataOrApId.replace(/[^a-fA-F0-9 ]/g, '');
+            this._clientAuthToken = sha512(this._accessPointSgtin + "jiLpVitHvWnIGD1yo7MA").toUpperCase();
             this._authToken = '';
             this._clientId = '';
 
@@ -32,7 +32,7 @@ class HmCloudAPI {
             this._authToken = configDataOrApId.authToken;
             this._clientAuthToken = configDataOrApId.clientAuthToken;
             this._clientId = configDataOrApId.clientId;
-            this._apSgtin = configDataOrApId.apSgtin.replace(/[^a-fA-F0-9 ]/g, '');
+            this._accessPointSgtin = configDataOrApId.accessPointSgtin.replace(/[^a-fA-F0-9 ]/g, '');
             this._pin = configDataOrApId.pin;
             this._deviceId = configDataOrApId.deviceId || uuidv4();
         }
@@ -49,7 +49,7 @@ class HmCloudAPI {
                 "osType": 'Linux',
                 "osVersion": 'NT',
             },
-            "id": this._apSgtin
+            "id": this._accessPointSgtin
         };
     }
 
@@ -58,7 +58,7 @@ class HmCloudAPI {
             'authToken': this._authToken,
             'clientAuthToken': this._clientAuthToken,
             'clientId': this._clientId,
-            'apSgtin': this._apSgtin,
+            'accessPointSgtin': this._accessPointSgtin,
             'pin': this._pin,
             'deviceId': this._deviceId 
         }
@@ -76,7 +76,7 @@ class HmCloudAPI {
         const headers = { 'content-type': 'application/json', 'accept': 'application/json', 'VERSION': '12', 'CLIENTAUTH': this._clientAuthToken };
         if (this._pin)
             headers['PIN'] = this._pin;
-        const body = { "deviceId": this._deviceId, "deviceName": devicename, "sgtin": this._apSgtin };
+        const body = { "deviceId": this._deviceId, "deviceName": devicename, "sgtin": this._accessPointSgtin };
         let res = await rq(this._urlREST + "/hmip/auth/connectionRequest", { method: 'POST', json: true, body: body, headers: headers, simple: false, resolveWithFullResponse: true });
         if (res.statusCode != 200)
             throw "error";

@@ -4,6 +4,7 @@
 
 const utils = require('@iobroker/adapter-core'); // Get common adapter utils
 const apiClass = require('./api/hm-cloud-api.js');
+const delay = require('delay');
 
 const adapterName = require('./package.json').name.split('.').pop();
 
@@ -17,11 +18,15 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         this.on('unload', this._unload);
         this.on('objectChange', this._objectChange);
         this.on('stateChange', this._stateChange);
-        this.on('message', this._message);
+        this.on('message', this._message.bind(this));
         this.on('ready', this._ready);
+
+        this._unloaded = false;
+        this._requestTokenState = { state: 'idle' };
     }
 
     _unload(callback) {
+        this._unloaded = true;
         try {
             this.log.info('cleaned everything up...');
             callback();
@@ -35,35 +40,44 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     async _message(msg) {
+        this.log.debug('message recieved - ' + JSON.stringify(msg));
         switch (msg.command) {
             case 'requestToken':
-                try {
-                    this._api.parseConfigData(this.config.accessPointSgtin, this.config.pin);
-                    await this._api.getHomematicHosts();
-                    await this._api.auth1connectionRequest();
-                    while (!await this._api.auth2isRequestAcknowledged()) {
-                        if (obj.callback)
-                            this.sendTo(obj.from, obj.command, 'waitForBlueButton', obj.callback);
-                        await delay(2000);
-                    }
-                    if (obj.callback)
-                        this.sendTo(obj.from, obj.command, 'confirmToken', obj.callback);
-                    await this._api.auth3requestAuthToken();
-                    let saveData = this._api.getSaveData();
-                    this.config.authToken = saveData.authToken;
-                    this.config.clientAuthToken = saveData.clientAuthToken;
-                    this.config.clientId = saveData.clientId;
-                    this.config.accessPointSgtin = saveData.accessPointSgtin;
-                    this.config.pin = saveData.pin;
-                    if (obj.callback)
-                        this.sendTo(obj.from, obj.command, 'tokenDone', obj.callback);
-                }
-                catch (err) {
-                    if (obj.callback)
-                        this.sendTo(obj.from, obj.command, 'errorOccured', obj.callback);
-                    this.log.error('error requesting token: ' + err);
-                }
+                this._requestTokenState = { state: 'startedTokenCreation' };
+                this.sendTo(msg.from, msg.command, this._requestTokenState, msg.callback);
+                await this._startTokenRequest(msg);
                 break;
+            case 'requestTokenState':
+                this.sendTo(msg.from, msg.command, this._requestTokenState, msg.callback);
+                break;
+        }
+    }
+
+    async _startTokenRequest(msg) {
+        try {
+            this.log.info('started token request');
+            let config = msg.message;
+            this._api.parseConfigData(config.accessPointSgtin, config.pin, config.clientId);
+            await this._api.getHomematicHosts();
+            this.log.info('auth step 1');
+            await this._api.auth1connectionRequest();
+            this.log.info('auth step 2');
+            while (!await this._api.auth2isRequestAcknowledged() && !this._unloaded) {
+                this._requestTokenState = { state: 'waitForBlueButton' };
+                await delay(2000);
+            }
+            if (!this._unloaded) {
+                this._requestTokenState = { state: 'confirmToken' };
+                this.log.info('auth step 3');
+                await this._api.auth3requestAuthToken();
+                let saveData = this._api.getSaveData();
+                saveData.state = 'tokenCreated';
+                this._requestTokenState = saveData;
+            }
+        }
+        catch (err) {
+            this._requestTokenState = { state: 'errorOccured' };
+            this.log.error('error requesting token: ' + err);
         }
     }
 
@@ -88,7 +102,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             authToken: this.config.authToken,
             clientAuthToken: this.config.clientAuthToken,
             clientId: this.config.clientId,
-            apSgtin: this.config.accessPointSgtin,
+            accessPointSgtin: this.config.accessPointSgtin,
             pin: this.config.pin
         });
         await this._api.getHomematicHosts();

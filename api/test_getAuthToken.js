@@ -1,7 +1,7 @@
 // node --inspect-brk testterminal.js
 
 if (!process.argv || !process.argv[2])
-    console.log("run like this ./test_getAuthToken.js ACCESSPOINTGTIN [PIN]");
+    console.log("run like this \"node test_getAuthToken.js ACCESSPOINTGTIN [PIN]\"");
 
 const delay = require('delay');
 

@@ -1,18 +1,19 @@
 <html>
 
 <head>
-    <!-- these 4 files always have to be included -->
     <link rel="stylesheet" type="text/css" href="../../lib/css/materialize.css">
     <link rel="stylesheet" type="text/css" href="../../css/adapter.css" />
 
     <script type="text/javascript" src="../../lib/js/jquery-3.2.1.min.js"></script>
     <script type="text/javascript" src="../../socket.io/socket.io.js"></script>
 
-    <!-- these files always have to be included -->
     <script type="text/javascript" src="../../js/translate.js"></script>
     <script type="text/javascript" src="../../lib/js/materialize.js"></script>
     <script type="text/javascript" src="../../js/adapter-settings.js"></script>
+
     <script type="text/javascript" src="words.js"></script>
+
+    <script type="text/javascript" src="uuid.js"></script>
     <style>
         .m .col .select-wrapper+label {
    top: -26px;  
@@ -21,21 +22,63 @@
          font-size: 0.9em;
      }
  </style>
-    <!-- you have to define 2 functions in the global scope: -->
     <script type="text/javascript">
 
+        function handleResponse(response) {
+            switch (response.state) {
+                case 'startedTokenCreation':
+                    $('#deviceInfo').text('started token creation');
+                    return true;
+                case 'waitForBlueButton':
+                    $('#deviceInfo').text('press blue button on accesspoint');
+                    return true;
+                case 'confirmToken':
+                    $('#deviceInfo').text('confirming token');
+                    return true;
+                case 'errorOccured':
+                    $('#deviceInfo').text('error occured during token generation, log at the logs');
+                    break;
+                case 'idle':
+                    $('#deviceInfo').text('press "start token creation"');
+                    break;
+                case 'tokenCreated': {
+                    $('#authToken').val(response.authToken);
+                    $('#clientAuthToken').val(response.clientAuthToken);
+                    $('#clientId').val(response.clientId);
+                    $('#deviceInfo').text('token created, save settinghs to use your accesspoint');
+                    break;
+                }
+            }
+            return false;
+        }
         function requestToken() {
-            sendTo(null, 'requestToken', null, function (response) {
-                //var text = sprintf(systemDictionary['StatusInfo'][systemLang], response.result.devices, response.result.devicesConnected, response.result.devicesWithSchema, response.result.devicesWithLocalKey);
-                //$('#deviceInfo').text(text);
+            let accessPointSgtin = $('#accessPointSgtin').val();
+            let clientId = $('#clientId').val();
+            let pin = $('#pin').val();
+            let config = {
+                'accessPointSgtin': accessPointSgtin,
+                'clientId': clientId,
+                'pin': pin
+            }
+            $('#deviceInfo').text('started token creation');
+            sendTo(null, 'requestToken', config, function (response) {
+                if (handleResponse(response))
+                    sendrequestTokenState();
             });
-            //setTimeout(getDeviceInfos, 60000);
+        }
+
+        function sendrequestTokenState() {
+            sendTo(null, 'requestTokenState', null, function (response) {
+                if (handleResponse(response))
+                    sendrequestTokenState();
+            });
         }
 
         // the function loadSettings has to exist ...
         function load(settings, onChange) {
             // example: select elements with id=key and class=value and insert value
             if (!settings) return;
+            if (settings.deviceId === undefined) settings.deviceId = UUID.genV4();
             $('.value').each(function () {
                 var $key = $(this);
                 var id = $key.attr('id');
@@ -72,52 +115,107 @@
             });
             callback(obj);
         }
+
+        setTimeout(() => sendrequestTokenState(), 2000);
     </script>
+
+    <style>
+        .sub-title {
+            padding: 0.5rem;
+            background: #2196f3;
+            color: white;
+        }
+    </style>
+
 </head>
 
 <body>
     <!-- you have to put your config page in a div with id adapter-container -->
     <div class="m adapter-container">
         <div class="row">
-            <!-- Forms are the standard way to receive user inputted data.
-         Learn more http://materializecss.com/forms.html-->
             <div class="row">
                 <div class="input-field col s6">
                     <img src="homematic.png" class="logo">
                 </div>
-            </div>
-            <div class="row">
-                <div class="input-field col s12 m6 l4">
-                    <input class="value" id="accessPointSgtin" type="text">
-                    <label for="accessPointSgtin">AccessPoint SGTIN</label>
-                    <span class="translate">AccessPoint SGTIN</span>
-                </div>
-                <div class="input-field col s12 m6 l4">
-                    <input class="value" id="pin" type="text">
-                    <label for="pin">AccessPoint PIN</label>
-                    <span class="translate">AccessPoint PIN</span>
+                <div class="col s12">
+                    <p class="translate">caution - this adapter is only for communication with a homatic ip cloud
+                        accesspoint</p>
                 </div>
             </div>
+
+
+
             <div class="row">
-                <div class="input-field col s12 m6 l4">
-                    <input class="value" id="authToken" type="text">
-                    <label for="authToken">authToken</label>
-                    <span class="translate">authToken</span>
-                </div>
-                <div class="input-field col s12 m6 l4">
-                    <input class="value" id="clientAuthToken" type="text">
-                    <label for="clientAuthToken">clientAuthToken</label>
-                    <span class="translate">clientAuthToken</span>
-                </div>
-                <div class="input-field col s12 m6 l4">
-                    <input class="value" id="clientId" type="text">
-                    <label for="clientId">clientId</label>
-                    <span class="translate">clientId</span>
+                <div class="col s12">
+                    <h6 class="translate sub-title">Create HomematicIP Token</h6>
                 </div>
             </div>
             <div class="row">
                 <div class="col s12">
-                    <p class="translate">on save adapter restarts with new config immediately</p>
+                    <p class="translate">enter accessPointSgtin, pin here</p>
+                    <p class="translate">and press "start token creation"</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12">
+                    <input class="value" id="accessPointSgtin" /><label for="accessPointSgtin" class="translate">accesspoint
+                        sgtin</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12">
+                    <p class="translate">id for your homatic device, leave empty or reuse already created one (if you
+                        remove adapter and install again)</p>
+                    <input class="value" id="deviceId" /><label for="deviceId" class="translate">device id</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12">
+                    <input class="value" id="pin" /><label for="pin" class="translate">pin</label>
+                </div>
+                <div class="col s12 m6 l4">
+                    <button id="table-button-create" class="waves-effect waves-light btn" style="margin-top: 20px;"
+                        onclick="requestToken()"><span class="translate">start token creation</span></button>
+                </div>
+                <div id="deviceInfo" class="col s12 m6 l4" style="background: lightgrey; height: 60px; color:black; display: flex; justify-content: center; align-items: center;"
+                    class="translate">
+                    press "start token creation"
+                </div>
+            </div>
+
+
+            <div class="section">
+                <div class="row">
+                    <div class="col s12">
+                        <h6 class="translate sub-title">Token Data</h6>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s12">
+                        <p class="translate">normaly filled by token creation</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s12 m6 l4">
+                        <input class="value" id="authToken" type="text">
+                        <label for="authToken">authToken</label>
+                        <span class="translate">authToken</span>
+                    </div>
+                    <div class="input-field col s12 m6 l4">
+                        <input class="value" id="clientAuthToken" type="text">
+                        <label for="clientAuthToken">clientAuthToken</label>
+                        <span class="translate">clientAuthToken</span>
+                    </div>
+                    <div class="input-field col s12 m6 l4">
+                        <input class="value" id="clientId" type="text">
+                        <label for="clientId">clientId</label>
+                        <span class="translate">clientId</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col s12">
+                        <p class="translate">on save adapter restarts with new config immediately</p>
+                    </div>
                 </div>
             </div>
         </div>
