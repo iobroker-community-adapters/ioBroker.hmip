@@ -4,15 +4,42 @@
         "version": "0.0.1",
         "news": {
             "0.0.1": {
-                "en": "initial release"
+                "en": "initial release",
+                "de": "Erstveröffentlichung",
+                "ru": "Первый выпуск",
+                "pt": "lançamento inicial",
+                "nl": "Eerste uitgave",
+                "fr": "Première version",
+                "it": "Versione iniziale",
+                "es": "Versión inicial",
+                "pl": "Pierwsze wydanie",
+                "zh-cn": "初始发行"
             }
         },
         "title": "HomeMaticIP Cloud AccessPoint",
         "titleLang": {
-            "en": "HomeMaticIP Cloud AccessPoint"
+            "en": "HomeMaticIP Cloud AccessPoint",
+            "de": "HomeMatic IP Cloud-Zugriffspunkt",
+            "ru": "Точка доступа HomeMatic IP Cloud",
+            "pt": "Ponto de acesso da nuvem IP da HomeMatic",
+            "nl": "HomeMatic IP Cloud Access Point",
+            "fr": "Point d'accès IP HomeMatic Cloud",
+            "it": "HomeMatic IP Cloud Access Point",
+            "es": "Punto de acceso HomeMatic IP Cloud",
+            "pl": "Punkt dostępu do chmury internetowej HomeMatic",
+            "zh-cn": "HomeMatic IP云接入点"
         },
         "desc": {
-            "en": "HomeMaticIP Cloud AccessPoint"
+            "en": "HomeMaticIP Cloud AccessPoint",
+            "de": "HomeMatic IP Cloud-Zugriffspunkt",
+            "ru": "Точка доступа HomeMatic IP Cloud",
+            "pt": "Ponto de acesso da nuvem IP da HomeMatic",
+            "nl": "HomeMatic IP Cloud Access Point",
+            "fr": "Point d'accès IP HomeMatic Cloud",
+            "it": "HomeMatic IP Cloud Access Point",
+            "es": "Punto de acceso HomeMatic IP Cloud",
+            "pl": "Punkt dostępu do chmury internetowej HomeMatic",
+            "zh-cn": "HomeMatic IP云接入点"
         },
         "authors": [
             "jogibear9988 <jochen.kuehner@gmx.de>"

@@ -1,0 +1,17 @@
+{
+    "on save adapter restarts with new config immediately": "при сохранении адаптер перезапускается с новым конфигом немедленно",
+    "normaly filled by token creation": "обычно заполненный созданием токена",
+    "token data": "данные токена",
+    "press \"start token creation\"": "нажмите \"начать создание токена\"",
+    "start token creation": "начать создание токена",
+    "id for your homatic device, leave empty or reuse already created one (if you remove adapter and install again)": "идентификатор вашего homatic-устройства, оставьте пустым или повторно используйте уже созданный (если вы удалите адаптер и установите заново)",
+    "enter accessPointSgtin & pin here": "введите accessPointSgtin и закрепите здесь",
+    "and press \"start token creation\"": "и нажмите «начать создание токена»",
+    "create HomematicIP token": "создать токен HomematicIP",
+    "caution - this adapter is only for communication with a homatic ip cloudaccesspoint": "осторожно - этот адаптер предназначен только для связи с домашней точкой IP-облака homematic",
+    "started token creation": "началось создание токена",
+    "press blue button on accesspoint": "нажмите синюю кнопку на точке доступа",
+    "confirming token": "подтверждающий токен",
+    "error occured during token generation, look at the logs": "во время генерации токена произошла ошибка, посмотрите логи",
+    "token created, save settings to use your accesspoint": "токен создан, сохраните настройки для использования вашей точки доступа"
+}

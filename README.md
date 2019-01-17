@@ -11,6 +11,9 @@
 ## Description
 This adapter allows to Communicate with a HomaticIP CloudAccessPoint via the Rest API of the Homatic Cloud
 
+## Installation
+This Adapter needs node-js in version >= 8.0
+
 ## Settings
 * specify the your SGTIN and the PIN of your Accesspoint, and validate via press of the blue Button. This will create a Authentication token.
 

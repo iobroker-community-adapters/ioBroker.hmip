@@ -46,6 +46,7 @@
                     $('#clientAuthToken').val(response.clientAuthToken);
                     $('#clientId').val(response.clientId);
                     $('#deviceInfo').text('token created, save settings to use your accesspoint');
+                    M.updateTextFields();
                     break;
                 }
             }

@@ -1,0 +1,17 @@
+{
+    "on save adapter restarts with new config immediately": "保存适配器立即重新启动新配置",
+    "normaly filled by token creation": "通过令牌创建来填充",
+    "token data": "令牌数据",
+    "press \"start token creation\"": "按“开始令牌创建”",
+    "start token creation": "开始令牌创建",
+    "id for your homatic device, leave empty or reuse already created one (if you remove adapter and install again)": "您的homatic设备的ID，留空或重新使用已创建的设备（如果您删除适配器并再次安装）",
+    "enter accessPointSgtin & pin here": "在这里输入accessPointSgtin＆pin",
+    "and press \"start token creation\"": "并按“开始令牌创建”",
+    "create HomematicIP token": "创建HomematicIP令牌",
+    "caution - this adapter is only for communication with a homatic ip cloudaccesspoint": "注意 - 此适配器仅用于与主题IP云访问点进行通信",
+    "started token creation": "开始令牌创建",
+    "press blue button on accesspoint": "按接入点上的蓝色按钮",
+    "confirming token": "确认令牌",
+    "error occured during token generation, look at the logs": "在令牌生成期间发生错误，请查看日志",
+    "token created, save settings to use your accesspoint": "已创建令牌，保存设置以使用您的接入点"
+}
