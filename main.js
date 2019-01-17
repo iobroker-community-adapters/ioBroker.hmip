@@ -34,23 +34,6 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         this.log.info('objectChange ' + id + ' ' + JSON.stringify(obj));
     }
 
-    async _stateChange(id, state) {
-        if (!id || !state || state.ack) return;
-
-        let o = await this.getObjectAsync(id);
-        if (o.native.parameter) {
-            this.log.info('state change - ' + o.native.parameter + ' - ' + o.native.id);
-            switch (o.native.parameter) {
-                case 'switchState':
-                    this._api.deviceControlSetSwitchState(o.native.id, state.val, o.native.channel)
-                    break;
-                case 'resetEnergyCounter':
-                    this._api.deviceControlResetEnergyCounter(o.native.id, o.native.channel)
-                    break;
-            }
-        }
-    }
-
     async _message(msg) {
         switch (msg.command) {
             case 'requestToken':
@@ -128,6 +111,26 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         this.log.info('hmip adapter connected and ready');
     }
 
+    async _stateChange(id, state) {
+        if (!id || !state || state.ack) return;
+
+        let o = await this.getObjectAsync(id);
+        if (o.native.parameter) {
+            this.log.info('state change - ' + o.native.parameter + ' - ' + o.native.id);
+            switch (o.native.parameter) {
+                case 'switchState':
+                    this._api.deviceControlSetSwitchState(o.native.id, state.val, o.native.channel)
+                    break;
+                case 'resetEnergyCounter':
+                    this._api.deviceControlResetEnergyCounter(o.native.id, o.native.channel)
+                    break;
+                case 'setPointTemperature':
+                    this._api.deviceConfigurationSetPointTemperature(o.native.id, state.val, o.native.channel)
+                    break;
+            }
+        }
+    }
+
     async _deviceChanged(device) {
         await Promise.all(this._updateDeviceStates(device));
     }
@@ -200,7 +203,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             case 'TEMPERATURE_HUMIDITY_SENSOR_DISPLAY': {
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.temperatureOffset', { type: 'state', common: { name: 'temperatureOffset', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'thermo', read: true, write: true }, native: { id: device.id, channel: 1, parameter: 'setPointTemperature' } }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.display', { type: 'state', common: { name: 'display', type: 'string', role: 'info', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.humidity', { type: 'state', common: { name: 'humidity', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
                 break;
@@ -213,13 +216,13 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             case 'PUSH_BUTTON_6':
             case 'OPEN_COLLECTOR_8_MODULE':
             case 'REMOTE_CONTROL_8': {
-                    let max = 1;
-                    for (let i in device.functionalChannels) {
-                        if (i != 0)
-                            promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + i + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: i, parameter: 'switchState' } }));
-                    }
-                    break;
+                let max = 1;
+                for (let i in device.functionalChannels) {
+                    if (i != 0)
+                        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + i + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: i, parameter: 'switchState' } }));
                 }
+                break;
+            }
 
             default: {
                 this.log.debug("device - not implemented device :" + JSON.stringify(device));

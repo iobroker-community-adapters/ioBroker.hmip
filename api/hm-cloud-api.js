@@ -175,7 +175,7 @@ class HmCloudAPI {
         await this.callRestApi('device/control/resetEnergyCounter', data);
     }
 
-    async deviceControlsetDimLevel(deviceId, dimLevel, channelIndex = 1) {
+    async deviceControlSetDimLevel(deviceId, dimLevel, channelIndex = 1) {
         let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'dimLevel': dimLevel };
         await this.callRestApi('device/control/setDimLevel', data);
     }
@@ -188,6 +188,41 @@ class HmCloudAPI {
     async deviceControlStop(deviceId, channelIndex = 1) {
         let data = { "deviceId": deviceId, "channelIndex": channelIndex };
         await this.callRestApi('device/control/stop', data);
+    }
+
+    //todo check -> does not work atm
+    async deviceConfigurationSetPointTemperature(deviceId, setPointTemperature, channelIndex = 1) {
+        let data = { "deviceId": deviceId, "setPointTemperature": setPointTemperature, "channelIndex": channelIndex };
+        await this.callRestApi('device/configuration/setSetPointTemperature', data);
+    }
+
+
+
+    async deviceConfigurationSetRouterModuleEnabled(deviceId, routerModuleEnabled, channelIndex = 1) {
+        let data = { "deviceId": deviceId, "routerModuleEnabled": routerModuleEnabled, "channelIndex": channelIndex };
+        await this.callRestApi('device/configuration/setRouterModuleEnabled', data);
+    }
+
+
+
+    async deviceDeleteDevice(deviceId) {
+        let data = { "deviceId": deviceId };
+        await this.callRestApi('device/deleteDevice', data);
+    }
+
+    async deviceSetDeviceLabel(deviceId, label) {
+        let data = { "deviceId": deviceId, "label": label };
+        await this.callRestApi('device/setDeviceLabel', data);
+    }
+
+    async deviceIsUpdateApplicable(deviceId) {
+        let data = { "deviceId": deviceId };
+        await this.callRestApi('device/isUpdateApplicable', data);
+    }
+
+    async deviceAuthorizeUpdate(deviceId) {
+        let data = { "deviceId": deviceId };
+        await this.callRestApi('device/authorizeUpdate', data);
     }
 };
 
