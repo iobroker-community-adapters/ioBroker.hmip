@@ -13,7 +13,7 @@ class HmCloudAPI {
             this.parseConfigData(configDataOrApId, pin);
         }
         
-        this.deviceChanged = null;
+        this.eventRaised = null;
     }
 
     parseConfigData(configDataOrApId, pin, deviceId)
@@ -140,27 +140,36 @@ class HmCloudAPI {
 
     _parseEventdata(data) {
         for (let i in data.events) {
-            switch (data.events[i].pushEventType) {
+            let ev = data.events[i];
+            switch (ev.pushEventType) {
+                case 'DEVICE_ADDED':
                 case 'DEVICE_CHANGED':
-                    this._parseDeviceChangedEvent(data.events[i].device);
+                    this.devices[ev.device.id] = ev.device;
                     break;
+                case 'GROUP_ADDED':
                 case 'GROUP_CHANGED':
-                    this._parseDeviceChangedEvent(data.events[i].group);
+                    this.groups[ev.group.id] = ev.group;
                     break;
-                default:
-                   break;
+                case 'CLIENT_ADDED':
+                case 'CLIENT_CHANGED':
+                    this.clients[ev.client.id] = ev.client;
+                    break;
+                case 'DEVICE_REMOVED':
+                    delete this.devices[ev.device.id];
+                    break;
+                case 'GROUP_REMOVED':
+                    delete this.clients[ev.group.id];
+                    break;
+                case 'CLIENT_REMOVED':
+                    delete this.groups[ev.client.id];
+                    break;
+                case 'HOME_CHANGED':
+                    this.home = ev.home;
+                    break;
             }
+            if (this.eventRaised)
+                this.eventRaised(ev);
         }
-    }
-
-    _parseDeviceChangedEvent(ev) {
-        this.devices[ev.id] = ev;
-        if (this.deviceChanged)
-            this.deviceChanged(ev); 
-    }
-
-    _parseGroupChangedEvent(ev) {
-        this.groups[ev.id] = ev;
     }
 
     // =========== API for HM Devices ===========
@@ -223,6 +232,13 @@ class HmCloudAPI {
     async deviceAuthorizeUpdate(deviceId) {
         let data = { "deviceId": deviceId };
         await this.callRestApi('device/authorizeUpdate', data);
+    }
+
+
+
+    async clientDeleteClient(clientId) {
+        let data = { "clientId": clientId };
+        await this.callRestApi('client/deleteClient', data);
     }
 };
 

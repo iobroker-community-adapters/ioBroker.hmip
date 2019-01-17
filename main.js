@@ -13,12 +13,12 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         super({ ...options, name: adapterName });
 
         this._api = new apiClass();
-        this._api.deviceChanged = this._deviceChanged.bind(this);
+        this._api.eventRaised = this._eventRaised.bind(this);
 
         this.on('unload', this._unload);
         this.on('objectChange', this._objectChange);
         this.on('stateChange', this._stateChange);
-        this.on('message', this._message.bind(this));
+        this.on('message', this._message);
         this.on('ready', this._ready);
 
         this._unloaded = false;
@@ -109,6 +109,12 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         await this._api.loadCurrentConfig();
         this.log.debug('createObjectsForDevices');
         await this._createObjectsForDevices();
+        this.log.debug('createObjectsForGroups');
+        await this._createObjectsForGroups();
+        this.log.debug('createObjectsForClients');
+        await this._createObjectsForClients();
+        this.log.debug('createObjectsForHome');
+        await this._createObjectsForHome();
         this.log.debug('connectWebsocket');
         this._api.connectWebsocket();
         this.log.debug('updateDeviceStates');
@@ -116,6 +122,13 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         for (let d in this._api.devices) {
             promises.push(...this._updateDeviceStates(this._api.devices[d]));
         }
+        for (let g in this._api.groups) {
+            promises.push(...this._updateGroupStates(this._api.groups[g]));
+        }
+        for (let c in this._api.clients) {
+            promises.push(...this._updateClientStates(this._api.clients[c]));
+        }
+        promises.push(...this._updateHomeStates(this._api.home));
         await Promise.all(promises);
 
         this.log.debug('subscribeStates');
@@ -145,8 +158,39 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         }
     }
 
-    async _deviceChanged(device) {
-        await Promise.all(this._updateDeviceStates(device));
+    async _eventRaised(ev) {
+        switch (ev.pushEventType) {
+            case 'DEVICE_ADDED':
+                await Promise.all(this._createObjectsForDevice(ev.device));
+                await Promise.all(this._updateDeviceStates(ev.device));
+                break;
+            case 'DEVICE_CHANGED':
+                await Promise.all(this._updateDeviceStates(ev.device));
+                break;
+            case 'GROUP_ADDED':
+                await Promise.all(this._createObjectsForGroup(ev.group));
+                await Promise.all(this._updateGroupStates(ev.group));
+                break;
+            case 'GROUP_CHANGED':
+                await Promise.all(this._updateGroupStates(ev.group));
+                break;
+            case 'CLIENT_ADDED':
+                await Promise.all(this._createObjectsForClient(ev.client));
+                await Promise.all(this._updateClientStates(ev.client));
+                break;
+            case 'CLIENT_CHANGED':   
+                await Promise.all(this._updateClientStates(ev.client));
+                break;
+            case 'DEVICE_REMOVED':
+                break;
+            case 'GROUP_REMOVED':
+                break;
+            case 'CLIENT_REMOVED':
+                break;
+            case 'HOME_CHANGED':
+                await Promise.all(this._updateHomeStates(ev.home));
+                break;
+        }
     }
 
     _updateDeviceStates(device) {
@@ -192,6 +236,27 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         return promises;
     }
 
+    _updateGroupStates(group) {
+        this.log.silly("_updateGroupStates - " + JSON.stringify(group));
+        let promises = [];
+        promises.push(this.setStateAsync('groups.' + group.id + '.info.type', group.type, true));
+        promises.push(this.setStateAsync('groups.' + group.id + '.info.label', group.label, true));
+        return promises;
+    }
+
+    _updateClientStates(client) {
+        this.log.silly("_updateClientStates - " + JSON.stringify(client));
+        let promises = [];
+        promises.push(this.setStateAsync('clients.' + client.id + '.info.label', client.label, true));
+        return promises;
+    }
+
+    _updateHomeStates(home) {
+        this.log.silly("_updateHomeStates - " + JSON.stringify(home));
+        let promises = [];
+        return promises;
+    }
+
     async _createObjectsForDevices() {
         let promises = [];
         for (let i in this._api.devices) {
@@ -200,14 +265,32 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         await Promise.all(promises);
     }
 
+    async _createObjectsForGroups() {
+        let promises = [];
+        for (let i in this._api.groups) {
+            promises.push(...this._createObjectsForGroup(this._api.groups[i]));
+        }
+        await Promise.all(promises);
+    }
+
+    async _createObjectsForClients() {
+        let promises = [];
+        for (let i in this._api.clients) {
+            promises.push(...this._createObjectsForClient(this._api.clients[i]));
+        }
+        await Promise.all(promises);
+    }
+
     _createObjectsForDevice(device) {
         this.log.silly("createObjectsForDevice - " + device.type + " - " + JSON.stringify(device));
         let promises = [];
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id, { type: 'device', common: {}, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.info.type', { type: 'state', common: { name: 'type', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.info.modelType', { type: 'state', common: { name: 'type', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.info.label', { type: 'state', common: { name: 'type', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         switch (device.type) {
             case 'PLUGABLE_SWITCH_MEASURING': {
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1', { type: 'channel', common: {}, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: 1, parameter: 'switchState' } }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.energyCounter', { type: 'state', common: { name: 'energyCounter', type: 'number', role: 'info', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.currentPowerConsumption', { type: 'state', common: { name: 'currentPowerConsumption', type: 'number', role: 'info', read: true, write: false }, native: {} }));
@@ -215,6 +298,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 break;
             }
             case 'TEMPERATURE_HUMIDITY_SENSOR_DISPLAY': {
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1', { type: 'channel', common: {}, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.temperatureOffset', { type: 'state', common: { name: 'temperatureOffset', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'thermo', read: true, write: true }, native: { id: device.id, channel: 1, parameter: 'setPointTemperature' } }));
@@ -233,7 +317,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 let max = 1;
                 for (let i in device.functionalChannels) {
                     if (i != 0)
-                        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + i + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: i, parameter: 'switchState' } }));
+                    promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + i, { type: 'channel', common: {}, native: {} }));
+                    promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + i + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: i, parameter: 'switchState' } }));
                 }
                 break;
             }
@@ -246,6 +331,28 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         return promises;
     }
 
+    _createObjectsForGroup(group) {
+        this.log.silly("createObjectsForGroup - " + JSON.stringify(group));
+        let promises = [];
+        promises.push(this.setObjectNotExistsAsync('groups.' + group.id, { type: 'device', common: {}, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.info.type', { type: 'state', common: { name: 'type', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.info.label', { type: 'state', common: { name: 'label', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
+    _createObjectsForClient(client) {
+        this.log.silly("createObjectsForClient - " + JSON.stringify(client));
+        let promises = [];
+        promises.push(this.setObjectNotExistsAsync('clients.' + client.id, { type: 'device', common: {}, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('clients.' + client.id + '.info.label', { type: 'state', common: { name: 'label', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
+    _createObjectsForHome(home) {
+        this.log.silly("createObjectsForHome - " + JSON.stringify(home));
+        let promises = [];
+        return promises;
+    }
 };
 
 // If started as allInOne/compact mode => return function to create instance

@@ -14,6 +14,13 @@ This adapter allows to Communicate with a HomaticIP CloudAccessPoint via the Res
 ## Installation
 This Adapter needs node-js in version >= 8.0
 
+## Info
+At the Moment only a few Devices are supported.
+
+I will improve it, but it will take time. For not working devices, please create an issue (one per device).
+Then switch adapter logging to silly mode and add the json of the device wich is printed to the log.
+I may also need a json of a state change.
+
 ## Settings
 * specify the your SGTIN and the PIN of your Accesspoint, and validate via press of the blue Button. This will create a Authentication token.
 
