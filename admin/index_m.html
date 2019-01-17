@@ -36,7 +36,7 @@
                     $('#deviceInfo').text('confirming token');
                     return true;
                 case 'errorOccured':
-                    $('#deviceInfo').text('error occured during token generation, log at the logs');
+                    $('#deviceInfo').text('error occured during token generation, look at the logs');
                     break;
                 case 'idle':
                     $('#deviceInfo').text('press "start token creation"');
@@ -45,7 +45,7 @@
                     $('#authToken').val(response.authToken);
                     $('#clientAuthToken').val(response.clientAuthToken);
                     $('#clientId').val(response.clientId);
-                    $('#deviceInfo').text('token created, save settinghs to use your accesspoint');
+                    $('#deviceInfo').text('token created, save settings to use your accesspoint');
                     break;
                 }
             }
@@ -138,8 +138,7 @@
                     <img src="homematic.png" class="logo">
                 </div>
                 <div class="col s12">
-                    <p class="translate">caution - this adapter is only for communication with a homatic ip cloud
-                        accesspoint</p>
+                    <p class="translate">caution - this adapter is only for communication with a homatic ip cloudaccesspoint</p>
                 </div>
             </div>
 
@@ -147,12 +146,12 @@
 
             <div class="row">
                 <div class="col s12">
-                    <h6 class="translate sub-title">Create HomematicIP Token</h6>
+                    <h6 class="translate sub-title">create HomematicIP token</h6>
                 </div>
             </div>
             <div class="row">
                 <div class="col s12">
-                    <p class="translate">enter accessPointSgtin, pin here</p>
+                    <p class="translate">enter accessPointSgtin & pin here</p>
                     <p class="translate">and press "start token creation"</p>
                 </div>
             </div>
@@ -164,8 +163,7 @@
             </div>
             <div class="row">
                 <div class="col s12">
-                    <p class="translate">id for your homatic device, leave empty or reuse already created one (if you
-                        remove adapter and install again)</p>
+                    <p class="translate">id for your homatic device, leave empty or reuse already created one (if you remove adapter and install again)</p>
                     <input class="value" id="deviceId" /><label for="deviceId" class="translate">device id</label>
                 </div>
             </div>
@@ -187,7 +185,7 @@
             <div class="section">
                 <div class="row">
                     <div class="col s12">
-                        <h6 class="translate sub-title">Token Data</h6>
+                        <h6 class="translate sub-title">token data</h6>
                     </div>
                 </div>
                 <div class="row">
