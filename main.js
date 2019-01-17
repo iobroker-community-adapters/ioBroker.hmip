@@ -2,14 +2,11 @@
 /*jslint node: true */
 'use strict';
 
-// you have to require the utils module and call adapter function
 const utils = require('@iobroker/adapter-core'); // Get common adapter utils
 const apiClass = require('./api/hm-cloud-api.js');
 
-// read the adapter name from package.json
 const adapterName = require('./package.json').name.split('.').pop();
 
-// define adapter class wich will be used for communication with controller
 class HmIpCloudAccesspointAdapter extends utils.Adapter {
     constructor(options) {
         super({ ...options, name: adapterName });
@@ -34,7 +31,6 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     _objectChange(id, obj) {
-        // Warning, obj can be null if it was deleted
         this.log.info('objectChange ' + id + ' ' + JSON.stringify(obj));
     }
 
@@ -129,6 +125,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         this.subscribeStates('*');
 
         this.setState('info.connection', true, true);
+        this.log.info('hmip adapter connected and ready');
     }
 
     async _deviceChanged(device) {
@@ -136,6 +133,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     _updateDeviceStates(device) {
+        this.log.silly("updateDeviceStates - " + device.type + " - " + JSON.stringify(device));
         let promises = [];
         promises.push(this.setStateAsync('devices.' + device.id + '.info.type', device.type, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.info.modelType', device.modelType, true));
@@ -154,8 +152,21 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.display', device.functionalChannels['1'].display, true));
                 break;
             }
+            case 'SHUTTER_CONTACT': {
+                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.windowState', device.functionalChannels['1'].windowState == 'OPEN' ? 'open' : 'close', true));
+                break;
+            }
+            case 'PUSH_BUTTON':
+            case 'PUSH_BUTTON_6': {
+                let max = 1;
+                if (device.type == 'PUSH_BUTTON_6')
+                    max = 6;
+                for (let i = 1; i <= max; i++) {
+                    promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + i + '.on', device.functionalChannels[i].on, true));
+                }
+                break;
+            }
             default: {
-                //this.log.info("state - not implemented device :" + JSON.stringify(device.type));
                 break;
             }
         }
@@ -171,6 +182,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     _createObjectsForDevice(device) {
+        this.log.silly("createObjectsForDevice - " + device.type + " - " + JSON.stringify(device));
         let promises = [];
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.info.type', { type: 'state', common: { name: 'type', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.info.modelType', { type: 'state', common: { name: 'type', type: 'string', role: 'info', read: true, write: false }, native: {} }));
@@ -188,6 +200,10 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.display', { type: 'state', common: { name: 'display', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+                break;
+            }
+            case 'SHUTTER_CONTACT': {
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.windowState', { type: 'state', common: { name: 'windowOpen', type: 'string', role: 'sensor.window', read: true, write: false }, native: {} }));
                 break;
             }
             case 'PUSH_BUTTON':
