@@ -150,6 +150,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.actualTemperature', device.functionalChannels['1'].actualTemperature, true));
                 promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.setPointTemperature', device.functionalChannels['1'].setPointTemperature, true));
                 promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.display', device.functionalChannels['1'].display, true));
+                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.humidity', device.functionalChannels['1'].humidity, true));
                 break;
             }
             case 'SHUTTER_CONTACT': {
@@ -157,12 +158,13 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 break;
             }
             case 'PUSH_BUTTON':
-            case 'PUSH_BUTTON_6': {
+            case 'PUSH_BUTTON_6':
+            case 'OPEN_COLLECTOR_8_MODULE':
+            case 'REMOTE_CONTROL_8': {
                 let max = 1;
-                if (device.type == 'PUSH_BUTTON_6')
-                    max = 6;
-                for (let i = 1; i <= max; i++) {
-                    promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + i + '.on', device.functionalChannels[i].on, true));
+                for (let i in device.functionalChannels) {
+                    if (i != 0)
+                        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + i + '.on', device.functionalChannels[i].on, true));
                 }
                 break;
             }
@@ -200,6 +202,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.display', { type: 'state', common: { name: 'display', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.humidity', { type: 'state', common: { name: 'humidity', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
                 break;
             }
             case 'SHUTTER_CONTACT': {
@@ -207,15 +210,16 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 break;
             }
             case 'PUSH_BUTTON':
-            case 'PUSH_BUTTON_6': {
-                let max = 1;
-                if (device.type == 'PUSH_BUTTON_6')
-                    max = 6;
-                for (let i = 1; i <= max; i++) {
-                    promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + i + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: i, parameter: 'switchState' } }));
+            case 'PUSH_BUTTON_6':
+            case 'OPEN_COLLECTOR_8_MODULE':
+            case 'REMOTE_CONTROL_8': {
+                    let max = 1;
+                    for (let i in device.functionalChannels) {
+                        if (i != 0)
+                            promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + i + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: i, parameter: 'switchState' } }));
+                    }
+                    break;
                 }
-                break;
-            }
 
             default: {
                 this.log.debug("device - not implemented device :" + JSON.stringify(device));
