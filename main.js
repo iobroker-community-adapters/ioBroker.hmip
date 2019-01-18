@@ -155,10 +155,10 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     this._api.deviceConfigurationSetPointTemperature(o.native.id, state.val, o.native.channel)
                     break;
                 case 'shutterlevel':
-		            this._api.deviceConfigurationShutterLevel(o.native.id, state.val, o.native.channel)
+		            this._api.deviceControlSetShutterLevel(o.native.id, state.val, o.native.channel)
 		            break;	
 		        case 'changeOverDelay':
-		            this._api.deviceConfigurationChangeOverDelay(o.native.id, state.val, o.native.channel)
+		            //this._api.deviceConfigurationChangeOverDelay(o.native.id, state.val, o.native.channel)
 	                break;
             }
         }
