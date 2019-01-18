@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "0.0.1",
+        "version": "0.0.2",
         "news": {
+            "0.0.2": {
+                "en": "bugfixes, more devices and initial support of groups",
+                "de": "Bugfixes, mehr Geräte und anfängliche Unterstützung von Gruppen",
+                "ru": "исправления, больше устройств и начальная поддержка групп",
+                "pt": "correções de bugs, mais dispositivos e suporte inicial de grupos",
+                "nl": "bugfixes, meer apparaten en initiële ondersteuning van groepen",
+                "fr": "corrections de bugs, plus de périphériques et support initial des groupes",
+                "it": "correzioni di errori, più dispositivi e supporto iniziale di gruppi",
+                "es": "Corrección de errores, más dispositivos y soporte inicial de grupos.",
+                "pl": "poprawki błędów, więcej urządzeń i początkowe wsparcie grup",
+                "zh-cn": "错误修正，更多设备和组的初始支持"
+            },
             "0.0.1": {
                 "en": "initial release",
                 "de": "Erstveröffentlichung",
