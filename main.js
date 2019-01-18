@@ -215,7 +215,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.humidity', device.functionalChannels['1'].humidity, true));
                 break;
             }
-            case 'SHUTTER_CONTACT': {
+            case 'SHUTTER_CONTACT':
+            case 'SHUTTER_CONTACT_MAGNETIC': {
                 promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.windowState', device.functionalChannels['1'].windowState == 'OPEN' ? 'open' : 'close', true));
                 break;
             }
@@ -308,7 +309,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.humidity', { type: 'state', common: { name: 'humidity', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
                 break;
             }
-            case 'SHUTTER_CONTACT': {
+            case 'SHUTTER_CONTACT':
+            case 'SHUTTER_CONTACT_MAGNETIC': {
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.windowState', { type: 'state', common: { name: 'windowOpen', type: 'string', role: 'sensor.window', read: true, write: false }, native: {} }));
                 break;
             }
