@@ -201,12 +201,14 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setStateAsync('devices.' + device.id + '.info.label', device.label, true));
         switch (device.type) {
             case 'FULL_FLUSH_SWITCH_MEASURING':
+            case 'PLUGABLE_SWITCH':
             case 'PLUGABLE_SWITCH_MEASURING': {
                 promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.on', device.functionalChannels['1'].on, true));
                 promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.energyCounter', device.functionalChannels['1'].energyCounter, true));
                 promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.currentPowerConsumption', device.functionalChannels['1'].currentPowerConsumption, true));
                 break;
             }
+            case 'BRAND_WALL_MOUNTED_THERMOSTAT':
             case 'TEMPERATURE_HUMIDITY_SENSOR_DISPLAY': {
                 promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.temperatureOffset', device.functionalChannels['1'].temperatureOffset, true));
                 promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.actualTemperature', device.functionalChannels['1'].actualTemperature, true));
@@ -291,6 +293,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.info.label', { type: 'state', common: { name: 'type', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         switch (device.type) {
             case 'FULL_FLUSH_SWITCH_MEASURING':
+            case 'PLUGABLE_SWITCH':
             case 'PLUGABLE_SWITCH_MEASURING': {
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1', { type: 'channel', common: {}, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: 1, parameter: 'switchState' } }));
@@ -299,6 +302,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.resetEnergyCounter', { type: 'state', common: { name: 'on', type: 'boolean', role: 'button', read: false, write: true }, native: { id: device.id, channel: 1, parameter: 'resetEnergyCounter' } }));
                 break;
             }
+            case 'BRAND_WALL_MOUNTED_THERMOSTAT':
             case 'TEMPERATURE_HUMIDITY_SENSOR_DISPLAY': {
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1', { type: 'channel', common: {}, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.temperatureOffset', { type: 'state', common: { name: 'temperatureOffset', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
