@@ -59,7 +59,7 @@
         "platform": "Javascript/Node.js",
         "mode": "daemon",
         "compact": true,
-        "icon": "template.png",
+        "icon": "homematic.png",
         "materialize": true,
         "enabled": true,
         "extIcon": "https://github.com/iobroker-community-adapters/ioBroker.hmip/master/admin/homematic.png",

@@ -363,7 +363,6 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             case 'PUSH_BUTTON_6':
             case 'OPEN_COLLECTOR_8_MODULE':
             case 'REMOTE_CONTROL_8': {
-                let max = 1;
                 for (let i in device.functionalChannels) {
                     if (i != 0)
                     promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + i, { type: 'channel', common: {}, native: {} }));

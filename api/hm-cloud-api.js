@@ -205,8 +205,6 @@ class HmCloudAPI {
         await this.callRestApi('device/configuration/setSetPointTemperature', data);
     }
 
-
-
     async deviceConfigurationSetRouterModuleEnabled(deviceId, routerModuleEnabled, channelIndex = 1) {
         let data = { "deviceId": deviceId, "routerModuleEnabled": routerModuleEnabled, "channelIndex": channelIndex };
         await this.callRestApi('device/configuration/setRouterModuleEnabled', data);
