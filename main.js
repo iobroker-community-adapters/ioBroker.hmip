@@ -210,6 +210,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setStateAsync('devices.' + device.id + '.info.modelType', device.modelType, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.info.label', device.label, true));
         switch (device.type) {
+            case 'BRAND_SWITCH_MEASURING':
             case 'FULL_FLUSH_SWITCH_MEASURING':
             case 'PLUGABLE_SWITCH_MEASURING': {
                 promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.on', device.functionalChannels['1'].on, true));
@@ -352,6 +353,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.info.modelType', { type: 'state', common: { name: 'type', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.info.label', { type: 'state', common: { name: 'type', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         switch (device.type) {
+            case 'BRAND_SWITCH_MEASURING':
             case 'FULL_FLUSH_SWITCH_MEASURING':
             case 'PLUGABLE_SWITCH_MEASURING': {
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1', { type: 'channel', common: {}, native: {} }));
