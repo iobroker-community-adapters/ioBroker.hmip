@@ -12,12 +12,11 @@ class HmCloudAPI {
         if (configDataOrApId != null) {
             this.parseConfigData(configDataOrApId, pin);
         }
-        
+
         this.eventRaised = null;
     }
 
-    parseConfigData(configDataOrApId, pin, deviceId)
-    {
+    parseConfigData(configDataOrApId, pin, deviceId) {
         if (typeof configDataOrApId === 'string') {
             this._accessPointSgtin = configDataOrApId.replace(/[^a-fA-F0-9 ]/g, '');
             this._clientAuthToken = sha512(this._accessPointSgtin + "jiLpVitHvWnIGD1yo7MA").toUpperCase();
@@ -60,7 +59,7 @@ class HmCloudAPI {
             'clientId': this._clientId,
             'accessPointSgtin': this._accessPointSgtin,
             'pin': this._pin,
-            'deviceId': this._deviceId 
+            'deviceId': this._deviceId
         }
     }
 
@@ -118,14 +117,14 @@ class HmCloudAPI {
     // =========== Event Handling ===========
 
     connectWebsocket() {
-         this._ws = new webSocket(this._urlWebSocket, {
+        this._ws = new webSocket(this._urlWebSocket, {
             headers: {
                 'AUTHTOKEN': this._authToken, 'CLIENTAUTH': this._clientAuthToken
             },
             perMessageDeflate: false
         });
 
-        this._ws.on('open', () => {          
+        this._ws.on('open', () => {
         });
 
         this._ws.on('close', () => {
@@ -227,7 +226,7 @@ class HmCloudAPI {
     }
 
     // =========== API for HM Groups ===========
-    
+
     async groupHeatingSetPointTemperature(groupId, setPointTemperature) {
         let data = { "groupId": groupId, "setPointTemperature": setPointTemperature };
         await this.callRestApi('group/heating/setSetPointTemperature', data);
@@ -248,6 +247,31 @@ class HmCloudAPI {
     async clientDeleteClient(clientId) {
         let data = { "clientId": clientId };
         await this.callRestApi('client/deleteClient', data);
+    }
+
+    // =========== API for HM Home ===========
+
+    async homeHeatingActivateAbsenceWithPeriod(endTime) {
+        let data = { "endTime": endTime };
+        await this.callRestApi('home/heating/activateAbsenceWithPeriod', data);
+    }
+
+    async homeHeatingActivateAbsenceWithDuration(duration) {
+        let data = { "duration": duration };
+        await this.callRestApi('home/heating/activateAbsenceWithDuration', data);
+    }
+
+    async homeHeatingDeactivateAbsence() {
+        await this.callRestApi('home/heating/deactivateAbsence');
+    }
+
+    async homeHeatingActivateVacation(temperature, endtime) {
+        let data = { "temperature": temperature, "endtime": endtime };
+        await this.callRestApi('home/heating/activateVacation', data);
+    }
+
+    async homeHeatingDeactivateVacation() {
+        await this.callRestApi('home/heating/deactivateVacation');
     }
 };
 

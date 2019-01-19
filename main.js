@@ -113,8 +113,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         await this._createObjectsForGroups();
         this.log.debug('createObjectsForClients');
         await this._createObjectsForClients();
-        this.log.debug('createObjectsForHome');
-        await this._createObjectsForHome();
+        this.log.debug('createObjectsForHomess');
+        await this._createObjectsForHomes();
         this.log.debug('connectWebsocket');
         this._api.connectWebsocket();
         this.log.debug('updateDeviceStates');
@@ -143,7 +143,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
         let o = await this.getObjectAsync(id);
         if (o.native.parameter) {
-            this.log.info('state change - ' + o.native.parameter + ' - id ' + o.native.id + ' - value ' + state.val);
+            this.log.info('state change - ' + o.native.parameter + ' - id ' + (o.native.id ? o.native.id : '') + ' - value ' + state.val);
             switch (o.native.parameter) {
                 case 'switchState':
                     this._api.deviceControlSetSwitchState(o.native.id, state.val, o.native.channel)
@@ -163,6 +163,15 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     break;
                 case 'changeOverDelay':
                     //this._api.deviceConfigurationChangeOverDelay(o.native.id, state.val, o.native.channel)
+                    break;
+                case 'setAbsenceEndTime':
+                    this._api.homeHeatingActivateAbsenceWithPeriod(state.val)
+                    break;
+                case 'setAbsenceDuration':
+                    this._api.homeHeatingActivateAbsenceWithDuration(state.val)
+                    break;
+                case 'deactivateAbsence':
+                    this._api.homeHeatingDeactivateAbsence()
                     break;
             }
         }
@@ -319,6 +328,28 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _updateHomeStates(home) {
         this.log.silly("_updateHomeStates - " + JSON.stringify(home));
         let promises = [];
+        
+        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventTimestamp', home.functionalHomes.SECURITY_AND_ALARM.alarmEventTimestamp, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventDeviceId', home.functionalHomes.SECURITY_AND_ALARM.alarmEventDeviceId, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventTriggerId', home.functionalHomes.SECURITY_AND_ALARM.alarmEventTriggerId, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventDeviceChannel', home.functionalHomes.SECURITY_AND_ALARM.alarmEventDeviceChannel, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmSecurityJournalEntryType', home.functionalHomes.SECURITY_AND_ALARM.alarmSecurityJournalEntryType, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmActive', home.functionalHomes.SECURITY_AND_ALARM.alarmActive, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.zoneActivationDelay', home.functionalHomes.SECURITY_AND_ALARM.zoneActivationDelay, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.intrusionAlertThroughSmokeDetectors', home.functionalHomes.SECURITY_AND_ALARM.intrusionAlertThroughSmokeDetectors, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.securityZoneActivationMode', home.functionalHomes.SECURITY_AND_ALARM.securityZoneActivationMode, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.solution', home.functionalHomes.SECURITY_AND_ALARM.solution, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.activationInProgress', home.functionalHomes.SECURITY_AND_ALARM.activationInProgress, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.active', home.functionalHomes.SECURITY_AND_ALARM.active, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.absenceType', home.functionalHomes.INDOOR_CLIMATE.absenceType, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.absenceEndTime', home.functionalHomes.INDOOR_CLIMATE.absenceEndTime, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.ecoTemperature', home.functionalHomes.INDOOR_CLIMATE.ecoTemperature, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.coolingEnabled', home.functionalHomes.INDOOR_CLIMATE.coolingEnabled, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.ecoDuration', home.functionalHomes.INDOOR_CLIMATE.ecoDuration, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.optimumStartStopEnabled', home.functionalHomes.INDOOR_CLIMATE.optimumStartStopEnabled, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.solution', home.functionalHomes.INDOOR_CLIMATE.solution, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.active', home.functionalHomes.INDOOR_CLIMATE.active, true));
+
         return promises;
     }
 
@@ -345,6 +376,13 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         }
         await Promise.all(promises);
     }
+
+    async _createObjectsForHomes() {
+        let promises = [];
+        promises.push(...this._createObjectsForHome(this._api.home));
+        await Promise.all(promises);
+    }
+    
 
     _createObjectsForDevice(device) {
         this.log.silly("createObjectsForDevice - " + device.type + " - " + JSON.stringify(device));
@@ -481,6 +519,33 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _createObjectsForHome(home) {
         this.log.silly("createObjectsForHome - " + JSON.stringify(home));
         let promises = [];
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id, { type: 'device', common: {}, native: {} }));
+
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventTimestamp', { type: 'state', common: { name: 'alarmEventTimestamp', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventDeviceId', { type: 'state', common: { name: 'alarmEventDeviceId', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventTriggerId', { type: 'state', common: { name: 'alarmEventTriggerId', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventDeviceChannel', { type: 'state', common: { name: 'alarmEventDeviceChannel', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmSecurityJournalEntryType', { type: 'state', common: { name: 'alarmSecurityJournalEntryType', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmActive', { type: 'state', common: { name: 'alarmActive', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.zoneActivationDelay', { type: 'state', common: { name: 'zoneActivationDelay', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.intrusionAlertThroughSmokeDetectors', { type: 'state', common: { name: 'intrusionAlertThroughSmokeDetectors', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.securityZoneActivationMode', { type: 'state', common: { name: 'securityZoneActivationMode', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.solution', { type: 'state', common: { name: 'solution', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.activationInProgress', { type: 'state', common: { name: 'activationInProgress', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.active', { type: 'state', common: { name: 'active', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.absenceType', { type: 'state', common: { name: 'absenceType', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.absenceEndTime', { type: 'state', common: { name: 'absenceEndTime', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.ecoTemperature', { type: 'state', common: { name: 'ecoTemperature', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.coolingEnabled', { type: 'state', common: { name: 'coolingEnabled', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.ecoDuration', { type: 'state', common: { name: 'ecoDuration', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.optimumStartStopEnabled', { type: 'state', common: { name: 'optimumStartStopEnabled', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.solution', { type: 'state', common: { name: 'solution', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.active', { type: 'state', common: { name: 'active', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.setAbsenceEndTime', { type: 'state', common: { name: 'setAbsenceEndTime', type: 'string', role: 'info', read: false, write: true }, native: { parameter: 'setAbsenceEndTime' } }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.setAbsenceDuration', { type: 'state', common: { name: 'setAbsenceDuration', type: 'string', role: 'info', read: false, write: true }, native: { parameter: 'setAbsenceDuration' } }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.deactivateAbsence', { type: 'state', common: { name: 'deactivateAbsence', type: 'boolean', role: 'button', read: false, write: true }, native: { parameter: 'deactivateAbsence' } }));
+
         return promises;
     }
 };
