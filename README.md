@@ -21,6 +21,28 @@ I will improve it, but it will take time. For not working devices, please create
 Then switch adapter logging to silly mode and add the json of the device wich is printed to the log.
 I may also need a json of a state change.
 
+## Included Devices
+
+    BRAND_SWITCH_MEASURING
+    FULL_FLUSH_SWITCH_MEASURING
+    PLUGABLE_SWITCH_MEASURING
+    PLUGABLE_SWITCH
+    BRAND_WALL_MOUNTED_THERMOSTAT
+    WALL_MOUNTED_THERMOSTAT_PRO
+    TEMPERATURE_HUMIDITY_SENSOR_DISPLAY
+    HEATING_THERMOSTAT
+    SHUTTER_CONTACT
+    SHUTTER_CONTACT_MAGNETIC
+    BRAND_DIMMER
+    PLUGGABLE_DIMMER
+    PUSH_BUTTON
+    PUSH_BUTTON_6
+    OPEN_COLLECTOR_8_MODULE
+    REMOTE_CONTROL_8
+    BRAND_SHUTTER
+    MOTION_DETECTOR_INDOOR
+    SMOKE_DETECTOR
+
 ## Settings
 * specify the your SGTIN and the PIN of your Accesspoint, and validate via press of the blue Button. This will create a Authentication token.
 
