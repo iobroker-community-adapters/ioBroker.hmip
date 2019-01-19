@@ -1,6 +1,6 @@
 {
   "name": "iobroker.hmip",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "ioBroker Adapter to use the Homatic Cloud Ip AccessPoint via Homatic Cloud Rest API",
   "author": {
     "name": "jogibear9988",

@@ -30,6 +30,9 @@ to coreGreenberet for his python lib (https://github.com/coreGreenberet/homemati
 
 ## Changelog
 
+### 0.0.3
+* (jogibear9988) bugfixes and more devices 
+
 ### 0.0.2
 * (jogibear9988) bugfixes, more devices and initial support of groups
 

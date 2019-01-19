@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "0.0.2",
+        "version": "0.0.3",
         "news": {
+            "0.0.3": {
+                "en": "bugfixes and more devices",
+                "de": "Bugfixes und weitere Geräte",
+                "ru": "исправления и другие устройства",
+                "pt": "correções de bugs e mais dispositivos",
+                "nl": "bugfixes en meer apparaten",
+                "fr": "corrections de bugs et plus de périphériques",
+                "it": "correzioni di bug e altri dispositivi",
+                "es": "correcciones de errores y más dispositivos",
+                "pl": "poprawki błędów i więcej urządzeń",
+                "zh-cn": "错误修正和更多设备"
+            },
             "0.0.2": {
                 "en": "bugfixes, more devices and initial support of groups",
                 "de": "Bugfixes, mehr Geräte und anfängliche Unterstützung von Gruppen",
