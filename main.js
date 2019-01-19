@@ -143,7 +143,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
         let o = await this.getObjectAsync(id);
         if (o.native.parameter) {
-            this.log.info('state change - ' + o.native.parameter + ' - ' + o.native.id);
+            this.log.info('state change - ' + o.native.parameter + ' - id ' + o.native.id + ' - value ' + state.val);
             switch (o.native.parameter) {
                 case 'switchState':
                     this._api.deviceControlSetSwitchState(o.native.id, state.val, o.native.channel)
@@ -151,15 +151,16 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'resetEnergyCounter':
                     this._api.deviceControlResetEnergyCounter(o.native.id, o.native.channel)
                     break;
-                case 'setPointTemperature':
-                    this._api.deviceConfigurationSetPointTemperature(o.native.id, state.val, o.native.channel)
-                    break;
                 case 'shutterlevel':
-		            this._api.deviceControlSetShutterLevel(o.native.id, state.val, o.native.channel)
-		            break;	
-		        case 'changeOverDelay':
-		            //this._api.deviceConfigurationChangeOverDelay(o.native.id, state.val, o.native.channel)
-	                break;
+                    this._api.deviceControlSetShutterLevel(o.native.id, state.val, o.native.channel)
+                    break;
+                case 'setPointTemperature':
+                    for (let id of o.native.id)
+                        this._api.groupHeatingSetPointTemperature(id, state.val);
+                    break;
+                case 'changeOverDelay':
+                    //this._api.deviceConfigurationChangeOverDelay(o.native.id, state.val, o.native.channel)
+                    break;
             }
         }
     }
@@ -184,7 +185,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 await Promise.all(this._createObjectsForClient(ev.client));
                 await Promise.all(this._updateClientStates(ev.client));
                 break;
-            case 'CLIENT_CHANGED':   
+            case 'CLIENT_CHANGED':
                 await Promise.all(this._updateClientStates(ev.client));
                 break;
             case 'DEVICE_REMOVED':
@@ -251,15 +252,15 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 break;
             }
             case 'BRAND_SHUTTER': {
-		        promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.shutterLevel', device.functionalChannels['1'].shutterLevel, true));
-		        promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.previousShutterLevel', device.functionalChannels['1'].previousShutterLevel, true));
-		        promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.processing', device.functionalChannels['1'].processing, true));
-		        promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.selfCalibrationInProgress', device.functionalChannels['1'].selfCalibrationInProgress, true));
-		        promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.topToBottomReferenceTime', device.functionalChannels['1'].topToBottomReferenceTime, true));
-		        promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.bottomToTopReferenceTime', device.functionalChannels['1'].bottomToTopReferenceTime, true));
-		        promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.changeOverDelay', device.functionalChannels['1'].changeOverDelay, true));
-		        promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.endpositionAutoDetectionEnabled', device.functionalChannels['1'].endpositionAutoDetectionEnabled, true));
-		        break;
+                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.shutterLevel', device.functionalChannels['1'].shutterLevel, true));
+                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.previousShutterLevel', device.functionalChannels['1'].previousShutterLevel, true));
+                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.processing', device.functionalChannels['1'].processing, true));
+                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.selfCalibrationInProgress', device.functionalChannels['1'].selfCalibrationInProgress, true));
+                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.topToBottomReferenceTime', device.functionalChannels['1'].topToBottomReferenceTime, true));
+                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.bottomToTopReferenceTime', device.functionalChannels['1'].bottomToTopReferenceTime, true));
+                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.changeOverDelay', device.functionalChannels['1'].changeOverDelay, true));
+                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.endpositionAutoDetectionEnabled', device.functionalChannels['1'].endpositionAutoDetectionEnabled, true));
+                break;
             }
             default: {
                 break;
@@ -273,6 +274,16 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         let promises = [];
         promises.push(this.setStateAsync('groups.' + group.id + '.info.type', group.type, true));
         promises.push(this.setStateAsync('groups.' + group.id + '.info.label', group.label, true));
+
+        switch (group.type) {
+            case 'HEATING': {
+                promises.push(this.setStateAsync('groups.' + group.id + '.actualTemperature', group.actualTemperature, true));
+                promises.push(this.setStateAsync('groups.' + group.id + '.setPointTemperature', group.setPointTemperature, true));
+                promises.push(this.setStateAsync('groups.' + group.id + '.humidity', group.humidity, true));
+                break;
+            }
+        }
+
         return promises;
     }
 
@@ -341,7 +352,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1', { type: 'channel', common: {}, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.temperatureOffset', { type: 'state', common: { name: 'temperatureOffset', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'thermo', read: true, write: true }, native: { id: device.id, channel: 1, parameter: 'setPointTemperature' } }));
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'thermo', read: true, write: true }, native: { id: device.functionalChannels[1].groups, parameter: 'setPointTemperature' } }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.display', { type: 'state', common: { name: 'display', type: 'string', role: 'info', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.humidity', { type: 'state', common: { name: 'humidity', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
                 break;
@@ -350,7 +361,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1', { type: 'channel', common: {}, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.temperatureOffset', { type: 'state', common: { name: 'temperatureOffset', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.valvePosition', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'thermo', read: true, write: true }, native: { id: device.id, channel: 1, parameter: 'setPointTemperature' } }));
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'thermo', read: true, write: true }, native: { id: device.functionalChannels[1].groups, parameter: 'setPointTemperature' } }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.valveState', { type: 'state', common: { name: 'display', type: 'string', role: 'info', read: true, write: false }, native: {} }));
                 break;
             }
@@ -365,22 +376,22 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             case 'REMOTE_CONTROL_8': {
                 for (let i in device.functionalChannels) {
                     if (i != 0)
-                    promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + i, { type: 'channel', common: {}, native: {} }));
+                        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + i, { type: 'channel', common: {}, native: {} }));
                     promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + i + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: i, parameter: 'switchState' } }));
                 }
                 break;
             }
             case 'BRAND_SHUTTER': {
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1', { type: 'channel', common: {}, native: {} }));
-               	promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.shutterLevel', { type: 'state', common: { name: 'shutterLevel', type: 'number', role: 'level', read: true, write: true }, native: { id: device.id, channel: 1, parameter: 'shutterlevel' } }));
-		        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.previousShutterLevel', { type: 'state', common: { name: 'previousShutterLevel', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.shutterLevel', { type: 'state', common: { name: 'shutterLevel', type: 'number', role: 'level', read: true, write: true }, native: { id: device.id, channel: 1, parameter: 'shutterlevel' } }));
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.previousShutterLevel', { type: 'state', common: { name: 'previousShutterLevel', type: 'string', role: 'info', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.processing', { type: 'state', common: { name: 'processing', type: 'string', role: 'info', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.selfCalibrationInProgress', { type: 'state', common: { name: 'selfCalibrationInProgress', type: 'string', role: 'info', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.topToBottomReferenceTime', { type: 'state', common: { name: 'topToBottomReferenceTime', type: 'number', role: 'seconds', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.bottomToTopReferenceTime', { type: 'state', common: { name: 'bottomToTopReferenceTime', type: 'number', role: 'seconds', read: true, write: false }, native: {} }));
-               	promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.changeOverDelay', { type: 'state', common: { name: 'changeOverDelay', type: 'number', role: 'seconds', read: true, write: true }, native: { id: device.id, channel: 1, parameter: 'changeOverDelay' } }));
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.changeOverDelay', { type: 'state', common: { name: 'changeOverDelay', type: 'number', role: 'seconds', read: true, write: true }, native: { id: device.id, channel: 1, parameter: 'changeOverDelay' } }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.endpositionAutoDetectionEnabled', { type: 'state', common: { name: 'endpositionAutoDetectionEnabled', type: 'string', role: 'switch', read: true, write: true }, native: { id: device.id, channel: 1, parameter: 'switchState' } }));
-		        break;
+                break;
             }
             default: {
                 this.log.debug("device - not implemented device :" + JSON.stringify(device));
@@ -396,6 +407,16 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setObjectNotExistsAsync('groups.' + group.id, { type: 'device', common: {}, native: {} }));
         promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.info.type', { type: 'state', common: { name: 'type', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.info.label', { type: 'state', common: { name: 'label', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+
+        switch (group.type) {
+            case 'HEATING': {
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'thermo', read: true, write: true }, native: { id: [group.id], parameter: 'setPointTemperature' } }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.humidity', { type: 'state', common: { name: 'humidity', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+                break;
+            }
+        }
+
         return promises;
     }
 

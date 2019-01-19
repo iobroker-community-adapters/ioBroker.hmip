@@ -199,12 +199,6 @@ class HmCloudAPI {
         await this.callRestApi('device/control/stop', data);
     }
 
-    //todo check -> does not work atm
-    async deviceConfigurationSetPointTemperature(deviceId, setPointTemperature, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "setPointTemperature": setPointTemperature, "channelIndex": channelIndex };
-        await this.callRestApi('device/configuration/setSetPointTemperature', data);
-    }
-
     async deviceConfigurationSetRouterModuleEnabled(deviceId, routerModuleEnabled, channelIndex = 1) {
         let data = { "deviceId": deviceId, "routerModuleEnabled": routerModuleEnabled, "channelIndex": channelIndex };
         await this.callRestApi('device/configuration/setRouterModuleEnabled', data);
@@ -232,7 +226,24 @@ class HmCloudAPI {
         await this.callRestApi('device/authorizeUpdate', data);
     }
 
+    // =========== API for HM Groups ===========
+    
+    async groupHeatingSetPointTemperature(groupId, setPointTemperature) {
+        let data = { "groupId": groupId, "setPointTemperature": setPointTemperature };
+        await this.callRestApi('group/heating/setSetPointTemperature', data);
+    }
 
+    async groupHeatingSetBoostDuration(groupId, boostDuration) {
+        let data = { "groupId": groupId, "boostDuration": boostDuration };
+        await this.callRestApi('group/heating/setBoostDuration', data);
+    }
+
+    async groupHeatingSetBoost(groupId, boost) {
+        let data = { "groupId": groupId, "boost": boost };
+        await this.callRestApi('group/heating/setBoost', data);
+    }
+
+    // =========== API for HM Clients ===========
 
     async clientDeleteClient(clientId) {
         let data = { "clientId": clientId };
