@@ -275,10 +275,10 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.illumination', device.functionalChannels['1'].illumination, true));
                 promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.currentIllumination', device.functionalChannels['1'].currentIllumination, true));
                 promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.motionDetectionSendInterval', device.functionalChannels['1'].motionDetectionSendInterval, true));
-		        promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.motionBufferActive', device.functionalChannels['1'].motionBufferActive, true));
-		        break;
-			}
-            case 'SMOKE_DETECTOR':{
+                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.motionBufferActive', device.functionalChannels['1'].motionBufferActive, true));
+                break;
+            }
+            case 'SMOKE_DETECTOR': {
                 promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.smokeDetectorAlarmType', device.functionalChannels['1'].smokeDetectorAlarmType, true));
                 break;
             }
@@ -433,7 +433,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1', { type: 'channel', common: {}, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.smokeDetectorAlarmType', { type: 'state', common: { name: 'smokeDetectorAlarmType', type: 'string', role: 'info', read: true, write: false }, native: {} }));
                 break;
-            }  
+            }
             default: {
                 this.log.debug("device - not implemented device :" + JSON.stringify(device));
                 break;
