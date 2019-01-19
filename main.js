@@ -158,6 +158,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     for (let id of o.native.id)
                         this._api.groupHeatingSetPointTemperature(id, state.val);
                     break;
+                case 'setDimLevel':
+                    this._api.deviceControlSetDimLevel(o.native.id, state.val, o.native.channel)
+                    break;
                 case 'changeOverDelay':
                     //this._api.deviceConfigurationChangeOverDelay(o.native.id, state.val, o.native.channel)
                     break;
@@ -240,6 +243,11 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.windowState', device.functionalChannels['1'].windowState == 'OPEN' ? 'open' : 'close', true));
                 break;
             }
+            case 'BRAND_DIMMER':
+            case 'PLUGGABLE_DIMMER': {
+                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.dimLevel', device.functionalChannels['1'].dimLevel, true));
+                break;
+            }
             case 'PUSH_BUTTON':
             case 'PUSH_BUTTON_6':
             case 'OPEN_COLLECTOR_8_MODULE':
@@ -260,6 +268,10 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.bottomToTopReferenceTime', device.functionalChannels['1'].bottomToTopReferenceTime, true));
                 promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.changeOverDelay', device.functionalChannels['1'].changeOverDelay, true));
                 promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.endpositionAutoDetectionEnabled', device.functionalChannels['1'].endpositionAutoDetectionEnabled, true));
+                break;
+            }
+            case 'SMOKE_DETECTOR':{
+                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.smokeDetectorAlarmType', device.functionalChannels['1'].smokeDetectorAlarmType, true));
                 break;
             }
             default: {
@@ -367,7 +379,14 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             }
             case 'SHUTTER_CONTACT':
             case 'SHUTTER_CONTACT_MAGNETIC': {
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1', { type: 'channel', common: {}, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.windowState', { type: 'state', common: { name: 'windowOpen', type: 'string', role: 'sensor.window', read: true, write: false }, native: {} }));
+                break;
+            }
+            case 'BRAND_DIMMER':
+            case 'PLUGGABLE_DIMMER': {
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1', { type: 'channel', common: {}, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.dimLevel', { type: 'state', common: { name: 'dimLevel', type: 'number', role: 'level.dimmer', read: true, write: false }, native: { id: device.id, channel: i, parameter: 'setDimLevel' } }));
                 break;
             }
             case 'PUSH_BUTTON':
@@ -393,6 +412,11 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.endpositionAutoDetectionEnabled', { type: 'state', common: { name: 'endpositionAutoDetectionEnabled', type: 'string', role: 'switch', read: true, write: true }, native: { id: device.id, channel: 1, parameter: 'switchState' } }));
                 break;
             }
+            case 'SMOKE_DETECTOR': {
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1', { type: 'channel', common: {}, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.smokeDetectorAlarmType', { type: 'state', common: { name: 'smokeDetectorAlarmType', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+                break;
+            }  
             default: {
                 this.log.debug("device - not implemented device :" + JSON.stringify(device));
                 break;
