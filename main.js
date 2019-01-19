@@ -118,19 +118,17 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         this.log.debug('connectWebsocket');
         this._api.connectWebsocket();
         this.log.debug('updateDeviceStates');
-        let promises = [];
         for (let d in this._api.devices) {
-            promises.push(...this._updateDeviceStates(this._api.devices[d]));
+            await this._updateDeviceStates(this._api.devices[d]);
         }
         for (let g in this._api.groups) {
-            promises.push(...this._updateGroupStates(this._api.groups[g]));
+            await this._updateGroupStates(this._api.groups[g]);
         }
         for (let c in this._api.clients) {
-            promises.push(...this._updateClientStates(this._api.clients[c]));
+            await this._updateClientStates(this._api.clients[c]);
         }
-        promises.push(...this._updateHomeStates(this._api.home));
-        await Promise.all(promises);
-
+        await this._updateHomeStates(this._api.home);
+        
         this.log.debug('subscribeStates');
         this.subscribeStates('*');
 
@@ -180,25 +178,25 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     async _eventRaised(ev) {
         switch (ev.pushEventType) {
             case 'DEVICE_ADDED':
-                await Promise.all(this._createObjectsForDevice(ev.device));
-                await Promise.all(this._updateDeviceStates(ev.device));
+                await this._createObjectsForDevice(ev.device);
+                await this._updateDeviceStates(ev.device);
                 break;
             case 'DEVICE_CHANGED':
-                await Promise.all(this._updateDeviceStates(ev.device));
+                await this._updateDeviceStates(ev.device);
                 break;
             case 'GROUP_ADDED':
-                await Promise.all(this._createObjectsForGroup(ev.group));
-                await Promise.all(this._updateGroupStates(ev.group));
+                await this._createObjectsForGroup(ev.group);
+                await this._updateGroupStates(ev.group);
                 break;
             case 'GROUP_CHANGED':
-                await Promise.all(this._updateGroupStates(ev.group));
+                await this._updateGroupStates(ev.group);
                 break;
             case 'CLIENT_ADDED':
-                await Promise.all(this._createObjectsForClient(ev.client));
-                await Promise.all(this._updateClientStates(ev.client));
+                await this._createObjectsForClient(ev.client);
+                await this._updateClientStates(ev.client);
                 break;
             case 'CLIENT_CHANGED':
-                await Promise.all(this._updateClientStates(ev.client));
+                await this._updateClientStates(ev.client);
                 break;
             case 'DEVICE_REMOVED':
                 break;
@@ -207,7 +205,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             case 'CLIENT_REMOVED':
                 break;
             case 'HOME_CHANGED':
-                await Promise.all(this._updateHomeStates(ev.home));
+                await this._updateHomeStates(ev.home);
                 break;
         }
     }
@@ -297,7 +295,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 break;
             }
         }
-        return promises;
+        return Promise.all(promises);
     }
 
     _updateGroupStates(group) {
@@ -315,14 +313,14 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             }
         }
 
-        return promises;
+        return Promise.all(promises);
     }
 
     _updateClientStates(client) {
         this.log.silly("_updateClientStates - " + JSON.stringify(client));
         let promises = [];
         promises.push(this.setStateAsync('clients.' + client.id + '.info.label', client.label, true));
-        return promises;
+        return Promise.all(promises);
     }
 
     _updateHomeStates(home) {
@@ -350,37 +348,29 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.solution', home.functionalHomes.INDOOR_CLIMATE.solution, true));
         promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.active', home.functionalHomes.INDOOR_CLIMATE.active, true));
 
-        return promises;
+        return Promise.all(promises);
     }
 
     async _createObjectsForDevices() {
-        let promises = [];
         for (let i in this._api.devices) {
-            promises.push(...this._createObjectsForDevice(this._api.devices[i]));
+            await this._createObjectsForDevice(this._api.devices[i]);
         }
-        await Promise.all(promises);
     }
 
     async _createObjectsForGroups() {
-        let promises = [];
         for (let i in this._api.groups) {
-            promises.push(...this._createObjectsForGroup(this._api.groups[i]));
+            await this._createObjectsForGroup(this._api.groups[i]);
         }
-        await Promise.all(promises);
     }
 
     async _createObjectsForClients() {
-        let promises = [];
         for (let i in this._api.clients) {
-            promises.push(...this._createObjectsForClient(this._api.clients[i]));
+            await this._createObjectsForClient(this._api.clients[i]);
         }
-        await Promise.all(promises);
     }
 
     async _createObjectsForHomes() {
-        let promises = [];
-        promises.push(...this._createObjectsForHome(this._api.home));
-        await Promise.all(promises);
+        await this._createObjectsForHome(this._api.home);
     }
     
 
@@ -486,7 +476,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 break;
             }
         }
-        return promises;
+        return Promise.all(promises);;
     }
 
     _createObjectsForGroup(group) {
@@ -505,7 +495,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             }
         }
 
-        return promises;
+        return Promise.all(promises);
     }
 
     _createObjectsForClient(client) {
@@ -513,7 +503,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         let promises = [];
         promises.push(this.setObjectNotExistsAsync('clients.' + client.id, { type: 'device', common: {}, native: {} }));
         promises.push(this.setObjectNotExistsAsync('clients.' + client.id + '.info.label', { type: 'state', common: { name: 'label', type: 'string', role: 'info', read: true, write: false }, native: {} }));
-        return promises;
+        return Promise.all(promises);
     }
 
     _createObjectsForHome(home) {
@@ -546,7 +536,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.setAbsenceDuration', { type: 'state', common: { name: 'setAbsenceDuration', type: 'string', role: 'info', read: false, write: true }, native: { parameter: 'setAbsenceDuration' } }));
         promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.deactivateAbsence', { type: 'state', common: { name: 'deactivateAbsence', type: 'boolean', role: 'button', read: false, write: true }, native: { parameter: 'deactivateAbsence' } }));
 
-        return promises;
+        return Promise.all(promises);
     }
 };
 

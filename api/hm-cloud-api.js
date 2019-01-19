@@ -273,6 +273,16 @@ class HmCloudAPI {
     async homeHeatingDeactivateVacation() {
         await this.callRestApi('home/heating/deactivateVacation');
     }
+
+    async homeSetIntrusionAlertThroughSmokeDetectors(intrusionAlertThroughSmokeDetectors) {
+        let data = { "intrusionAlertThroughSmokeDetectors": intrusionAlertThroughSmokeDetectors};
+        await this.callRestApi('home/security/setIntrusionAlertThroughSmokeDetectors', data);
+    }
+
+    async homeSetZonesActivation(internal, external) {
+        let data = { "zonesActivation": { "INTERNAL": internal, "EXTERNAL": external } };
+        await this.callRestApi('home/security/setZonesActivation', data);
+    }
 };
 
 module.exports = HmCloudAPI;
