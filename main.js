@@ -247,6 +247,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             case 'BRAND_DIMMER':
             case 'PLUGGABLE_DIMMER': {
                 promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.dimLevel', device.functionalChannels['1'].dimLevel, true));
+                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.on', device.functionalChannels['1'].on, true));
                 break;
             }
             case 'PUSH_BUTTON':
@@ -396,7 +397,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             case 'BRAND_DIMMER':
             case 'PLUGGABLE_DIMMER': {
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1', { type: 'channel', common: {}, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.dimLevel', { type: 'state', common: { name: 'dimLevel', type: 'number', role: 'level.dimmer', read: true, write: false }, native: { id: device.id, channel: i, parameter: 'setDimLevel' } }));
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.dimLevel', { type: 'state', common: { name: 'dimLevel', type: 'number', role: 'level.dimmer', read: true, write: false }, native: { id: device.id, channel: 1, parameter: 'setDimLevel' } }));
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: 1, parameter: 'switchState' } }));
                 break;
             }
             case 'PUSH_BUTTON':
