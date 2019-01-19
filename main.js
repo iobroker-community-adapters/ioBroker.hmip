@@ -262,6 +262,14 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.endpositionAutoDetectionEnabled', device.functionalChannels['1'].endpositionAutoDetectionEnabled, true));
                 break;
             }
+            case 'MOTION_DETECTOR_INDOOR': {
+                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.motionDetected', device.functionalChannels['1'].motionDetected, true));
+                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.illumination', device.functionalChannels['1'].illumination, true));
+                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.currentIllumination', device.functionalChannels['1'].currentIllumination, true));
+                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.motionDetectionSendInterval', device.functionalChannels['1'].motionDetectionSendInterval, true));
+		        promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.motionBufferActive', device.functionalChannels['1'].motionBufferActive, true));
+		        break;
+            }
             default: {
                 break;
             }
@@ -391,6 +399,15 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.bottomToTopReferenceTime', { type: 'state', common: { name: 'bottomToTopReferenceTime', type: 'number', role: 'seconds', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.changeOverDelay', { type: 'state', common: { name: 'changeOverDelay', type: 'number', role: 'seconds', read: true, write: true }, native: { id: device.id, channel: 1, parameter: 'changeOverDelay' } }));
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.endpositionAutoDetectionEnabled', { type: 'state', common: { name: 'endpositionAutoDetectionEnabled', type: 'string', role: 'switch', read: true, write: true }, native: { id: device.id, channel: 1, parameter: 'switchState' } }));
+                break;
+            }
+            case 'MOTION_DETECTOR_INDOOR': {
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1', { type: 'channel', common: {}, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.motionDetected', { type: 'state', common: { name: 'motionDetected', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.illumination', { type: 'state', common: { name: 'illumination', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.currentIllumination', { type: 'state', common: { name: 'currentIllumination', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.motionDetectionSendInterval', { type: 'state', common: { name: 'motionDetectionSendInterval', type: 'string', role: 'info', read: false, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.motionBufferActive', { type: 'state', common: { name: 'motionBufferActive', type: 'boolean', role: 'switch', read: false, write: true }, native: { id: device.id, channel: 1, parameter: 'switchState' } }));
                 break;
             }
             default: {
