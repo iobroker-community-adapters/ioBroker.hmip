@@ -55,6 +55,9 @@ https://forum.iobroker.net/viewtopic.php?f=36&t=21000#p220517
 
 ## Changelog
 
+### 0.0.4
+* (jogibear9988) more devices, bugfixes. thanks to TobiasF1986, steckenpferd and Ma-ster77
+
 ### 0.0.3
 * (jogibear9988) bugfixes and more devices 
 
