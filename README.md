@@ -53,6 +53,9 @@ to coreGreenberet for his python lib (https://github.com/coreGreenberet/homemati
 ## Diskussion in ioBroker Forum
 https://forum.iobroker.net/viewtopic.php?f=36&t=21000#p220517
 
+## Adapter Request auf GitHub
+https://github.com/ioBroker/AdapterRequests/issues/62
+
 ## Changelog
 
 ### 0.0.4
