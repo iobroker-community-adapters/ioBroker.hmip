@@ -275,6 +275,15 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'WATER_SENSOR_CHANNEL':
                     promises.push(...this._updateWaterSensorChannelStates(device, i));
                     break;
+                case 'WEATHER_SENSOR_CHANNEL':
+                    promises.push(...this._updateWeatherSensorChannelStates(device, i));
+                    break;
+                case 'WEATHER_SENSOR_PLUS_CHANNEL':
+                    promises.push(...this._updateWeatherSensorPlusChannelStates(device, i));
+                    break;
+                case 'WEATHER_SENSOR_PRO_CHANNEL':
+                    promises.push(...this._updateWeatherSensorProChannelStates(device, i));
+                    break;
                 case 'SHUTTER_CHANNEL':
                     promises.push(...this._updateShutterChannelStates(device, i));
                     break;
@@ -388,6 +397,41 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.acousticAlarmSignal', device.functionalChannels[channel].acousticAlarmSignal, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.acousticAlarmTiming', device.functionalChannels[channel].acousticAlarmTiming, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.acousticWaterAlarmTrigger', device.functionalChannels[channel].acousticWaterAlarmTrigger, true));
+        return promises;
+    }
+
+    _updateWeatherSensorChannelStates(device, channel) {
+        let promises = [];
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.actualTemperature', device.functionalChannels[channel].actualTemperature, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.humidity', device.functionalChannels[channel].humidity, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.illumination', device.functionalChannels[channel].illumination, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.illuminationThresholdSunshine', device.functionalChannels[channel].illuminationThresholdSunshine, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.storm', device.functionalChannels[channel].storm, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.sunshine', device.functionalChannels[channel].sunshine, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.todaySunshineDuration', device.functionalChannels[channel].todaySunshineDuration, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.totalSunshineDuration', device.functionalChannels[channel].totalSunshineDuration, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windSpeed', device.functionalChannels[channel].windSpeed, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windValueType', device.functionalChannels[channel].windValueType, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.yesterdaySunshineDuration', device.functionalChannels[channel].yesterdaySunshineDuration, true));
+        return promises;
+    }
+
+    _updateWeatherSensorPlusChannelStates(device, channel) {
+        let promises = [];
+        promises.push(...this._updateWeatherSensorChannelStates());
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.raining', device.functionalChannels[channel].raining, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.todayRainCounter', device.functionalChannels[channel].todayRainCounter, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.totalRainCounter', device.functionalChannels[channel].totalRainCounter, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.yesterdayRainCounter', device.functionalChannels[channel].yesterdayRainCounter, true));
+        return promises;
+    }
+
+    _updateWeatherSensorProChannelStates(device, channel) {
+        let promises = [];
+        promises.push(...this._updateWeatherSensorPlusChannelStates());
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.weathervaneAlignmentNeeded', device.functionalChannels[channel].weathervaneAlignmentNeeded, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windDirection', device.functionalChannels[channel].windDirection, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windDirectionVariation', device.functionalChannels[channel].windDirectionVariation, true));
         return promises;
     }
 
@@ -575,6 +619,15 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'WATER_SENSOR_CHANNEL':
                     promises.push(...this._createWaterSensorChannel(device, i));
                     break;
+                case 'WEATHER_SENSOR_CHANNEL':
+                    promises.push(...this._createWeatherSensorChannel(device, i));
+                    break;
+                case 'WEATHER_SENSOR_PLUS_CHANNEL':
+                    promises.push(...this._createWeatherSensorPlusChannel(device, i));
+                    break;
+                case 'WEATHER_SENSOR_PRO_CHANNEL':
+                    promises.push(...this._createWeatherSensorProChannel(device, i));
+                    break;
                 case 'SHUTTER_CHANNEL':
                     promises.push(...this._createShutterChannel(device, i));
                     break;
@@ -711,6 +764,41 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.acousticAlarmSignal', { type: 'state', common: { name: 'acousticAlarmSignal', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.acousticAlarmTiming', { type: 'state', common: { name: 'acousticAlarmTiming', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.acousticWaterAlarmTrigger', { type: 'state', common: { name: 'acousticWaterAlarmTrigger', type: 'string', role: 'info', read: true, write: true }, native: {} }));
+        return promises;
+    }
+
+    _createWeatherSensorChannel(device, channel) {
+        let promises = [];
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.actualTemperature', { type: 'state', common: { name: 'raining', type: 'boolean', role: 'info', read: true, write: true }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.humidity', { type: 'state', common: { name: 'todayRainCounter', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.illumination', { type: 'state', common: { name: 'totalRainCounter', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.illuminationThresholdSunshine', { type: 'state', common: { name: 'yesterdayRainCounter', type: 'number', role: 'level', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.storm', { type: 'state', common: { name: 'yesterdayRainCounter', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.sunshine', { type: 'state', common: { name: 'yesterdayRainCounter', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.todaySunshineDuration', { type: 'state', common: { name: 'yesterdayRainCounter', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.totalSunshineDuration', { type: 'state', common: { name: 'yesterdayRainCounter', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windSpeed', { type: 'state', common: { name: 'yesterdayRainCounter', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windValueType', { type: 'state', common: { name: 'yesterdayRainCounter', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.yesterdaySunshineDuration', { type: 'state', common: { name: 'yesterdayRainCounter', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
+    _createWeatherSensorPlusChannel(device, channel) {
+        let promises = [];
+        promises.push(...this._createWaterSensorChannel());
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.raining', { type: 'state', common: { name: 'raining', type: 'boolean', role: 'info', read: true, write: true }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.todayRainCounter', { type: 'state', common: { name: 'todayRainCounter', type: 'number', role: 'level', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.totalRainCounter', { type: 'state', common: { name: 'totalRainCounter', type: 'number', role: 'level', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.yesterdayRainCounter', { type: 'state', common: { name: 'yesterdayRainCounter', type: 'number', role: 'level', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
+    _createWeatherSensorProChannel(device, channel) {
+        let promises = [];
+        promises.push(...this._createWeatherSensorPlusChannel());
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.weathervaneAlignmentNeeded', { type: 'state', common: { name: 'weathervaneAlignmentNeeded', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windDirection', { type: 'state', common: { name: 'windDirection', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windDirectionVariation', { type: 'state', common: { name: 'windDirectionVariation', type: 'number', role: 'info', read: true, write: false }, native: {} }));
         return promises;
     }
 
