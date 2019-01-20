@@ -13,5 +13,6 @@
     "press blue button on accesspoint": "нажмите синюю кнопку на точке доступа",
     "confirming token": "подтверждающий токен",
     "error occured during token generation, look at the logs": "во время генерации токена произошла ошибка, посмотрите логи",
-    "token created, save settings to use your accesspoint": "токен создан, сохраните настройки для использования вашей точки доступа"
+    "token created, save settings to use your accesspoint": "токен создан, сохраните настройки для использования вашей точки доступа",
+    "name for the device shown in the app": "имя для устройства, показанного в приложении"
 }

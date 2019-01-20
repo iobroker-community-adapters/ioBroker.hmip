@@ -13,5 +13,6 @@
     "press blue button on accesspoint": "Drücken Sie die blaue Taste am Zugangspunkt",
     "confirming token": "Token bestätigen",
     "error occured during token generation, look at the logs": "Bei der Token-Generierung ist ein Fehler aufgetreten. Sehen Sie sich die Protokolle an",
-    "token created, save settings to use your accesspoint": "Speichern Sie die Einstellungen, um Ihren Zugangspunkt zu verwenden"
+    "token created, save settings to use your accesspoint": "Speichern Sie die Einstellungen, um Ihren Zugangspunkt zu verwenden",
+    "name for the device shown in the app": "Name für das in der App angezeigte Gerät"
 }

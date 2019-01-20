@@ -13,5 +13,6 @@
     "press blue button on accesspoint": "按接入点上的蓝色按钮",
     "confirming token": "确认令牌",
     "error occured during token generation, look at the logs": "在令牌生成期间发生错误，请查看日志",
-    "token created, save settings to use your accesspoint": "已创建令牌，保存设置以使用您的接入点"
+    "token created, save settings to use your accesspoint": "已创建令牌，保存设置以使用您的接入点",
+    "name for the device shown in the app": "应用中显示的设备的名称"
 }

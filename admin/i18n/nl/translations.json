@@ -13,5 +13,6 @@
     "press blue button on accesspoint": "druk op de blauwe knop op het toegangspunt",
     "confirming token": "token bevestigen",
     "error occured during token generation, look at the logs": "er is een fout opgetreden tijdens het genereren van tokens, kijk naar de logboeken",
-    "token created, save settings to use your accesspoint": "token gemaakt, sla instellingen op om uw toegangspunt te gebruiken"
+    "token created, save settings to use your accesspoint": "token gemaakt, sla instellingen op om uw toegangspunt te gebruiken",
+    "name for the device shown in the app": "naam voor het apparaat dat wordt weergegeven in de app"
 }

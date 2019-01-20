@@ -60,7 +60,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             this._api.parseConfigData(config.accessPointSgtin, config.pin, config.clientId);
             await this._api.getHomematicHosts();
             this.log.info('auth step 1');
-            await this._api.auth1connectionRequest();
+            await this._api.auth1connectionRequest(config.deviceName);
             this.log.info('auth step 2');
             while (!await this._api.auth2isRequestAcknowledged() && !this._unloaded) {
                 this._requestTokenState = { state: 'waitForBlueButton' };

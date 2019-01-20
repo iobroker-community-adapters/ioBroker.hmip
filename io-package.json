@@ -74,7 +74,7 @@
         "icon": "homematic.png",
         "materialize": true,
         "enabled": true,
-        "extIcon": "https://github.com/iobroker-community-adapters/ioBroker.hmip/master/admin/homematic.png",
+        "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.hmip/master/admin/homematic.png",
         "keywords": [
             "hardware",
             "homematic",
@@ -87,6 +87,7 @@
         "messagebox": true
     },
     "native": {
+        "deviceName": "iobroker",
         "authToken": "",
         "clientAuthToken": "",
         "clientId": "",

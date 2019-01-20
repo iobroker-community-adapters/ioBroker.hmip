@@ -56,10 +56,12 @@
             let accessPointSgtin = $('#accessPointSgtin').val();
             let clientId = $('#clientId').val();
             let pin = $('#pin').val();
+            let deviceName = $('#deviceName').val();
             let config = {
                 'accessPointSgtin': accessPointSgtin,
                 'clientId': clientId,
-                'pin': pin
+                'pin': pin,
+                'deviceName': deviceName
             }
             $('#deviceInfo').text('started token creation');
             sendTo(null, 'requestToken', config, function (response) {
@@ -139,7 +141,8 @@
                     <img src="homematic.png" class="logo">
                 </div>
                 <div class="col s12">
-                    <p class="translate">caution - this adapter is only for communication with a homatic ip cloudaccesspoint</p>
+                    <p class="translate">caution - this adapter is only for communication with a homatic ip
+                        cloudaccesspoint</p>
                 </div>
             </div>
 
@@ -163,8 +166,13 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col s12">
-                    <p class="translate">id for your homatic device, leave empty or reuse already created one (if you remove adapter and install again)</p>
+                <div class="col s12 m6 l6">
+                    <p class="translate">name for the device shown in the app</p>
+                    <input class="value" id="deviceName" /><label for="deviceName" class="translate">device name</label>
+                </div>
+                <div class="col s12 m6 l6">
+                    <p class="translate">id for your homatic device, leave empty or reuse already created one (if you
+                        remove adapter and install again)</p>
                     <input class="value" id="deviceId" /><label for="deviceId" class="translate">device id</label>
                 </div>
             </div>

@@ -13,5 +13,6 @@
     "press blue button on accesspoint": "pressione o botão azul no ponto de acesso",
     "confirming token": "token confirmando",
     "error occured during token generation, look at the logs": "erro ocorreu durante a geração do token, observe os logs",
-    "token created, save settings to use your accesspoint": "token criado, salve as configurações para usar seu ponto de acesso"
+    "token created, save settings to use your accesspoint": "token criado, salve as configurações para usar seu ponto de acesso",
+    "name for the device shown in the app": "nome do dispositivo mostrado no aplicativo"
 }

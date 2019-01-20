@@ -13,5 +13,6 @@
     "press blue button on accesspoint": "press blue button on accesspoint",
     "confirming token": "confirming token",
     "error occured during token generation, look at the logs": "error occured during token generation, look at the logs",
-    "token created, save settings to use your accesspoint": "token created, save settings to use your accesspoint"
+    "token created, save settings to use your accesspoint": "token created, save settings to use your accesspoint",
+    "name for the device shown in the app": "name for the device shown in the app"
 }
