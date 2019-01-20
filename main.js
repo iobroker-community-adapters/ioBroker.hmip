@@ -291,7 +291,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     promises.push(...this._updateSingleKeyChannelStates(device, i));
                     break;
                 case 'DEVICE_BASE':
-                    //promises.push(...this._createDeviceBaseChannel(device, i));
+                    promises.push(...this._updateDeviceBaseChannelStates(device, i));
                     break;
                 case 'WALL_MOUNTED_THERMOSTAT_PRO_CHANNEL':
                     promises.push(...this._updateWallMountedThermostatProChannelStates(device, i));
@@ -303,7 +303,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     promises.push(...this._updateBlindChannelStates(device, i));
                     break;
                 case 'ROTARY_HANDLE_CHANNEL':
-                    promises.push(...this._createRotaryHandleChannel(device, i));
+                    promises.push(...this._updateRotaryHandleChannelStates(device, i));
                     break;
                 default:
                     this.log.info("unkown channel type - " + fc.functionalChannelType + " - " + JSON.stringify(device));
@@ -315,7 +315,20 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     /* Start Channel Types */
 
-    _createRotaryHandleChannel(device, channel) {
+    _updateDeviceBaseChannelStates(device, channel) {
+        let promises = [];
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.configPending', device.functionalChannels[channel].configPending));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.dutyCycle', device.functionalChannels[channel].dutyCycle));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.lowBat', device.functionalChannels[channel].lowBat));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.routerModuleEnabled', device.functionalChannels[channel].routerModuleEnabled));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.routerModuleSupported', device.functionalChannels[channel].routerModuleSupported));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.rssiDeviceValue', device.functionalChannels[channel].rssiDeviceValue));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.rssiPeerValue', device.functionalChannels[channel].rssiPeerValue));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.unreach', device.functionalChannels[channel].unreach));
+        return promises;
+    }
+
+    _updateRotaryHandleChannelStates(device, channel) {
         let promises = [];
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windowState', device.functionalChannels[channel].windowState));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.eventDelay', device.functionalChannels[channel].eventDelay));
@@ -615,6 +628,14 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _createDeviceBaseChannel(device, channel) {
         let promises = [];
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.configPending', { type: 'state', common: { name: 'configPending', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.dutyCycle', { type: 'state', common: { name: 'dutyCycle', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.lowBat', { type: 'state', common: { name: 'lowBat', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.routerModuleEnabled', { type: 'state', common: { name: 'routerModuleEnabled', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.routerModuleSupported', { type: 'state', common: { name: 'routerModuleSupported', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.rssiDeviceValue', { type: 'state', common: { name: 'rssiDeviceValue', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.rssiPeerValue', { type: 'state', common: { name: 'rssiPeerValue', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.unreach', { type: 'state', common: { name: 'unreach', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         return promises;
     }
 
