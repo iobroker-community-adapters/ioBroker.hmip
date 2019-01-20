@@ -42,6 +42,7 @@ I may also need a json of a state change.
     BRAND_SHUTTER (HMIP-BROLL)
     MOTION_DETECTOR_INDOOR (HMIP-SMI)
     SMOKE_DETECTOR (HMIP-SWSD)
+    WATER_SENSOR (HMIP-SWD)
 
 ## Settings
 * specify the your SGTIN and the PIN of your Accesspoint, and validate via press of the blue Button. This will create a Authentication token.
