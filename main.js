@@ -171,6 +171,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'deactivateAbsence':
                     this._api.homeHeatingDeactivateAbsence()
                     break;
+                case 'setIntrusionAlertThroughSmokeDetectors':
+                    this._api.homeSetIntrusionAlertThroughSmokeDetectors(state.val)
+                    break;
             }
         }
     }
@@ -523,6 +526,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.solution', { type: 'state', common: { name: 'solution', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.activationInProgress', { type: 'state', common: { name: 'activationInProgress', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.active', { type: 'state', common: { name: 'active', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+       
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.setIntrusionAlertThroughSmokeDetectors', { type: 'state', common: { name: 'setIntrusionAlertThroughSmokeDetectors', type: 'boolean', role: 'info', read: false, write: true }, native: { parameter: 'setIntrusionAlertThroughSmokeDetectors' } }));
+
         promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.absenceType', { type: 'state', common: { name: 'absenceType', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.absenceEndTime', { type: 'state', common: { name: 'absenceEndTime', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.ecoTemperature', { type: 'state', common: { name: 'ecoTemperature', type: 'number', role: 'info', read: true, write: false }, native: {} }));
