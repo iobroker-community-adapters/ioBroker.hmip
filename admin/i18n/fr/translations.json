@@ -2,11 +2,11 @@
     "on save adapter restarts with new config immediately": "sur save, l'adaptateur redémarre immédiatement avec la nouvelle configuration",
     "normaly filled by token creation": "normalement rempli par la création de jetons",
     "token data": "données de jeton",
-    "press \"start token creation\"": "appuyez sur \"démarrer la création de jeton\"",
+    "press 'start token creation'": "appuyez sur \"démarrer la création de jeton\"",
     "start token creation": "lancer la création de jetons",
     "id for your homatic device, leave empty or reuse already created one (if you remove adapter and install again)": "Identifiant de votre appareil homatic, laissez vide ou réutilisez celui déjà créé (si vous retirez l’adaptateur et réinstallez-le)",
     "enter accessPointSgtin & pin here": "entrez accessPointSgtin & pin ici",
-    "and press \"start token creation\"": "et appuyez sur \"démarrer la création de jeton\"",
+    "and press 'start token creation'": "et appuyez sur \"démarrer la création de jeton\"",
     "create HomematicIP token": "créer un jeton HomematicIP",
     "caution - this adapter is only for communication with a homatic ip cloudaccesspoint": "attention - cet adaptateur est uniquement destiné à la communication avec un point d'accès homematic ip cloud",
     "started token creation": "a commencé la création de jetons",
@@ -14,5 +14,6 @@
     "confirming token": "jeton de confirmation",
     "error occured during token generation, look at the logs": "une erreur est survenue pendant la génération du jeton, consultez les journaux",
     "token created, save settings to use your accesspoint": "Jeton créé, enregistrez les paramètres pour utiliser votre point d'accès",
-    "name for the device shown in the app": "nom de l'appareil affiché dans l'application"
+    "name for the device shown in the app": "nom de l'appareil affiché dans l'application",
+    "please start adapter so token could be created": "s'il vous plaît démarrez adaptateur afin jeton pourrait être créé"
 }

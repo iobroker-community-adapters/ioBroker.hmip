@@ -37,9 +37,11 @@
                     return true;
                 case 'errorOccured':
                     $('#deviceInfo').text('error occured during token generation, look at the logs');
+                    $('#table-button-create').prop("disabled", false);
                     break;
                 case 'idle':
-                    $('#deviceInfo').text('press "start token creation"');
+                    $('#deviceInfo').text("press 'start token creation'");
+                    $('#table-button-create').prop("disabled", false);
                     break;
                 case 'tokenCreated': {
                     $('#authToken').val(response.authToken);
@@ -47,12 +49,14 @@
                     $('#clientId').val(response.clientId);
                     $('#deviceInfo').text('token created, save settings to use your accesspoint');
                     M.updateTextFields();
+                    $('#table-button-create').prop("disabled", false);
                     break;
                 }
             }
             return false;
         }
         function requestToken() {
+            $('#table-button-create').prop("disabled", true);
             let accessPointSgtin = $('#accessPointSgtin').val();
             let clientId = $('#clientId').val();
             let pin = $('#pin').val();
@@ -119,7 +123,7 @@
             callback(obj);
         }
 
-        setTimeout(() => sendrequestTokenState(), 2000);
+        setTimeout(() => sendrequestTokenState(), 100);
     </script>
 
     <style>
@@ -156,7 +160,7 @@
             <div class="row">
                 <div class="col s12">
                     <p class="translate">enter accessPointSgtin & pin here</p>
-                    <p class="translate">and press "start token creation"</p>
+                    <p class="translate">and press 'start token creation'</p>
                 </div>
             </div>
             <div class="row">
@@ -181,12 +185,12 @@
                     <input class="value" id="pin" /><label for="pin" class="translate">pin</label>
                 </div>
                 <div class="col s12 m6 l4">
-                    <button id="table-button-create" class="waves-effect waves-light btn" style="margin-top: 20px;"
+                    <button disabled id="table-button-create" class="waves-effect waves-light btn" style="margin-top: 20px;"
                         onclick="requestToken()"><span class="translate">start token creation</span></button>
                 </div>
                 <div id="deviceInfo" class="col s12 m6 l4" style="background: lightgrey; height: 60px; color:black; display: flex; justify-content: center; align-items: center;"
                     class="translate">
-                    press "start token creation"
+                    please start adapter so token could be created
                 </div>
             </div>
 

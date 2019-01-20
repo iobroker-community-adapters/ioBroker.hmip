@@ -2,11 +2,11 @@
     "on save adapter restarts with new config immediately": "on save adapter reinicia com nova configuração imediatamente",
     "normaly filled by token creation": "normalmente preenchido por criação simbólica",
     "token data": "dados de token",
-    "press \"start token creation\"": "pressione \"iniciar criação de token\"",
+    "press 'start token creation'": "pressione \"iniciar criação de token\"",
     "start token creation": "iniciar criação de token",
     "id for your homatic device, leave empty or reuse already created one (if you remove adapter and install again)": "id para o seu dispositivo homatic, deixe em branco ou reutilize um já criado (se você remover o adaptador e instalar novamente)",
     "enter accessPointSgtin & pin here": "insira accessPointSgtin & pin aqui",
-    "and press \"start token creation\"": "e pressione \"start token creation\"",
+    "and press 'start token creation'": "e pressione \"start token creation\"",
     "create HomematicIP token": "criar token HomematicIP",
     "caution - this adapter is only for communication with a homatic ip cloudaccesspoint": "cuidado - este adaptador é apenas para comunicação com um ponto de acesso de nuvem ip homematic",
     "started token creation": "criação de token iniciada",
@@ -14,5 +14,6 @@
     "confirming token": "token confirmando",
     "error occured during token generation, look at the logs": "erro ocorreu durante a geração do token, observe os logs",
     "token created, save settings to use your accesspoint": "token criado, salve as configurações para usar seu ponto de acesso",
-    "name for the device shown in the app": "nome do dispositivo mostrado no aplicativo"
+    "name for the device shown in the app": "nome do dispositivo mostrado no aplicativo",
+    "please start adapter so token could be created": "por favor, inicie o adaptador para que o token possa ser criado"
 }
