@@ -43,6 +43,9 @@ I may also need a json of a state change.
     MOTION_DETECTOR_INDOOR (HMIP-SMI)
     SMOKE_DETECTOR (HMIP-SWSD)
     WATER_SENSOR (HMIP-SWD)
+    ROTARY_HANDLE_SENSOR (HMIP-SRH)
+    BRAND_BLIND (HMIP-BBL)
+    ALARM_SIREN_INDOOR (HMIP-ASIR, HMIP-ASIR-B1)
 
 ## Settings
 * specify the your SGTIN and the PIN of your Accesspoint, and validate via press of the blue Button. This will create a Authentication token.
@@ -60,7 +63,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 ## Changelog
 
 ### 0.0.5
-* (jogibear9988) more devices and big refactoring
+* (jogibear9988) more devices and big refactoring (switched from DeviceType to FunctionalChannelType)
 
 ### 0.0.4
 * (jogibear9988) more devices, bugfixes. thanks to TobiasF1986, steckenpferd and Ma-ster77
