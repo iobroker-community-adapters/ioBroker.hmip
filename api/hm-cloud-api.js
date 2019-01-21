@@ -242,6 +242,34 @@ class HmCloudAPI {
         await this.callRestApi('group/heating/setBoost', data);
     }
 
+    async groupHeatingSetControlMode(groupId, controlMode) {
+        let data = { "groupId": groupId, "controlMode": controlMode };
+        //AUTOMATIC,MANUAL
+        await this.callRestApi('group/heating/setControlMode', data);
+    }
+
+    async groupHeatingSetActiveProfile(groupId, profileIndex) {
+        let data = { "groupId": groupId, "profileIndex": profileIndex };
+        await this.callRestApi('group/heating/setActiveProfile', data);
+    }
+
+    async groupSwitchingAlarmSetOnTime(groupId, onTime) {
+        let data ={"groupId": groupId, "onTime": onTime};
+        await this.callRestApi('group/switching/alarm/setOnTime', data);
+    }
+
+    async groupSwitchingAlarmTestSignalOptical(groupId, signalOptical) {
+        let data = { "groupId": groupId, "signalOptical": signalOptical };
+        //DISABLE_OPTICAL_SIGNAL,BLINKING_ALTERNATELY_REPEATING,BLINKING_BOTH_REPEATING,DOUBLE_FLASHING_REPEATING,FLASHING_BOTH_REPEATING,CONFIRMATION_SIGNAL_0,CONFIRMATION_SIGNAL_1,CONFIRMATION_SIGNAL_2
+        await this.callRestApi('group/switching/alarm/testSignalOptical', data);
+    }
+
+    async groupSwitchingAlarmSetSignalOptical(groupId, signalOptical) {
+        let data = { "groupId": groupId, "signalOptical": signalOptical };
+        //DISABLE_OPTICAL_SIGNAL,BLINKING_ALTERNATELY_REPEATING,BLINKING_BOTH_REPEATING,DOUBLE_FLASHING_REPEATING,FLASHING_BOTH_REPEATING,CONFIRMATION_SIGNAL_0,CONFIRMATION_SIGNAL_1,CONFIRMATION_SIGNAL_2
+        await this.callRestApi('group/switching/alarm/setSignalOptical', data);
+    }
+
     // =========== API for HM Clients ===========
 
     async clientDeleteClient(clientId) {
