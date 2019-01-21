@@ -59,6 +59,9 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
+### 0.0.5
+* (jogibear9988) more devices and big refactoring
+
 ### 0.0.4
 * (jogibear9988) more devices, bugfixes. thanks to TobiasF1986, steckenpferd and Ma-ster77
 

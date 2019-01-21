@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "0.0.4",
+        "version": "0.0.5",
         "news": {
+            "0.0.5": {
+                "en": "more devices and big refactoring",
+                "de": "mehr Geräte und großes Refactoring",
+                "ru": "больше устройств и большой рефакторинг",
+                "pt": "mais dispositivos e grande refatoração",
+                "nl": "meer apparaten en grote refactoring",
+                "fr": "plus d'appareils et grand refactoring",
+                "it": "più dispositivi e grande refactoring",
+                "es": "Más dispositivos y grandes refactorizaciones.",
+                "pl": "więcej urządzeń i duży refaktoryzacji",
+                "zh-cn": "更多设备和大型重构"
+            },
             "0.0.4": {
                 "en": "more devices, bugfixes. thanks to TobiasF1986, steckenpferd and Ma-ster77",
                 "de": "weitere Geräte, Bugfixes. ",
