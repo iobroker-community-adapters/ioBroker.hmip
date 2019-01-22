@@ -178,8 +178,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     this._api.homeSetIntrusionAlertThroughSmokeDetectors(state.val)
                     break;
                 case 'activateVacation':
-                    let vacTemp = await this.getState('homes.' + id + '.functionalHomes.indoorClimate.vacationTemperature').val;
-                    this._api.homeHeatingActivateVacation(val, state.val);
+                    let vacTemp = await this.getState('homes.' + o.native.id + '.functionalHomes.indoorClimate.vacationTemperature').val;
+                    this._api.homeHeatingActivateVacation(vacTemp, state.val);
                     break;
                 case 'deactivateVacation':
                     this._api.homeHeatingDeactivateVacation();
@@ -195,6 +195,15 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     break;
                 case 'setSecurityZonesActivationInternalAndExternal':
                     this._api.homeSetZonesActivation(true, true)
+                    break;
+                case 'setOnTime':
+                    this._api.groupSwitchingAlarmSetOnTime(o.native.id, state.val);
+                    break;
+                case 'testSignalOptical':
+                    this._api.groupSwitchingAlarmTestSignalOptical(o.native.id, state.val);
+                    break;
+                case 'setSignalOptical':
+                    this._api.groupSwitchingAlarmSetSignalOptical(o.native.id, state.val);
                     break;
             }
         }
@@ -908,6 +917,11 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.solution', { type: 'state', common: { name: 'solution', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.activationInProgress', { type: 'state', common: { name: 'activationInProgress', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.active', { type: 'state', common: { name: 'active', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.setOnTime', { type: 'state', common: { name: 'setOnTime', type: 'string', role: 'info', read: true, write: true }, native: { id: home.functionalHomes.SECURITY_AND_ALARM.id, parameter: 'setOnTime' } }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.testSignalOptical', { type: 'state', common: { name: 'testSignalOptical', type: 'string', role: 'info', read: true, write: true, states: { DISABLE_OPTICAL_SIGNAL: 'DISABLE_OPTICAL_SIGNAL', BLINKING_ALTERNATELY_REPEATING: 'BLINKING_ALTERNATELY_REPEATING', BLINKING_BOTH_REPEATING: 'BLINKING_BOTH_REPEATING', DOUBLE_FLASHING_REPEATING: 'DOUBLE_FLASHING_REPEATING', FLASHING_BOTH_REPEATING: 'FLASHING_BOTH_REPEATING', CONFIRMATION_SIGNAL_0: 'CONFIRMATION_SIGNAL_0', CONFIRMATION_SIGNAL_1: 'CONFIRMATION_SIGNAL_1', CONFIRMATION_SIGNAL_2: 'CONFIRMATION_SIGNAL_2' } }, native: { id: home.functionalHomes.SECURITY_AND_ALARM.id, parameter: 'testSignalOptical' } }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.setSignalOptical', { type: 'state', common: { name: 'setSignalOptical', type: 'string', role: 'info', read: true, write: true, states: { DISABLE_OPTICAL_SIGNAL: 'DISABLE_OPTICAL_SIGNAL', BLINKING_ALTERNATELY_REPEATING: 'BLINKING_ALTERNATELY_REPEATING', BLINKING_BOTH_REPEATING: 'BLINKING_BOTH_REPEATING', DOUBLE_FLASHING_REPEATING: 'DOUBLE_FLASHING_REPEATING', FLASHING_BOTH_REPEATING: 'FLASHING_BOTH_REPEATING', CONFIRMATION_SIGNAL_0: 'CONFIRMATION_SIGNAL_0', CONFIRMATION_SIGNAL_1: 'CONFIRMATION_SIGNAL_1', CONFIRMATION_SIGNAL_2: 'CONFIRMATION_SIGNAL_2' } }, native: { id: home.functionalHomes.SECURITY_AND_ALARM.id, parameter: 'setSignalOptical' } }));
+
 
         promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.setIntrusionAlertThroughSmokeDetectors', { type: 'state', common: { name: 'setIntrusionAlertThroughSmokeDetectors', type: 'boolean', role: 'info', read: false, write: true }, native: { parameter: 'setIntrusionAlertThroughSmokeDetectors' } }));
         promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.setSecurityZonesActivationNone', { type: 'state', common: { name: 'setSecurityZonesActivationNone', type: 'boolean', role: 'button', read: false, write: true }, native: { parameter: 'setSecurityZonesActivationNone' } }));
