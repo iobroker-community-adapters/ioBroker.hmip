@@ -62,6 +62,9 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
+### 0.0.6
+* (jogibear9988) fixes for more devices, alarm handling
+
 ### 0.0.5
 * (jogibear9988) more devices and big refactoring (switched from DeviceType to FunctionalChannelType)
 

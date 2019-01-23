@@ -1,8 +1,10 @@
 {
     "common": {
         "name": "hmip",
-        "version": "0.0.5",
+        "version": "0.0.6",
         "news": {
+            "0.0.6": {
+                "en": "fixes for more devices, alarm handling"},
             "0.0.5": {
                 "en": "more devices and big refactoring",
                 "de": "mehr Geräte und großes Refactoring",
