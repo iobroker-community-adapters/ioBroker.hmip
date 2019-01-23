@@ -268,7 +268,7 @@ class HmCloudAPI {
         await this.callRestApi('group/switching/alarm/setSignalOptical', data);
     }
 
-    async groupSwitchingAlarmTestSignalAcoustic(groupId, signalOptical) {
+    async groupSwitchingAlarmTestSignalAcoustic(groupId, signalAcoustic) {
         let data = { "groupId": groupId, "signalAcoustic": signalAcoustic };
         await this.callRestApi('group/switching/alarm/testSignalAcoustic', data);
     }
