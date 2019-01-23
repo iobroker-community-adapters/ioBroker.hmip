@@ -349,44 +349,44 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _updateDeviceBaseChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.configPending', device.functionalChannels[channel].configPending));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.dutyCycle', device.functionalChannels[channel].dutyCycle));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.lowBat', device.functionalChannels[channel].lowBat));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.routerModuleEnabled', device.functionalChannels[channel].routerModuleEnabled));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.routerModuleSupported', device.functionalChannels[channel].routerModuleSupported));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.rssiDeviceValue', device.functionalChannels[channel].rssiDeviceValue));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.rssiPeerValue', device.functionalChannels[channel].rssiPeerValue));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.unreach', device.functionalChannels[channel].unreach));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.configPending', device.functionalChannels[channel].configPending, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.dutyCycle', device.functionalChannels[channel].dutyCycle, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.lowBat', device.functionalChannels[channel].lowBat, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.routerModuleEnabled', device.functionalChannels[channel].routerModuleEnabled, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.routerModuleSupported', device.functionalChannels[channel].routerModuleSupported, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.rssiDeviceValue', device.functionalChannels[channel].rssiDeviceValue, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.rssiPeerValue', device.functionalChannels[channel].rssiPeerValue, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.unreach', device.functionalChannels[channel].unreach, true));
         return promises;
     }
 
     _updateRotaryHandleChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windowState', device.functionalChannels[channel].windowState));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.eventDelay', device.functionalChannels[channel].eventDelay));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windowState', device.functionalChannels[channel].windowState, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.eventDelay', device.functionalChannels[channel].eventDelay, true));
         return promises;
     }
 
     _updateBlindChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.shutterLevel', device.functionalChannels[channel].shutterLevel));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.previousShutterLevel', device.functionalChannels[channel].previousShutterLevel));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.processing', device.functionalChannels[channel].processing));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.selfCalibrationInProgress', device.functionalChannels[channel].selfCalibrationInProgress));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.topToBottomReferenceTime', device.functionalChannels[channel].topToBottomReferenceTime));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.bottomToTopReferenceTime', device.functionalChannels[channel].bottomToTopReferenceTime));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.changeOverDelay', device.functionalChannels[channel].changeOverDelay));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.supportingSelfCalibration', device.functionalChannels[channel].supportingSelfCalibration));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.endpositionAutoDetectionEnabled', device.functionalChannels[channel].endpositionAutoDetectionEnabled));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.supportingEndpositionAutoDetection', device.functionalChannels[channel].supportingEndpositionAutoDetection));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.delayCompensationValue', device.functionalChannels[channel].delayCompensationValue));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.supportingDelayCompensation', device.functionalChannels[channel].supportingDelayCompensation));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.profileMode', device.functionalChannels[channel].profileMode));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.userDesiredProfileMode', device.functionalChannels[channel].userDesiredProfileMode));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.slatsLevel', device.functionalChannels[channel].slatsLevel));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.previousSlatsLevel', device.functionalChannels[channel].previousSlatsLevel));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.slatsReferenceTime', device.functionalChannels[channel].slatsReferenceTime));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.blindModeActive', device.functionalChannels[channel].blindModeActive));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.shutterLevel', device.functionalChannels[channel].shutterLevel, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.previousShutterLevel', device.functionalChannels[channel].previousShutterLevel, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.processing', device.functionalChannels[channel].processing, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.selfCalibrationInProgress', device.functionalChannels[channel].selfCalibrationInProgress, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.topToBottomReferenceTime', device.functionalChannels[channel].topToBottomReferenceTime, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.bottomToTopReferenceTime', device.functionalChannels[channel].bottomToTopReferenceTime, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.changeOverDelay', device.functionalChannels[channel].changeOverDelay, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.supportingSelfCalibration', device.functionalChannels[channel].supportingSelfCalibration, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.endpositionAutoDetectionEnabled', device.functionalChannels[channel].endpositionAutoDetectionEnabled, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.supportingEndpositionAutoDetection', device.functionalChannels[channel].supportingEndpositionAutoDetection, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.delayCompensationValue', device.functionalChannels[channel].delayCompensationValue, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.supportingDelayCompensation', device.functionalChannels[channel].supportingDelayCompensation, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.profileMode', device.functionalChannels[channel].profileMode, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.userDesiredProfileMode', device.functionalChannels[channel].userDesiredProfileMode, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.slatsLevel', device.functionalChannels[channel].slatsLevel, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.previousSlatsLevel', device.functionalChannels[channel].previousSlatsLevel, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.slatsReferenceTime', device.functionalChannels[channel].slatsReferenceTime, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.blindModeActive', device.functionalChannels[channel].blindModeActive, true));
         return promises;
     }
 
