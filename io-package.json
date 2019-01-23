@@ -1,10 +1,32 @@
 {
     "common": {
         "name": "hmip",
-        "version": "0.0.6",
+        "version": "0.0.7",
         "news": {
+            "0.0.7": {
+                "en": "fixes wrong state handling",
+                "de": "behebt falsche Zustandsbehandlung",
+                "ru": "исправляет неправильную обработку состояний",
+                "pt": "corrige o manuseio incorreto do estado",
+                "nl": "corrigeert verkeerde verwerking van de toestand",
+                "fr": "corrige une mauvaise gestion d'état",
+                "it": "corregge la gestione dello stato errato",
+                "es": "corrige el manejo incorrecto del estado",
+                "pl": "naprawia nieprawidłową obsługę stanu",
+                "zh-cn": "修复错误的状态处理"
+            },
             "0.0.6": {
-                "en": "fixes for more devices, alarm handling"},
+                "en": "fixes for more devices, alarm handling",
+                "de": "Korrekturen für mehr Geräte, Alarmbehandlung",
+                "ru": "исправления для большего количества устройств, обработка сигналов тревоги",
+                "pt": "correções para mais dispositivos, manipulação de alarmes",
+                "nl": "reparaties voor meer apparaten, alarmafhandeling",
+                "fr": "corrections pour plus d'appareils, gestion des alarmes",
+                "it": "correzioni per più dispositivi, gestione allarmi",
+                "es": "Reparaciones para más dispositivos, manejo de alarmas.",
+                "pl": "poprawki dla większej liczby urządzeń, obsługa alarmów",
+                "zh-cn": "修复了更多设备，报警处理"
+            },
             "0.0.5": {
                 "en": "more devices and big refactoring",
                 "de": "mehr Geräte und großes Refactoring",
