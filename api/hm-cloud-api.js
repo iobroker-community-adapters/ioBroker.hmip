@@ -270,6 +270,18 @@ class HmCloudAPI {
         await this.callRestApi('group/switching/alarm/setSignalOptical', data);
     }
 
+    async groupSwitchingAlarmTestSignalAcoustic(groupId, signalOptical) {
+        let data = { "groupId": groupId, "signalAcoustic": signalAcoustic };
+        //DISABLE_OPTICAL_SIGNAL,BLINKING_ALTERNATELY_REPEATING,BLINKING_BOTH_REPEATING,DOUBLE_FLASHING_REPEATING,FLASHING_BOTH_REPEATING,CONFIRMATION_SIGNAL_0,CONFIRMATION_SIGNAL_1,CONFIRMATION_SIGNAL_2
+        await this.callRestApi('group/switching/alarm/testSignalAcoustic', data);
+    }
+
+    async groupSwitchingAlarmSetSignalAcoustic(groupId, signalAcoustic) {
+        let data = { "groupId": groupId, "signalAcoustic": signalAcoustic };
+        //DISABLE_OPTICAL_SIGNAL,BLINKING_ALTERNATELY_REPEATING,BLINKING_BOTH_REPEATING,DOUBLE_FLASHING_REPEATING,FLASHING_BOTH_REPEATING,CONFIRMATION_SIGNAL_0,CONFIRMATION_SIGNAL_1,CONFIRMATION_SIGNAL_2
+        await this.callRestApi('group/switching/alarm/setSignalAcoustic', data);
+    }
+
     // =========== API for HM Clients ===========
 
     async clientDeleteClient(clientId) {
