@@ -363,6 +363,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _updateRotaryHandleChannelStates(device, channel) {
         let promises = [];
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windowState', device.functionalChannels[channel].windowState, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windowOpen', device.functionalChannels[channel].windowState == 'OPEN', true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.eventDelay', device.functionalChannels[channel].eventDelay, true));
         return promises;
     }
@@ -400,7 +401,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _updateShutterContactChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windowState', device.functionalChannels[channel].windowState == 'OPEN' ? 'open' : 'close', true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windowState', device.functionalChannels[channel].windowState, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windowOpen', device.functionalChannels[channel].windowState == 'OPEN', true));
         return promises;
     }
 
@@ -723,6 +725,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _createRotaryHandleChannel(device, channel) {
         let promises = [];
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windowState', { type: 'state', common: { name: 'windowState', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windowOpen', { type: 'state', common: { name: 'windowOpen', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.eventDelay', { type: 'state', common: { name: 'eventDelay', type: 'number', role: 'info', read: true, write: false }, native: {} }));
         return promises;
     }
@@ -762,7 +765,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _createShutterContactChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windowState', { type: 'state', common: { name: 'windowOpen', type: 'string', role: 'sensor.window', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windowState', { type: 'state', common: { name: 'windowState', type: 'string', role: 'sensor.window', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windowOpen', { type: 'state', common: { name: 'windowOpen', type: 'boolean', role: 'sensor.window', read: true, write: false }, native: {} }));
         return promises;
     }
 
