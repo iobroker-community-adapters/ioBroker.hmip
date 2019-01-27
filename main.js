@@ -283,7 +283,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     //promises.push(...this._createDeviceOperationLockChannel(device, i));
                     break;
                 case 'DEVICE_SABOTAGE':
-                    //promises.push(...this._createDeviceSabotageChannel(device, i));
+                    promises.push(...this._updateDeviceSabotageChannelStates(device, i));
                     break;
                 case 'HEATING_THERMOSTAT_CHANNEL':
                     promises.push(...this._updateHeatingThermostatChannelStates(device, i));
@@ -397,6 +397,13 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.rssiDeviceValue', device.functionalChannels[channel].rssiDeviceValue, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.rssiPeerValue', device.functionalChannels[channel].rssiPeerValue, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.unreach', device.functionalChannels[channel].unreach, true));
+        return promises;
+    }
+
+    _updateDeviceSabotageChannelStates(device, channel) {
+        let promises = [];
+        promises.push(...this._updateDeviceBaseChannelStates(device, channel));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.sabotage', device.functionalChannels[channel].sabotage, true));
         return promises;
     }
 
@@ -760,11 +767,6 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         return promises;
     }
 
-    _createDeviceSabotageChannel(device, channel) {
-        let promises = [];
-        return promises;
-    }
-
     _createInternalSwitchChannel(device, channel) {
         let promises = [];
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.frostProtectionTemperature', { type: 'state', common: { name: 'frostProtectionTemperature', type: 'number', role: 'info', read: true, write: false }, native: {} }));
@@ -800,6 +802,13 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.rssiDeviceValue', { type: 'state', common: { name: 'rssiDeviceValue', type: 'number', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.rssiPeerValue', { type: 'state', common: { name: 'rssiPeerValue', type: 'number', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.unreach', { type: 'state', common: { name: 'unreach', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
+    _createDeviceSabotageChannel(device, channel) {
+        let promises = [];
+        promises.push(...this._createDeviceBaseChannel(device, channel));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.sabotage', { type: 'state', common: { name: 'sabotage', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         return promises;
     }
 
