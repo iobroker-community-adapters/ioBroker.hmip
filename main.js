@@ -337,6 +337,12 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'ROTARY_HANDLE_CHANNEL':
                     promises.push(...this._updateRotaryHandleChannelStates(device, i));
                     break;
+                case 'MULTI_MODE_INPUT_CHANNEL':
+                    promises.push(...this._updateMultiModeInputChannelStates(device, i));
+                    break;
+                case 'SMOKE_DETECTOR_CHANNEL':
+                    promises.push(...this._updateSmokeDetectorChannelStates(device, i));
+                    break;
                 default:
                     this.log.info("unkown channel type - " + fc.functionalChannelType + " - " + JSON.stringify(device));
                     break;
@@ -346,6 +352,21 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     /* Start Channel Types */
+
+    _updateSmokeDetectorChannelStates(device, channel) {
+        let promises = [];
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.smokeDetectorAlarmType', device.functionalChannels[channel].smokeDetectorAlarmType, true));
+        return promises;
+    }
+
+    _updateMultiModeInputChannelStates(device, channel) {
+        let promises = [];
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.binaryBehaviorType', device.functionalChannels[channel].binaryBehaviorType, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.multiModeInputMode', device.functionalChannels[channel].multiModeInputMode, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windowState', device.functionalChannels[channel].windowState, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windowOpen', device.functionalChannels[channel].windowState == 'OPEN', true));
+        return promises;
+    }
 
     _updateDeviceBaseChannelStates(device, channel) {
         let promises = [];
@@ -683,6 +704,13 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'ROTARY_HANDLE_CHANNEL':
                     promises.push(...this._createRotaryHandleChannel(device, i));
                     break;
+                case 'MULTI_MODE_INPUT_CHANNEL':
+                    promises.push(...this._createMultiModeInputChannel(device, i));
+                    break;
+                case 'SMOKE_DETECTOR_CHANNEL':
+                    promises.push(...this._createSmokeDetectorChannel(device, i));
+                    break;
+
                 default:
                     this.log.info("unkown channel type - " + fc.functionalChannelType + " - " + JSON.stringify(device));
                     break;
@@ -701,6 +729,21 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _createDeviceSabotageChannel(device, channel) {
         let promises = [];
+        return promises;
+    }
+
+    _createSmokeDetectorChannel(device, channel) {
+        let promises = [];
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.smokeDetectorAlarmType', { type: 'state', common: { name: 'smokeDetectorAlarmType', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
+    _createMultiModeInputChannel(device, channel) {
+        let promises = [];
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.binaryBehaviorType', { type: 'state', common: { name: 'binaryBehaviorType', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.multiModeInputMode', { type: 'state', common: { name: 'multiModeInputMode', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windowState', { type: 'state', common: { name: 'windowState', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windowOpen', { type: 'state', common: { name: 'windowOpen', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         return promises;
     }
 
