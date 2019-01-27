@@ -62,6 +62,9 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
+### 0.0.8
+* (jogibear9988) fixes a few devices
+
 ### 0.0.7
 * (jogibear9988) fixes wrong state handling
 

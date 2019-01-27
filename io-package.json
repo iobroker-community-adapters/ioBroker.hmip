@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "0.0.7",
+        "version": "0.0.8",
         "news": {
+            "0.0.8": {
+                "en": "fixes a few devices",
+                "de": "behebt ein paar Geräte",
+                "ru": "исправляет несколько устройств",
+                "pt": "corrige alguns dispositivos",
+                "nl": "repareert een paar apparaten",
+                "fr": "corrige quelques appareils",
+                "it": "corregge alcuni dispositivi",
+                "es": "arregla algunos dispositivos",
+                "pl": "naprawia kilka urządzeń",
+                "zh-cn": "修复了一些设备"
+            },
             "0.0.7": {
                 "en": "fixes wrong state handling",
                 "de": "behebt falsche Zustandsbehandlung",
