@@ -334,6 +334,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'SWITCH_MEASURING_CHANNEL':
                     promises.push(...this._updateSwitchMeasuringChannelStates(device, i));
                     break;
+                case 'SWITCH_CHANNEL':
+                    promises.push(...this._updateSwitchChannelStates(device, i));
+                    break;
                 case 'BLIND_CHANNEL':
                     promises.push(...this._updateBlindChannelStates(device, i));
                     break;
@@ -429,9 +432,17 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         return promises;
     }
 
-    _updateSwitchMeasuringChannelStates(device, channel) {
+    _updateSwitchChannelStates(device, channel) {
         let promises = [];
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.on', device.functionalChannels[channel].on, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.profileMode', device.functionalChannels[channel].profileMode, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.userDesiredProfileMode', device.functionalChannels[channel].userDesiredProfileMode, true));
+        return promises;
+    }
+
+    _updateSwitchMeasuringChannelStates(device, channel) {
+        let promises = [];
+        promises.push(...this._updateSwitchChannelStates());
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.energyCounter', device.functionalChannels[channel].energyCounter, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.currentPowerConsumption', device.functionalChannels[channel].currentPowerConsumption, true));
         return promises;
@@ -715,6 +726,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'SWITCH_MEASURING_CHANNEL':
                     promises.push(...this._createSwitchMeasuringChannel(device, i));
                     break;
+                case 'SWITCH_CHANNEL':
+                    promises.push(...this._createSwitchChannel(device, i));
+                    break;
                 case 'BLIND_CHANNEL':
                     promises.push(...this._createBlindChannel(device, i));
                     break;
@@ -923,9 +937,17 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         return promises;
     }
 
-    _createSwitchMeasuringChannel(device, channel) {
+    _createSwitchChannel(device, channel) {
         let promises = [];
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'switchState' } }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.profileMode', { type: 'state', common: { name: 'profileMode', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.userDesiredProfileMode', { type: 'state', common: { name: 'userDesiredProfileMode', type: 'string', role: 'button', read: false, write: true }, native: { id: device.id, channel: channel, parameter: 'resetEnergyCounter' } }));
+        return promises;
+    }
+
+    _createSwitchMeasuringChannel(device, channel) {
+        let promises = [];
+        promises.push(...this._createSwitchChannel());
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.energyCounter', { type: 'state', common: { name: 'energyCounter', type: 'number', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.currentPowerConsumption', { type: 'state', common: { name: 'currentPowerConsumption', type: 'number', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.resetEnergyCounter', { type: 'state', common: { name: 'on', type: 'boolean', role: 'button', read: false, write: true }, native: { id: device.id, channel: channel, parameter: 'resetEnergyCounter' } }));
