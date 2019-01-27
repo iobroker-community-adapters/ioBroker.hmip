@@ -319,7 +319,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     promises.push(...this._updateAlarmSirenChannelStates(device, i));
                     break;
                 case 'DEVICE_PERMANENT_FULL_RX':
-                    //promises.push(...this._createDevicePermanentFullRxChannel(device, i));
+                    promises.push(...this._updateDevicePermanentFullRxChannelStates(device, i));
                     break;
                 case 'SINGLE_KEY_CHANNEL':
                     promises.push(...this._updateSingleKeyChannelStates(device, i));
@@ -411,6 +411,13 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         let promises = [];
         promises.push(...this._updateDeviceBaseChannelStates(device, channel));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.operationLockActive', device.functionalChannels[channel].operationLockActive, true));
+        return promises;
+    }
+
+    _updateDevicePermanentFullRxChannelStates(device, channel) {
+        let promises = [];
+        promises.push(...this._updateDeviceBaseChannelStates(device, channel));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.permanentFullRx', device.functionalChannels[channel].permanentFullRx, true));
         return promises;
     }
 
@@ -823,6 +830,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _createDevicePermanentFullRxChannel(device, channel) {
         let promises = [];
+        promises.push(...this._createDeviceBaseChannel(device, channel));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.permanentFullRx', { type: 'state', common: { name: 'permanentFullRx', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         return promises;
     }
 
