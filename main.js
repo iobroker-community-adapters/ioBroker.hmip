@@ -343,6 +343,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'SMOKE_DETECTOR_CHANNEL':
                     promises.push(...this._updateSmokeDetectorChannelStates(device, i));
                     break;
+                case 'INTERNAL_SWITCH_CHANNEL':
+                    promises.push(...this._updateInternalSwitchChannelStates(device, i));
+                    break;
                 default:
                     this.log.info("unkown channel type - " + fc.functionalChannelType + " - " + JSON.stringify(device));
                     break;
@@ -352,6 +355,17 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     /* Start Channel Types */
+
+    _updateInternalSwitchChannelStates(device, channel) {
+        let promises = [];
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.frostProtectionTemperature', device.functionalChannels[channel].frostProtectionTemperature, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.heatingValveType', device.functionalChannels[channel].heatingValveType, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.internalSwitchOutputEnabled', device.functionalChannels[channel].internalSwitchOutputEnabled, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionDuration', device.functionalChannels[channel].valveProtectionDuration, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionSwitchingInterval', device.functionalChannels[channel].valveProtectionSwitchingInterval, true));
+
+        return promises;
+    }
 
     _updateSmokeDetectorChannelStates(device, channel) {
         let promises = [];
@@ -710,6 +724,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'SMOKE_DETECTOR_CHANNEL':
                     promises.push(...this._createSmokeDetectorChannel(device, i));
                     break;
+                case 'INTERNAL_SWITCH_CHANNEL':
+                    promises.push(...this._createInternalSwitchChannel(device, i));
+                    break;
 
                 default:
                     this.log.info("unkown channel type - " + fc.functionalChannelType + " - " + JSON.stringify(device));
@@ -729,6 +746,16 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _createDeviceSabotageChannel(device, channel) {
         let promises = [];
+        return promises;
+    }
+
+    _createInternalSwitchChannel(device, channel) {
+        let promises = [];
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.frostProtectionTemperature', { type: 'state', common: { name: 'frostProtectionTemperature', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.heatingValveType', { type: 'state', common: { name: 'heatingValveType', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.internalSwitchOutputEnabled', { type: 'state', common: { name: 'internalSwitchOutputEnabled', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionDuration', { type: 'state', common: { name: 'valveProtectionDuration', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionSwitchingInterval', { type: 'state', common: { name: 'valveProtectionSwitchingInterval', type: 'number', role: 'info', read: true, write: false }, native: {} }));
         return promises;
     }
 
