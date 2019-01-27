@@ -152,6 +152,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'shutterlevel':
                     this._api.deviceControlSetShutterLevel(o.native.id, state.val, o.native.channel)
                     break;
+                case 'slatsLevel':
+                    this._api.deviceControlSetSlatsLevel(o.native.id, state.val, o.native.channel)
+                    break;
                 case 'stop':
                     this._api.deviceControlStop(o.native.id, o.native.channel)
                     break;
@@ -817,7 +820,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.supportingDelayCompensation', { type: 'state', common: { name: 'supportingDelayCompensation', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.profileMode', { type: 'state', common: { name: 'profileMode', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.userDesiredProfileMode', { type: 'state', common: { name: 'userDesiredProfileMode', type: 'string', role: 'info', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.slatsLevel', { type: 'state', common: { name: 'slatsLevel', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.slatsLevel', { type: 'state', common: { name: 'slatsLevel', type: 'number', role: 'info', read: true, write: false }, native: { id: device.id, channel: channel, parameter: 'slatsLevel' } }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.previousSlatsLevel', { type: 'state', common: { name: 'previousSlatsLevel', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.slatsReferenceTime', { type: 'state', common: { name: 'slatsReferenceTime', type: 'number', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.blindModeActive', { type: 'state', common: { name: 'blindModeActive', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));

@@ -193,6 +193,11 @@ class HmCloudAPI {
         await this.callRestApi('device/control/setShutterLevel', data);
     }
 
+    async deviceControlSetSlatsLevel(deviceId, slatsLevel, channelIndex = 1) {
+        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'slatsLevel': slatsLevel };
+        await this.callRestApi('device/control/setSlatsLevel', data);
+    }
+
     async deviceControlStop(deviceId, channelIndex = 1) {
         let data = { "deviceId": deviceId, "channelIndex": channelIndex };
         await this.callRestApi('device/control/stop', data);
