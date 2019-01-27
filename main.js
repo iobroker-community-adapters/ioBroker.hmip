@@ -280,7 +280,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             switch (fc.functionalChannelType) {
 
                 case 'DEVICE_OPERATIONLOCK':
-                    //promises.push(...this._createDeviceOperationLockChannel(device, i));
+                    promises.push(...this._updateDeviceOperationLockChannelStates(device, i));
                     break;
                 case 'DEVICE_SABOTAGE':
                     promises.push(...this._updateDeviceSabotageChannelStates(device, i));
@@ -404,6 +404,13 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         let promises = [];
         promises.push(...this._updateDeviceBaseChannelStates(device, channel));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.sabotage', device.functionalChannels[channel].sabotage, true));
+        return promises;
+    }
+
+    _updateDeviceOperationLockChannelStates(device, channel) {
+        let promises = [];
+        promises.push(...this._updateDeviceBaseChannelStates(device, channel));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.operationLockActive', device.functionalChannels[channel].operationLockActive, true));
         return promises;
     }
 
@@ -762,11 +769,6 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     /* Start Channel Types */
 
-    _createDeviceOperationLockChannel(device, channel) {
-        let promises = [];
-        return promises;
-    }
-
     _createInternalSwitchChannel(device, channel) {
         let promises = [];
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.frostProtectionTemperature', { type: 'state', common: { name: 'frostProtectionTemperature', type: 'number', role: 'info', read: true, write: false }, native: {} }));
@@ -809,6 +811,13 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         let promises = [];
         promises.push(...this._createDeviceBaseChannel(device, channel));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.sabotage', { type: 'state', common: { name: 'sabotage', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
+    _createDeviceOperationLockChannel(device, channel) {
+        let promises = [];
+        promises.push(...this._createDeviceBaseChannel(device, channel));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.operationLockActive', { type: 'state', common: { name: 'operationLockActive', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         return promises;
     }
 
