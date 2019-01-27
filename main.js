@@ -88,9 +88,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         if (this.config.accessPointSgtin && this.config.authToken && this.config.clientAuthToken && this.config.clientId) {
             try {
                 await this._startupHomematic();
-
             } catch (err) {
-                this.log.error('error starting homematic: ' + err);
+                this.log.error('error starting homematic: ' +  err);
             }
         } else {
             this.log.info('token not yet created');
@@ -144,41 +143,41 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             this.log.info('state change - ' + o.native.parameter + ' - id ' + (o.native.id ? o.native.id : '') + ' - value ' + state.val);
             switch (o.native.parameter) {
                 case 'switchState':
-                    this._api.deviceControlSetSwitchState(o.native.id, state.val, o.native.channel)
+                    this._api.deviceControlSetSwitchState(o.native.id, state.val, o.native.channel);
                     break;
                 case 'resetEnergyCounter':
-                    this._api.deviceControlResetEnergyCounter(o.native.id, o.native.channel)
+                    this._api.deviceControlResetEnergyCounter(o.native.id, o.native.channel);
                     break;
                 case 'shutterlevel':
-                    this._api.deviceControlSetShutterLevel(o.native.id, state.val, o.native.channel)
+                    this._api.deviceControlSetShutterLevel(o.native.id, state.val, o.native.channel);
                     break;
                 case 'slatsLevel':
-                    this._api.deviceControlSetSlatsLevel(o.native.id, state.val, o.native.channel)
+                    this._api.deviceControlSetSlatsLevel(o.native.id, state.val, o.native.channel);
                     break;
                 case 'stop':
-                    this._api.deviceControlStop(o.native.id, o.native.channel)
+                    this._api.deviceControlStop(o.native.id, o.native.channel);
                     break;
                 case 'setPointTemperature':
                     for (let id of o.native.id)
                         this._api.groupHeatingSetPointTemperature(id, state.val);
                     break;
                 case 'setDimLevel':
-                    this._api.deviceControlSetDimLevel(o.native.id, state.val, o.native.channel)
+                    this._api.deviceControlSetDimLevel(o.native.id, state.val, o.native.channel);
                     break;
                 case 'changeOverDelay':
                     //this._api.deviceConfigurationChangeOverDelay(o.native.id, state.val, o.native.channel)
                     break;
                 case 'setAbsenceEndTime':
-                    this._api.homeHeatingActivateAbsenceWithPeriod(state.val)
+                    this._api.homeHeatingActivateAbsenceWithPeriod(state.val);
                     break;
                 case 'setAbsenceDuration':
-                    this._api.homeHeatingActivateAbsenceWithDuration(state.val)
+                    this._api.homeHeatingActivateAbsenceWithDuration(state.val);
                     break;
                 case 'deactivateAbsence':
-                    this._api.homeHeatingDeactivateAbsence()
+                    this._api.homeHeatingDeactivateAbsence();
                     break;
                 case 'setIntrusionAlertThroughSmokeDetectors':
-                    this._api.homeSetIntrusionAlertThroughSmokeDetectors(state.val)
+                    this._api.homeSetIntrusionAlertThroughSmokeDetectors(state.val);
                     break;
                 case 'activateVacation':
                     let vacTemp = await this.getState('homes.' + o.native.id + '.functionalHomes.indoorClimate.vacationTemperature').val;
@@ -188,16 +187,16 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     this._api.homeHeatingDeactivateVacation();
                     break;
                 case 'setSecurityZonesActivationNone':
-                    this._api.homeSetZonesActivation(false, false)
+                    this._api.homeSetZonesActivation(false, false);
                     break;
                 case 'setSecurityZonesActivationInternal':
-                    this._api.homeSetZonesActivation(true, false)
+                    this._api.homeSetZonesActivation(true, false);
                     break;
                 case 'setSecurityZonesActivationExternal':
-                    this._api.homeSetZonesActivation(false, true)
+                    this._api.homeSetZonesActivation(false, true);
                     break;
                 case 'setSecurityZonesActivationInternalAndExternal':
-                    this._api.homeSetZonesActivation(true, true)
+                    this._api.homeSetZonesActivation(true, true);
                     break;
                 case 'setOnTime':
                     for (let id of o.native.id)
@@ -442,7 +441,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _updateSwitchMeasuringChannelStates(device, channel) {
         let promises = [];
-        promises.push(...this._updateSwitchChannelStates());
+        promises.push(...this._updateSwitchChannelStates(device, channel));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.energyCounter', device.functionalChannels[channel].energyCounter, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.currentPowerConsumption', device.functionalChannels[channel].currentPowerConsumption, true));
         return promises;
@@ -492,7 +491,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _updateWeatherSensorPlusChannelStates(device, channel) {
         let promises = [];
-        promises.push(...this._updateWeatherSensorChannelStates());
+        promises.push(...this._updateWeatherSensorChannelStates(device, channel));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.raining', device.functionalChannels[channel].raining, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.todayRainCounter', device.functionalChannels[channel].todayRainCounter, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.totalRainCounter', device.functionalChannels[channel].totalRainCounter, true));
@@ -502,7 +501,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _updateWeatherSensorProChannelStates(device, channel) {
         let promises = [];
-        promises.push(...this._updateWeatherSensorPlusChannelStates());
+        promises.push(...this._updateWeatherSensorPlusChannelStates(device, channel));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.weathervaneAlignmentNeeded', device.functionalChannels[channel].weathervaneAlignmentNeeded, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windDirection', device.functionalChannels[channel].windDirection, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windDirectionVariation', device.functionalChannels[channel].windDirectionVariation, true));
@@ -900,7 +899,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _createWeatherSensorPlusChannel(device, channel) {
         let promises = [];
-        promises.push(...this._createWaterSensorChannel());
+        promises.push(...this._createWaterSensorChannel(device, channel));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.raining', { type: 'state', common: { name: 'raining', type: 'boolean', role: 'info', read: true, write: true }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.todayRainCounter', { type: 'state', common: { name: 'todayRainCounter', type: 'number', role: 'level', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.totalRainCounter', { type: 'state', common: { name: 'totalRainCounter', type: 'number', role: 'level', read: true, write: false }, native: {} }));
@@ -910,7 +909,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _createWeatherSensorProChannel(device, channel) {
         let promises = [];
-        promises.push(...this._createWeatherSensorPlusChannel());
+        promises.push(...this._createWeatherSensorPlusChannel(device, channel));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.weathervaneAlignmentNeeded', { type: 'state', common: { name: 'weathervaneAlignmentNeeded', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windDirection', { type: 'state', common: { name: 'windDirection', type: 'number', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windDirectionVariation', { type: 'state', common: { name: 'windDirectionVariation', type: 'number', role: 'info', read: true, write: false }, native: {} }));
@@ -947,7 +946,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _createSwitchMeasuringChannel(device, channel) {
         let promises = [];
-        promises.push(...this._createSwitchChannel());
+        promises.push(...this._createSwitchChannel(device, channel));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.energyCounter', { type: 'state', common: { name: 'energyCounter', type: 'number', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.currentPowerConsumption', { type: 'state', common: { name: 'currentPowerConsumption', type: 'number', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.resetEnergyCounter', { type: 'state', common: { name: 'on', type: 'boolean', role: 'button', read: false, write: true }, native: { id: device.id, channel: channel, parameter: 'resetEnergyCounter' } }));
