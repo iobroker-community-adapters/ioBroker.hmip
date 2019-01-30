@@ -132,6 +132,8 @@ class HmCloudAPI {
 
         this._ws.on('message', (d) => {
             let dString = d.toString('utf8');
+            if (this.dataReceived)
+                this.dataReceived(dString);
             let data = JSON.parse(dString);
             this._parseEventdata(data);
         });

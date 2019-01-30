@@ -14,6 +14,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
         this._api = new apiClass();
         this._api.eventRaised = this._eventRaised.bind(this);
+        //this._api.dataReceived = this._dataReceived.bind(this);
 
         this.on('unload', this._unload);
         this.on('objectChange', this._objectChange);
@@ -222,6 +223,10 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         }
     }
 
+    _dataReceived(data) {
+        this.log.silly("data received - " + data);
+    }
+
     async _eventRaised(ev) {
         switch (ev.pushEventType) {
             case 'DEVICE_ADDED':
@@ -254,6 +259,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             case 'HOME_CHANGED':
                 await this._updateHomeStates(ev.home);
                 break;
+            default:
+                this.log.warn("unhandled event - " + JSON.stringify(ev));
         }
     }
 
@@ -329,6 +336,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     break;
                 case 'WALL_MOUNTED_THERMOSTAT_PRO_CHANNEL':
                     promises.push(...this._updateWallMountedThermostatProChannelStates(device, i));
+                    break;
+                case 'CLIMATE_SENSOR_CHANNEL':
+                    promises.push(...this._updateClimateSensorChannelStates(device, i));
                     break;
                 case 'SWITCH_MEASURING_CHANNEL':
                     promises.push(...this._updateSwitchMeasuringChannelStates(device, i));
@@ -563,14 +573,19 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         return promises;
     }
 
+    _updateClimateSensorChannelStates(device, channel) {
+        let promises = [];
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.actualTemperature', device.functionalChannels[channel].actualTemperature, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.humidity', device.functionalChannels[channel].humidity, true));
+        return promises;
+    }
+
     _updateWallMountedThermostatProChannelStates(device, channel) {
         let promises = [];
+        promises.push(...this._updateClimateSensorChannelStates(device, channel));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOffset', device.functionalChannels[channel].temperatureOffset, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.actualTemperature', device.functionalChannels[channel].actualTemperature, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.setPointTemperature', device.functionalChannels[channel].setPointTemperature, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.display', device.functionalChannels[channel].display, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.humidity', device.functionalChannels[channel].humidity, true));
-
         return promises;
     }
 
@@ -603,6 +618,10 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.setStateAsync('groups.' + group.id + '.actualTemperature', group.actualTemperature, true));
                 promises.push(this.setStateAsync('groups.' + group.id + '.setPointTemperature', group.setPointTemperature, true));
                 promises.push(this.setStateAsync('groups.' + group.id + '.humidity', group.humidity, true));
+                break;
+            }
+            case 'SWITCHING': {
+                promises.push(this.setStateAsync('groups.' + group.id + '.on', group.on, true));
                 break;
             }
         }
@@ -673,7 +692,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _createObjectsForDevice(device) {
         this.log.silly("createObjectsForDevice - " + device.type + " - " + JSON.stringify(device));
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id, { type: 'device', common: {}, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id, { type: 'device', common: { name: device.label }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.info.type', { type: 'state', common: { name: 'type', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.info.modelType', { type: 'state', common: { name: 'type', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.info.label', { type: 'state', common: { name: 'type', type: 'string', role: 'info', read: true, write: false }, native: {} }));
@@ -742,6 +761,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     break;
                 case 'WALL_MOUNTED_THERMOSTAT_PRO_CHANNEL':
                     promises.push(...this._createWallMountedThermostatProChannel(device, i));
+                    break;
+                case 'CLIMATE_SENSOR_CHANNEL':
+                    promises.push(...this._createClimateSensorChannel(device, i));
                     break;
                 case 'SWITCH_MEASURING_CHANNEL':
                     promises.push(...this._createSwitchMeasuringChannel(device, i));
@@ -959,7 +981,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _createSingleKeyChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'switchState' } }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { } }));
         return promises;
     }
 
@@ -980,14 +1002,19 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         return promises;
     }
 
+    _createClimateSensorChannel(device, channel) {
+        let promises = [];
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.humidity', { type: 'state', common: { name: 'humidity', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
     _createWallMountedThermostatProChannel(device, channel) {
         let promises = [];
+        promises.push(...this._createClimateSensorChannel(device, channel));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOffset', { type: 'state', common: { name: 'temperatureOffset', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'thermo', read: true, write: true }, native: { id: device.functionalChannels[channel].groups, parameter: 'setPointTemperature' } }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.display', { type: 'state', common: { name: 'display', type: 'string', role: 'info', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.humidity', { type: 'state', common: { name: 'humidity', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
-
         return promises;
     }
 
@@ -1012,7 +1039,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _createObjectsForGroup(group) {
         this.log.silly("createObjectsForGroup - " + JSON.stringify(group));
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('groups.' + group.id, { type: 'device', common: {}, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('groups.' + group.id, { type: 'device', common: { name: group.label }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.info.type', { type: 'state', common: { name: 'type', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.info.label', { type: 'state', common: { name: 'label', type: 'string', role: 'info', read: true, write: false }, native: {} }));
 
@@ -1031,6 +1058,10 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.setSignalAcoustic', { type: 'state', common: { name: 'setSignalAcoustic', type: 'string', role: 'info', read: true, write: true, states: { DISABLE_ACOUSTIC_SIGNAL: 'DISABLE_ACOUSTIC_SIGNAL', FREQUENCY_RISING: 'FREQUENCY_RISING', FREQUENCY_FALLING: 'FREQUENCY_FALLING', FREQUENCY_RISING_AND_FALLING: 'FREQUENCY_RISING_AND_FALLING', FREQUENCY_ALTERNATING_LOW_HIGH: 'FREQUENCY_ALTERNATING_LOW_HIGH', FREQUENCY_ALTERNATING_LOW_MID_HIGH: 'FREQUENCY_ALTERNATING_LOW_MID_HIGH', FREQUENCY_HIGHON_OFF: 'FREQUENCY_HIGHON_OFF', FREQUENCY_HIGHON_LONGOFF: 'FREQUENCY_HIGHON_LONGOFF', FREQUENCY_LOWON_OFF_HIGHON_OFF: 'FREQUENCY_LOWON_OFF_HIGHON_OFF', FREQUENCY_LOWON_LONGOFF_HIGHON_LONGOFF: 'FREQUENCY_LOWON_LONGOFF_HIGHON_LONGOFF', LOW_BATTERY: 'LOW_BATTERY', DISARMED: 'DISARMED', INTERNALLY_ARMED: 'INTERNALLY_ARMED', EXTERNALLY_ARMED: 'EXTERNALLY_ARMED', DELAYED_INTERNALLY_ARMED: 'DELAYED_INTERNALLY_ARMED', DELAYED_EXTERNALLY_ARMED: 'DELAYED_EXTERNALLY_ARMED', EVENT: 'EVENT', ERROR: 'ERROR' } }, native: { id: [group.id], parameter: 'setSignalAcoustic' } }));
                 break;
             }
+            case 'SWITCHING': {
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'info', read: true, write: true }, native: { } }));
+                break;
+            }
         }
 
         return Promise.all(promises);
@@ -1039,7 +1070,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _createObjectsForClient(client) {
         this.log.silly("createObjectsForClient - " + JSON.stringify(client));
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('clients.' + client.id, { type: 'device', common: {}, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('clients.' + client.id, { type: 'device', common: { name: client.label }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('clients.' + client.id + '.info.label', { type: 'state', common: { name: 'label', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         return Promise.all(promises);
     }
