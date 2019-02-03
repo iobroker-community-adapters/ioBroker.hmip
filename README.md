@@ -62,6 +62,9 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
+### 0.0.9
+* (jogibear9988) fullrx and operationlock channel
+
 ### 0.0.8
 * (jogibear9988) fixes a few devices
 

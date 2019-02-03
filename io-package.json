@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "0.0.8",
+        "version": "0.0.9",
         "news": {
+            "0.0.9": {
+                "en": "fullrx and operationlock channel",
+                "de": "Fullrx und Operationssperrenkanal",
+                "ru": "fullrx и канал блокировки операций",
+                "pt": "canal fullrx e operação",
+                "nl": "fullrx en operationlock-kanaal",
+                "fr": "canal fullrx et operationlock",
+                "it": "canale fullrx e operationlock",
+                "es": "Canal fullrx y operationlock",
+                "pl": "kanał fullrx i operationlock",
+                "zh-cn": "fullrx和operationlock通道"
+            },
             "0.0.8": {
                 "en": "fixes a few devices",
                 "de": "behebt ein paar Geräte",
