@@ -12,7 +12,7 @@
 This adapter allows to Communicate with a HomaticIP CloudAccessPoint via the Rest API of the Homatic Cloud
 
 ## Installation
-This Adapter needs node-js in version >= 8.0
+This Adapter needs node-js in version >= 8.6
 
 ## Info
 At the Moment only a few Devices are supported.
