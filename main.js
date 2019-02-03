@@ -334,6 +334,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'DEVICE_BASE':
                     promises.push(...this._updateDeviceBaseChannelStates(device, i));
                     break;
+                case 'WALL_MOUNTED_THERMOSTAT_WITHOUT_DISPLAY_CHANNEL':
+                    promises.push(...this._updateWallMountedThermostatWithoutDisplayStates(device, i));
+                    break; 
                 case 'WALL_MOUNTED_THERMOSTAT_PRO_CHANNEL':
                     promises.push(...this._updateWallMountedThermostatProChannelStates(device, i));
                     break;
@@ -580,11 +583,17 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         return promises;
     }
 
-    _updateWallMountedThermostatProChannelStates(device, channel) {
+    _updateWallMountedThermostatWithoutDisplayStates(device, channel) {
         let promises = [];
         promises.push(...this._updateClimateSensorChannelStates(device, channel));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOffset', device.functionalChannels[channel].temperatureOffset, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.setPointTemperature', device.functionalChannels[channel].setPointTemperature, true));
+        return promises;
+    }
+
+    _updateWallMountedThermostatProChannelStates(device, channel) {
+        let promises = [];
+        promises.push(...this._updateWallMountedThermostatWithoutDisplayStates(device, channel));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.display', device.functionalChannels[channel].display, true));
         return promises;
     }
@@ -759,6 +768,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'DEVICE_BASE':
                     promises.push(...this._createDeviceBaseChannel(device, i));
                     break;
+                case 'WALL_MOUNTED_THERMOSTAT_WITHOUT_DISPLAY_CHANNEL':
+                    promises.push(...this._createWallMountedThermostatWithoutDisplay(device, i));
+                    break;        
                 case 'WALL_MOUNTED_THERMOSTAT_PRO_CHANNEL':
                     promises.push(...this._createWallMountedThermostatProChannel(device, i));
                     break;
@@ -1009,11 +1021,17 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         return promises;
     }
 
-    _createWallMountedThermostatProChannel(device, channel) {
+    _createWallMountedThermostatWithoutDisplay(device, channel) {
         let promises = [];
         promises.push(...this._createClimateSensorChannel(device, channel));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOffset', { type: 'state', common: { name: 'temperatureOffset', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'thermo', read: true, write: true }, native: { id: device.functionalChannels[channel].groups, parameter: 'setPointTemperature' } }));
+        return promises;
+    }
+
+    _createWallMountedThermostatProChannel(device, channel) {
+        let promises = [];
+        promises.push(...this._createWallMountedThermostatWithoutDisplay(device, channel));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.display', { type: 'state', common: { name: 'display', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         return promises;
     }
