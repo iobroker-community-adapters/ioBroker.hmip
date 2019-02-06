@@ -125,9 +125,15 @@ class HmCloudAPI {
         });
 
         this._ws.on('open', () => {
+            if (this.opened)
+                this.opened();
         });
 
-        this._ws.on('close', () => {
+        this._ws.on('close', (code, reason) => {
+            if (this.closed)
+                this.closed(code, reason);
+            if (!this.isClosed)
+                setTimeout(connectWebsocket, 1000);
         });
 
         this._ws.on('message', (d) => {

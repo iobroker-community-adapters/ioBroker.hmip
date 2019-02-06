@@ -14,7 +14,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
         this._api = new apiClass();
         this._api.eventRaised = this._eventRaised.bind(this);
-        //this._api.dataReceived = this._dataReceived.bind(this);
+        this._api.opened = this._opened.bind(this);
+        this._api.closed = this._closed.bind(this);
 
         this.on('unload', this._unload);
         this.on('objectChange', this._objectChange);
@@ -28,6 +29,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _unload(callback) {
         this._unloaded = true;
+        this._api.isClosed = true;
         try {
             this.log.info('cleaned everything up...');
             callback();
@@ -113,7 +115,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         await this._createObjectsForGroups();
         this.log.debug('createObjectsForClients');
         await this._createObjectsForClients();
-        this.log.debug('createObjectsForHomess');
+        this.log.debug('createObjectsForHomes');
         await this._createObjectsForHomes();
         this.log.debug('connectWebsocket');
         this._api.connectWebsocket();
@@ -225,6 +227,14 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _dataReceived(data) {
         this.log.silly("data received - " + data);
+    }
+
+    _opened() {
+        this.log.info("ws connection opened");
+    }
+
+    _closed(code, reason) { 
+        this.log.warn("ws connection closed - code: " + code + " - reason: " + reason);
     }
 
     async _eventRaised(ev) {
