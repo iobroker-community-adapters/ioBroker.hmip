@@ -7,7 +7,7 @@ const api = new apiClass({
     authToken: 'xxxxxxxxxx',
     clientAuthToken: 'xxxxxxxxxxxxxxxxxxxxxxxx',
     clientId: 'xxxxxxxxxxxxxxxxxxx',
-    apSgtin: 'xxxxxxxxxxxxx',
+    accessPointSgtin: 'xxxxxxxxxxxxx',
     pin: undefined
 });
 

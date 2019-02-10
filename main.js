@@ -634,9 +634,31 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
         switch (group.type) {
             case 'HEATING': {
-                promises.push(this.setStateAsync('groups.' + group.id + '.actualTemperature', group.actualTemperature, true));
+                promises.push(this.setStateAsync('groups.' + group.id + '.windowOpenTemperature', group.windowOpenTemperature, true));
                 promises.push(this.setStateAsync('groups.' + group.id + '.setPointTemperature', group.setPointTemperature, true));
+                promises.push(this.setStateAsync('groups.' + group.id + '.minTemperature', group.minTemperature, true));
+                promises.push(this.setStateAsync('groups.' + group.id + '.maxTemperature', group.maxTemperature, true));
+                promises.push(this.setStateAsync('groups.' + group.id + '.windowState', group.windowState, true));
+                promises.push(this.setStateAsync('groups.' + group.id + '.cooling', group.cooling, true));
+                promises.push(this.setStateAsync('groups.' + group.id + '.partyMode', group.partyMode, true));
+                promises.push(this.setStateAsync('groups.' + group.id + '.controlMode', group.controlMode, true));
+                promises.push(this.setStateAsync('groups.' + group.id + '.boostMode', group.boostMode, true));
+                promises.push(this.setStateAsync('groups.' + group.id + '.boostDuration', group.boostDuration, true));
+                promises.push(this.setStateAsync('groups.' + group.id + '.actualTemperature', group.actualTemperature, true));
                 promises.push(this.setStateAsync('groups.' + group.id + '.humidity', group.humidity, true));
+                promises.push(this.setStateAsync('groups.' + group.id + '.coolingAllowed', group.coolingAllowed, true));
+                promises.push(this.setStateAsync('groups.' + group.id + '.coolingIgnored', group.coolingIgnored, true));
+                promises.push(this.setStateAsync('groups.' + group.id + '.ecoAllowed', group.ecoAllowed, true));
+                promises.push(this.setStateAsync('groups.' + group.id + '.ecoIgnored', group.ecoIgnored, true));
+                promises.push(this.setStateAsync('groups.' + group.id + '.controllable', group.controllable, true));
+                promises.push(this.setStateAsync('groups.' + group.id + '.floorHeatingMode', group.floorHeatingMode, true));
+                promises.push(this.setStateAsync('groups.' + group.id + '.humidityLimitEnabled', group.humidityLimitEnabled, true));
+                promises.push(this.setStateAsync('groups.' + group.id + '.humidityLimitValue', group.humidityLimitValue, true));
+                promises.push(this.setStateAsync('groups.' + group.id + '.externalClockEnabled', group.externalClockEnabled, true));
+                promises.push(this.setStateAsync('groups.' + group.id + '.externalClockHeatingTemperature', group.externalClockHeatingTemperature, true));
+                promises.push(this.setStateAsync('groups.' + group.id + '.externalClockCoolingTemperature', group.externalClockCoolingTemperature, true));
+                promises.push(this.setStateAsync('groups.' + group.id + '.valvePosition', group.valvePosition, true));
+                promises.push(this.setStateAsync('groups.' + group.id + '.sabotage', group.sabotage, true));             
                 break;
             }
             case 'SWITCHING': {
@@ -1073,9 +1095,31 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
         switch (group.type) {
             case 'HEATING': {
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.windowOpenTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'thermo', read: true, write: true }, native: { id: [group.id], parameter: 'setPointTemperature' } }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.humidity', { type: 'state', common: { name: 'humidity', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.minTemperature', { type: 'state', common: { name: 'minTemperature', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.maxTemperature', { type: 'state', common: { name: 'maxTemperature', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.windowState', { type: 'state', common: { name: 'windowState', type: 'string', role: 'thermo', read: true, write: true }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.cooling', { type: 'state', common: { name: 'cooling', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.partyMode', { type: 'state', common: { name: 'partyMode', type: 'string', role: 'thermo', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.controlMode', { type: 'state', common: { name: 'controlMode', type: 'string', role: 'thermo', read: true, write: true }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.boostMode', { type: 'state', common: { name: 'boostMode', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.boostDuration', { type: 'state', common: { name: 'boostDuration', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'thermo', read: true, write: true }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.humidity', { type: 'state', common: { name: 'humidity', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.coolingAllowed', { type: 'state', common: { name: 'coolingAllowed', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.coolingIgnored', { type: 'state', common: { name: 'coolingIgnored', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.ecoAllowed', { type: 'state', common: { name: 'ecoAllowed', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.ecoIgnored', { type: 'state', common: { name: 'ecoIgnored', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.controllable', { type: 'state', common: { name: 'controllable', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.floorHeatingMode', { type: 'state', common: { name: 'floorHeatingMode', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.humidityLimitEnabled', { type: 'state', common: { name: 'humidityLimitEnabled', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.humidityLimitValue', { type: 'state', common: { name: 'humidityLimitValue', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.externalClockEnabled', { type: 'state', common: { name: 'externalClockEnabled', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.externalClockHeatingTemperature', { type: 'state', common: { name: 'externalClockHeatingTemperature', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.externalClockCoolingTemperature', { type: 'state', common: { name: 'externalClockCoolingTemperature', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.valvePosition', { type: 'state', common: { name: 'valvePosition', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.sabotage', { type: 'state', common: { name: 'sabotage', type: 'string', role: 'info', read: true, write: false }, native: {} }));
                 break;
             }
             case 'ALARM_SWITCHING': {
