@@ -32,7 +32,7 @@ Thank you
 For example direct connections between devices have no events in the app and can also not be triggert thru this adapter!!! 
 
 ## Settings
-* specify the your SGTIN and the PIN of your Accesspoint, and validate via press of the blue Button. This will create a Authentication token.
+* enter your SGTIN (back of the Access Point) and the PIN (if set before), and validate the data via press of the blue LED Button. This will create an Authentication token.
 
 ## Thanks
 to coreGreenberet for his python lib (https://github.com/coreGreenberet/homematicip-rest-api)
