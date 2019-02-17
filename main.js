@@ -175,6 +175,10 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     for (let id of o.native.id)
                         this._api.groupHeatingSetActiveProfile(id, state.val);
                     break;
+                case 'setControlMode':
+                    for (let id of o.native.id)
+                        this._api.groupHeatingSetControlMode(id, state.val);
+                    break;
                 case 'setDimLevel':
                     this._api.deviceControlSetDimLevel(o.native.id, state.val, o.native.channel);
                     break;
@@ -1114,7 +1118,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.windowState', { type: 'state', common: { name: 'windowState', type: 'string', role: 'thermo', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.cooling', { type: 'state', common: { name: 'cooling', type: 'string', role: 'info', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.partyMode', { type: 'state', common: { name: 'partyMode', type: 'string', role: 'thermo', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.controlMode', { type: 'state', common: { name: 'controlMode', type: 'string', role: 'thermo', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.controlMode', { type: 'state', common: { name: 'controlMode', type: 'string', role: 'thermo', read: true, write: true }, native:  { id: [group.id], parameter: 'setControlMode' } }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.boostMode', { type: 'state', common: { name: 'boostMode', type: 'boolean', role: 'info', read: true, write: true }, native:  { id: [group.id], parameter: 'setBoost' } }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.activeProfile', { type: 'state', common: { name: 'activeProfile', type: 'string', role: 'info', read: true, write: true }, native:  { id: [group.id], parameter: 'setActiveProfile' } }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.boostDuration', { type: 'state', common: { name: 'boostDuration', type: 'number', role: 'thermo', unit: "s", read: true, write: false }, native: {} }));
