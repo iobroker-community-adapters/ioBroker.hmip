@@ -9,49 +9,32 @@
 [![NPM](https://nodei.co/npm/iobroker.hmip.png?downloads=true)](https://nodei.co/npm/iobroker.hmip/) [![Greenkeeper badge](https://badges.greenkeeper.io/iobroker-community-adapters/ioBroker.hmip.svg)](https://greenkeeper.io/)
 
 ## Description
-This adapter allows to Communicate with a HomaticIP CloudAccessPoint via the Rest API of the Homatic Cloud
+This adapter allows to communicate with a HomematicIP CloudAccessPoint via the Rest API of the Homematic IP Cloud
 
 ## Installation
 This Adapter needs node-js in version >= 8.6
 
 ## Info
-At the Moment only a few Devices are supported.
 
-I will improve it, but it will take time. For not working devices, please create an issue (one per device).
-Then switch adapter logging to silly mode and add the json of the device wich is printed to the log.
+Most Homematic IP devices are already working with the latest adapter version. 
+
+I will improve it constantly, but it will take time. Any help from the community thru e.g. Pull Request would be highly appreciated.
+
+For not working HmIP devices, please create an issue with this info (please one per device and if possible the technical name in the subject).
+Switch adapter logging in ioBroker to silly mode and add the json of the device which is printed to the log in the issue.
 I may also need a json of a state change.
 
-## Included Devices
+Thank you
 
-    BRAND_SWITCH_MEASURING (HMIP-BSM)
-    FULL_FLUSH_SWITCH_MEASURING (HMIP-FSM)
-    PLUGABLE_SWITCH_MEASURING (HMIP-PSM)
-    PLUGABLE_SWITCH (HMIP-PS)
-    BRAND_WALL_MOUNTED_THERMOSTAT (HMIP-BWTH)
-    WALL_MOUNTED_THERMOSTAT_PRO (HMIP-WTH, HMIP-WTH-2)
-    TEMPERATURE_HUMIDITY_SENSOR_DISPLAY (HMIP-STHD)
-    HEATING_THERMOSTAT (HMIP-eTRV, HMIP-eTRV2, HMIP-eTRV-B, HMIP-eTRV-B1)
-    SHUTTER_CONTACT (HMIP-SWDO)
-    SHUTTER_CONTACT_MAGNETIC (HMIP-SWDM, HMIP-SWDM-B2)
-    BRAND_DIMMER (HMIP-BDT)
-    PLUGGABLE_DIMMER (HMIP-PDT)
-    PUSH_BUTTON (HMIP-WRC2)
-    PUSH_BUTTON_6 (HMIP-WRC6)
-    OPEN_COLLECTOR_8_MODULE (HmIP-MOD-OC8)
-    REMOTE_CONTROL_8 (HMIP-RC8)
-    BRAND_SHUTTER (HMIP-BROLL)
-    MOTION_DETECTOR_INDOOR (HMIP-SMI)
-    SMOKE_DETECTOR (HMIP-SWSD)
-    WATER_SENSOR (HMIP-SWD)
-    ROTARY_HANDLE_SENSOR (HMIP-SRH)
-    BRAND_BLIND (HMIP-BBL)
-    ALARM_SIREN_INDOOR (HMIP-ASIR, HMIP-ASIR-B1)
+## Important Info what can be done with this adapter
+
+!!! You can only trigger events with this adapater that can be triggered thru the original Homematic IP app. 
+For example direct connections between devices have no events in the app and can also not be triggert thru this adapter!!! 
 
 ## Settings
-* specify the your SGTIN and the PIN of your Accesspoint, and validate via press of the blue Button. This will create a Authentication token.
+* enter your SGTIN (back of the Access Point) and the PIN (if set before), and validate the data via press of the blue LED Button. This will create an Authentication token.
 
 ## Thanks
-
 to coreGreenberet for his python lib (https://github.com/coreGreenberet/homematicip-rest-api)
 
 ## Diskussion in ioBroker Forum
@@ -61,6 +44,9 @@ https://forum.iobroker.net/viewtopic.php?f=36&t=21000#p220517
 https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
+
+### 0.0.10
+* (jogibear9988) added ping/pong, enable setBoots, more units, more hardware
 
 ### 0.0.9
 * (jogibear9988) fullrx and operationlock channel

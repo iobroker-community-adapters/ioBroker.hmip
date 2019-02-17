@@ -116,6 +116,14 @@ class HmCloudAPI {
 
     // =========== Event Handling ===========
 
+    dispose() {
+        this.isClosed = true;
+        if (this._connectTimeout)
+            clearTimeout(this._connectTimeout);
+        if (this._pingInterval)
+            clearInterval(this._pingInterval);
+    }
+
     connectWebsocket() {
         this._ws = new webSocket(this._urlWebSocket, {
             headers: {
@@ -133,7 +141,7 @@ class HmCloudAPI {
             if (this.closed)
                 this.closed(code, reason);
             if (!this.isClosed)
-                setTimeout(connectWebsocket, 1000);
+                this._connectTimeout = setTimeout(connectWebsocket, 1000);
         });
 
         this._ws.on('message', (d) => {
@@ -143,6 +151,20 @@ class HmCloudAPI {
             let data = JSON.parse(dString);
             this._parseEventdata(data);
         });
+
+        this._ws.on('ping', () => {
+            if (this.dataReceived)
+                this.dataReceived("ping");
+        });
+
+        this._ws.on('pong', () => {
+            if (this.dataReceived)
+                this.dataReceived("pong");
+        });
+
+        this._pingInterval = setInterval(() => {
+            this._ws.ping(() => { });
+        }, 5000);
     }
 
     _parseEventdata(data) {

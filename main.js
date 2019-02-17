@@ -14,6 +14,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
         this._api = new apiClass();
         this._api.eventRaised = this._eventRaised.bind(this);
+        // this._api.dataReceived = this._dataReceived.bind(this);
         this._api.opened = this._opened.bind(this);
         this._api.closed = this._closed.bind(this);
 
@@ -29,7 +30,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _unload(callback) {
         this._unloaded = true;
-        this._api.isClosed = true;
+        this._api.dispose();
         try {
             this.log.info('cleaned everything up...');
             callback();
