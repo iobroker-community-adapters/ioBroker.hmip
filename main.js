@@ -295,6 +295,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setStateAsync('devices.' + device.id + '.info.type', device.type, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.info.modelType', device.modelType, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.info.label', device.label, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.info.firmwareVersion', device.firmwareVersion, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.info.updateState', device.updateState, true));
         switch (device.type) {
             /*case 'PLUGABLE_SWITCH': {
                 promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.on', device.functionalChannels['1'].on, true));
@@ -406,7 +408,6 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.internalSwitchOutputEnabled', device.functionalChannels[channel].internalSwitchOutputEnabled, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionDuration', device.functionalChannels[channel].valveProtectionDuration, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionSwitchingInterval', device.functionalChannels[channel].valveProtectionSwitchingInterval, true));
-
         return promises;
     }
 
@@ -699,6 +700,15 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         this.log.silly("_updateHomeStates - " + JSON.stringify(home));
         let promises = [];
 
+        promises.push(this.setStateAsync('homes.' + home.id + '.weather.temperature', home.weather.temperature, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.weather.weatherCondition', home.weather.weatherCondition, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.weather.weatherDayTime', home.weather.weatherDayTime, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.weather.minTemperature', home.weather.minTemperature, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.weather.maxTemperature', home.weather.maxTemperature, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.weather.humidity', home.weather.humidity, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.weather.windSpeed', home.weather.windSpeed, true));
+        promises.push(this.setStateAsync('homes.' + home.id + '.weather.windDirection', home.weather.windDirection, true));
+
         promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventTimestamp', home.functionalHomes.SECURITY_AND_ALARM.alarmEventTimestamp, true));
         promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventDeviceId', home.functionalHomes.SECURITY_AND_ALARM.alarmEventDeviceId, true));
         promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventTriggerId', home.functionalHomes.SECURITY_AND_ALARM.alarmEventTriggerId, true));
@@ -755,6 +765,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.info.type', { type: 'state', common: { name: 'type', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.info.modelType', { type: 'state', common: { name: 'type', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.info.label', { type: 'state', common: { name: 'type', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.info.firmwareVersion', { type: 'state', common: { name: 'type', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.info.updateState', { type: 'state', common: { name: 'type', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         switch (device.type) {
             /*case 'PLUGABLE_SWITCH': {
                 promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1', { type: 'channel', common: {}, native: {} }));
@@ -953,10 +965,10 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _createHeatingThermostatChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOffset', { type: 'state', common: { name: 'temperatureOffset', type: 'number', role: 'thermo', unit: "°C", read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOffset', { type: 'state', common: { name: 'temperatureOffset', type: 'number', role: 'thermo', unit: '°C', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.valvePosition', { type: 'state', common: { name: 'valvePosition', type: 'number', role: 'thermo', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'thermo', unit: "°C", read: true, write: true }, native: { id: device.functionalChannels[channel].groups, parameter: 'setPointTemperature' } }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.valveActualTemperature', { type: 'state', common: { name: 'valveActualTemperature', type: 'number', role: 'thermo', unit: "°C", read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'thermo', unit: '°C', read: true, write: true }, native: { id: device.functionalChannels[channel].groups, parameter: 'setPointTemperature' } }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.valveActualTemperature', { type: 'state', common: { name: 'valveActualTemperature', type: 'number', role: 'thermo', unit: '°C', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.valveState', { type: 'state', common: { name: 'valveState', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         return promises;
     }
@@ -1067,16 +1079,16 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _createClimateSensorChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'thermo', unit: "°C", read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.humidity', { type: 'state', common: { name: 'humidity', type: 'number', role: 'thermo', unit: "%", read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'thermo', unit: '°C', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.humidity', { type: 'state', common: { name: 'humidity', type: 'number', role: 'thermo', unit: '%', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createWallMountedThermostatWithoutDisplay(device, channel) {
         let promises = [];
         promises.push(...this._createClimateSensorChannel(device, channel));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOffset', { type: 'state', common: { name: 'temperatureOffset', type: 'number', role: 'thermo', unit: "°C", read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'thermo', unit: "°C", read: true, write: true }, native: { id: device.functionalChannels[channel].groups, parameter: 'setPointTemperature' } }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOffset', { type: 'state', common: { name: 'temperatureOffset', type: 'number', role: 'thermo', unit: '°C', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'thermo', unit: '°C', read: true, write: true }, native: { id: device.functionalChannels[channel].groups, parameter: 'setPointTemperature' } }));
         return promises;
     }
 
@@ -1114,19 +1126,19 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
         switch (group.type) {
             case 'HEATING': {
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.windowOpenTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'thermo', unit: "°C", read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'thermo', unit: "°C", read: true, write: true }, native: { id: [group.id], parameter: 'setPointTemperature' } }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.minTemperature', { type: 'state', common: { name: 'minTemperature', type: 'number', role: 'thermo', unit: "°C", read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.maxTemperature', { type: 'state', common: { name: 'maxTemperature', type: 'number', role: 'thermo', unit: "°C", read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.windowOpenTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'thermo', unit: '°C', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'thermo', unit: '°C', read: true, write: true }, native: { id: [group.id], parameter: 'setPointTemperature' } }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.minTemperature', { type: 'state', common: { name: 'minTemperature', type: 'number', role: 'thermo', unit: '°C', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.maxTemperature', { type: 'state', common: { name: 'maxTemperature', type: 'number', role: 'thermo', unit: '°C', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.windowState', { type: 'state', common: { name: 'windowState', type: 'string', role: 'thermo', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.cooling', { type: 'state', common: { name: 'cooling', type: 'string', role: 'info', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.partyMode', { type: 'state', common: { name: 'partyMode', type: 'string', role: 'thermo', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.controlMode', { type: 'state', common: { name: 'controlMode', type: 'string', role: 'thermo', read: true, write: true }, native:  { id: [group.id], parameter: 'setControlMode' } }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.boostMode', { type: 'state', common: { name: 'boostMode', type: 'boolean', role: 'info', read: true, write: true }, native:  { id: [group.id], parameter: 'setBoost' } }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.activeProfile', { type: 'state', common: { name: 'activeProfile', type: 'string', role: 'info', read: true, write: true }, native:  { id: [group.id], parameter: 'setActiveProfile' } }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.boostDuration', { type: 'state', common: { name: 'boostDuration', type: 'number', role: 'thermo', unit: "s", read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'thermo', unit: "°C", read: true, write: true }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.humidity', { type: 'state', common: { name: 'humidity', type: 'number', role: 'info', unit: "%", read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.boostDuration', { type: 'state', common: { name: 'boostDuration', type: 'number', role: 'thermo', unit: 's', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'thermo', unit: '°C', read: true, write: true }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.humidity', { type: 'state', common: { name: 'humidity', type: 'number', role: 'info', unit: '%', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.coolingAllowed', { type: 'state', common: { name: 'coolingAllowed', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.coolingIgnored', { type: 'state', common: { name: 'coolingIgnored', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.ecoAllowed', { type: 'state', common: { name: 'ecoAllowed', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
@@ -1134,10 +1146,10 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.controllable', { type: 'state', common: { name: 'controllable', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.floorHeatingMode', { type: 'state', common: { name: 'floorHeatingMode', type: 'string', role: 'info', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.humidityLimitEnabled', { type: 'state', common: { name: 'humidityLimitEnabled', type: 'number', role: 'info', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.humidityLimitValue', { type: 'state', common: { name: 'humidityLimitValue', type: 'number', role: 'info', unit: "%", read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.humidityLimitValue', { type: 'state', common: { name: 'humidityLimitValue', type: 'number', role: 'info', unit: '%', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.externalClockEnabled', { type: 'state', common: { name: 'externalClockEnabled', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.externalClockHeatingTemperature', { type: 'state', common: { name: 'externalClockHeatingTemperature', type: 'number', role: 'info', unit: "°C", read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.externalClockCoolingTemperature', { type: 'state', common: { name: 'externalClockCoolingTemperature', type: 'number', role: 'info', unit: "°C", read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.externalClockHeatingTemperature', { type: 'state', common: { name: 'externalClockHeatingTemperature', type: 'number', role: 'info', unit: '°C', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.externalClockCoolingTemperature', { type: 'state', common: { name: 'externalClockCoolingTemperature', type: 'number', role: 'info', unit: '°C', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.valvePosition', { type: 'state', common: { name: 'valvePosition', type: 'number', role: 'info', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.sabotage', { type: 'state', common: { name: 'sabotage', type: 'string', role: 'info', read: true, write: false }, native: {} }));
                 break;
@@ -1171,6 +1183,15 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         this.log.silly("createObjectsForHome - " + JSON.stringify(home));
         let promises = [];
         promises.push(this.setObjectNotExistsAsync('homes.' + home.id, { type: 'device', common: {}, native: {} }));
+
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.weather.temperature', { type: 'state', common: { name: 'temperature', type: 'number', role: 'thermo', unit: '°C', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.weather.weatherCondition', { type: 'state', common: { name: 'weatherCondition', type: 'string', role: 'info',  read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.weather.weatherDayTime', { type: 'state', common: { name: 'weatherDayTime', type: 'string', role: 'info',  read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.weather.minTemperature', { type: 'state', common: { name: 'minTemperature', type: 'number', role: 'thermo', unit: '°C', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.weather.maxTemperature', { type: 'state', common: { name: 'maxTemperature', type: 'number', role: 'thermo', unit: '°C', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.weather.humidity', { type: 'state', common: { name: 'humidity', type: 'number', role: 'info', unit: '%', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.weather.windSpeed', { type: 'state', common: { name: 'windSpeed', type: 'number', role: 'info', unit: 'km/h', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.weather.windDirection', { type: 'state', common: { name: 'windDirection', type: 'number', role: 'info',unit: '°', read: true, write: false }, native: {} }));
 
         promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventTimestamp', { type: 'state', common: { name: 'alarmEventTimestamp', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventDeviceId', { type: 'state', common: { name: 'alarmEventDeviceId', type: 'string', role: 'info', read: true, write: false }, native: {} }));
