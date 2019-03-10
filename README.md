@@ -2,7 +2,7 @@
 # ioBroker HomeMatic IP Cloud AccessPoint Adapter
 =================
 
-[![NPM version](http://img.shields.io/npm/v/iobroker.hmip.svg)](https://www.npmjs.com/package/iobroker.hmip)
+![Number of Installations](http://iobroker.live/badges/hmip-installed.svg) ![Number of Installations](http://iobroker.live/badges/hmip-stable.svg) [![NPM version](http://img.shields.io/npm/v/iobroker.hmip.svg)](https://www.npmjs.com/package/iobroker.hmip)
 [![Downloads](https://img.shields.io/npm/dm/iobroker.hmip.svg)](https://www.npmjs.com/package/iobroker.hmip)
 [![Build Status](https://travis-ci.org/iobroker-community-adapters/ioBroker.hmip.svg?branch=master)](https://travis-ci.org/iobroker-community-adapters/ioBroker.hmip.svg?branch=master)
 
