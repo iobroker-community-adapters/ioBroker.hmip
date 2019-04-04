@@ -391,6 +391,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'INTERNAL_SWITCH_CHANNEL':
                     promises.push(...this._updateInternalSwitchChannelStates(device, i));
                     break;
+                case 'LIGHT_SENSOR_CHANNEL':
+                    promises.push(...this._updateLightSensorChannelStates(device, i));
+                    break;
                 default:
                     this.log.info("unkown channel type - " + fc.functionalChannelType + " - " + JSON.stringify(device));
                     break;
@@ -400,6 +403,15 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     /* Start Channel Types */
+
+    _updateLightSensorChannelStates(device, channel) {
+        let promises = [];
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.currentIllumination', device.functionalChannels[channel].currentIllumination, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.averageIllumination', device.functionalChannels[channel].averageIllumination, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.lowestIllumination', device.functionalChannels[channel].lowestIllumination, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.highestIllumination', device.functionalChannels[channel].highestIllumination, true));
+        return promises;
+    }
 
     _updateInternalSwitchChannelStates(device, channel) {
         let promises = [];
@@ -860,6 +872,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'INTERNAL_SWITCH_CHANNEL':
                     promises.push(...this._createInternalSwitchChannel(device, i));
                     break;
+                case 'LIGHT_SENSOR_CHANNEL':
+                    promises.push(...this._createLightSensorChannel(device, i));
+                    break;
 
                 default:
                     this.log.info("unkown channel type - " + fc.functionalChannelType + " - " + JSON.stringify(device));
@@ -871,6 +886,15 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     /* Start Channel Types */
+
+    _createLightSensorChannel(device, channel) {
+        let promises = [];
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.currentIllumination', { type: 'state', common: { name: 'currentIllumination', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.averageIllumination', { type: 'state', common: { name: 'averageIllumination', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.lowestIllumination', { type: 'state', common: { name: 'lowestIllumination', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.highestIllumination', { type: 'state', common: { name: 'highestIllumination', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        return promises;
+    }
 
     _createInternalSwitchChannel(device, channel) {
         let promises = [];
