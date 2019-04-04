@@ -394,6 +394,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'LIGHT_SENSOR_CHANNEL':
                     promises.push(...this._updateLightSensorChannelStates(device, i));
                     break;
+                case 'NOTIFICATION_LIGHT_CHANNEL':
+                    promises.push(...this._updateNotificationLightChannelStates(device, i));
+                    break;
                 default:
                     this.log.info("unkown channel type - " + fc.functionalChannelType + " - " + JSON.stringify(device));
                     break;
@@ -403,6 +406,14 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     /* Start Channel Types */
+
+    _updateNotificationLightChannelStates(device, channel) {
+        let promises = [];
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.on', device.functionalChannels[channel].on, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.dimLevel', device.functionalChannels[channel].dimLevel, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.simpleRGBColorState', device.functionalChannels[channel].simpleRGBColorState, true));
+        return promises;
+    }
 
     _updateLightSensorChannelStates(device, channel) {
         let promises = [];
@@ -875,7 +886,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'LIGHT_SENSOR_CHANNEL':
                     promises.push(...this._createLightSensorChannel(device, i));
                     break;
-
+                case 'NOTIFICATION_LIGHT_CHANNEL':
+                    promises.push(...this._createNotificationLightChannel(device, i));
+                    break;
                 default:
                     this.log.info("unkown channel type - " + fc.functionalChannelType + " - " + JSON.stringify(device));
                     break;
@@ -886,6 +899,14 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     /* Start Channel Types */
+
+    _createNotificationLightChannel(device, channel) {
+        let promises = [];
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.dimLevel', { type: 'state', common: { name: 'dimLevel', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.simpleRGBColorState', { type: 'state', common: { name: 'simpleRGBColorState', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        return promises;
+    }
 
     _createLightSensorChannel(device, channel) {
         let promises = [];
