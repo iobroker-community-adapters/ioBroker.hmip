@@ -4,7 +4,16 @@
         "version": "0.0.10",
         "news": {
             "0.0.10": {
-                "en": "added ping/pong, enable setBoots, more units, more hardware"
+                "en": "added ping/pong, enable setBoots, more units, more hardware",
+                "de": "Ping / Pong hinzugefügt, SetBoots aktiviert, mehr Einheiten, mehr Hardware",
+                "ru": "добавлен ping / pong, активирован setBoots, больше юнитов, больше оборудования",
+                "pt": "adicionado ping / pong, habilitar setBoots, mais unidades, mais hardware",
+                "nl": "ping / pong toegevoegd, setbooten inschakelen, meer eenheden, meer hardware",
+                "fr": "Ping / Pong ajouté, activer setBoots, plus d'unités, plus de matériel",
+                "it": "aggiunto ping / pong, abilita setBoots, più unità, più hardware",
+                "es": "añadido ping / pong, habilitar setBoots, más unidades, más hardware",
+                "pl": "dodano ping / pong, włącz setBoots, więcej jednostek, więcej sprzętu",
+                "zh-cn": "添加ping / pong，启用setBoots，更多单元，更多硬件"
             },
             "0.0.9": {
                 "en": "fullrx and operationlock channel",

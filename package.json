@@ -28,20 +28,20 @@
   },
   "dependencies": {
     "@iobroker/adapter-core": "^1.0.3",
-    "delay": "^4.1.0",
+    "delay": "^4.3.0",
     "js-sha512": "^0.8.0",
-    "request-promise-native": "^1.0.5",
+    "request-promise-native": "^1.0.7",
     "uuid": "^3.3.2",
-    "ws": "^6.2.0"
+    "ws": "^7.0.1"
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "gulp": "^4.0.0",
-    "mocha": "^6.0.2",
+    "gulp": "^4.0.2",
+    "mocha": "^6.1.4",
     "@vitalets/google-translate-api": "github:vitalets/google-translate-api",
-    "configstore": "^4.0.0",
-    "axios": "^0.18.0",
-    "@iobroker/testing": "^1.1.15"
+    "configstore": "^5.0.0",
+    "axios": "^0.19.0",
+    "@iobroker/testing": "^1.2.5"
   },
   "main": "main.js",
   "scripts": {
