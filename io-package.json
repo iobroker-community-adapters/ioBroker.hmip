@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "0.0.10",
+        "version": "0.0.11",
         "news": {
+            "0.0.11": {
+                "en": "multiple fixes",
+                "de": "mehrfache Verlegenheiten",
+                "ru": "несколько исправлений",
+                "pt": "várias correções",
+                "nl": "meerdere fixes",
+                "fr": "plusieurs corrections",
+                "it": "correzioni multiple",
+                "es": "múltiples correcciones",
+                "pl": "wiele poprawek",
+                "zh-cn": "多个修复程序"
+            },
             "0.0.10": {
                 "en": "added ping/pong, enable setBoots, more units, more hardware",
                 "de": "Ping / Pong hinzugefügt, SetBoots aktiviert, mehr Einheiten, mehr Hardware",
