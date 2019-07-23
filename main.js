@@ -319,6 +319,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'DEVICE_SABOTAGE':
                     promises.push(...this._updateDeviceSabotageChannelStates(device, i));
                     break;
+                case 'PRESENCE_DETECTION_CHANNEL':
+                    promises.push(...this._updatePresenceDetectionChannel(device, i));
+                    break;
                 case 'HEATING_THERMOSTAT_CHANNEL':
                     promises.push(...this._updateHeatingThermostatChannelStates(device, i));
                     break;
@@ -466,6 +469,18 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         let promises = [];
         promises.push(...this._updateDeviceBaseChannelStates(device, channel));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.sabotage', device.functionalChannels[channel].sabotage, true));
+        return promises;
+    }
+
+    _updatePresenceDetectionChannel(device, channel) {
+        let promises = [];
+        promises.push(...this._updateDeviceBaseChannelStates(device, channel));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.presenceDetected', device.functionalChannels[channel].presenceDetected, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.illumination', device.functionalChannels[channel].illumination, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.currentIllumination', device.functionalChannels[channel].currentIllumination, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.numberOfBrightnessMeasurements', device.functionalChannels[channel].numberOfBrightnessMeasurements, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.motionDetectionSendInterval', device.functionalChannels[channel].motionDetectionSendInterval, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.motionBufferActive', device.functionalChannels[channel].motionBufferActive, true));       
         return promises;
     }
 
@@ -811,6 +826,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'DEVICE_SABOTAGE':
                     promises.push(...this._createDeviceSabotageChannel(device, i));
                     break;
+                case 'PRESENCE_DETECTION_CHANNEL':
+                    promises.push(...this._createPresenceDetectionChannel(device, i));
+                    break;
                 case 'HEATING_THERMOSTAT_CHANNEL':
                     promises.push(...this._createHeatingThermostatChannel(device, i));
                     break;
@@ -959,6 +977,18 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         let promises = [];
         promises.push(...this._createDeviceBaseChannel(device, channel));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.sabotage', { type: 'state', common: { name: 'sabotage', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
+    _createPresenceDetectionChannel(device, channel) {
+        let promises = [];
+        promises.push(...this._createDeviceBaseChannel(device, channel));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.presenceDetected', { type: 'state', common: { name: 'presenceDetected', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.illumination', { type: 'state', common: { name: 'illumination', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.currentIllumination', { type: 'state', common: { name: 'currentIllumination', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.numberOfBrightnessMeasurements', { type: 'state', common: { name: 'numberOfBrightnessMeasurements', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.motionDetectionSendInterval', { type: 'state', common: { name: 'motionDetectionSendInterval', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.motionBufferActive', { type: 'state', common: { name: 'motionBufferActive', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         return promises;
     }
 
