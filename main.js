@@ -334,6 +334,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'DEVICE_INCORRECT_POSITIONED':
                     promises.push(...this._updateDeviceIncorrectPositioned(device, i));
                     break;
+                case 'CONTACT_INTERFACE_CHANNEL':
+                    promises.push(...this._updateContactInterfaceChannel(device, i));
+                    break;
                 case 'HEATING_THERMOSTAT_CHANNEL':
                     promises.push(...this._updateHeatingThermostatChannelStates(device, i));
                     break;
@@ -535,6 +538,16 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.numberOfBrightnessMeasurements', device.functionalChannels[channel].numberOfBrightnessMeasurements, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.motionDetectionSendInterval', device.functionalChannels[channel].motionDetectionSendInterval, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.motionBufferActive', device.functionalChannels[channel].motionBufferActive, true));       
+        return promises;
+    }
+
+    _updateContactInterfaceChannel(device, channel) {
+        let promises = [];
+        promises.push(...this._updateDeviceBaseChannel(device, channel));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windowState', device.functionalChannels[channel].windowState, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.contactType', device.functionalChannels[channel].contactType, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.alarmContactType', device.functionalChannels[channel].alarmContactType, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.eventDelay', device.functionalChannels[channel].eventDelay, true));
         return promises;
     }
 
@@ -895,6 +908,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'DEVICE_INCORRECT_POSITIONED':
                     promises.push(...this._createDeviceIncorrectPositioned(device, i));
                     break;
+                case 'CONTACT_INTERFACE_CHANNEL':
+                    promises.push(...this._createDeviceContactInterfaceChannel(device, i));
+                    break;
                 case 'SHUTTER_CONTACT_CHANNEL':
                     promises.push(...this._createShutterContactChannel(device, i));
                     break;
@@ -1093,6 +1109,16 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverheated', { type: 'state', common: { name: 'deviceOverheated', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOutOfRange', { type: 'state', common: { name: 'temperatureOutOfRange', boolean: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.incorrectPositioned', { type: 'state', common: { name: 'incorrectPositioned', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
+    _createDeviceContactInterfaceChannel(device, channel) {
+        let promises = [];
+        promises.push(...this._createDeviceBaseChannel(device, channel));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windowState', { type: 'state', common: { name: 'windowState', type: 'string', role: 'sensor.window', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.contactType', { type: 'state', common: { name: 'contactType', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.alarmContactType', { type: 'state', common: { name: 'alarmContactType', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.eventDelay', { type: 'state', common: { name: 'eventDelay', type: 'number', role: 'info', read: true, write: false }, native: {} }));
         return promises;
     }
 
