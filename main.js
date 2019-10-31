@@ -1112,7 +1112,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         return promises;
     }
 
-    _createContactInterfaceChannel(device, channel) {
+    _createDeviceContactInterfaceChannel(device, channel) {
         let promises = [];
         promises.push(...this._createDeviceBaseChannel(device, channel));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windowState', { type: 'state', common: { name: 'windowState', type: 'string', role: 'sensor.window', read: true, write: false }, native: {} }));
