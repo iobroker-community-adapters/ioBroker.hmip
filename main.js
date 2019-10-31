@@ -331,14 +331,6 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'FLOOR_TERMINAL_BLOCK_LOCAL_PUMP_CHANNEL':
                     promises.push(...this._updateFloorTerminalBlockLockPumpChannel(device, i));
                     break;
-                case 'FLOOR_TERMINAL_BLOCK_CHANNEL':
-                    break;
-                case 'HEAT_DEMAND_CHANNEL':
-                    break;
-                case 'DEHUMIDIFIER_DEMAND_CHANNEL':
-                    break;
-                case 'CHANGE_OVER_CHANNEL':
-                    break;
                 case 'DEVICE_INCORRECT_POSITIONED':
                     promises.push(...this._updateDeviceIncorrectPositioned(device, i));
                     break;
@@ -912,14 +904,6 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     break;
                 case 'FLOOR_TERMINAL_BLOCK_LOCAL_PUMP_CHANNEL':
                     promises.push(...this._createFloorTerminalBlockLockPumpChannel(device, i));
-                    break;
-                case 'FLOOR_TERMINAL_BLOCK_CHANNEL':
-                    break;
-                case 'HEAT_DEMAND_CHANNEL':
-                    break;
-                case 'DEHUMIDIFIER_DEMAND_CHANNEL':
-                    break;
-                case 'CHANGE_OVER_CHANNEL':
                     break;
                 case 'DEVICE_INCORRECT_POSITIONED':
                     promises.push(...this._createDeviceIncorrectPositioned(device, i));
