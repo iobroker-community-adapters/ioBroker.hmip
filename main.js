@@ -331,6 +331,14 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'FLOOR_TERMINAL_BLOCK_LOCAL_PUMP_CHANNEL':
                     promises.push(...this._updateFloorTerminalBlockLockPumpChannel(device, i));
                     break;
+													
+						  
+										   
+						  
+												   
+						  
+										   
+						  
                 case 'DEVICE_INCORRECT_POSITIONED':
                     promises.push(...this._updateDeviceIncorrectPositioned(device, i));
                     break;
@@ -543,7 +551,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _updateContactInterfaceChannel(device, channel) {
         let promises = [];
-        promises.push(...this._updateDeviceBaseChannel(device, channel));
+        promises.push(...this._updateDeviceBaseChannelStates(device, channel));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windowState', device.functionalChannels[channel].windowState, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.contactType', device.functionalChannels[channel].contactType, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.alarmContactType', device.functionalChannels[channel].alarmContactType, true));
@@ -905,6 +913,14 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'FLOOR_TERMINAL_BLOCK_LOCAL_PUMP_CHANNEL':
                     promises.push(...this._createFloorTerminalBlockLockPumpChannel(device, i));
                     break;
+													
+						  
+										   
+						  
+												   
+						  
+										   
+						  
                 case 'DEVICE_INCORRECT_POSITIONED':
                     promises.push(...this._createDeviceIncorrectPositioned(device, i));
                     break;
