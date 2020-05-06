@@ -1254,8 +1254,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _createWeatherSensorChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'boolean', role: 'info', read: true, write: true }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.humidity', { type: 'state', common: { name: 'humidity', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'info', read: true, write: true }, native: {} }));
+	promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.humidity', { type: 'state', common: { name: 'humidity', type: 'number', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.illumination', { type: 'state', common: { name: 'illumination', type: 'number', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.illuminationThresholdSunshine', { type: 'state', common: { name: 'illuminationThresholdSunshine', type: 'number', role: 'level', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.storm', { type: 'state', common: { name: 'storm', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
