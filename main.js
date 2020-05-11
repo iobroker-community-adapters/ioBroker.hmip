@@ -1242,7 +1242,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.weathervaneAlignmentNeeded', { type: 'state', common: { name: 'weathervaneAlignmentNeeded', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windDirection', { type: 'state', common: { name: 'windDirection', type: 'number', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windDirectionVariation', { type: 'state', common: { name: 'windDirectionVariation', type: 'number', role: 'info', read: true, write: false }, native: {} }));
-        return promises;
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.vaporAmount', { type: 'state', common: { name: 'vaporAmount', type: 'number', role: 'info', read: true, write: true }, native: {} }));
+	  return promises;
     }
 
     _createShutterChannel(device, channel) {
