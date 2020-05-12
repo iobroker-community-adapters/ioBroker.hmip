@@ -41,7 +41,7 @@
     "@vitalets/google-translate-api": "github:vitalets/google-translate-api",
     "configstore": "^5.0.0",
     "axios": "^0.19.0",
-    "@iobroker/testing": "^2.0.0"
+    "@iobroker/testing": "^2.2.0"
   },
   "main": "main.js",
   "scripts": {
