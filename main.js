@@ -92,6 +92,13 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         this.log.debug('ready');
         this.setState('info.connection', false, true);
 
+        if (!this.Sentry && this.supportsFeature && this.supportsFeature('PLUGINS')) {
+            const sentryInstance = this.getPluginInstance('sentry');
+            if (sentryInstance) {
+                this.Sentry = sentryInstance.getSentryObject();
+            }
+        }
+
         if (this.config.accessPointSgtin && this.config.authToken && this.config.clientAuthToken && this.config.clientId) {
             try {
                 await this._startupHomematic();
@@ -458,7 +465,13 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     promises.push(...this._updateNotificationLightChannelStates(device, i));
                     break;
                 default:
-                    this.log.info("unkown channel type - " + fc.functionalChannelType + " - " + JSON.stringify(device));
+                    this.log.info("unknown channel type - " + fc.functionalChannelType + " - " + JSON.stringify(device));
+                    this.Sentry && this.Sentry.withScope(scope => {
+                        scope.setLevel('info');
+                        scope.setExtra('channelData', JSON.stringify(device));
+                        this.Sentry.captureMessage('Unknown Channel type ' + fc.functionalChannelType, 'info');
+                    });
+
                     break;
             }
         }
