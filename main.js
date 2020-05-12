@@ -712,6 +712,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.weathervaneAlignmentNeeded', device.functionalChannels[channel].weathervaneAlignmentNeeded, true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.windDirection', device.functionalChannels[channel].windDirection, true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.windDirectionVariation', device.functionalChannels[channel].windDirectionVariation, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.vaporAmount', device.functionalChannels[channel].vaporAmount, true));
         return promises;
     }
 
