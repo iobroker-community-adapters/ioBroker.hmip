@@ -1498,3 +1498,4 @@ if (module && module.parent) {
     // or start the instance directly
     new HmIpCloudAccesspointAdapter();
 }
+
