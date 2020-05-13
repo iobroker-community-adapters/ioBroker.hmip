@@ -140,8 +140,28 @@ class HmCloudAPI {
         this._ws.on('close', (code, reason) => {
             if (this.closed)
                 this.closed(code, reason);
-            if (!this.isClosed)
-                this._connectTimeout = setTimeout(connectWebsocket, 1000);
+            if (!this.isClosed) {
+                this._connectTimeout && clearTimeout(this._connectTimeout);
+                this._connectTimeout = setTimeout(() => this.connectWebsocket(), 1000);
+            }
+        });
+
+        this._ws.on('error', (error) => {
+            if (this.errored)
+                this.errored(error);
+            if (!this.isClosed) {
+                this._connectTimeout && clearTimeout(this._connectTimeout);
+                this._connectTimeout = setTimeout(() => this.connectWebsocket(), 1000);
+            }
+        });
+
+        this._ws.on('unexpected-response', (request, response) => {
+            if (this.unexpectedResponse)
+                this.unexpectedResponse(request, response);
+            if (!this.isClosed) {
+                this._connectTimeout && clearTimeout(this._connectTimeout);
+                this._connectTimeout = setTimeout(() => this.connectWebsocket(), 1000);
+            }
         });
 
         this._ws.on('message', (d) => {
