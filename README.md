@@ -7,11 +7,16 @@
 
 [![NPM](https://nodei.co/npm/iobroker.hmip.png?downloads=true)](https://nodei.co/npm/iobroker.hmip/) [![Greenkeeper badge](https://badges.greenkeeper.io/iobroker-community-adapters/ioBroker.hmip.svg)](https://greenkeeper.io/)
 
+**This adapter uses Sentry libraries to automatically report exceptions and code errors to the developers.** For more details and for information how to disable the error reporting see [Sentry-Plugin Documentation](https://github.com/ioBroker/plugin-sentry#plugin-sentry)! Sentry reporting is used starting with js-controller 3.0.
+
 ## Description
 This adapter allows to communicate with a HomematicIP CloudAccessPoint via the Rest API of the Homematic IP Cloud
 
 ## Installation
 This Adapter needs node-js in version >= 8.6
+
+Here a Step-by-Step Installation Video on YouTube 
+https://youtu.be/kXWfJRUYJIA
 
 ## Info
 
@@ -37,12 +42,22 @@ For example direct connections between devices have no events in the app and can
 to coreGreenberet for his python lib (https://github.com/coreGreenberet/homematicip-rest-api)
 
 ## Diskussion in ioBroker Forum
-https://forum.iobroker.net/viewtopic.php?f=36&t=21000#p220517
+https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 
 ## Adapter Request auf GitHub
 https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
+
+### 1.0.0 (2020-05-12)
+* (Apollon77) Add Sentry for error/crash reporting
+* (Apollon77) multiple fixes and optimizations
+* (Apollon77) prevent adapter crashes in some places
+* (Apollon77) 
+* (ApolloSK) add vaporAmount for WeatherSensorPro
+* (ApolloSK) fix HmIP-SWO-PR wrong DataType actualTemperature
+* (marcus0303) Added DEVICE_GLOBAL_PUMP_CONTROL, FLOOR_TERMINAL_BLOCK_LOCAL_PUMP_CHANNEL and DEVICE_INCORRECT_POSITIONED, Fixed role in _createWaterSensorChannel and function call in _createWeatherSensorPlusChannel
+* (marcus0303) Added CONTACT_INTERFACE_CHANNEL for HmIP-SCI (see Issue #70 ), Added FLOOR_TERMINAL_BLOCK_CHANNEL, HEAT_DEMAND_CHANNEL, DEHUMIDIFIER_DEMAND_CHANNEL, CHANGE_OVER_CHANNEL, but without functionality, because it's not implemented in REST-API. Only to supress Warnings in Log.
 
 ### 0.0.12
 * (jogibear9988) multiple fixes

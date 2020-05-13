@@ -17,6 +17,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         // this._api.dataReceived = this._dataReceived.bind(this);
         this._api.opened = this._opened.bind(this);
         this._api.closed = this._closed.bind(this);
+        this._api.errored = this._errored.bind(this);
+        this._api.unexpectedResponse = this._unexpectedResponse.bind(this);
 
         this.on('unload', this._unload);
         this.on('objectChange', this._objectChange);
@@ -30,6 +32,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _unload(callback) {
         this._unloaded = true;
+        this.reInitTimeout && clearTimeout(this.reInitTimeout);
         this._api.dispose();
         try {
             this.log.info('cleaned everything up...');
@@ -89,11 +92,20 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         this.log.debug('ready');
         this.setState('info.connection', false, true);
 
+        if (!this.Sentry && this.supportsFeature && this.supportsFeature('PLUGINS')) {
+            const sentryInstance = this.getPluginInstance('sentry');
+            if (sentryInstance) {
+                this.Sentry = sentryInstance.getSentryObject();
+            }
+        }
+
         if (this.config.accessPointSgtin && this.config.authToken && this.config.clientAuthToken && this.config.clientId) {
             try {
                 await this._startupHomematic();
             } catch (err) {
                 this.log.error('error starting homematic: ' +  err);
+                this.log.error('Try reconnect in 30s');
+                this.reInitTimeout = setTimeout(() => this._ready(), 30000);
             }
         } else {
             this.log.info('token not yet created');
@@ -121,16 +133,32 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         this.log.debug('connectWebsocket');
         this._api.connectWebsocket();
         this.log.debug('updateDeviceStates');
-        for (let d in this._api.devices) {
-            await this._updateDeviceStates(this._api.devices[d]);
+        if (this._api.devices) {
+            for (let d in this._api.devices) {
+                await this._updateDeviceStates(this._api.devices[d]);
+            }
+        } else {
+            this.log.debug('No devices');
         }
-        for (let g in this._api.groups) {
-            await this._updateGroupStates(this._api.groups[g]);
+        if (this._api.groups) {
+            for (let g in this._api.groups) {
+                await this._updateGroupStates(this._api.groups[g]);
+            }
+        } else {
+            this.log.debug('No groups');
         }
-        for (let c in this._api.clients) {
-            await this._updateClientStates(this._api.clients[c]);
+        if (this._api.clients) {
+            for (let c in this._api.clients) {
+                await this._updateClientStates(this._api.clients[c]);
+            }
+        } else {
+            this.log.debug('No clients');
         }
-        await this._updateHomeStates(this._api.home);
+        if (this._api.home) {
+            await this._updateHomeStates(this._api.home);
+        } else {
+            this.log.debug('No home');
+        }
 
         this.log.debug('subscribeStates');
         this.subscribeStates('*');
@@ -252,6 +280,14 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         this.log.warn("ws connection closed - code: " + code + " - reason: " + reason);
     }
 
+    _errored(error) {
+        this.log.warn("ws connection error: " + error);
+    }
+
+    _unexpectedResponse(req, res) {
+        this.log.warn("ws connection unexpected response: " + res.statusCode);
+    }
+
     async _eventRaised(ev) {
         switch (ev.pushEventType) {
             case 'DEVICE_ADDED':
@@ -282,24 +318,40 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             case 'CLIENT_REMOVED':
                 break;
             case 'HOME_CHANGED':
-                await this._updateHomeStates(ev.home);
+                if (ev.home) {
+                    await this._updateHomeStates(ev.home);
+                } else {
+                    this.log.warn('No home in HOME_CHANGED: ' + JSON.stringify(ev));
+                }
+                break;
+            case 'SECURITY_JOURNAL_CHANGED':
+                if (ev.home) {
+                    await this._updateHomeStates(ev.home);
+                } else {
+                    this.log.warn('No home in SECURITY_JOURNAL_CHANGED: ' + JSON.stringify(ev));
+                }
                 break;
             default:
                 this.log.warn("unhandled event - " + JSON.stringify(ev));
         }
     }
 
+    secureSetStateAsync(id, value, ack) {
+        if (value === undefined) value = null;
+        return this.setStateAsync(id, value, ack);
+    }
+
     _updateDeviceStates(device) {
         this.log.silly("updateDeviceStates - " + device.type + " - " + JSON.stringify(device));
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.info.type', device.type, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.info.modelType', device.modelType, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.info.label', device.label, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.info.firmwareVersion', device.firmwareVersion, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.info.updateState', device.updateState, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.info.type', device.type, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.info.modelType', device.modelType, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.info.label', device.label, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.info.firmwareVersion', device.firmwareVersion, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.info.updateState', device.updateState, true));
         switch (device.type) {
             /*case 'PLUGABLE_SWITCH': {
-                promises.push(this.setStateAsync('devices.' + device.id + '.channels.1.on', device.functionalChannels['1'].on, true));
+                promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.1.on', device.functionalChannels['1'].on, true));
                 break;
             }*/
             default: {
@@ -309,7 +361,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
         for (let i in device.functionalChannels) {
             let fc = device.functionalChannels[i];
-            promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + i + '.functionalChannelType', fc.functionalChannelType, true));
+            promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + i + '.functionalChannelType', fc.functionalChannelType, true));
 
             switch (fc.functionalChannelType) {
 
@@ -321,6 +373,18 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     break;
                 case 'PRESENCE_DETECTION_CHANNEL':
                     promises.push(...this._updatePresenceDetectionChannel(device, i));
+                    break;
+                case 'DEVICE_GLOBAL_PUMP_CONTROL':
+                    promises.push(...this._updateDeviceGlobalPumpControl(device, i));
+                    break;
+                case 'FLOOR_TERMINAL_BLOCK_LOCAL_PUMP_CHANNEL':
+                    promises.push(...this._updateFloorTerminalBlockLockPumpChannel(device, i));
+                    break;
+                case 'DEVICE_INCORRECT_POSITIONED':
+                    promises.push(...this._updateDeviceIncorrectPositioned(device, i));
+                    break;
+                case 'CONTACT_INTERFACE_CHANNEL':
+                    promises.push(...this._updateContactInterfaceChannel(device, i));
                     break;
                 case 'HEATING_THERMOSTAT_CHANNEL':
                     promises.push(...this._updateHeatingThermostatChannelStates(device, i));
@@ -401,7 +465,13 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     promises.push(...this._updateNotificationLightChannelStates(device, i));
                     break;
                 default:
-                    this.log.info("unkown channel type - " + fc.functionalChannelType + " - " + JSON.stringify(device));
+                    this.log.info("unknown channel type - " + fc.functionalChannelType + " - " + JSON.stringify(device));
+                    this.Sentry && this.Sentry.withScope(scope => {
+                        scope.setLevel('info');
+                        scope.setExtra('channelData', JSON.stringify(device));
+                        this.Sentry.captureMessage('Unknown Channel type ' + fc.functionalChannelType, 'info');
+                    });
+
                     break;
             }
         }
@@ -412,271 +482,324 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _updateNotificationLightChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.on', device.functionalChannels[channel].on, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.dimLevel', device.functionalChannels[channel].dimLevel, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.simpleRGBColorState', device.functionalChannels[channel].simpleRGBColorState, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.on', device.functionalChannels[channel].on, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.dimLevel', device.functionalChannels[channel].dimLevel, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.simpleRGBColorState', device.functionalChannels[channel].simpleRGBColorState, true));
         return promises;
     }
 
     _updateLightSensorChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.currentIllumination', device.functionalChannels[channel].currentIllumination, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.averageIllumination', device.functionalChannels[channel].averageIllumination, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.lowestIllumination', device.functionalChannels[channel].lowestIllumination, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.highestIllumination', device.functionalChannels[channel].highestIllumination, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.currentIllumination', device.functionalChannels[channel].currentIllumination, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.averageIllumination', device.functionalChannels[channel].averageIllumination, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.lowestIllumination', device.functionalChannels[channel].lowestIllumination, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.highestIllumination', device.functionalChannels[channel].highestIllumination, true));
         return promises;
     }
 
     _updateInternalSwitchChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.frostProtectionTemperature', device.functionalChannels[channel].frostProtectionTemperature, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.heatingValveType', device.functionalChannels[channel].heatingValveType, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.internalSwitchOutputEnabled', device.functionalChannels[channel].internalSwitchOutputEnabled, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionDuration', device.functionalChannels[channel].valveProtectionDuration, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionSwitchingInterval', device.functionalChannels[channel].valveProtectionSwitchingInterval, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.frostProtectionTemperature', device.functionalChannels[channel].frostProtectionTemperature, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.heatingValveType', device.functionalChannels[channel].heatingValveType, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.internalSwitchOutputEnabled', device.functionalChannels[channel].internalSwitchOutputEnabled, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionDuration', device.functionalChannels[channel].valveProtectionDuration, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionSwitchingInterval', device.functionalChannels[channel].valveProtectionSwitchingInterval, true));
         return promises;
     }
 
     _updateSmokeDetectorChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.smokeDetectorAlarmType', device.functionalChannels[channel].smokeDetectorAlarmType, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.smokeDetectorAlarmType', device.functionalChannels[channel].smokeDetectorAlarmType, true));
         return promises;
     }
 
     _updateMultiModeInputChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.binaryBehaviorType', device.functionalChannels[channel].binaryBehaviorType, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.multiModeInputMode', device.functionalChannels[channel].multiModeInputMode, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windowState', device.functionalChannels[channel].windowState, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windowOpen', device.functionalChannels[channel].windowState == 'OPEN', true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.binaryBehaviorType', device.functionalChannels[channel].binaryBehaviorType, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.multiModeInputMode', device.functionalChannels[channel].multiModeInputMode, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.windowState', device.functionalChannels[channel].windowState, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.windowOpen', device.functionalChannels[channel].windowState == 'OPEN', true));
         return promises;
     }
 
     _updateDeviceBaseChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.configPending', device.functionalChannels[channel].configPending, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.dutyCycle', device.functionalChannels[channel].dutyCycle, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.lowBat', device.functionalChannels[channel].lowBat, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.routerModuleEnabled', device.functionalChannels[channel].routerModuleEnabled, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.routerModuleSupported', device.functionalChannels[channel].routerModuleSupported, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.rssiDeviceValue', device.functionalChannels[channel].rssiDeviceValue, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.rssiPeerValue', device.functionalChannels[channel].rssiPeerValue, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.unreach', device.functionalChannels[channel].unreach, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.configPending', device.functionalChannels[channel].configPending, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.dutyCycle', device.functionalChannels[channel].dutyCycle, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.lowBat', device.functionalChannels[channel].lowBat, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.routerModuleEnabled', device.functionalChannels[channel].routerModuleEnabled, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.routerModuleSupported', device.functionalChannels[channel].routerModuleSupported, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.rssiDeviceValue', device.functionalChannels[channel].rssiDeviceValue, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.rssiPeerValue', device.functionalChannels[channel].rssiPeerValue, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.unreach', device.functionalChannels[channel].unreach, true));
         return promises;
     }
 
     _updateDeviceSabotageChannelStates(device, channel) {
         let promises = [];
         promises.push(...this._updateDeviceBaseChannelStates(device, channel));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.sabotage', device.functionalChannels[channel].sabotage, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.sabotage', device.functionalChannels[channel].sabotage, true));
+        return promises;
+    }
+
+    _updateDeviceGlobalPumpControl(device, channel) {
+        let promises = [];
+        promises.push(...this._updateDeviceBaseChannelStates(device, channel));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverloaded', device.functionalChannels[channel].deviceOverloaded, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.deviceUndervoltage', device.functionalChannels[channel].deviceUndervoltage, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverheated', device.functionalChannels[channel].deviceOverheated, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOutOfRange', device.functionalChannels[channel].temperatureOutOfRange, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionDuration', device.functionalChannels[channel].valveProtectionDuration, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionSwitchingInterval', device.functionalChannels[channel].valveProtectionSwitchingInterval, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.frostProtectionTemperature', device.functionalChannels[channel].frostProtectionTemperature, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.coolingEmergencyValue', device.functionalChannels[channel].coolingEmergencyValue, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.heatingEmergencyValue', device.functionalChannels[channel].heatingEmergencyValue, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.globalPumpControl', device.functionalChannels[channel].globalPumpControl, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.heatingValveType', device.functionalChannels[channel].heatingValveType, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.heatingLoadType', device.functionalChannels[channel].heatingLoadType, true));
+        return promises;
+    }
+
+    _updateFloorTerminalBlockLockPumpChannel(device, channel) {
+        let promises = [];
+        promises.push(...this._updateDeviceBaseChannelStates(device, channel));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.pumpLeadTime', device.functionalChannels[channel].pumpLeadTime, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.pumpFollowUpTime', device.functionalChannels[channel].pumpFollowUpTime, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.pumpProtectionDuration', device.functionalChannels[channel].pumpProtectionDuration, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.pumpProtectionSwitchingInterval', device.functionalChannels[channel].pumpProtectionSwitchingInterval, true));
+        return promises;
+    }
+
+    _updateDeviceIncorrectPositioned(device, channel) {
+        let promises = [];
+        promises.push(...this._updateDeviceBaseChannelStates(device, channel));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverloaded', device.functionalChannels[channel].deviceOverloaded, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.coProUpdateFailure', device.functionalChannels[channel].coProUpdateFailure, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.coProFaulty', device.functionalChannels[channel].coProFaulty, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.coProRestartNeeded', device.functionalChannels[channel].coProRestartNeeded, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.deviceUndervoltage', device.functionalChannels[channel].deviceUndervoltage, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverheated', device.functionalChannels[channel].deviceOverheated, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOutOfRange', device.functionalChannels[channel].temperatureOutOfRange, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.incorrectPositioned', device.functionalChannels[channel].incorrectPositioned, true));
         return promises;
     }
 
     _updatePresenceDetectionChannel(device, channel) {
         let promises = [];
         promises.push(...this._updateDeviceBaseChannelStates(device, channel));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.presenceDetected', device.functionalChannels[channel].presenceDetected, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.illumination', device.functionalChannels[channel].illumination, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.currentIllumination', device.functionalChannels[channel].currentIllumination, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.numberOfBrightnessMeasurements', device.functionalChannels[channel].numberOfBrightnessMeasurements, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.motionDetectionSendInterval', device.functionalChannels[channel].motionDetectionSendInterval, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.motionBufferActive', device.functionalChannels[channel].motionBufferActive, true));       
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.presenceDetected', device.functionalChannels[channel].presenceDetected, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.illumination', device.functionalChannels[channel].illumination, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.currentIllumination', device.functionalChannels[channel].currentIllumination, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.numberOfBrightnessMeasurements', device.functionalChannels[channel].numberOfBrightnessMeasurements, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.motionDetectionSendInterval', device.functionalChannels[channel].motionDetectionSendInterval, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.motionBufferActive', device.functionalChannels[channel].motionBufferActive, true));
+        return promises;
+    }
+
+    _updateContactInterfaceChannel(device, channel) {
+        let promises = [];
+        promises.push(...this._updateDeviceBaseChannelStates(device, channel));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.windowState', device.functionalChannels[channel].windowState, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.contactType', device.functionalChannels[channel].contactType, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.alarmContactType', device.functionalChannels[channel].alarmContactType, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.eventDelay', device.functionalChannels[channel].eventDelay, true));
         return promises;
     }
 
     _updateDeviceOperationLockChannelStates(device, channel) {
         let promises = [];
         promises.push(...this._updateDeviceBaseChannelStates(device, channel));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.operationLockActive', device.functionalChannels[channel].operationLockActive, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.operationLockActive', device.functionalChannels[channel].operationLockActive, true));
         return promises;
     }
 
     _updateDevicePermanentFullRxChannelStates(device, channel) {
         let promises = [];
         promises.push(...this._updateDeviceBaseChannelStates(device, channel));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.permanentFullRx', device.functionalChannels[channel].permanentFullRx, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.permanentFullRx', device.functionalChannels[channel].permanentFullRx, true));
         return promises;
     }
 
     _updateRotaryHandleChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windowState', device.functionalChannels[channel].windowState, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windowOpen', device.functionalChannels[channel].windowState == 'OPEN', true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.eventDelay', device.functionalChannels[channel].eventDelay, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.windowState', device.functionalChannels[channel].windowState, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.windowOpen', device.functionalChannels[channel].windowState == 'OPEN', true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.eventDelay', device.functionalChannels[channel].eventDelay, true));
         return promises;
     }
 
     _updateBlindChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.shutterLevel', device.functionalChannels[channel].shutterLevel, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.previousShutterLevel', device.functionalChannels[channel].previousShutterLevel, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.processing', device.functionalChannels[channel].processing, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.selfCalibrationInProgress', device.functionalChannels[channel].selfCalibrationInProgress, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.topToBottomReferenceTime', device.functionalChannels[channel].topToBottomReferenceTime, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.bottomToTopReferenceTime', device.functionalChannels[channel].bottomToTopReferenceTime, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.changeOverDelay', device.functionalChannels[channel].changeOverDelay, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.supportingSelfCalibration', device.functionalChannels[channel].supportingSelfCalibration, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.endpositionAutoDetectionEnabled', device.functionalChannels[channel].endpositionAutoDetectionEnabled, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.supportingEndpositionAutoDetection', device.functionalChannels[channel].supportingEndpositionAutoDetection, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.delayCompensationValue', device.functionalChannels[channel].delayCompensationValue, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.supportingDelayCompensation', device.functionalChannels[channel].supportingDelayCompensation, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.profileMode', device.functionalChannels[channel].profileMode, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.userDesiredProfileMode', device.functionalChannels[channel].userDesiredProfileMode, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.slatsLevel', device.functionalChannels[channel].slatsLevel, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.previousSlatsLevel', device.functionalChannels[channel].previousSlatsLevel, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.slatsReferenceTime', device.functionalChannels[channel].slatsReferenceTime, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.blindModeActive', device.functionalChannels[channel].blindModeActive, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.shutterLevel', device.functionalChannels[channel].shutterLevel, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.previousShutterLevel', device.functionalChannels[channel].previousShutterLevel, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.processing', device.functionalChannels[channel].processing, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.selfCalibrationInProgress', device.functionalChannels[channel].selfCalibrationInProgress, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.topToBottomReferenceTime', device.functionalChannels[channel].topToBottomReferenceTime, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.bottomToTopReferenceTime', device.functionalChannels[channel].bottomToTopReferenceTime, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.changeOverDelay', device.functionalChannels[channel].changeOverDelay, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.supportingSelfCalibration', device.functionalChannels[channel].supportingSelfCalibration, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.endpositionAutoDetectionEnabled', device.functionalChannels[channel].endpositionAutoDetectionEnabled, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.supportingEndpositionAutoDetection', device.functionalChannels[channel].supportingEndpositionAutoDetection, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.delayCompensationValue', device.functionalChannels[channel].delayCompensationValue, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.supportingDelayCompensation', device.functionalChannels[channel].supportingDelayCompensation, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.profileMode', device.functionalChannels[channel].profileMode, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.userDesiredProfileMode', device.functionalChannels[channel].userDesiredProfileMode, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.slatsLevel', device.functionalChannels[channel].slatsLevel, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.previousSlatsLevel', device.functionalChannels[channel].previousSlatsLevel, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.slatsReferenceTime', device.functionalChannels[channel].slatsReferenceTime, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.blindModeActive', device.functionalChannels[channel].blindModeActive, true));
         return promises;
     }
 
     _updateSwitchChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.on', device.functionalChannels[channel].on, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.profileMode', device.functionalChannels[channel].profileMode, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.userDesiredProfileMode', device.functionalChannels[channel].userDesiredProfileMode, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.on', device.functionalChannels[channel].on, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.profileMode', device.functionalChannels[channel].profileMode, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.userDesiredProfileMode', device.functionalChannels[channel].userDesiredProfileMode, true));
         return promises;
     }
 
     _updateSwitchMeasuringChannelStates(device, channel) {
         let promises = [];
         promises.push(...this._updateSwitchChannelStates(device, channel));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.energyCounter', device.functionalChannels[channel].energyCounter, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.currentPowerConsumption', device.functionalChannels[channel].currentPowerConsumption, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.energyCounter', device.functionalChannels[channel].energyCounter, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.currentPowerConsumption', device.functionalChannels[channel].currentPowerConsumption, true));
         return promises;
     }
 
     _updateShutterContactChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windowState', device.functionalChannels[channel].windowState, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windowOpen', device.functionalChannels[channel].windowState == 'OPEN', true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.windowState', device.functionalChannels[channel].windowState, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.windowOpen', device.functionalChannels[channel].windowState == 'OPEN', true));
         return promises;
     }
 
     _updateDimmerChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.dimLevel', device.functionalChannels[channel].dimLevel, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.on', device.functionalChannels[channel].on, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.dimLevel', device.functionalChannels[channel].dimLevel, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.on', device.functionalChannels[channel].on, true));
         return promises;
     }
 
     _updateWaterSensorChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.moistureDetected', device.functionalChannels[channel].moistureDetected, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.waterlevelDetected', device.functionalChannels[channel].waterlevelDetected, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.sirenWaterAlarmTrigger', device.functionalChannels[channel].sirenWaterAlarmTrigger, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.inAppWaterAlarmTrigger', device.functionalChannels[channel].inAppWaterAlarmTrigger, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.acousticAlarmSignal', device.functionalChannels[channel].acousticAlarmSignal, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.acousticAlarmTiming', device.functionalChannels[channel].acousticAlarmTiming, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.acousticWaterAlarmTrigger', device.functionalChannels[channel].acousticWaterAlarmTrigger, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.moistureDetected', device.functionalChannels[channel].moistureDetected, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.waterlevelDetected', device.functionalChannels[channel].waterlevelDetected, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.sirenWaterAlarmTrigger', device.functionalChannels[channel].sirenWaterAlarmTrigger, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.inAppWaterAlarmTrigger', device.functionalChannels[channel].inAppWaterAlarmTrigger, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.acousticAlarmSignal', device.functionalChannels[channel].acousticAlarmSignal, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.acousticAlarmTiming', device.functionalChannels[channel].acousticAlarmTiming, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.acousticWaterAlarmTrigger', device.functionalChannels[channel].acousticWaterAlarmTrigger, true));
         return promises;
     }
 
     _updateWeatherSensorChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.actualTemperature', device.functionalChannels[channel].actualTemperature, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.humidity', device.functionalChannels[channel].humidity, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.illumination', device.functionalChannels[channel].illumination, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.illuminationThresholdSunshine', device.functionalChannels[channel].illuminationThresholdSunshine, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.storm', device.functionalChannels[channel].storm, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.sunshine', device.functionalChannels[channel].sunshine, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.todaySunshineDuration', device.functionalChannels[channel].todaySunshineDuration, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.totalSunshineDuration', device.functionalChannels[channel].totalSunshineDuration, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windSpeed', device.functionalChannels[channel].windSpeed, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windValueType', device.functionalChannels[channel].windValueType, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.yesterdaySunshineDuration', device.functionalChannels[channel].yesterdaySunshineDuration, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.actualTemperature', device.functionalChannels[channel].actualTemperature, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.humidity', device.functionalChannels[channel].humidity, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.illumination', device.functionalChannels[channel].illumination, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.illuminationThresholdSunshine', device.functionalChannels[channel].illuminationThresholdSunshine, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.storm', device.functionalChannels[channel].storm, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.sunshine', device.functionalChannels[channel].sunshine, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.todaySunshineDuration', device.functionalChannels[channel].todaySunshineDuration, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.totalSunshineDuration', device.functionalChannels[channel].totalSunshineDuration, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.windSpeed', device.functionalChannels[channel].windSpeed, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.windValueType', device.functionalChannels[channel].windValueType, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.yesterdaySunshineDuration', device.functionalChannels[channel].yesterdaySunshineDuration, true));
         return promises;
     }
 
     _updateWeatherSensorPlusChannelStates(device, channel) {
         let promises = [];
         promises.push(...this._updateWeatherSensorChannelStates(device, channel));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.raining', device.functionalChannels[channel].raining, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.todayRainCounter', device.functionalChannels[channel].todayRainCounter, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.totalRainCounter', device.functionalChannels[channel].totalRainCounter, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.yesterdayRainCounter', device.functionalChannels[channel].yesterdayRainCounter, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.raining', device.functionalChannels[channel].raining, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.todayRainCounter', device.functionalChannels[channel].todayRainCounter, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.totalRainCounter', device.functionalChannels[channel].totalRainCounter, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.yesterdayRainCounter', device.functionalChannels[channel].yesterdayRainCounter, true));
         return promises;
     }
 
     _updateWeatherSensorProChannelStates(device, channel) {
         let promises = [];
         promises.push(...this._updateWeatherSensorPlusChannelStates(device, channel));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.weathervaneAlignmentNeeded', device.functionalChannels[channel].weathervaneAlignmentNeeded, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windDirection', device.functionalChannels[channel].windDirection, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.windDirectionVariation', device.functionalChannels[channel].windDirectionVariation, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.weathervaneAlignmentNeeded', device.functionalChannels[channel].weathervaneAlignmentNeeded, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.windDirection', device.functionalChannels[channel].windDirection, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.windDirectionVariation', device.functionalChannels[channel].windDirectionVariation, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.vaporAmount', device.functionalChannels[channel].vaporAmount, true));
         return promises;
     }
 
     _updateSingleKeyChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.on', device.functionalChannels[channel].on, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.on', device.functionalChannels[channel].on, true));
         return promises;
     }
 
     _updateShutterChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.shutterLevel', device.functionalChannels[channel].shutterLevel, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.previousShutterLevel', device.functionalChannels[channel].previousShutterLevel, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.processing', device.functionalChannels[channel].processing, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.selfCalibrationInProgress', device.functionalChannels[channel].selfCalibrationInProgress, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.topToBottomReferenceTime', device.functionalChannels[channel].topToBottomReferenceTime, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.bottomToTopReferenceTime', device.functionalChannels[channel].bottomToTopReferenceTime, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.changeOverDelay', device.functionalChannels[channel].changeOverDelay, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.endpositionAutoDetectionEnabled', device.functionalChannels[channel].endpositionAutoDetectionEnabled, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.shutterLevel', device.functionalChannels[channel].shutterLevel, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.previousShutterLevel', device.functionalChannels[channel].previousShutterLevel, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.processing', device.functionalChannels[channel].processing, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.selfCalibrationInProgress', device.functionalChannels[channel].selfCalibrationInProgress, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.topToBottomReferenceTime', device.functionalChannels[channel].topToBottomReferenceTime, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.bottomToTopReferenceTime', device.functionalChannels[channel].bottomToTopReferenceTime, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.changeOverDelay', device.functionalChannels[channel].changeOverDelay, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.endpositionAutoDetectionEnabled', device.functionalChannels[channel].endpositionAutoDetectionEnabled, true));
         return promises;
     }
 
     _updateSmokeDetectorChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.smokeDetectorAlarmType', device.functionalChannels[channel].smokeDetectorAlarmType, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.smokeDetectorAlarmType', device.functionalChannels[channel].smokeDetectorAlarmType, true));
         return promises;
     }
 
     _updateHeatingThermostatChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOffset', device.functionalChannels[channel].temperatureOffset, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.valvePosition', device.functionalChannels[channel].valvePosition, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.setPointTemperature', device.functionalChannels[channel].setPointTemperature, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.valveActualTemperature', device.functionalChannels[channel].valveActualTemperature, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.valveState', device.functionalChannels[channel].valveState, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOffset', device.functionalChannels[channel].temperatureOffset, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.valvePosition', device.functionalChannels[channel].valvePosition, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.setPointTemperature', device.functionalChannels[channel].setPointTemperature, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.valveActualTemperature', device.functionalChannels[channel].valveActualTemperature, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.valveState', device.functionalChannels[channel].valveState, true));
         return promises;
     
     }
 
     _updateClimateSensorChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.actualTemperature', device.functionalChannels[channel].actualTemperature, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.humidity', device.functionalChannels[channel].humidity, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.actualTemperature', device.functionalChannels[channel].actualTemperature, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.humidity', device.functionalChannels[channel].humidity, true));
         return promises;
     }
 
     _updateWallMountedThermostatWithoutDisplayStates(device, channel) {
         let promises = [];
         promises.push(...this._updateClimateSensorChannelStates(device, channel));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOffset', device.functionalChannels[channel].temperatureOffset, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.setPointTemperature', device.functionalChannels[channel].setPointTemperature, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOffset', device.functionalChannels[channel].temperatureOffset, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.setPointTemperature', device.functionalChannels[channel].setPointTemperature, true));
         return promises;
     }
 
     _updateWallMountedThermostatProChannelStates(device, channel) {
         let promises = [];
         promises.push(...this._updateWallMountedThermostatWithoutDisplayStates(device, channel));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.display', device.functionalChannels[channel].display, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.display', device.functionalChannels[channel].display, true));
         return promises;
     }
 
     _updateAlarmSirenChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.on', device.functionalChannels[channel].on, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.on', device.functionalChannels[channel].on, true));
         return promises;
     }
 
     _updateMotionDetectionChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.motionDetected', device.functionalChannels[channel].motionDetected, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.illumination', device.functionalChannels[channel].illumination, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.currentIllumination', device.functionalChannels[channel].currentIllumination, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.motionDetectionSendInterval', device.functionalChannels[channel].motionDetectionSendInterval, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.motionBufferActive', device.functionalChannels[channel].motionBufferActive, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.motionDetected', device.functionalChannels[channel].motionDetected, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.illumination', device.functionalChannels[channel].illumination, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.currentIllumination', device.functionalChannels[channel].currentIllumination, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.motionDetectionSendInterval', device.functionalChannels[channel].motionDetectionSendInterval, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.motionBufferActive', device.functionalChannels[channel].motionBufferActive, true));
         return promises;
     }
 
@@ -685,41 +808,41 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _updateGroupStates(group) {
         this.log.silly("_updateGroupStates - " + JSON.stringify(group));
         let promises = [];
-        promises.push(this.setStateAsync('groups.' + group.id + '.info.type', group.type, true));
-        promises.push(this.setStateAsync('groups.' + group.id + '.info.label', group.label, true));
+        promises.push(this.secureSetStateAsync('groups.' + group.id + '.info.type', group.type, true));
+        promises.push(this.secureSetStateAsync('groups.' + group.id + '.info.label', group.label, true));
 
         switch (group.type) {
             case 'HEATING': {
-                promises.push(this.setStateAsync('groups.' + group.id + '.windowOpenTemperature', group.windowOpenTemperature, true));
-                promises.push(this.setStateAsync('groups.' + group.id + '.setPointTemperature', group.setPointTemperature, true));
-                promises.push(this.setStateAsync('groups.' + group.id + '.minTemperature', group.minTemperature, true));
-                promises.push(this.setStateAsync('groups.' + group.id + '.maxTemperature', group.maxTemperature, true));
-                promises.push(this.setStateAsync('groups.' + group.id + '.windowState', group.windowState, true));
-                promises.push(this.setStateAsync('groups.' + group.id + '.cooling', group.cooling, true));
-                promises.push(this.setStateAsync('groups.' + group.id + '.partyMode', group.partyMode, true));
-                promises.push(this.setStateAsync('groups.' + group.id + '.controlMode', group.controlMode, true));
-                promises.push(this.setStateAsync('groups.' + group.id + '.activeProfile', group.activeProfile, true));
-                promises.push(this.setStateAsync('groups.' + group.id + '.boostMode', group.boostMode, true));
-                promises.push(this.setStateAsync('groups.' + group.id + '.boostDuration', group.boostDuration, true));
-                promises.push(this.setStateAsync('groups.' + group.id + '.actualTemperature', group.actualTemperature, true));
-                promises.push(this.setStateAsync('groups.' + group.id + '.humidity', group.humidity, true));
-                promises.push(this.setStateAsync('groups.' + group.id + '.coolingAllowed', group.coolingAllowed, true));
-                promises.push(this.setStateAsync('groups.' + group.id + '.coolingIgnored', group.coolingIgnored, true));
-                promises.push(this.setStateAsync('groups.' + group.id + '.ecoAllowed', group.ecoAllowed, true));
-                promises.push(this.setStateAsync('groups.' + group.id + '.ecoIgnored', group.ecoIgnored, true));
-                promises.push(this.setStateAsync('groups.' + group.id + '.controllable', group.controllable, true));
-                promises.push(this.setStateAsync('groups.' + group.id + '.floorHeatingMode', group.floorHeatingMode, true));
-                promises.push(this.setStateAsync('groups.' + group.id + '.humidityLimitEnabled', group.humidityLimitEnabled, true));
-                promises.push(this.setStateAsync('groups.' + group.id + '.humidityLimitValue', group.humidityLimitValue, true));
-                promises.push(this.setStateAsync('groups.' + group.id + '.externalClockEnabled', group.externalClockEnabled, true));
-                promises.push(this.setStateAsync('groups.' + group.id + '.externalClockHeatingTemperature', group.externalClockHeatingTemperature, true));
-                promises.push(this.setStateAsync('groups.' + group.id + '.externalClockCoolingTemperature', group.externalClockCoolingTemperature, true));
-                promises.push(this.setStateAsync('groups.' + group.id + '.valvePosition', group.valvePosition, true));
-                promises.push(this.setStateAsync('groups.' + group.id + '.sabotage', group.sabotage, true));             
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.windowOpenTemperature', group.windowOpenTemperature, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.setPointTemperature', group.setPointTemperature, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.minTemperature', group.minTemperature, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.maxTemperature', group.maxTemperature, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.windowState', group.windowState, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.cooling', group.cooling, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.partyMode', group.partyMode, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.controlMode', group.controlMode, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.activeProfile', group.activeProfile, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.boostMode', group.boostMode, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.boostDuration', group.boostDuration, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.actualTemperature', group.actualTemperature, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.humidity', group.humidity, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.coolingAllowed', group.coolingAllowed, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.coolingIgnored', group.coolingIgnored, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.ecoAllowed', group.ecoAllowed, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.ecoIgnored', group.ecoIgnored, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.controllable', group.controllable, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.floorHeatingMode', group.floorHeatingMode, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.humidityLimitEnabled', group.humidityLimitEnabled, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.humidityLimitValue', group.humidityLimitValue, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.externalClockEnabled', group.externalClockEnabled, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.externalClockHeatingTemperature', group.externalClockHeatingTemperature, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.externalClockCoolingTemperature', group.externalClockCoolingTemperature, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.valvePosition', group.valvePosition, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.sabotage', group.sabotage, true));
                 break;
             }
             case 'SWITCHING': {
-                promises.push(this.setStateAsync('groups.' + group.id + '.on', group.on, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.on', group.on, true));
                 break;
             }
         }
@@ -730,7 +853,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _updateClientStates(client) {
         this.log.silly("_updateClientStates - " + JSON.stringify(client));
         let promises = [];
-        promises.push(this.setStateAsync('clients.' + client.id + '.info.label', client.label, true));
+        promises.push(this.secureSetStateAsync('clients.' + client.id + '.info.label', client.label, true));
         return Promise.all(promises);
     }
 
@@ -738,37 +861,37 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         this.log.silly("_updateHomeStates - " + JSON.stringify(home));
         let promises = [];
 
-        promises.push(this.setStateAsync('homes.' + home.id + '.weather.temperature', home.weather.temperature, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.weather.weatherCondition', home.weather.weatherCondition, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.weather.weatherDayTime', home.weather.weatherDayTime, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.weather.minTemperature', home.weather.minTemperature, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.weather.maxTemperature', home.weather.maxTemperature, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.weather.humidity', home.weather.humidity, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.weather.windSpeed', home.weather.windSpeed, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.weather.windDirection', home.weather.windDirection, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.weather.temperature', home.weather.temperature, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.weather.weatherCondition', home.weather.weatherCondition, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.weather.weatherDayTime', home.weather.weatherDayTime, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.weather.minTemperature', home.weather.minTemperature, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.weather.maxTemperature', home.weather.maxTemperature, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.weather.humidity', home.weather.humidity, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.weather.windSpeed', home.weather.windSpeed, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.weather.windDirection', home.weather.windDirection, true));
 
-        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventTimestamp', home.functionalHomes.SECURITY_AND_ALARM.alarmEventTimestamp, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventDeviceId', home.functionalHomes.SECURITY_AND_ALARM.alarmEventDeviceId, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventTriggerId', home.functionalHomes.SECURITY_AND_ALARM.alarmEventTriggerId, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventDeviceChannel', home.functionalHomes.SECURITY_AND_ALARM.alarmEventDeviceChannel, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmSecurityJournalEntryType', home.functionalHomes.SECURITY_AND_ALARM.alarmSecurityJournalEntryType, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmActive', home.functionalHomes.SECURITY_AND_ALARM.alarmActive, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.zoneActivationDelay', home.functionalHomes.SECURITY_AND_ALARM.zoneActivationDelay, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.intrusionAlertThroughSmokeDetectors', home.functionalHomes.SECURITY_AND_ALARM.intrusionAlertThroughSmokeDetectors, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.securityZoneActivationMode', home.functionalHomes.SECURITY_AND_ALARM.securityZoneActivationMode, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.solution', home.functionalHomes.SECURITY_AND_ALARM.solution, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.activationInProgress', home.functionalHomes.SECURITY_AND_ALARM.activationInProgress, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.active', home.functionalHomes.SECURITY_AND_ALARM.active, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.absenceType', home.functionalHomes.INDOOR_CLIMATE.absenceType, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.absenceEndTime', home.functionalHomes.INDOOR_CLIMATE.absenceEndTime, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.ecoTemperature', home.functionalHomes.INDOOR_CLIMATE.ecoTemperature, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.coolingEnabled', home.functionalHomes.INDOOR_CLIMATE.coolingEnabled, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.ecoDuration', home.functionalHomes.INDOOR_CLIMATE.ecoDuration, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.optimumStartStopEnabled', home.functionalHomes.INDOOR_CLIMATE.optimumStartStopEnabled, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.solution', home.functionalHomes.INDOOR_CLIMATE.solution, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.active', home.functionalHomes.INDOOR_CLIMATE.active, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.lightAndShadow.active', home.functionalHomes.LIGHT_AND_SHADOW.active, true));
-        promises.push(this.setStateAsync('homes.' + home.id + '.functionalHomes.weatherAndEnvironment.active', home.functionalHomes.WEATHER_AND_ENVIRONMENT.active, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventTimestamp', home.functionalHomes.SECURITY_AND_ALARM.alarmEventTimestamp, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventDeviceId', home.functionalHomes.SECURITY_AND_ALARM.alarmEventDeviceId, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventTriggerId', home.functionalHomes.SECURITY_AND_ALARM.alarmEventTriggerId, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventDeviceChannel', home.functionalHomes.SECURITY_AND_ALARM.alarmEventDeviceChannel, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmSecurityJournalEntryType', home.functionalHomes.SECURITY_AND_ALARM.alarmSecurityJournalEntryType, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmActive', home.functionalHomes.SECURITY_AND_ALARM.alarmActive, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.zoneActivationDelay', home.functionalHomes.SECURITY_AND_ALARM.zoneActivationDelay, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.intrusionAlertThroughSmokeDetectors', home.functionalHomes.SECURITY_AND_ALARM.intrusionAlertThroughSmokeDetectors, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.securityZoneActivationMode', home.functionalHomes.SECURITY_AND_ALARM.securityZoneActivationMode, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.solution', home.functionalHomes.SECURITY_AND_ALARM.solution, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.activationInProgress', home.functionalHomes.SECURITY_AND_ALARM.activationInProgress, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.active', home.functionalHomes.SECURITY_AND_ALARM.active, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.absenceType', home.functionalHomes.INDOOR_CLIMATE.absenceType, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.absenceEndTime', home.functionalHomes.INDOOR_CLIMATE.absenceEndTime, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.ecoTemperature', home.functionalHomes.INDOOR_CLIMATE.ecoTemperature, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.coolingEnabled', home.functionalHomes.INDOOR_CLIMATE.coolingEnabled, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.ecoDuration', home.functionalHomes.INDOOR_CLIMATE.ecoDuration, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.optimumStartStopEnabled', home.functionalHomes.INDOOR_CLIMATE.optimumStartStopEnabled, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.solution', home.functionalHomes.INDOOR_CLIMATE.solution, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.active', home.functionalHomes.INDOOR_CLIMATE.active, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.lightAndShadow.active', home.functionalHomes.LIGHT_AND_SHADOW.active, true));
+        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.weatherAndEnvironment.active', home.functionalHomes.WEATHER_AND_ENVIRONMENT.active, true));
 
         return Promise.all(promises);
     }
@@ -826,11 +949,23 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'DEVICE_SABOTAGE':
                     promises.push(...this._createDeviceSabotageChannel(device, i));
                     break;
+                case 'HEATING_THERMOSTAT_CHANNEL':
+                    promises.push(...this._createHeatingThermostatChannel(device, i));
+                    break;
                 case 'PRESENCE_DETECTION_CHANNEL':
                     promises.push(...this._createPresenceDetectionChannel(device, i));
                     break;
-                case 'HEATING_THERMOSTAT_CHANNEL':
-                    promises.push(...this._createHeatingThermostatChannel(device, i));
+                case 'DEVICE_GLOBAL_PUMP_CONTROL':
+                    promises.push(...this._createDeviceGlobalPumpControl(device, i));
+                    break;
+                case 'FLOOR_TERMINAL_BLOCK_LOCAL_PUMP_CHANNEL':
+                    promises.push(...this._createFloorTerminalBlockLockPumpChannel(device, i));
+                    break;
+                case 'DEVICE_INCORRECT_POSITIONED':
+                    promises.push(...this._createDeviceIncorrectPositioned(device, i));
+                    break;
+                case 'CONTACT_INTERFACE_CHANNEL':
+                    promises.push(...this._createDeviceContactInterfaceChannel(device, i));
                     break;
                 case 'SHUTTER_CONTACT_CHANNEL':
                     promises.push(...this._createShutterContactChannel(device, i));
@@ -992,6 +1127,57 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         return promises;
     }
 
+    _createDeviceGlobalPumpControl(device, channel) {
+        let promises = [];
+        promises.push(...this._createDeviceBaseChannel(device, channel));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverloaded', { type: 'state', common: { name: 'deviceOverloaded', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.deviceUndervoltage', { type: 'state', common: { name: 'deviceUndervoltage', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverheated', { type: 'state', common: { name: 'deviceOverheated', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOutOfRange', { type: 'state', common: { name: 'temperatureOutOfRange', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionDuration', { type: 'state', common: { name: 'valveProtectionDuration', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionSwitchingInterval', { type: 'state', common: { name: 'valveProtectionSwitchingInterval', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.frostProtectionTemperature', { type: 'state', common: { name: 'frostProtectionTemperature', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.coolingEmergencyValue', { type: 'state', common: { name: 'coolingEmergencyValue', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.heatingEmergencyValue', { type: 'state', common: { name: 'heatingEmergencyValue', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.globalPumpControl', { type: 'state', common: { name: 'globalPumpControl', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.heatingValveType', { type: 'state', common: { name: 'heatingValveType', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.heatingLoadType', { type: 'state', common: { name: 'heatingLoadType', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
+    _createFloorTerminalBlockLockPumpChannel(device, channel) {
+        let promises = [];
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.pumpLeadTime', { type: 'state', common: { name: 'pumpLeadTime', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.pumpFollowUpTime', { type: 'state', common: { name: 'pumpFollowUpTime', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.pumpProtectionDuration', { type: 'state', common: { name: 'pumpProtectionDuration', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.pumpProtectionSwitchingInterval', { type: 'state', common: { name: 'pumpProtectionSwitchingInterval', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
+    _createDeviceIncorrectPositioned(device, channel) {
+        let promises = [];
+        promises.push(...this._createDeviceBaseChannel(device, channel));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverloaded', { type: 'state', common: { name: 'deviceOverloaded', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.coProUpdateFailure', { type: 'state', common: { name: 'coProUpdateFailure', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.coProFaulty', { type: 'state', common: { name: 'coProFaulty', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.coProRestartNeeded', { type: 'state', common: { name: 'coProRestartNeeded', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));        
+		promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.deviceUndervoltage', { type: 'state', common: { name: 'deviceUndervoltage', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverheated', { type: 'state', common: { name: 'deviceOverheated', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOutOfRange', { type: 'state', common: { name: 'temperatureOutOfRange', boolean: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.incorrectPositioned', { type: 'state', common: { name: 'incorrectPositioned', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
+    _createDeviceContactInterfaceChannel(device, channel) {
+        let promises = [];
+        promises.push(...this._createDeviceBaseChannel(device, channel));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windowState', { type: 'state', common: { name: 'windowState', type: 'string', role: 'sensor.window', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.contactType', { type: 'state', common: { name: 'contactType', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.alarmContactType', { type: 'state', common: { name: 'alarmContactType', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.eventDelay', { type: 'state', common: { name: 'eventDelay', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
     _createDeviceOperationLockChannel(device, channel) {
         let promises = [];
         promises.push(...this._createDeviceBaseChannel(device, channel));
@@ -1070,7 +1256,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _createWaterSensorChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.moistureDetected', { type: 'state', common: { name: 'moistureDetected', type: 'boolean', role: 'level', read: true, write: true }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.moistureDetected', { type: 'state', common: { name: 'moistureDetected', type: 'boolean', role: 'info', read: true, write: true }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.waterlevelDetected', { type: 'state', common: { name: 'waterlevelDetected', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.sirenWaterAlarmTrigger', { type: 'state', common: { name: 'sirenWaterAlarmTrigger', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.inAppWaterAlarmTrigger', { type: 'state', common: { name: 'inAppWaterAlarmTrigger', type: 'string', role: 'info', read: true, write: false }, native: {} }));
@@ -1082,23 +1268,23 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _createWeatherSensorChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.actualTemperature', { type: 'state', common: { name: 'raining', type: 'boolean', role: 'info', read: true, write: true }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.humidity', { type: 'state', common: { name: 'todayRainCounter', type: 'number', role: 'info', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.illumination', { type: 'state', common: { name: 'totalRainCounter', type: 'number', role: 'info', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.illuminationThresholdSunshine', { type: 'state', common: { name: 'yesterdayRainCounter', type: 'number', role: 'level', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.storm', { type: 'state', common: { name: 'yesterdayRainCounter', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.sunshine', { type: 'state', common: { name: 'yesterdayRainCounter', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.todaySunshineDuration', { type: 'state', common: { name: 'yesterdayRainCounter', type: 'number', role: 'info', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.totalSunshineDuration', { type: 'state', common: { name: 'yesterdayRainCounter', type: 'number', role: 'info', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windSpeed', { type: 'state', common: { name: 'yesterdayRainCounter', type: 'number', role: 'info', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windValueType', { type: 'state', common: { name: 'yesterdayRainCounter', type: 'string', role: 'info', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.yesterdaySunshineDuration', { type: 'state', common: { name: 'yesterdayRainCounter', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'info', read: true, write: true }, native: {} }));
+	    promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.humidity', { type: 'state', common: { name: 'humidity', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.illumination', { type: 'state', common: { name: 'illumination', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.illuminationThresholdSunshine', { type: 'state', common: { name: 'illuminationThresholdSunshine', type: 'number', role: 'level', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.storm', { type: 'state', common: { name: 'storm', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.sunshine', { type: 'state', common: { name: 'sunshine', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.todaySunshineDuration', { type: 'state', common: { name: 'todaySunshineDuration', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.totalSunshineDuration', { type: 'state', common: { name: 'totalSunshineDuration', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windSpeed', { type: 'state', common: { name: 'windSpeed', type: 'number', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windValueType', { type: 'state', common: { name: 'windValueType', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.yesterdaySunshineDuration', { type: 'state', common: { name: 'yesterdaySunshineDuration', type: 'number', role: 'info', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createWeatherSensorPlusChannel(device, channel) {
         let promises = [];
-        promises.push(...this._createWaterSensorChannel(device, channel));
+        promises.push(...this._createWeatherSensorChannel(device, channel));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.raining', { type: 'state', common: { name: 'raining', type: 'boolean', role: 'info', read: true, write: true }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.todayRainCounter', { type: 'state', common: { name: 'todayRainCounter', type: 'number', role: 'level', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.totalRainCounter', { type: 'state', common: { name: 'totalRainCounter', type: 'number', role: 'level', read: true, write: false }, native: {} }));
@@ -1112,7 +1298,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.weathervaneAlignmentNeeded', { type: 'state', common: { name: 'weathervaneAlignmentNeeded', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windDirection', { type: 'state', common: { name: 'windDirection', type: 'number', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windDirectionVariation', { type: 'state', common: { name: 'windDirectionVariation', type: 'number', role: 'info', read: true, write: false }, native: {} }));
-        return promises;
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.vaporAmount', { type: 'state', common: { name: 'vaporAmount', type: 'number', role: 'info', read: true, write: true }, native: {} }));
+	  return promises;
     }
 
     _createShutterChannel(device, channel) {
@@ -1324,3 +1511,4 @@ if (module && module.parent) {
     // or start the instance directly
     new HmIpCloudAccesspointAdapter();
 }
+
