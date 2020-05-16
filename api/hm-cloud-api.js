@@ -4,7 +4,7 @@
 
 const rq = require('request-promise-native');
 const sha512 = require('js-sha512');
-const uuidv4 = require('uuid/v4');
+const {v4: uuidv4} = require('uuid');
 const webSocket = require('ws');
 
 class HmCloudAPI {
