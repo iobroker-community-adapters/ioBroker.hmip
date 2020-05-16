@@ -328,7 +328,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 if (ev.home) {
                     await this._updateHomeStates(ev.home);
                 } else {
-                    this.log.warn('No home in SECURITY_JOURNAL_CHANGED: ' + JSON.stringify(ev));
+                    this.log.debug('No home in SECURITY_JOURNAL_CHANGED: ' + JSON.stringify(ev));
                 }
                 break;
             default:
