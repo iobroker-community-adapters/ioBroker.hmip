@@ -193,24 +193,30 @@ class HmCloudAPI {
             switch (ev.pushEventType) {
                 case 'DEVICE_ADDED':
                 case 'DEVICE_CHANGED':
-                    this.devices[ev.device.id] = ev.device;
+                    if (ev.device) {
+                        this.devices[ev.device.id] = ev.device;
+                    }
                     break;
                 case 'GROUP_ADDED':
                 case 'GROUP_CHANGED':
-                    this.groups[ev.group.id] = ev.group;
+                    if (ev.group) {
+                        this.groups[ev.group.id] = ev.group;
+                    }
                     break;
                 case 'CLIENT_ADDED':
                 case 'CLIENT_CHANGED':
-                    this.clients[ev.client.id] = ev.client;
+                    if (ev.client) {
+                        this.clients[ev.client.id] = ev.client;
+                    }
                     break;
                 case 'DEVICE_REMOVED':
-                    delete this.devices[ev.device.id];
+                    ev.device && delete this.devices[ev.device.id];
                     break;
                 case 'GROUP_REMOVED':
-                    delete this.clients[ev.group.id];
+                    ev.group && delete this.clients[ev.group.id];
                     break;
                 case 'CLIENT_REMOVED':
-                    delete this.groups[ev.client.id];
+                    ev.client && delete this.groups[ev.client.id];
                     break;
                 case 'HOME_CHANGED':
                     this.home = ev.home;
