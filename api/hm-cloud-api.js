@@ -135,6 +135,10 @@ class HmCloudAPI {
         this._ws.on('open', () => {
             if (this.opened)
                 this.opened();
+
+            this._pingInterval = setInterval(() => {
+                this._ws.ping(() => { });
+            }, 5000);
         });
 
         this._ws.on('close', (code, reason) => {
@@ -181,10 +185,6 @@ class HmCloudAPI {
             if (this.dataReceived)
                 this.dataReceived("pong");
         });
-
-        this._pingInterval = setInterval(() => {
-            this._ws.ping(() => { });
-        }, 5000);
     }
 
     _parseEventdata(data) {
