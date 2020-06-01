@@ -355,7 +355,12 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     secureSetStateAsync(id, value, ack) {
-        if (value === undefined) value = null;
+        if (value && typeof value === 'object') {
+            value = value.val;
+        }
+        if (value === undefined) {
+            value = null;
+        }
         return this.setStateAsync(id, value, ack);
     }
 
