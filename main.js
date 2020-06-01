@@ -154,8 +154,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             this.log.debug('No groups');
         }
         if (this._api.clients) {
-            for (let c in this._api.devices) {
-                if (!this._api.devices.hasOwnProperty(c)) {
+            for (let c in this._api.clients) {
+                if (!this._api.clients.hasOwnProperty(c)) {
                     continue;
                 }
                 await this._updateClientStates(this._api.clients[c]);
