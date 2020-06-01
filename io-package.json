@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "news": {
+            "1.0.1": {
+                "en": "crash cases fixed",
+                "de": "Absturzfälle behoben",
+                "ru": "исправлены случаи аварий",
+                "pt": "casos de travamento corrigidos",
+                "nl": "crashgevallen opgelost",
+                "fr": "cas de crash corrigés",
+                "it": "casi di crash risolti",
+                "es": "casos de fallo arreglados",
+                "pl": "naprawiono awarie",
+                "zh-cn": "崩溃情况已修复"
+            },
             "1.0.0": {
                 "en": "Several fixes, vaprValue added for weather station pro, bump version because ready",
                 "de": "Mehrere Korrekturen, vaprValue für Wetterstation Pro hinzugefügt, Bump-Version, weil bereit",
