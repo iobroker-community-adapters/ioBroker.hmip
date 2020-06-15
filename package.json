@@ -37,7 +37,7 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "gulp": "^4.0.2",
-    "mocha": "^7.1.2",
+    "mocha": "^8.0.1",
     "@vitalets/google-translate-api": "github:vitalets/google-translate-api",
     "configstore": "^5.0.1",
     "axios": "^0.19.2",
