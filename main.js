@@ -400,6 +400,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'PRESENCE_DETECTION_CHANNEL':
                     promises.push(...this._updatePresenceDetectionChannelStates(device, i));
                     break;
+                case 'PASSAGE_DETECTOR_CHANNEL':
+                    promises.push(...this._updatePassageDetectorChannelStates(device, i));
+                    break;           
                 case 'DEVICE_GLOBAL_PUMP_CONTROL':
                     promises.push(...this._updateDeviceGlobalPumpControl(device, i));
                     break;
@@ -619,6 +622,19 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.numberOfBrightnessMeasurements', device.functionalChannels[channel].numberOfBrightnessMeasurements, true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.motionDetectionSendInterval', device.functionalChannels[channel].motionDetectionSendInterval, true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.motionBufferActive', device.functionalChannels[channel].motionBufferActive, true));
+        return promises;
+    }
+
+    _updatePassageDetectorChannelStates(device, channel) {
+        let promises = [];
+        promises.push(...this._updateDeviceBaseChannelStates(device, channel));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.leftCounter', device.functionalChannels[channel].leftCounter, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.leftRightCounterDelta', device.functionalChannels[channel].leftRightCounterDelta, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.passageBlindtime', device.functionalChannels[channel].passageBlindtime, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.passageDirection', device.functionalChannels[channel].passageDirection, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.passageSensorSensitivity', device.functionalChannels[channel].passageSensorSensitivity, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.passageTimeout', device.functionalChannels[channel].passageTimeout, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.rightCounter', device.functionalChannels[channel].rightCounter, true));
         return promises;
     }
 
@@ -987,6 +1003,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'PRESENCE_DETECTION_CHANNEL':
                     promises.push(...this._createPresenceDetectionChannel(device, i));
                     break;
+                case 'PASSAGE_DETECTOR_CHANNEL':
+                    promises.push(...this._createPassageDetectorChannel(device, i));
+                    break;
                 case 'DEVICE_GLOBAL_PUMP_CONTROL':
                     promises.push(...this._createDeviceGlobalPumpControl(device, i));
                     break;
@@ -1156,6 +1175,19 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.numberOfBrightnessMeasurements', { type: 'state', common: { name: 'numberOfBrightnessMeasurements', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.motionDetectionSendInterval', { type: 'state', common: { name: 'motionDetectionSendInterval', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.motionBufferActive', { type: 'state', common: { name: 'motionBufferActive', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
+    _createPassageDetectorChannel(device, channel) {
+        let promises = [];
+        promises.push(...this._createDeviceBaseChannel(device, channel));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.leftCounter', { type: 'state', common: { name: 'leftCounter', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.leftRightCounterDelta', { type: 'state', common: { name: 'leftRightCounterDelta', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.passageBlindtime', { type: 'state', common: { name: 'passageBlindtime', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.passageDirection', { type: 'state', common: { name: 'passageDirection', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.passageSensorSensitivity', { type: 'state', common: { name: 'passageSensorSensitivity', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.passageTimeout', { type: 'state', common: { name: 'passageTimeout', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.rightCounter', { type: 'state', common: { name: 'rightCounter', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         return promises;
     }
 
@@ -1424,7 +1456,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.controlMode', { type: 'state', common: { name: 'controlMode', type: 'string', role: 'thermo', read: true, write: true }, native:  { id: [group.id], parameter: 'setControlMode' } }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.boostMode', { type: 'state', common: { name: 'boostMode', type: 'boolean', role: 'switch', read: true, write: true }, native:  { id: [group.id], parameter: 'setBoost' } }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.activeProfile', { type: 'state', common: { name: 'activeProfile', type: 'string', role: 'text', read: true, write: false }, native:  { id: [group.id], parameter: 'setActiveProfile' } }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.boostDuration', { type: 'state', common: { name: 'boostDuration', type: 'number', role: 'thermo', unit: 's', read: true, write: false }, native: {} }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.boostDuration', { type: 'state', common: { name: 'boostDuration', type: 'number', role: 'thermo', unit: 'min', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'thermo', unit: '°C', read: true, write: true }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.humidity', { type: 'state', common: { name: 'humidity', type: 'number', role: 'value.humidity', unit: '%', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.coolingAllowed', { type: 'state', common: { name: 'coolingAllowed', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
