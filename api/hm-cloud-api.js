@@ -4,7 +4,7 @@
 
 const rq = require('request-promise-native');
 const sha512 = require('js-sha512');
-const uuidv4 = require('uuid/v4');
+const {v4: uuidv4} = require('uuid');
 const webSocket = require('ws');
 
 class HmCloudAPI {
@@ -116,6 +116,14 @@ class HmCloudAPI {
 
     // =========== Event Handling ===========
 
+    dispose() {
+        this.isClosed = true;
+        if (this._connectTimeout)
+            clearTimeout(this._connectTimeout);
+        if (this._pingInterval)
+            clearInterval(this._pingInterval);
+    }
+
     connectWebsocket() {
         this._ws = new webSocket(this._urlWebSocket, {
             headers: {
@@ -127,13 +135,37 @@ class HmCloudAPI {
         this._ws.on('open', () => {
             if (this.opened)
                 this.opened();
+
+            this._pingInterval = setInterval(() => {
+                this._ws.ping(() => { });
+            }, 5000);
         });
 
         this._ws.on('close', (code, reason) => {
             if (this.closed)
                 this.closed(code, reason);
-            if (!this.isClosed)
-                setTimeout(connectWebsocket, 1000);
+            if (!this.isClosed) {
+                this._connectTimeout && clearTimeout(this._connectTimeout);
+                this._connectTimeout = setTimeout(() => this.connectWebsocket(), 1000);
+            }
+        });
+
+        this._ws.on('error', (error) => {
+            if (this.errored)
+                this.errored(error);
+            if (!this.isClosed) {
+                this._connectTimeout && clearTimeout(this._connectTimeout);
+                this._connectTimeout = setTimeout(() => this.connectWebsocket(), 1000);
+            }
+        });
+
+        this._ws.on('unexpected-response', (request, response) => {
+            if (this.unexpectedResponse)
+                this.unexpectedResponse(request, response);
+            if (!this.isClosed) {
+                this._connectTimeout && clearTimeout(this._connectTimeout);
+                this._connectTimeout = setTimeout(() => this.connectWebsocket(), 1000);
+            }
         });
 
         this._ws.on('message', (d) => {
@@ -143,6 +175,16 @@ class HmCloudAPI {
             let data = JSON.parse(dString);
             this._parseEventdata(data);
         });
+
+        this._ws.on('ping', () => {
+            if (this.dataReceived)
+                this.dataReceived("ping");
+        });
+
+        this._ws.on('pong', () => {
+            if (this.dataReceived)
+                this.dataReceived("pong");
+        });
     }
 
     _parseEventdata(data) {
@@ -151,24 +193,30 @@ class HmCloudAPI {
             switch (ev.pushEventType) {
                 case 'DEVICE_ADDED':
                 case 'DEVICE_CHANGED':
-                    this.devices[ev.device.id] = ev.device;
+                    if (ev.device) {
+                        this.devices[ev.device.id] = ev.device;
+                    }
                     break;
                 case 'GROUP_ADDED':
                 case 'GROUP_CHANGED':
-                    this.groups[ev.group.id] = ev.group;
+                    if (ev.group) {
+                        this.groups[ev.group.id] = ev.group;
+                    }
                     break;
                 case 'CLIENT_ADDED':
                 case 'CLIENT_CHANGED':
-                    this.clients[ev.client.id] = ev.client;
+                    if (ev.client) {
+                        this.clients[ev.client.id] = ev.client;
+                    }
                     break;
                 case 'DEVICE_REMOVED':
-                    delete this.devices[ev.device.id];
+                    ev.device && delete this.devices[ev.device.id];
                     break;
                 case 'GROUP_REMOVED':
-                    delete this.clients[ev.group.id];
+                    ev.group && delete this.clients[ev.group.id];
                     break;
                 case 'CLIENT_REMOVED':
-                    delete this.groups[ev.client.id];
+                    ev.client && delete this.groups[ev.client.id];
                     break;
                 case 'HOME_CHANGED':
                     this.home = ev.home;

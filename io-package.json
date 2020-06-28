@@ -1,8 +1,68 @@
 {
     "common": {
         "name": "hmip",
-        "version": "0.0.9",
+        "version": "1.0.1",
         "news": {
+            "1.0.1": {
+                "en": "crash cases fixed",
+                "de": "Absturzfälle behoben",
+                "ru": "исправлены случаи аварий",
+                "pt": "casos de travamento corrigidos",
+                "nl": "crashgevallen opgelost",
+                "fr": "cas de crash corrigés",
+                "it": "casi di crash risolti",
+                "es": "casos de fallo arreglados",
+                "pl": "naprawiono awarie",
+                "zh-cn": "崩溃情况已修复"
+            },
+            "1.0.0": {
+                "en": "Several fixes, vaporValue added for weather station pro, bump version because ready",
+                "de": "Mehrere Korrekturen, vaporValue für Wetterstation Pro hinzugefügt, Bump-Version, weil bereit",
+                "ru": "Несколько исправлений, добавлен vaporValue для метеостанции pro, бамп-версия, потому что готово",
+                "pt": "Várias correções, vaporValue adicionado para a estação meteorológica pro, versão bump, porque pronto",
+                "nl": "Verschillende oplossingen, vaporValue toegevoegd voor weerstation pro, bump-versie omdat klaar",
+                "fr": "Plusieurs corrections, vaporValue ajouté pour la station météo pro, version bump car prêt",
+                "it": "Diverse correzioni, vaporValue aggiunto per la stazione meteorologica pro, versione bump perché pronta",
+                "es": "Varias correcciones, vaporValue agregado para la estación meteorológica pro, versión de prueba porque está lista",
+                "pl": "Kilka poprawek, dodano vaporValue dla stacji pogodowej pro, wersja wypukła, ponieważ jest gotowa",
+                "zh-cn": "多项修复，为气象站专业版添加了vaporValue，因为准备好了凹凸版"
+            },
+            "0.0.12": {
+                "en": "multiple fixes",
+                "de": "mehrfache Verlegenheiten",
+                "ru": "несколько исправлений",
+                "pt": "várias correções",
+                "nl": "meerdere fixes",
+                "fr": "plusieurs corrections",
+                "it": "correzioni multiple",
+                "es": "múltiples correcciones",
+                "pl": "wiele poprawek",
+                "zh-cn": "多个修复程序"
+            },
+            "0.0.11": {
+                "en": "multiple fixes",
+                "de": "mehrfache Verlegenheiten",
+                "ru": "несколько исправлений",
+                "pt": "várias correções",
+                "nl": "meerdere fixes",
+                "fr": "plusieurs corrections",
+                "it": "correzioni multiple",
+                "es": "múltiples correcciones",
+                "pl": "wiele poprawek",
+                "zh-cn": "多个修复程序"
+            },
+            "0.0.10": {
+                "en": "added ping/pong, enable setBoots, more units, more hardware",
+                "de": "Ping / Pong hinzugefügt, SetBoots aktiviert, mehr Einheiten, mehr Hardware",
+                "ru": "добавлен ping / pong, активирован setBoots, больше юнитов, больше оборудования",
+                "pt": "adicionado ping / pong, habilitar setBoots, mais unidades, mais hardware",
+                "nl": "ping / pong toegevoegd, setbooten inschakelen, meer eenheden, meer hardware",
+                "fr": "Ping / Pong ajouté, activer setBoots, plus d'unités, plus de matériel",
+                "it": "aggiunto ping / pong, abilita setBoots, più unità, più hardware",
+                "es": "añadido ping / pong, habilitar setBoots, más unidades, más hardware",
+                "pl": "dodano ping / pong, włącz setBoots, więcej jednostek, więcej sprzętu",
+                "zh-cn": "添加ping / pong，启用setBoots，更多单元，更多硬件"
+            },
             "0.0.9": {
                 "en": "fullrx and operationlock channel",
                 "de": "Fullrx und Operationssperrenkanal",
@@ -156,7 +216,12 @@
         "loglevel": "info",
         "type": "hardware",
         "license": "MIT",
-        "messagebox": true
+        "messagebox": true,
+        "plugins": {
+            "sentry": {
+                "dsn": "https://1716d7389af84920bddc96d2f1e8e421@sentry.iobroker.net/73"
+            }
+        }
     },
     "native": {
         "deviceName": "iobroker",

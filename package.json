@@ -1,6 +1,6 @@
 {
   "name": "iobroker.hmip",
-  "version": "0.0.9",
+  "version": "1.0.1",
   "description": "ioBroker Adapter to use the Homatic Cloud Ip AccessPoint via Homatic Cloud Rest API",
   "author": {
     "name": "jogibear9988",
@@ -27,24 +27,28 @@
     "node": ">=8.6.0"
   },
   "dependencies": {
-    "@iobroker/adapter-core": "^1.0.3",
-    "delay": "^4.1.0",
+    "@iobroker/adapter-core": "^2.4.0",
+    "delay": "^4.3.0",
     "js-sha512": "^0.8.0",
-    "request-promise-native": "^1.0.5",
-    "uuid": "^3.3.2",
-    "ws": "^6.1.2"
+    "request-promise-native": "^1.0.8",
+    "uuid": "^8.0.0",
+    "ws": "^7.3.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "gulp": "^4.0.0",
-    "mocha": "^5.2.0",
+    "gulp": "^4.0.2",
+    "mocha": "^7.1.2",
     "@vitalets/google-translate-api": "github:vitalets/google-translate-api",
-    "configstore": "^4.0.0",
-    "axios": "^0.18.0"
+    "configstore": "^5.0.1",
+    "axios": "^0.19.2",
+    "@iobroker/testing": "^2.2.0"
   },
   "main": "main.js",
   "scripts": {
-    "test": "node node_modules/mocha/bin/mocha --exit"
+    "test": "npm run test:package && npm run test:unit",
+    "test:package": "mocha test/package --exit",
+    "test:unit": "mocha test/unit --exit",
+    "test:integration": "mocha test/integration --exit"
   },
   "bugs": {
     "url": "https://github.com/iobroker-community-adapters/ioBroker.hmip/issues"
