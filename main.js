@@ -186,6 +186,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'switchState':
                     await this._api.deviceControlSetSwitchState(o.native.id, state.val, o.native.channel);
                     break;
+		case 'sendDoorCommand':
+                    await this._api.deviceControlSendDoorCommand(o.native.id, state.val, o.native.channel);
+                    break;
                 case 'resetEnergyCounter':
                     await this._api.deviceControlResetEnergyCounter(o.native.id, o.native.channel);
                     break;
@@ -1132,7 +1135,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.processing', { type: 'state', common: { name: 'processing', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.ventilationPositionSupported', { type: 'state', common: { name: 'ventilationPositionSupported', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.doorCommand', { type: 'state', common: { name: 'doorCommand', type: 'number', role: 'value', read: true, write: true }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.doorCommand', { type: 'state', common: { name: 'doorCommand', type: 'number', role: 'value', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'sendDoorCommand' } }));
 	return promises;
     }
 
