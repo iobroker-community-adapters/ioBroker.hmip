@@ -533,7 +533,6 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.processing', device.functionalChannels[channel].processing, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.doorState', device.functionalChannels[channel].doorState, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.doorCommand', device.functionalChannels[channel].doorCommand, true));
-
         return promises;
     }
 
