@@ -189,7 +189,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'switchState':
                     await this._api.deviceControlSetSwitchState(o.native.id, state.val, o.native.channel);
                     break;
-		case 'sendDoorCommand':
+		        case 'sendDoorCommand':
                     await this._api.deviceControlSendDoorCommand(o.native.id, state.val, o.native.channel);
                     break;
                 case 'resetEnergyCounter':
@@ -503,7 +503,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'NOTIFICATION_LIGHT_CHANNEL':
                     promises.push(...this._updateNotificationLightChannelStates(device, i));
                     break;
-		case 'DOOR_CHANNEL':
+                case 'DOOR_CHANNEL':
                     promises.push(...this._updateDoorChannelStates(device, i));
                     break;
                 default:
@@ -532,7 +532,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.on', device.functionalChannels[channel].on, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.processing', device.functionalChannels[channel].processing, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.doorState', device.functionalChannels[channel].doorState, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.ventilationPositionSupported', device.functionalChannels[channel].ventilationPositionSupported, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.doorCommand', device.functionalChannels[channel].doorCommand, true));
+
         return promises;
     }
 
@@ -1120,7 +1121,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'NOTIFICATION_LIGHT_CHANNEL':
                     promises.push(...this._createNotificationLightChannel(device, i));
                     break;
-		case 'DOOR_CHANNEL':
+                case 'DOOR_CHANNEL':
                     promises.push(...this._createDoorChannel(device, i));
                     break;
                 default:
@@ -1144,7 +1145,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 	
     _createDoorChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.doorState', { type: 'state', common: { name: 'doorState', type: 'string', role: 'info', read: true, write: true }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.doorState', { type: 'state', common: { name: 'doorState', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.processing', { type: 'state', common: { name: 'processing', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.ventilationPositionSupported', { type: 'state', common: { name: 'ventilationPositionSupported', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
