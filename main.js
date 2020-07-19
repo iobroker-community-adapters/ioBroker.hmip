@@ -189,7 +189,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'switchState':
                     await this._api.deviceControlSetSwitchState(o.native.id, state.val, o.native.channel);
                     break;
-            case 'sendDoorCommand':
+                case 'sendDoorCommand':
                     await this._api.deviceControlSendDoorCommand(o.native.id, state.val, o.native.channel);
                     break;
                 case 'resetEnergyCounter':
