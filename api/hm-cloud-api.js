@@ -64,9 +64,20 @@ class HmCloudAPI {
     }
 
     async getHomematicHosts() {
-        let res = await rq("https://lookup.homematic.com:48335/getHost", { method: 'POST', json: true, body: this._clientCharacteristics });
-        this._urlREST = res.urlREST;
-        this._urlWebSocket = res.urlWebSocket;
+        let res;
+        try {
+            res = await rq("https://lookup.homematic.com:48335/getHost", {
+                method: 'POST',
+                json: true,
+                body: this._clientCharacteristics
+            });
+        } catch (err) {
+            this.requestError && this.requestError(err);
+        }
+        if (res && typeof res === 'object') {
+            this._urlREST = res.urlREST;
+            this._urlWebSocket = res.urlWebSocket;
+        }
     }
 
     // =========== API for Token generation ===========
@@ -76,32 +87,52 @@ class HmCloudAPI {
         if (this._pin)
             headers['PIN'] = this._pin;
         const body = { "deviceId": this._deviceId, "deviceName": devicename, "sgtin": this._accessPointSgtin };
-        let res = await rq(this._urlREST + "/hmip/auth/connectionRequest", { method: 'POST', json: true, body: body, headers: headers, simple: false, resolveWithFullResponse: true });
-        if (res.statusCode != 200)
+        let res;
+        try {
+            res = await rq(this._urlREST + "/hmip/auth/connectionRequest", { method: 'POST', json: true, body: body, headers: headers, simple: false, resolveWithFullResponse: true });
+        } catch (err) {
+            this.requestError && this.requestError(err);
+        }
+        if (!res || res.statusCode != 200)
             throw "error";
     }
 
     async auth2isRequestAcknowledged() {
         const headers = { 'content-type': 'application/json', 'accept': 'application/json', 'VERSION': '12', 'CLIENTAUTH': this._clientAuthToken };
         const body = { "deviceId": this._deviceId };
-        let res = await rq(this._urlREST + "/hmip/auth/isRequestAcknowledged", { method: 'POST', json: true, body: body, headers: headers, simple: false, resolveWithFullResponse: true });
-        return res.statusCode == 200;
+        let res;
+        try {
+            let res = await rq(this._urlREST + "/hmip/auth/isRequestAcknowledged", { method: 'POST', json: true, body: body, headers: headers, simple: false, resolveWithFullResponse: true });
+        } catch (err) {
+            this.requestError && this.requestError(err);
+        }
+        return res && typeof res === 'object' && res.statusCode == 200;
     }
 
     async auth3requestAuthToken() {
         let headers = { 'content-type': 'application/json', 'accept': 'application/json', 'VERSION': '12', 'CLIENTAUTH': this._clientAuthToken };
         let body = { "deviceId": this._deviceId };
-        let res = await rq(this._urlREST + "/hmip/auth/requestAuthToken", { method: 'POST', json: true, body: body, headers: headers });
-        this._authToken = res.authToken;
-        body = { "deviceId": this._deviceId, "authToken": this._authToken };
-        res = await rq(this._urlREST + "/hmip/auth/confirmAuthToken", { method: 'POST', json: true, body: body, headers: headers });
-        this._clientId = res.clientId;
+        let res;
+        try {
+            res = await rq(this._urlREST + "/hmip/auth/requestAuthToken", { method: 'POST', json: true, body: body, headers: headers });
+            this._authToken = res.authToken;
+            body = { "deviceId": this._deviceId, "authToken": this._authToken };
+            res = await rq(this._urlREST + "/hmip/auth/confirmAuthToken", { method: 'POST', json: true, body: body, headers: headers });
+            this._clientId = res.clientId;
+        } catch (err) {
+            this.requestError && this.requestError(err);
+        }
     }
 
     async callRestApi(path, data) {
         let headers = { 'content-type': 'application/json', 'accept': 'application/json', 'VERSION': '12', 'AUTHTOKEN': this._authToken, 'CLIENTAUTH': this._clientAuthToken };
-        let res = await rq(this._urlREST + "/hmip/" + path, { method: 'POST', json: true, body: data, headers: headers });
-        return res;
+        let res;
+        try {
+            res = await rq(this._urlREST + "/hmip/" + path, { method: 'POST', json: true, body: data, headers: headers });
+            return res;
+        } catch (err) {
+            this.requestError && this.requestError(err);
+        }
     }
 
     // =========== API for HM ===========
@@ -125,6 +156,10 @@ class HmCloudAPI {
     }
 
     connectWebsocket() {
+        if (this._pingInterval) {
+            clearInterval(this._pingInterval);
+            this._pingInterval = null;
+        }
         this._ws = new webSocket(this._urlWebSocket, {
             headers: {
                 'AUTHTOKEN': this._authToken, 'CLIENTAUTH': this._clientAuthToken
@@ -136,6 +171,7 @@ class HmCloudAPI {
             if (this.opened)
                 this.opened();
 
+            this._pingInterval && clearInterval(this._pingInterval);
             this._pingInterval = setInterval(() => {
                 this._ws.ping(() => { });
             }, 5000);
@@ -144,6 +180,10 @@ class HmCloudAPI {
         this._ws.on('close', (code, reason) => {
             if (this.closed)
                 this.closed(code, reason);
+            if (this._pingInterval) {
+                clearInterval(this._pingInterval);
+                this._pingInterval = null;
+            }
             if (!this.isClosed) {
                 this._connectTimeout && clearTimeout(this._connectTimeout);
                 this._connectTimeout = setTimeout(() => this.connectWebsocket(), 1000);

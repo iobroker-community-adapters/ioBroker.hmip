@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "1.0.1",
+        "version": "1.1.0",
         "news": {
+            "1.1.0": {
+                "en": "Remember already sent unknown channel infos to not spam Sentry\nHandle reconnects better (Sentry IOBROKER-HMIP-G)\nTry to prevent crashes on i valid server reponses, warning is logged\nAdd HMIP-SPDR (PASSAGE_DETECTOR_CHANNEL)",
+                "de": "Denken Sie daran, dass bereits unbekannte Kanalinformationen gesendet wurden, um Sentry nicht zu spammen\nGriffverbindungen besser (Sentry IOBROKER-HMIP-G)\nVersuchen Sie, Abstürze auf gültigen Serverantworten zu verhindern. Die Warnung wird protokolliert\nHMIP-SPDR hinzufügen (PASSAGE_DETECTOR_CHANNEL)",
+                "ru": "Помните, уже отправил неизвестную информацию канала, чтобы не спамить Sentry\nРучка переподключается лучше (Sentry IOBROKER-HMIP-G)\nПостарайтесь предотвратить сбои на сервере, действительные ответы, предупреждение регистрируется\nДобавить HMIP-SPDR (PASSAGE_DETECTOR_CHANNEL)",
+                "pt": "Lembre-se de já enviou informações de canal desconhecidas para não enviar spam\nO identificador reconecta melhor (Sentry IOBROKER-HMIP-G)\nTente evitar falhas nas respostas válidas do servidor, o aviso é registrado\nAdicionar HMIP-SPDR (PASSAGE_DETECTOR_CHANNEL)",
+                "nl": "Onthoud al verzonden onbekende kanaalinformatie om Sentry niet te spammen\nHandvat herstelt beter (Sentry IOBROKER-HMIP-G)\nProbeer crashes te voorkomen op een geldige serverrepons, waarschuwing wordt vastgelegd\nHMIP-SPDR (PASSAGE_DETECTOR_CHANNEL) toevoegen",
+                "fr": "Rappelez-vous déjà envoyé des informations de canal inconnu pour ne pas spam Sentry\nLa poignée se reconnecte mieux (Sentry IOBROKER-HMIP-G)\nEssayez d'éviter les plantages sur les réponses valides du serveur, l'avertissement est enregistré\nAjouter HMIP-SPDR (PASSAGE_DETECTOR_CHANNEL)",
+                "it": "Ricorda che le informazioni sul canale sconosciuto sono già state inviate per non inviare spam a Sentry\nGestire le riconnessioni meglio (Sentry IOBROKER-HMIP-G)\nCerca di evitare arresti anomali su risposte valide del server, viene registrato un avviso\nAggiungi HMIP-SPDR (PASSAGE_DETECTOR_CHANNEL)",
+                "es": "Recuerde que ya envió información de canales desconocidos para no enviar correo no deseado a Centinela\nEl mango se reconecta mejor (Sentry IOBROKER-HMIP-G)\nIntente evitar bloqueos en las respuestas válidas del servidor, la advertencia se registra\nAgregar HMIP-SPDR (PASSAGE_DETECTOR_CHANNEL)",
+                "pl": "Pamiętaj, że wysłałem już nieznane informacje o kanale, aby nie spamować Strażnika\nUchwyt ponownie łączy się lepiej (Sentry IOBROKER-HMIP-G)\nStaraj się zapobiegać awariom przy prawidłowych odpowiedziach serwera, ostrzeżenie jest rejestrowane\nDodaj HMIP-SPDR (PASSAGE_DETECTOR_CHANNEL)",
+                "zh-cn": "记住已经向未知垃圾邮件发送了未知的频道信息\n手柄重新连接更好（Sentry IOBROKER-HMIP-G）\n尝试防止在有效服务器响应上崩溃，并记录警告\n添加HMIP-SPDR（PASSAGE_DETECTOR_CHANNEL）"
+            },
             "1.0.1": {
                 "en": "crash cases fixed",
                 "de": "Absturzfälle behoben",

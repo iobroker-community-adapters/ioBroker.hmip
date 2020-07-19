@@ -18,6 +18,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         this._api.opened = this._opened.bind(this);
         this._api.closed = this._closed.bind(this);
         this._api.errored = this._errored.bind(this);
+        this._api.requestError = this._requestError.bind(this);
         this._api.unexpectedResponse = this._unexpectedResponse.bind(this);
 
         this.on('unload', this._unload);
@@ -28,6 +29,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
         this._unloaded = false;
         this._requestTokenState = { state: 'idle' };
+
+        this.sendUnknownInfos = {};
     }
 
     _unload(callback) {
@@ -305,6 +308,10 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         this.log.warn("ws connection error: " + error);
     }
 
+    _requestError(error) {
+        this.log.warn("Request error: " + error);
+    }
+
     _unexpectedResponse(req, res) {
         this.log.warn("ws connection unexpected response: " + res.statusCode);
     }
@@ -500,12 +507,18 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     promises.push(...this._updateDoorChannelStates(device, i));
                     break;
                 default:
+                    if (Object.keys(fc) <= 6) { // we only have the minimum fields, so nothing to display
+                        break;
+                    }
                     this.log.info("unknown channel type - " + fc.functionalChannelType + " - " + JSON.stringify(device));
-                    this.Sentry && this.Sentry.withScope(scope => {
-                        scope.setLevel('info');
-                        scope.setExtra('channelData', JSON.stringify(device));
-                        this.Sentry.captureMessage('Unknown Channel type ' + fc.functionalChannelType, 'info');
-                    });
+                    if (!this.sendUnknownInfos[fc.functionalChannelType]) {
+                        this.sendUnknownInfos[fc.functionalChannelType] = true;
+                        this.Sentry && this.Sentry.withScope(scope => {
+                            scope.setLevel('info');
+                            scope.setExtra('channelData', JSON.stringify(device));
+                            this.Sentry.captureMessage('Unknown Channel type ' + fc.functionalChannelType, 'info');
+                        });
+                    }
 
                     break;
             }
