@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "1.1.0",
+        "version": "1.1.1",
         "news": {
+            "1.1.1": {
+                "en": "Crash prevented if object is deleted by state changed (Sentry IOBROKER-HMIP-Y)",
+                "de": "Absturz verhindert, wenn Objekt durch Statusänderung gelöscht wird (Sentry IOBROKER-HMIP-Y)",
+                "ru": "Сбой предотвращается, если объект удаляется при изменении состояния (Sentry IOBROKER-HMIP-Y)",
+                "pt": "Falha evitada se o objeto for excluído por estado alterado (Sentry IOBROKER-HMIP-Y)",
+                "nl": "Crash voorkomen als object wordt verwijderd door gewijzigde status (Sentry IOBROKER-HMIP-Y)",
+                "fr": "Crash évité si l'objet est supprimé par changement d'état (Sentry IOBROKER-HMIP-Y)",
+                "it": "Blocco impedito se l'oggetto viene eliminato dallo stato modificato (Sentry IOBROKER-HMIP-Y)",
+                "es": "Bloqueo evitado si el objeto es eliminado por el estado cambiado (Sentry IOBROKER-HMIP-Y)",
+                "pl": "Zapobieganie awariom, jeśli obiekt zostanie usunięty po zmianie stanu (Sentry IOBROKER-HMIP-Y)",
+                "zh-cn": "如果通过状态更改删除对象，可以防止崩溃（Sentry IOBROKER-HMIP-Y）"
+            },
             "1.1.0": {
                 "en": "Remember already sent unknown channel infos to not spam Sentry\nHandle reconnects better (Sentry IOBROKER-HMIP-G)\nTry to prevent crashes on i valid server reponses, warning is logged\nAdd HMIP-SPDR (PASSAGE_DETECTOR_CHANNEL)",
                 "de": "Denken Sie daran, dass bereits unbekannte Kanalinformationen gesendet wurden, um Sentry nicht zu spammen\nGriffverbindungen besser (Sentry IOBROKER-HMIP-G)\nVersuchen Sie, Abstürze auf gültigen Serverantworten zu verhindern. Die Warnung wird protokolliert\nHMIP-SPDR hinzufügen (PASSAGE_DETECTOR_CHANNEL)",

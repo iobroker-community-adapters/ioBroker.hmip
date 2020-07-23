@@ -49,7 +49,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
-### __WORK IN PROGRESS__
+### 1.1.1 (2020-07-23)
 * (Apollon77) Crash prevented if object is deleted by state changed (Sentry IOBROKER-HMIP-Y)
 
 ### 1.1.0 (2020-07-14)
