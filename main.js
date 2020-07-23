@@ -183,7 +183,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         if (!id || !state || state.ack) return;
 
         let o = await this.getObjectAsync(id);
-        if (o.native.parameter) {
+        if (o && o.native && o.native.parameter) {
             this.log.info('state change - ' + o.native.parameter + ' - id ' + (o.native.id ? o.native.id : '') + ' - value ' + state.val);
             switch (o.native.parameter) {
                 case 'switchState':

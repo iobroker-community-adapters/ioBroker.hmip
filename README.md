@@ -49,6 +49,9 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
+### __WORK IN PROGRESS__
+* (Apollon77) Crash prevented if object is deleted by state changed (Sentry IOBROKER-HMIP-Y)
+
 ### 1.1.0 (2020-07-14)
 * (Apollon77) Remember already sent unknown channel infos to not spam Sentry
 * (Apollon77) Handle reconnects better (Sentry IOBROKER-HMIP-G)
