@@ -189,6 +189,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'switchState':
                     await this._api.deviceControlSetSwitchState(o.native.id, state.val, o.native.channel);
                     break;
+                case 'sendDoorCommand':
+                    await this._api.deviceControlSendDoorCommand(o.native.id, state.val, o.native.channel);
+                    break;
                 case 'resetEnergyCounter':
                     await this._api.deviceControlResetEnergyCounter(o.native.id, o.native.channel);
                     break;
@@ -500,6 +503,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'NOTIFICATION_LIGHT_CHANNEL':
                     promises.push(...this._updateNotificationLightChannelStates(device, i));
                     break;
+                case 'DOOR_CHANNEL':
+                    promises.push(...this._updateDoorChannelStates(device, i));
+                    break;
                 default:
                     if (Object.keys(fc) <= 6) { // we only have the minimum fields, so nothing to display
                         break;
@@ -521,6 +527,14 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     /* Start Channel Types */
+    _updateDoorChannelStates(device, channel) {
+        let promises = [];
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.on', device.functionalChannels[channel].on, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.processing', device.functionalChannels[channel].processing, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.doorState', device.functionalChannels[channel].doorState, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.doorCommand', device.functionalChannels[channel].doorCommand, true));
+        return promises;
+    }
 
     _updateNotificationLightChannelStates(device, channel) {
         let promises = [];
@@ -1106,6 +1120,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'NOTIFICATION_LIGHT_CHANNEL':
                     promises.push(...this._createNotificationLightChannel(device, i));
                     break;
+                case 'DOOR_CHANNEL':
+                    promises.push(...this._createDoorChannel(device, i));
+                    break;
                 default:
                     this.log.info("unknown channel type - " + fc.functionalChannelType + " - " + JSON.stringify(device));
                     break;
@@ -1123,6 +1140,16 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.dimLevel', { type: 'state', common: { name: 'dimLevel', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.simpleRGBColorState', { type: 'state', common: { name: 'simpleRGBColorState', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         return promises;
+    }
+	
+    _createDoorChannel(device, channel) {
+        let promises = [];
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.doorState', { type: 'state', common: { name: 'doorState', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.processing', { type: 'state', common: { name: 'processing', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.ventilationPositionSupported', { type: 'state', common: { name: 'ventilationPositionSupported', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.doorCommand', { type: 'state', common: { name: 'doorCommand', type: 'number', role: 'value', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'sendDoorCommand' } }));
+	return promises;
     }
 
     _createLightSensorChannel(device, channel) {
