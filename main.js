@@ -908,6 +908,10 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.secureSetStateAsync('groups.' + group.id + '.on', group.on, true));
                 break;
             }
+	    case 'SECURITY_ZONE': {
+		promises.push(this.secureSetStateAsync('groups.' + group.id + '.active', group.active, true));
+                break;
+            }			
         }
 
         return Promise.all(promises);
@@ -1526,6 +1530,10 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { } }));
                 break;
             }
+            case 'SECURITY_ZONE' : {
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.active', { type: 'state', common: { name: 'active', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+                break;
+            }			
         }
 
         return Promise.all(promises);
