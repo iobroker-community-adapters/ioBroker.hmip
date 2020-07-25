@@ -49,7 +49,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
-### __WORK IN PROGRESS__
+### 1.2.0 (2020-07-26)
 * (saschaabraham) Added an active property INTERNAL and EXTERNAL groups for alarm zones
 * (marcus0303/slix185) added DOOR_CHANNEL properties
 

@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "1.1.1",
+        "version": "1.2.0",
         "news": {
+            "1.2.0": {
+                "en": "Added an active property INTERNAL and EXTERNAL groups for alarm zones\n(marcus0303/slix185) added DOOR_CHANNEL properties",
+                "de": "Es wurde eine aktive Eigenschaft INTERNE und EXTERNE Gruppen für Alarmzonen hinzugefügt\n(marcus0303 / slix185) hat DOOR_CHANNEL-Eigenschaften hinzugefügt",
+                "ru": "Добавлено активное свойство ВНУТРЕННИЕ и ВНЕШНИЕ группы для зон тревоги\n(marcus0303 / slix185) добавил свойства DOOR_CHANNEL",
+                "pt": "Adicionada uma propriedade ativa a grupos INTERNOS e EXTERNOS para zonas de alarme\n(marcus0303 / slix185) adicionou propriedades de DOOR_CHANNEL",
+                "nl": "Een actieve eigenschap INTERNE en EXTERNE groepen toegevoegd voor alarmzones\n(marcus0303 / slix185) heeft DOOR_CHANNEL-eigenschappen toegevoegd",
+                "fr": "Ajout d'une propriété active des groupes INTERNAL et EXTERNAL pour les zones d'alarme\n(marcus0303 / slix185) a ajouté les propriétés DOOR_CHANNEL",
+                "it": "Aggiunta una proprietà attiva gruppi INTERNI ed ESTERNI per le zone di allarme\n(marcus0303 / slix185) aggiunte proprietà DOOR_CHANNEL",
+                "es": "Se agregó una propiedad activa a grupos INTERNOS y EXTERNOS para zonas de alarma\n(marcus0303 / slix185) agregó propiedades DOOR_CHANNEL",
+                "pl": "Dodano aktywną właściwość grupy WEWNĘTRZNE i ZEWNĘTRZNE dla stref alarmowych\n(marcus0303 / slix185) dodano właściwości DOOR_CHANNEL",
+                "zh-cn": "为警报区域添加了活动属性“内部”和“外部”组\n（marcus0303 / slix185）添加了DOOR_CHANNEL属性"
+            },
             "1.1.1": {
                 "en": "Crash prevented if object is deleted by state changed (Sentry IOBROKER-HMIP-Y)",
                 "de": "Absturz verhindert, wenn Objekt durch Statusänderung gelöscht wird (Sentry IOBROKER-HMIP-Y)",
