@@ -32,7 +32,7 @@
     "js-sha512": "^0.8.0",
     "request-promise-native": "^1.0.9",
     "request": "^2.88.2",
-    "uuid": "^8.2.0",
+    "uuid": "^8.3.0",
     "ws": "^7.3.1"
   },
   "devDependencies": {
