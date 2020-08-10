@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "1.2.0",
+        "version": "1.2.1",
         "news": {
+            "1.2.1": {
+                "en": "Fix pairing process",
+                "de": "Pairing-Prozess korrigieren",
+                "ru": "Исправить процесс сопряжения",
+                "pt": "Corrigir processo de emparelhamento",
+                "nl": "Herstel het koppelingsproces",
+                "fr": "Correction du processus de couplage",
+                "it": "Correggi il processo di accoppiamento",
+                "es": "Arreglar el proceso de emparejamiento",
+                "pl": "Napraw proces parowania",
+                "zh-cn": "修复配对过程"
+            },
             "1.2.0": {
                 "en": "Added an active property INTERNAL and EXTERNAL groups for alarm zones\n(marcus0303/slix185) added DOOR_CHANNEL properties",
                 "de": "Es wurde eine aktive Eigenschaft INTERNE und EXTERNE Gruppen für Alarmzonen hinzugefügt\n(marcus0303 / slix185) hat DOOR_CHANNEL-Eigenschaften hinzugefügt",

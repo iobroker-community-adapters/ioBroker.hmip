@@ -49,7 +49,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
-### __WORK IN PROGRESS__
+### 1.2.1 (2020-08-10)
 * (Apollon77) Fix pairing process
 
 ### 1.2.0 (2020-07-26)
