@@ -102,7 +102,7 @@ class HmCloudAPI {
         const body = { "deviceId": this._deviceId };
         let res;
         try {
-            let res = await rq(this._urlREST + "/hmip/auth/isRequestAcknowledged", { method: 'POST', json: true, body: body, headers: headers, simple: false, resolveWithFullResponse: true });
+            res = await rq(this._urlREST + "/hmip/auth/isRequestAcknowledged", { method: 'POST', json: true, body: body, headers: headers, simple: false, resolveWithFullResponse: true });
         } catch (err) {
             this.requestError && this.requestError(err);
         }
