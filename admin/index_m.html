@@ -24,6 +24,7 @@
  </style>
     <script type="text/javascript">
 
+        var theOnChange;
         function handleResponse(response) {
             switch (response.state) {
                 case 'startedTokenCreation':
@@ -48,6 +49,7 @@
                     $('#clientAuthToken').val(response.clientAuthToken);
                     $('#clientId').val(response.clientId);
                     $('#deviceInfo').text('token created, save settings to use your accesspoint');
+                    theOnChange();
                     M.updateTextFields();
                     $('#table-button-create').prop("disabled", false);
                     break;
@@ -104,6 +106,7 @@
                 }
             });
             onChange(false);
+            theOnChange = onChange;
             M.updateTextFields();  // function Materialize.updateTextFields(); to reinitialize all the Materialize labels on the page if you are dynamically adding inputs.
         }
 
