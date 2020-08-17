@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "1.2.1",
+        "version": "1.2.2",
         "news": {
+            "1.2.2": {
+                "en": "Prevent Crash case (Sentry IOBROKER-HMIP-1B)",
+                "de": "Absturz verhindern (Sentry IOBROKER-HMIP-1B)",
+                "ru": "Кейс Prevent Crash (Sentry IOBROKER-HMIP-1B)",
+                "pt": "Prevenir caso de falha (Sentry IOBROKER-HMIP-1B)",
+                "nl": "Voorkom een crashcase (Sentry IOBROKER-HMIP-1B)",
+                "fr": "Empêcher le cas de crash (Sentry IOBROKER-HMIP-1B)",
+                "it": "Prevent Crash case (Sentry IOBROKER-HMIP-1B)",
+                "es": "Caso de prevención de accidentes (Sentry IOBROKER-HMIP-1B)",
+                "pl": "Zapobiegaj przypadkowi Crash (Sentry IOBROKER-HMIP-1B)",
+                "zh-cn": "防止崩溃情况（Sentry IOBROKER-HMIP-1B）"
+            },
             "1.2.1": {
                 "en": "Fix pairing process",
                 "de": "Pairing-Prozess korrigieren",
