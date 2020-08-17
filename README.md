@@ -49,6 +49,9 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
+### __WORK IN PROGRESS__
+* (Apollon77) Prevent Crash case (Sentry IOBROKER-HMIP-1B)
+
 ### 1.2.1 (2020-08-10)
 * (Apollon77) Fix pairing process
 

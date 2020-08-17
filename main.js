@@ -264,28 +264,38 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     await this._api.homeSetZonesActivation(true, true);
                     break;
                 case 'setOnTime':
-                    for (let id of o.native.id) {
-                        await this._api.groupSwitchingAlarmSetOnTime(id, state.val);
+                    if (Array.isArray(o.native.id)) {
+                        for (let id of o.native.id) {
+                            await this._api.groupSwitchingAlarmSetOnTime(id, state.val);
+                        }
                     }
                     break;
                 case 'testSignalOptical':
-                    for (let id of o.native.id) {
-                        await this._api.groupSwitchingAlarmTestSignalOptical(id, state.val);
+                    if (Array.isArray(o.native.id)) {
+                        for (let id of o.native.id) {
+                            await this._api.groupSwitchingAlarmTestSignalOptical(id, state.val);
+                        }
                     }
                     break;
                 case 'setSignalOptical':
-                    for (let id of o.native.id) {
-                        await this._api.groupSwitchingAlarmSetSignalOptical(id, state.val);
+                    if (Array.isArray(o.native.id)) {
+                        for (let id of o.native.id) {
+                            await this._api.groupSwitchingAlarmSetSignalOptical(id, state.val);
+                        }
                     }
                     break;
                 case 'testSignalAcoustic':
-                    for (let id of o.native.id) {
-                        await this._api.groupSwitchingAlarmTestSignalAcoustic(id, state.val);
+                    if (Array.isArray(o.native.id)) {
+                        for (let id of o.native.id) {
+                            await this._api.groupSwitchingAlarmTestSignalAcoustic(id, state.val);
+                        }
                     }
                     break;
                 case 'setSignalAcoustic':
-                    for (let id of o.native.id) {
-                        await this._api.groupSwitchingAlarmSetSignalAcoustic(id, state.val);
+                    if (Array.isArray(o.native.id)) {
+                        for (let id of o.native.id) {
+                            await this._api.groupSwitchingAlarmSetSignalAcoustic(id, state.val);
+                        }
                     }
                     break;
             }
