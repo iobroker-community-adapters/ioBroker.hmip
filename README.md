@@ -49,6 +49,19 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
+### 1.2.2 (2020-08-17)
+* (Apollon77) Prevent Crash case (Sentry IOBROKER-HMIP-1B)
+
+### 1.2.1 (2020-08-10)
+* (Apollon77) Fix pairing process
+
+### 1.2.0 (2020-07-26)
+* (saschaabraham) Added an active property INTERNAL and EXTERNAL groups for alarm zones
+* (marcus0303/slix185) added DOOR_CHANNEL properties
+
+### 1.1.1 (2020-07-23)
+* (Apollon77) Crash prevented if object is deleted by state changed (Sentry IOBROKER-HMIP-Y)
+
 ### 1.1.0 (2020-07-14)
 * (Apollon77) Remember already sent unknown channel infos to not spam Sentry
 * (Apollon77) Handle reconnects better (Sentry IOBROKER-HMIP-G)

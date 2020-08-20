@@ -1,8 +1,56 @@
 {
     "common": {
         "name": "hmip",
-        "version": "1.1.0",
+        "version": "1.2.2",
         "news": {
+            "1.2.2": {
+                "en": "Prevent Crash case (Sentry IOBROKER-HMIP-1B)",
+                "de": "Absturz verhindern (Sentry IOBROKER-HMIP-1B)",
+                "ru": "Кейс Prevent Crash (Sentry IOBROKER-HMIP-1B)",
+                "pt": "Prevenir caso de falha (Sentry IOBROKER-HMIP-1B)",
+                "nl": "Voorkom een crashcase (Sentry IOBROKER-HMIP-1B)",
+                "fr": "Empêcher le cas de crash (Sentry IOBROKER-HMIP-1B)",
+                "it": "Prevent Crash case (Sentry IOBROKER-HMIP-1B)",
+                "es": "Caso de prevención de accidentes (Sentry IOBROKER-HMIP-1B)",
+                "pl": "Zapobiegaj przypadkowi Crash (Sentry IOBROKER-HMIP-1B)",
+                "zh-cn": "防止崩溃情况（Sentry IOBROKER-HMIP-1B）"
+            },
+            "1.2.1": {
+                "en": "Fix pairing process",
+                "de": "Pairing-Prozess korrigieren",
+                "ru": "Исправить процесс сопряжения",
+                "pt": "Corrigir processo de emparelhamento",
+                "nl": "Herstel het koppelingsproces",
+                "fr": "Correction du processus de couplage",
+                "it": "Correggi il processo di accoppiamento",
+                "es": "Arreglar el proceso de emparejamiento",
+                "pl": "Napraw proces parowania",
+                "zh-cn": "修复配对过程"
+            },
+            "1.2.0": {
+                "en": "Added an active property INTERNAL and EXTERNAL groups for alarm zones\n(marcus0303/slix185) added DOOR_CHANNEL properties",
+                "de": "Es wurde eine aktive Eigenschaft INTERNE und EXTERNE Gruppen für Alarmzonen hinzugefügt\n(marcus0303 / slix185) hat DOOR_CHANNEL-Eigenschaften hinzugefügt",
+                "ru": "Добавлено активное свойство ВНУТРЕННИЕ и ВНЕШНИЕ группы для зон тревоги\n(marcus0303 / slix185) добавил свойства DOOR_CHANNEL",
+                "pt": "Adicionada uma propriedade ativa a grupos INTERNOS e EXTERNOS para zonas de alarme\n(marcus0303 / slix185) adicionou propriedades de DOOR_CHANNEL",
+                "nl": "Een actieve eigenschap INTERNE en EXTERNE groepen toegevoegd voor alarmzones\n(marcus0303 / slix185) heeft DOOR_CHANNEL-eigenschappen toegevoegd",
+                "fr": "Ajout d'une propriété active des groupes INTERNAL et EXTERNAL pour les zones d'alarme\n(marcus0303 / slix185) a ajouté les propriétés DOOR_CHANNEL",
+                "it": "Aggiunta una proprietà attiva gruppi INTERNI ed ESTERNI per le zone di allarme\n(marcus0303 / slix185) aggiunte proprietà DOOR_CHANNEL",
+                "es": "Se agregó una propiedad activa a grupos INTERNOS y EXTERNOS para zonas de alarma\n(marcus0303 / slix185) agregó propiedades DOOR_CHANNEL",
+                "pl": "Dodano aktywną właściwość grupy WEWNĘTRZNE i ZEWNĘTRZNE dla stref alarmowych\n(marcus0303 / slix185) dodano właściwości DOOR_CHANNEL",
+                "zh-cn": "为警报区域添加了活动属性“内部”和“外部”组\n（marcus0303 / slix185）添加了DOOR_CHANNEL属性"
+            },
+            "1.1.1": {
+                "en": "Crash prevented if object is deleted by state changed (Sentry IOBROKER-HMIP-Y)",
+                "de": "Absturz verhindert, wenn Objekt durch Statusänderung gelöscht wird (Sentry IOBROKER-HMIP-Y)",
+                "ru": "Сбой предотвращается, если объект удаляется при изменении состояния (Sentry IOBROKER-HMIP-Y)",
+                "pt": "Falha evitada se o objeto for excluído por estado alterado (Sentry IOBROKER-HMIP-Y)",
+                "nl": "Crash voorkomen als object wordt verwijderd door gewijzigde status (Sentry IOBROKER-HMIP-Y)",
+                "fr": "Crash évité si l'objet est supprimé par changement d'état (Sentry IOBROKER-HMIP-Y)",
+                "it": "Blocco impedito se l'oggetto viene eliminato dallo stato modificato (Sentry IOBROKER-HMIP-Y)",
+                "es": "Bloqueo evitado si el objeto es eliminado por el estado cambiado (Sentry IOBROKER-HMIP-Y)",
+                "pl": "Zapobieganie awariom, jeśli obiekt zostanie usunięty po zmianie stanu (Sentry IOBROKER-HMIP-Y)",
+                "zh-cn": "如果通过状态更改删除对象，可以防止崩溃（Sentry IOBROKER-HMIP-Y）"
+            },
             "1.1.0": {
                 "en": "Remember already sent unknown channel infos to not spam Sentry\nHandle reconnects better (Sentry IOBROKER-HMIP-G)\nTry to prevent crashes on i valid server reponses, warning is logged\nAdd HMIP-SPDR (PASSAGE_DETECTOR_CHANNEL)",
                 "de": "Denken Sie daran, dass bereits unbekannte Kanalinformationen gesendet wurden, um Sentry nicht zu spammen\nGriffverbindungen besser (Sentry IOBROKER-HMIP-G)\nVersuchen Sie, Abstürze auf gültigen Serverantworten zu verhindern. Die Warnung wird protokolliert\nHMIP-SPDR hinzufügen (PASSAGE_DETECTOR_CHANNEL)",

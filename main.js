@@ -183,7 +183,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         if (!id || !state || state.ack) return;
 
         let o = await this.getObjectAsync(id);
-        if (o.native.parameter) {
+        if (o && o.native && o.native.parameter) {
             this.log.info('state change - ' + o.native.parameter + ' - id ' + (o.native.id ? o.native.id : '') + ' - value ' + state.val);
             switch (o.native.parameter) {
                 case 'switchState':
@@ -264,28 +264,38 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     await this._api.homeSetZonesActivation(true, true);
                     break;
                 case 'setOnTime':
-                    for (let id of o.native.id) {
-                        await this._api.groupSwitchingAlarmSetOnTime(id, state.val);
+                    if (Array.isArray(o.native.id)) {
+                        for (let id of o.native.id) {
+                            await this._api.groupSwitchingAlarmSetOnTime(id, state.val);
+                        }
                     }
                     break;
                 case 'testSignalOptical':
-                    for (let id of o.native.id) {
-                        await this._api.groupSwitchingAlarmTestSignalOptical(id, state.val);
+                    if (Array.isArray(o.native.id)) {
+                        for (let id of o.native.id) {
+                            await this._api.groupSwitchingAlarmTestSignalOptical(id, state.val);
+                        }
                     }
                     break;
                 case 'setSignalOptical':
-                    for (let id of o.native.id) {
-                        await this._api.groupSwitchingAlarmSetSignalOptical(id, state.val);
+                    if (Array.isArray(o.native.id)) {
+                        for (let id of o.native.id) {
+                            await this._api.groupSwitchingAlarmSetSignalOptical(id, state.val);
+                        }
                     }
                     break;
                 case 'testSignalAcoustic':
-                    for (let id of o.native.id) {
-                        await this._api.groupSwitchingAlarmTestSignalAcoustic(id, state.val);
+                    if (Array.isArray(o.native.id)) {
+                        for (let id of o.native.id) {
+                            await this._api.groupSwitchingAlarmTestSignalAcoustic(id, state.val);
+                        }
                     }
                     break;
                 case 'setSignalAcoustic':
-                    for (let id of o.native.id) {
-                        await this._api.groupSwitchingAlarmSetSignalAcoustic(id, state.val);
+                    if (Array.isArray(o.native.id)) {
+                        for (let id of o.native.id) {
+                            await this._api.groupSwitchingAlarmSetSignalAcoustic(id, state.val);
+                        }
                     }
                     break;
             }
@@ -533,7 +543,10 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.processing', device.functionalChannels[channel].processing, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.doorState', device.functionalChannels[channel].doorState, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.doorCommand', device.functionalChannels[channel].doorCommand, true));
+<<<<<<< HEAD
 
+=======
+>>>>>>> upstream/master
         return promises;
     }
 
@@ -909,6 +922,10 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.secureSetStateAsync('groups.' + group.id + '.on', group.on, true));
                 break;
             }
+	    case 'SECURITY_ZONE': {
+		promises.push(this.secureSetStateAsync('groups.' + group.id + '.active', group.active, true));
+                break;
+            }			
         }
 
         return Promise.all(promises);
@@ -1527,6 +1544,10 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { } }));
                 break;
             }
+            case 'SECURITY_ZONE' : {
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.active', { type: 'state', common: { name: 'active', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+                break;
+            }			
         }
 
         return Promise.all(promises);
