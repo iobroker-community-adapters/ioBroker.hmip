@@ -516,6 +516,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'DOOR_CHANNEL':
                     promises.push(...this._updateDoorChannelStates(device, i));
                     break;
+                case 'MAINS_FAILURE_CHANNEL':
+                    promises.push(...this._updateMainsFailureChannelStates(device, i));
+                    break;
                 default:
                     if (Object.keys(fc) <= 6) { // we only have the minimum fields, so nothing to display
                         break;
@@ -537,6 +540,12 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     /* Start Channel Types */
+    _updateMainsFailureChannelStates(device, channel) {
+        let promises = [];
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.powerMainsFailure', device.functionalChannels[channel].powerMainsFailure, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.genericAlarmSignal', device.functionalChannels[channel].genericAlarmSignal, true));
+        return promises;
+    }
     _updateDoorChannelStates(device, channel) {
         let promises = [];
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.on', device.functionalChannels[channel].on, true));
@@ -1137,6 +1146,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'DOOR_CHANNEL':
                     promises.push(...this._createDoorChannel(device, i));
                     break;
+                case 'MAINS_FAILURE_CHANNEL':
+                    promises.push(...this._createMainsFailureChannel(device, i));
+                    break;
                 default:
                     this.log.info("unknown channel type - " + fc.functionalChannelType + " - " + JSON.stringify(device));
                     break;
@@ -1147,6 +1159,12 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     /* Start Channel Types */
+    _createMainsFailureChannel(device, channel) {
+        let promises = [];
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.powerMainsFailure', { type: 'state', common: { name: 'powerMainsFailure', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.genericAlarmSignal', { type: 'state', common: { name: 'genericAlarmSignal', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        return promises;
+    }
 
     _createNotificationLightChannel(device, channel) {
         let promises = [];
