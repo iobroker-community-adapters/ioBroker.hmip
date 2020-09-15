@@ -285,9 +285,29 @@ class HmCloudAPI {
         await this.callRestApi('device/control/resetEnergyCounter', data);
     }
 
+    async deviceConfigurationSetOperationLock(deviceId, operationLock, channelIndex = 1) {
+        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'operationLock': operationLock };
+        await this.callRestApi('device/configuration/setOperationLock', data);
+    }
+
+    async deviceConfigurationSetClimateControlDisplay(deviceId, display, channelIndex = 1) {
+        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'display': display };
+        await this.callRestApi('device/configuration/setClimateControlDisplay', data);
+    }
+
+    async deviceConfigurationSetMinimumFloorHeatingValvePosition(deviceId, minimumFloorHeatingValvePosition, channelIndex = 1) {
+        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'minimumFloorHeatingValvePosition': minimumFloorHeatingValvePosition };
+        await this.callRestApi('device/configuration/setMinimumFloorHeatingValvePosition', data);
+    }
+
     async deviceControlSetDimLevel(deviceId, dimLevel, channelIndex = 1) {
         let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'dimLevel': dimLevel };
         await this.callRestApi('device/control/setDimLevel', data);
+    }
+
+    async deviceControlSetRgbDimLevel(deviceId, rgb, dimLevel, channelIndex = 1) {
+        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'rgb': rgb, 'dimLevel': dimLevel };
+        await this.callRestApi('device/control/setSimpleRGBColorDimLevel', data);
     }
 
     async deviceControlSetShutterLevel(deviceId, shutterLevel, channelIndex = 1) {
