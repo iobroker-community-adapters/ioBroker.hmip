@@ -477,6 +477,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'WATER_SENSOR_CHANNEL':
                     promises.push(...this._updateWaterSensorChannelStates(device, i));
                     break;
+                case 'SHADING_CHANNEL':
+                    promises.push(...this._updateShadingChannelStates(device, i));
+                    break;
                 case 'WEATHER_SENSOR_CHANNEL':
                     promises.push(...this._updateWeatherSensorChannelStates(device, i));
                     break;
@@ -905,6 +908,34 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         return promises;
     }
 
+    _updateShadingChannelStates(device, channel) {
+        let promises = [];
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.primaryShadingLevel', device.functionalChannels[channel].primaryShadingLevel, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.previousPrimaryShadingLevel', device.functionalChannels[channel].previousPrimaryShadingLevel, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.primaryShadingStateType', device.functionalChannels[channel].primaryShadingStateType, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.processing', device.functionalChannels[channel].processing, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.secondaryShadingLevel', device.functionalChannels[channel].secondaryShadingLevel, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.previousSecondaryShadingLevel', device.functionalChannels[channel].previousSecondaryShadingLevel, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.secondaryShadingStateType', device.functionalChannels[channel].secondaryShadingStateType, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.profileMode', device.functionalChannels[channel].profileMode, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.userDesiredProfileMode', device.functionalChannels[channel].userDesiredProfileMode, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.shadingPackagePosition', device.functionalChannels[channel].shadingPackagePosition, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.primaryOpenAdjustable', device.functionalChannels[channel].primaryOpenAdjustable, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.primaryCloseAdjustable', device.functionalChannels[channel].primaryCloseAdjustable, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.secondaryOpenAdjustable', device.functionalChannels[channel].secondaryOpenAdjustable, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.secondaryCloseAdjustable', device.functionalChannels[channel].secondaryCloseAdjustable, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.shadingPositionAdjustmentActive', device.functionalChannels[channel].shadingPositionAdjustmentActive, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.shadingPositionAdjustmentClientId', device.functionalChannels[channel].shadingPositionAdjustmentClientId, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.favoritePrimaryShadingPosition', device.functionalChannels[channel].favoritePrimaryShadingPosition, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.favoriteSecondaryShadingPosition', device.functionalChannels[channel].favoriteSecondaryShadingPosition, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.productId', device.functionalChannels[channel].productId, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.identifyOemSupported', device.functionalChannels[channel].identifyOemSupported, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.shadingDriveVersion', device.functionalChannels[channel].shadingDriveVersion, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.manualDriveSpeed', device.functionalChannels[channel].manualDriveSpeed, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.automationDriveSpeed', device.functionalChannels[channel].automationDriveSpeed, true));
+        return promises;
+    }
+
     _updateWeatherSensorChannelStates(device, channel) {
         let promises = [];
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.actualTemperature', device.functionalChannels[channel].actualTemperature, true));
@@ -1214,6 +1245,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     break;
                 case 'DIMMER_CHANNEL':
                     promises.push(...this._createDimmerChannel(device, i));
+                    break;
+                case 'SHADING_CHANNEL':
+                    promises.push(...this._createShadingChannel(device, i));
                     break;
                 case 'WATER_SENSOR_CHANNEL':
                     promises.push(...this._createWaterSensorChannel(device, i));
@@ -1615,6 +1649,34 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         let promises = [];
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.dimLevel', { type: 'state', common: { name: 'dimLevel', type: 'number', role: 'level.dimmer', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'setDimLevel' } }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'switchState' } }));
+        return promises;
+    }
+
+    _createShadingChannel(device, channel) {
+        let promises = [];
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.primaryShadingLevel', { type: 'state', common: { name: 'primaryShadingLevel', type: 'number', role: 'value', unit: '%', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.previousPrimaryShadingLevel', { type: 'state', common: { name: 'previousPrimaryShadingLevel', type: 'number', role: 'value', unit: '%', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.primaryShadingStateType', { type: 'state', common: { name: 'primaryShadingStateType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.processing', { type: 'state', common: { name: 'processing', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.secondaryShadingLevel', { type: 'state', common: { name: 'secondaryShadingLevel', type: 'number', role: 'value', unit: '%', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.previousSecondaryShadingLevel', { type: 'state', common: { name: 'previousSecondaryShadingLevel', type: 'number', role: 'value', unit: '%', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.secondaryShadingStateType', { type: 'state', common: { name: 'secondaryShadingStateType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.profileMode', { type: 'state', common: { name: 'profileMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.userDesiredProfileMode', { type: 'state', common: { name: 'userDesiredProfileMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.shadingPackagePosition', { type: 'state', common: { name: 'shadingPackagePosition', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.primaryOpenAdjustable', { type: 'state', common: { name: 'primaryOpenAdjustable', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.primaryCloseAdjustable', { type: 'state', common: { name: 'primaryCloseAdjustable', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.secondaryOpenAdjustable', { type: 'state', common: { name: 'secondaryOpenAdjustable', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.secondaryCloseAdjustable', { type: 'state', common: { name: 'secondaryCloseAdjustable', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.shadingPositionAdjustmentActive', { type: 'state', common: { name: 'shadingPositionAdjustmentActive', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.shadingPositionAdjustmentClientId', { type: 'state', common: { name: 'shadingPositionAdjustmentClientId', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.favoritePrimaryShadingPosition', { type: 'state', common: { name: 'favoritePrimaryShadingPosition', type: 'number', role: 'value', unit: '%', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.favoriteSecondaryShadingPosition', { type: 'state', common: { name: 'favoriteSecondaryShadingPosition', type: 'number', role: 'value', unit: '%', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.productId', { type: 'state', common: { name: 'productId', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.identifyOemSupported', { type: 'state', common: { name: 'identifyOemSupported', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.shadingDriveVersion', { type: 'state', common: { name: 'shadingDriveVersion', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.manualDriveSpeed', { type: 'state', common: { name: 'manualDriveSpeed', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.automationDriveSpeed', { type: 'state', common: { name: 'automationDriveSpeed', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         return promises;
     }
 
