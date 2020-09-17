@@ -306,7 +306,7 @@ class HmCloudAPI {
     }
 
     async deviceControlSetRgbDimLevel(deviceId, rgb, dimLevel, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'rgb': rgb, 'dimLevel': dimLevel };
+        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'simpleRGBColorState': rgb, 'dimLevel': dimLevel };
         await this.callRestApi('device/control/setSimpleRGBColorDimLevel', data);
     }
 
