@@ -1355,7 +1355,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _createNotificationLightChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'indicator', read: true, write: false }, native: {id: device.id, channel: channel, parameter: 'switchState'} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'indicator', read: true, write: true }, native: {id: device.id, channel: channel, parameter: 'switchState'} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.dimLevel', { type: 'state', common: { name: 'dimLevel', type: 'number', role: 'value', read: true, write: true }, native: {id: device.id, channel: channel, parameter: 'setRgbDimLevel'} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.simpleRGBColorState', { type: 'state', common: { name: 'simpleRGBColorState', type: 'string', role: 'text', read: true, write: true }, native: {id: device.id, channel: channel, parameter: 'setRgbDimLevel'} }));
         return promises;
