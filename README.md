@@ -49,7 +49,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
-### __WORK IN PROGRESS__
+### 1.3.1 (2020-09-18)
 * (Apollon77) Fix missing write permission for Notification Light "On" channel
 
 ### 1.3.0 (2020-09-18)

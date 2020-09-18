@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "1.3.0",
+        "version": "1.3.1",
         "news": {
+            "1.3.1": {
+                "en": "Fix missing write permission for Notification Light \"On\" channel",
+                "de": "Fehlende Schreibberechtigung für Notification Light \"On\" -Kanal behoben",
+                "ru": "Исправить отсутствие разрешения на запись для канала \"Вкл.\"",
+                "pt": "Corrigir a falta de permissão de gravação para o canal Notification Light \"On\"",
+                "nl": "Herstel ontbrekende schrijfmachtiging voor meldingslampje \"Aan\" -kanaal",
+                "fr": "Correction de l'autorisation d'écriture manquante pour le canal Notification Light \"On\"",
+                "it": "Correzione dell'autorizzazione di scrittura mancante per il canale \"On\" della spia di notifica",
+                "es": "Se corrigió el permiso de escritura que faltaba para el canal \"Encendido\" de la luz de notificación",
+                "pl": "Napraw brakujące uprawnienia do zapisu dla kanału „Włączony” wskaźnik powiadomień",
+                "zh-cn": "修复缺少通知灯“打开”通道的写权限"
+            },
             "1.3.0": {
                 "en": "Add MAINS_FAILURE_CHANNEL\nAdd DEVICE_RECHARGEABLE_WITH_SABOTAGE, ACCESS_CONTROLLER_CHANNEL, FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL, DEVICE_BASE_FLOOR_HEATING, MULTI_MODE_INPUT_DIMMER_CHANNEL, MULTI_MODE_INPUT_SWITCH_CHANNEL, ANALOG_OUTPUT_CHANNEL, ACCELERATION_SENSOR_CHANNEL, TILT_VIBRATION_SENSOR_CHANNEL, SHADING_CHANNEL\ntry to add dim/rgb support for NotificationLight. You might need to delete/recreate the states if it is not working.\nadd additional functions for setOperationLock, setClimateControlDisplay, setMinimumFloorHeatingValvePosition, setRgbDimLevel. You might need to delete/recreate the states if it is not working.\nadjusted some roles. You might need to delete/recreate the states if it is not working.",
                 "de": "Fügen Sie MAINS_FAILURE_CHANNEL hinzu\nIn DEVICE_RECHARGEABLE_WITH_SABOTAGE, ACCESS_CONTROLLER_CHANNEL, FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL, DEVICE_BASE_FLOOR_HEATING, MULTI_MODE_INPUT_DIMMER_CHANNEL, MULTI_MODE_INPUT_SWITCH_CHANNEL, ANALOG_OUTPUT_CHANNEL, ACCELERATION_SENSOR_CHANNEL, TILT_VIBRATION_SENSOR_CHANNEL, SHADING_CHANNEL\nVersuchen Sie, Dim / RGB-Unterstützung für NotificationLight hinzuzufügen. Möglicherweise müssen Sie die Status löschen / neu erstellen, wenn dies nicht funktioniert.\nFügen Sie zusätzliche Funktionen für setOperationLock, setClimateControlDisplay, setMinimumFloorHeatingValvePosition, setRgbDimLevel hinzu. Möglicherweise müssen Sie die Status löschen / neu erstellen, wenn dies nicht funktioniert.\neinige Rollen angepasst. Möglicherweise müssen Sie die Status löschen / neu erstellen, wenn dies nicht funktioniert.",
@@ -230,18 +242,6 @@
                 "es": "Corrección de errores, más dispositivos y soporte inicial de grupos.",
                 "pl": "poprawki błędów, więcej urządzeń i początkowe wsparcie grup",
                 "zh-cn": "错误修正，更多设备和组的初始支持"
-            },
-            "0.0.1": {
-                "en": "initial release",
-                "de": "Erstveröffentlichung",
-                "ru": "Первый выпуск",
-                "pt": "lançamento inicial",
-                "nl": "Eerste uitgave",
-                "fr": "Première version",
-                "it": "Versione iniziale",
-                "es": "Versión inicial",
-                "pl": "Pierwsze wydanie",
-                "zh-cn": "初始发行"
             }
         },
         "title": "HomeMaticIP Cloud AccessPoint",
