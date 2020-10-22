@@ -381,7 +381,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 if (ev.home) {
                     await this._updateHomeStates(ev.home);
                 } else {
-                    this.log.debug('No home in SECURITY_JOURNAL_CHANGED: ' + JSON.stringify(ev));
+                    this.log.debug('Read Home for SECURITY_JOURNAL_CHANGED: ' + JSON.stringify(ev));
+                    let state = await this._api.callRestApi('home/getCurrentState', this._api._clientCharacteristics);
+                    await this._updateHomeStates(state.home);
                 }
                 break;
             default:
@@ -437,6 +439,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     break;
                 case 'ACCESS_CONTROLLER_CHANNEL':
                     promises.push(...this._updateAccessControllerChannelStates(device, i));
+                    break;
+                case 'ACCESS_CONTROLLER_WIRED_CHANNEL':
+                    promises.push(...this._updateAccessControllerWiredChannelStates(device, i));
                     break;
                 case 'PRESENCE_DETECTION_CHANNEL':
                     promises.push(...this._updatePresenceDetectionChannelStates(device, i));
@@ -551,6 +556,12 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     break;
                 case 'TILT_VIBRATION_SENSOR_CHANNEL':
                     promises.push(...this._updateTiltVibrationSensorChannelStates(device, i));
+                    break;
+                case 'ROTARY_WHEEL_CHANNEL':
+                    promises.push(...this._updateRotaryWheelChannelStates(device, i));
+                    break;
+                case 'RAIN_DETECTION_CHANNEL':
+                    promises.push(...this._updateRainDetectionChannelStates(device, i));
                     break;
                 case 'ACCELERATION_SENSOR_CHANNEL':
                     promises.push(...this._updateAccelerationSensorChannelStates(device, i));
@@ -709,6 +720,19 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         return promises;
     }
 
+    _updateRotaryWheelChannelStates(device, channel) {
+        let promises = [];
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.rotationDirection', device.functionalChannels[channel].rotationDirection, true));
+        return promises;
+    }
+
+    _updateRainDetectionChannelStates(device, channel) {
+        let promises = [];
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.raining', device.functionalChannels[channel].raining, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.rainSensorSensitivity', device.functionalChannels[channel].rainSensorSensitivity, true));
+        return promises;
+    }
+
     _updateAccessControllerChannelStates(device, channel) {
         let promises = [];
         promises.push(...this._updateDeviceBaseChannelStates(device, channel));
@@ -716,6 +740,19 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.accessPointPriority', device.functionalChannels[channel].accessPointPriority, true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.dutyCycleLevel', device.functionalChannels[channel].dutyCycleLevel, true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.carrierSenseLevel', device.functionalChannels[channel].carrierSenseLevel, true));
+        return promises;
+    }
+
+    _updateAccessControllerWiredChannelStates(device, channel) {
+        let promises = [];
+        promises.push(...this._updateDeviceBaseChannelStates(device, channel));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.signalBrightness', device.functionalChannels[channel].signalBrightness, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.accessPointPriority', device.functionalChannels[channel].accessPointPriority, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.busConfigMismatch', device.functionalChannels[channel].busConfigMismatch, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.powerShortCircuit', device.functionalChannels[channel].powerShortCircuit, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.shortCircuitDataLine', device.functionalChannels[channel].shortCircuitDataLine, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.busMode', device.functionalChannels[channel].busMode, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.powerSupplyCurrent', device.functionalChannels[channel].powerSupplyCurrent, true));
         return promises;
     }
 
@@ -1210,6 +1247,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'ACCESS_CONTROLLER_CHANNEL':
                     promises.push(...this._createAccessControllerChannel(device, i));
                     break;
+                case 'ACCESS_CONTROLLER_WIRED_CHANNEL':
+                    promises.push(...this._createAccessControllerWiredChannel(device, i));
+                    break;
                 case 'HEATING_THERMOSTAT_CHANNEL':
                     promises.push(...this._createHeatingThermostatChannel(device, i));
                     break;
@@ -1324,6 +1364,12 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'TILT_VIBRATION_SENSOR_CHANNEL':
                     promises.push(...this._createTiltVibrationSensorChannel(device, i));
                     break;
+                case 'ROTARY_WHEEL_CHANNEL':
+                    promises.push(...this._createRotaryWheelChannel(device, i));
+                    break;
+                case 'RAIN_DETECTION_CHANNEL':
+                    promises.push(...this._createRainDetectionChannel(device, i));
+                    break;
                 case 'ACCELERATION_SENSOR_CHANNEL':
                     promises.push(...this._createAccelerationSensorChannel(device, i));
                     break;
@@ -1432,6 +1478,19 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         return promises;
     }
 
+    _createRotaryWheelChannel(device, channel) {
+        let promises = [];
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.rotationDirection', { type: 'state', common: { name: 'rotationDirection', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
+    _createRainDetectionChannel(device, channel) {
+        let promises = [];
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.raining', { type: 'state', common: { name: 'raining', type: 'boolean', role: 'sensor.rain', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.rainSensorSensitivity', { type: 'state', common: { name: 'rainSensorSensitivity', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
     _createMultiModeInputDimmerChannel(device, channel) {
         let promises = [];
         promises.push(...this._createMultiModeInputSwitchChannel(device, channel));
@@ -1477,6 +1536,19 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.accessPointPriority', { type: 'state', common: { name: 'accessPointPriority', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.dutyCycleLevel', { type: 'state', common: { name: 'dutyCycleLevel', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.carrierSenseLevel', { type: 'state', common: { name: 'carrierSenseLevel', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
+    _createAccessControllerWiredChannel(device, channel) {
+        let promises = [];
+        promises.push(...this._createDeviceBaseChannel(device, channel));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.signalBrightness', { type: 'state', common: { name: 'signalBrightness', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.accessPointPriority', { type: 'state', common: { name: 'accessPointPriority', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.busConfigMismatch', { type: 'state', common: { name: 'busConfigMismatch', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.powerShortCircuit', { type: 'state', common: { name: 'powerShortCircuit', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.shortCircuitDataLine', { type: 'state', common: { name: 'shortCircuitDataLine', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.busMode', { type: 'state', common: { name: 'busMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.powerSupplyCurrent', { type: 'state', common: { name: 'powerSupplyCurrent', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         return promises;
     }
 

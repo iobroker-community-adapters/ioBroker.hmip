@@ -49,6 +49,10 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
+### __WORK IN PROGRESS__
+* (Apollon77) Add ROTARY_WHEEL_CHANNEL and RAIN_DETECTION_CHANNEL, ACCESS_CONTROLLER_WIRED_CHANNEL
+* (Apollon77) Read home anew if no home object is provided for SECURITY_JOURNAL_CHANGED event
+
 ### 1.3.1 (2020-09-18)
 * (Apollon77) Fix missing write permission for Notification Light "On" channel
 
