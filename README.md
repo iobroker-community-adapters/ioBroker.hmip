@@ -30,6 +30,8 @@ I may also need a json of a state change.
 
 Thank you
 
+If you are looking for the information, if the alarm settings are active you have to check the active status of the group INTERNAL and EXTERNAL, they represent in combination the three alarm states. INTERNAL and EXTERNAL actives means Away, only EXTERNAL active means only Perimeter active.
+
 ## Important Info what can be done with this adapter
 
 !!! You can only trigger events with this adapater that can be triggered thru the original Homematic IP app. 
