@@ -51,7 +51,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
-### __WORK IN PROGRESS__
+### 1.4.0 (2020-10-29)
 * (Apollon77) Add ROTARY_WHEEL_CHANNEL and RAIN_DETECTION_CHANNEL, ACCESS_CONTROLLER_WIRED_CHANNEL
 * (Apollon77) Read home anew if no home object is provided for SECURITY_JOURNAL_CHANGED event
 
