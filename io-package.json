@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "1.4.0",
+        "version": "1.4.1",
         "news": {
+            "1.4.1": {
+                "en": "fix potential crash case (Sentry IOBROKER-HMIP-1N)",
+                "de": "Behebung eines möglichen Absturzfalls (Sentry IOBROKER-HMIP-1N)",
+                "ru": "исправить потенциальный сбой (Sentry IOBROKER-HMIP-1N)",
+                "pt": "corrigir possível caso de falha (Sentry IOBROKER-HMIP-1N)",
+                "nl": "mogelijke crash case repareren (Sentry IOBROKER-HMIP-1N)",
+                "fr": "correction d'un cas de crash potentiel (Sentry IOBROKER-HMIP-1N)",
+                "it": "risolvere potenziali casi di crash (Sentry IOBROKER-HMIP-1N)",
+                "es": "reparar un posible caso de bloqueo (Sentry IOBROKER-HMIP-1N)",
+                "pl": "napraw potencjalną awarię (Sentry IOBROKER-HMIP-1N)",
+                "zh-cn": "修复潜在的崩溃案例（Sentry IOBROKER-HMIP-1N）"
+            },
             "1.4.0": {
                 "en": "Add ROTARY_WHEEL_CHANNEL and RAIN_DETECTION_CHANNEL, ACCESS_CONTROLLER_WIRED_CHANNEL\nRead home anew if no home object is provided for SECURITY_JOURNAL_CHANGED event",
                 "de": "Fügen Sie ROTARY_WHEEL_CHANNEL und RAIN_DETECTION_CHANNEL, ACCESS_CONTROLLER_WIRED_CHANNEL hinzu\nLesen Sie home erneut, wenn für das Ereignis SECURITY_JOURNAL_CHANGED kein Home-Objekt angegeben ist",
@@ -230,18 +242,6 @@
                 "es": "Más dispositivos, correcciones de errores. ",
                 "pl": "więcej urządzeń, poprawek. ",
                 "zh-cn": "更多设备，错误修正。"
-            },
-            "0.0.3": {
-                "en": "bugfixes and more devices",
-                "de": "Bugfixes und weitere Geräte",
-                "ru": "исправления и другие устройства",
-                "pt": "correções de bugs e mais dispositivos",
-                "nl": "bugfixes en meer apparaten",
-                "fr": "corrections de bugs et plus de périphériques",
-                "it": "correzioni di bug e altri dispositivi",
-                "es": "correcciones de errores y más dispositivos",
-                "pl": "poprawki błędów i więcej urządzeń",
-                "zh-cn": "错误修正和更多设备"
             }
         },
         "title": "HomeMaticIP Cloud AccessPoint",
