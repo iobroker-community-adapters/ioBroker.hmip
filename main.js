@@ -383,7 +383,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 } else {
                     this.log.debug('Read Home for SECURITY_JOURNAL_CHANGED: ' + JSON.stringify(ev));
                     let state = await this._api.callRestApi('home/getCurrentState', this._api._clientCharacteristics);
-                    await this._updateHomeStates(state.home);
+                    state && await this._updateHomeStates(state.home);
                 }
                 break;
             default:
