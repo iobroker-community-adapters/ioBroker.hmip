@@ -51,7 +51,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
-### __WORK IN PROGRESS__
+### 1.5.0 (2020-11-09)
 * (Apollon77) Add control options for primary/secondaryShadingLevel datapoints
 
 ### 1.4.1 (2020-11-03)

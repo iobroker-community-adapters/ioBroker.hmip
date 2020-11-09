@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "1.4.1",
+        "version": "1.5.0",
         "news": {
+            "1.5.0": {
+                "en": "Add control options for primary/secondaryShadingLevel datapoints",
+                "de": "Fügen Sie Steuerungsoptionen für primäre / sekundäre ShadingLevel-Datenpunkte hinzu",
+                "ru": "Добавить параметры управления для первичных / вторичных точек данных ShadingLevel",
+                "pt": "Adicionar opções de controle para pontos de dados primário / secundárioShadingLevel",
+                "nl": "Voeg besturingsopties toe voor primaire / secundaire ShadingLevel-datapunten",
+                "fr": "Ajouter des options de contrôle pour les points de données primary / secondaryShadingLevel",
+                "it": "Aggiungi opzioni di controllo per i punti dati Primary / SecondaryShadingLevel",
+                "es": "Agregar opciones de control para puntos de datos de nivel primario / secundario",
+                "pl": "Dodaj opcje kontrolne dla podstawowych / drugorzędnych punktów danych ShadingLevel",
+                "zh-cn": "为primary / secondaryShadingLevel数据点添加控制选项"
+            },
             "1.4.1": {
                 "en": "fix potential crash case (Sentry IOBROKER-HMIP-1N)",
                 "de": "Behebung eines möglichen Absturzfalls (Sentry IOBROKER-HMIP-1N)",
@@ -230,18 +242,6 @@
                 "es": "Más dispositivos y grandes refactorizaciones.",
                 "pl": "więcej urządzeń i duży refaktoryzacji",
                 "zh-cn": "更多设备和大型重构"
-            },
-            "0.0.4": {
-                "en": "more devices, bugfixes. thanks to TobiasF1986, steckenpferd and Ma-ster77",
-                "de": "weitere Geräte, Bugfixes. ",
-                "ru": "больше устройств, исправлений. ",
-                "pt": "mais dispositivos, correções de bugs. ",
-                "nl": "meer apparaten, bugfixes. ",
-                "fr": "plus de périphériques, corrections de bugs. ",
-                "it": "più dispositivi, correzioni di errori. ",
-                "es": "Más dispositivos, correcciones de errores. ",
-                "pl": "więcej urządzeń, poprawek. ",
-                "zh-cn": "更多设备，错误修正。"
             }
         },
         "title": "HomeMaticIP Cloud AccessPoint",
