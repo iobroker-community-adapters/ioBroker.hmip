@@ -203,6 +203,14 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     let shutter = await this.getStateAsync('devices.' + o.native.id + '.channels.' + o.native.channel + '.shutterLevel');
                     await this._api.deviceControlSetSlatsLevel(o.native.id, slats.val, shutter.val, o.native.channel);
                     break;
+                case 'setPrimaryShadingLevel':
+                    await this._api.deviceControlSetPrimaryShadingLevel(o.native.id, state.val, o.native.channel);
+                    break;
+                case 'setSecondaryShadingLevel':
+                    let primary = await this.getStateAsync('devices.' + o.native.id + '.channels.' + o.native.channel + '.primaryShadingLevel');
+                    let secondary = await this.getStateAsync('devices.' + o.native.id + '.channels.' + o.native.channel + '.secondaryShadingLevel');
+                    await this._api.deviceControlSetSecondaryShadingLevel(o.native.id, primary.val, secondary.val, o.native.channel);
+                    break;
                 case 'stop':
                     await this._api.deviceControlStop(o.native.id, o.native.channel);
                     break;
@@ -1726,11 +1734,11 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _createShadingChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.primaryShadingLevel', { type: 'state', common: { name: 'primaryShadingLevel', type: 'number', role: 'value', unit: '%', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.primaryShadingLevel', { type: 'state', common: { name: 'primaryShadingLevel', type: 'number', role: 'value', unit: '%', read: true, write: true }, native: {id: device.id, channel: channel, parameter: 'setPrimaryShadingLevel'} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.previousPrimaryShadingLevel', { type: 'state', common: { name: 'previousPrimaryShadingLevel', type: 'number', role: 'value', unit: '%', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.primaryShadingStateType', { type: 'state', common: { name: 'primaryShadingStateType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.processing', { type: 'state', common: { name: 'processing', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.secondaryShadingLevel', { type: 'state', common: { name: 'secondaryShadingLevel', type: 'number', role: 'value', unit: '%', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.secondaryShadingLevel', { type: 'state', common: { name: 'secondaryShadingLevel', type: 'number', role: 'value', unit: '%', read: true, write: true }, native: {id: device.id, channel: channel, parameter: 'setSecondaryShadingLevel'} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.previousSecondaryShadingLevel', { type: 'state', common: { name: 'previousSecondaryShadingLevel', type: 'number', role: 'value', unit: '%', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.secondaryShadingStateType', { type: 'state', common: { name: 'secondaryShadingStateType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.profileMode', { type: 'state', common: { name: 'profileMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));

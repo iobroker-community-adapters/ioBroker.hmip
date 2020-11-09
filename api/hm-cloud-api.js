@@ -325,12 +325,20 @@ class HmCloudAPI {
         await this.callRestApi('device/control/stop', data);
     }
 
+    async deviceControlSetPrimaryShadingLevel(deviceId, primaryShadingLevel, channelIndex = 1) {
+        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'primaryShadingLevel': primaryShadingLevel };
+        await this.callRestApi('device/control/setPrimaryShadingLevel', data);
+    }
+
+    async deviceControlSetSecondaryShadingLevel(deviceId, primaryShadingLevel, secondaryShadingLevel, channelIndex = 1) {
+        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'primaryShadingLevel': primaryShadingLevel, 'secondaryShadingLevel': secondaryShadingLevel };
+        await this.callRestApi('device/control/setSecondaryShadingLevel', data);
+    }
+
     async deviceConfigurationSetRouterModuleEnabled(deviceId, routerModuleEnabled, channelIndex = 1) {
         let data = { "deviceId": deviceId, "routerModuleEnabled": routerModuleEnabled, "channelIndex": channelIndex };
         await this.callRestApi('device/configuration/setRouterModuleEnabled', data);
     }
-
-
 
     async deviceDeleteDevice(deviceId) {
         let data = { "deviceId": deviceId };

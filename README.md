@@ -51,6 +51,9 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
+### __WORK IN PROGRESS__
+* (Apollon77) Add control options for primary/secondaryShadingLevel datapoints
+
 ### 1.4.1 (2020-11-03)
 * (Apollon77) fix potential crash case (Sentry IOBROKER-HMIP-1N)
 
