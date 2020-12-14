@@ -394,6 +394,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     state && await this._updateHomeStates(state.home);
                 }
                 break;
+            case 'DEVICE_CHANNEL_EVENT':
+                this.log.debug("unhandled known event - " + JSON.stringify(ev));
             default:
                 this.log.warn("unhandled event - " + JSON.stringify(ev));
         }

@@ -51,6 +51,9 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
+### __WORK IN PROGRESS__
+* (Apollon77) ignore DEVICE_CHANNEL_EVENT for now and also log as debug to not flood log
+
 ### 1.5.0 (2020-11-09)
 * (Apollon77) Add control options for primary/secondaryShadingLevel datapoints
 
