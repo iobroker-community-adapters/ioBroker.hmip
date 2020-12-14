@@ -51,7 +51,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
-### 1.5.1 (2020-12-15)
+### __WORK IN PROGRESS__
 * (Apollon77) ignore DEVICE_CHANNEL_EVENT for now and also log as debug to not flood log
 
 ### 1.5.0 (2020-11-09)

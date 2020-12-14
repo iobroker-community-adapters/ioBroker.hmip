@@ -396,6 +396,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 break;
             case 'DEVICE_CHANNEL_EVENT':
                 this.log.debug("unhandled known event - " + JSON.stringify(ev));
+                break;
             default:
                 this.log.warn("unhandled event - " + JSON.stringify(ev));
         }
