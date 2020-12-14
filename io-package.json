@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "1.5.0",
+        "version": "1.5.1",
         "news": {
+            "1.5.1": {
+                "en": "ignore DEVICE_CHANNEL_EVENT for now and also log as debug to not flood log",
+                "de": "Ignorieren Sie DEVICE_CHANNEL_EVENT vorerst und protokollieren Sie auch als Debug, um das Protokoll nicht zu überfluten",
+                "ru": "пока игнорируйте DEVICE_CHANNEL_EVENT, а также регистрируйте как отладку, чтобы не заливать журнал",
+                "pt": "ignore DEVICE_CHANNEL_EVENT por enquanto e também registre como depuração para não inundar o log",
+                "nl": "negeer DEVICE_CHANNEL_EVENT voorlopig en log ook in als debug om het logboek niet te laten overstromen",
+                "fr": "ignorer DEVICE_CHANNEL_EVENT pour le moment et également se connecter en tant que débogage pour ne pas inonder le journal",
+                "it": "ignora DEVICE_CHANNEL_EVENT per ora e accedi anche come debug per non inondare il log",
+                "es": "ignore DEVICE_CHANNEL_EVENT por ahora y también registre como depuración para no inundar el registro",
+                "pl": "zignoruj na razie DEVICE_CHANNEL_EVENT, a także zaloguj się jako debug, aby nie zalać dziennika",
+                "zh-cn": "现在暂时忽略DEVICE_CHANNEL_EVENT，并作为调试记录，以不淹没日志"
+            },
             "1.5.0": {
                 "en": "Add control options for primary/secondaryShadingLevel datapoints",
                 "de": "Fügen Sie Steuerungsoptionen für primäre / sekundäre ShadingLevel-Datenpunkte hinzu",
@@ -230,18 +242,6 @@
                 "es": "Reparaciones para más dispositivos, manejo de alarmas.",
                 "pl": "poprawki dla większej liczby urządzeń, obsługa alarmów",
                 "zh-cn": "修复了更多设备，报警处理"
-            },
-            "0.0.5": {
-                "en": "more devices and big refactoring",
-                "de": "mehr Geräte und großes Refactoring",
-                "ru": "больше устройств и большой рефакторинг",
-                "pt": "mais dispositivos e grande refatoração",
-                "nl": "meer apparaten en grote refactoring",
-                "fr": "plus d'appareils et grand refactoring",
-                "it": "più dispositivi e grande refactoring",
-                "es": "Más dispositivos y grandes refactorizaciones.",
-                "pl": "więcej urządzeń i duży refaktoryzacji",
-                "zh-cn": "更多设备和大型重构"
             }
         },
         "title": "HomeMaticIP Cloud AccessPoint",
