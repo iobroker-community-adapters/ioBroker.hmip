@@ -527,6 +527,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     promises.push(...this._updateWallMountedThermostatWithoutDisplayStates(device, i));
                     break; 
                 case 'WALL_MOUNTED_THERMOSTAT_PRO_CHANNEL':
+                case 'WALL_MOUNTED_THERMOSTAT_CHANNEL':
                     promises.push(...this._updateWallMountedThermostatProChannelStates(device, i));
                     break;
                 case 'CLIMATE_SENSOR_CHANNEL':
@@ -1332,8 +1333,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     break;
                 case 'WALL_MOUNTED_THERMOSTAT_WITHOUT_DISPLAY_CHANNEL':
                     promises.push(...this._createWallMountedThermostatWithoutDisplay(device, i));
-                    break;        
+                    break;
                 case 'WALL_MOUNTED_THERMOSTAT_PRO_CHANNEL':
+                case 'WALL_MOUNTED_THERMOSTAT_CHANNEL':
                     promises.push(...this._createWallMountedThermostatProChannel(device, i));
                     break;
                 case 'CLIMATE_SENSOR_CHANNEL':
