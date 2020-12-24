@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "1.5.2",
+        "version": "1.6.0",
         "news": {
+            "1.6.0": {
+                "en": "Important note: Please limit control requests to the bare minimum because EQ-3 started to block IPs when you do too much!\nAdd support for WALL_MOUNTED_THERMOSTAT_CHANNEL",
+                "de": "Wichtiger Hinweis: Bitte beschränken Sie Steuerungsanfragen auf das Nötigste, da EQ-3 IPs blockiert, wenn Sie zu viel tun!\nUnterstützung für WALL_MOUNTED_THERMOSTAT_CHANNEL hinzufügen",
+                "ru": "Важное примечание: пожалуйста, ограничьте запросы на управление до минимума, потому что EQ-3 начал блокировать IP-адреса, когда вы делаете слишком много!\nДобавить поддержку для WALL_MOUNTED_THERMOSTAT_CHANNEL",
+                "pt": "Observação importante: limite as solicitações de controle ao mínimo, pois o EQ-3 começou a bloquear IPs quando você faz muito!\nAdicionar suporte para WALL_MOUNTED_THERMOSTAT_CHANNEL",
+                "nl": "Belangrijke opmerking: Beperk controleverzoeken tot het absolute minimum, want EQ-3 begon IP's te blokkeren als je te veel deed!\nOndersteuning toevoegen voor WALL_MOUNTED_THERMOSTAT_CHANNEL",
+                "fr": "Remarque importante: veuillez limiter les demandes de contrôle au strict minimum car EQ-3 a commencé à bloquer les adresses IP lorsque vous en faites trop!\nAjouter la prise en charge de WALL_MOUNTED_THERMOSTAT_CHANNEL",
+                "it": "Nota importante: per favore limita le richieste di controllo al minimo indispensabile perché EQ-3 ha iniziato a bloccare gli IP quando fai troppo!\nAggiungi supporto per WALL_MOUNTED_THERMOSTAT_CHANNEL",
+                "es": "Nota importante: limite las solicitudes de control al mínimo porque EQ-3 comenzó a bloquear las direcciones IP cuando hace demasiado.\nAgregar soporte para WALL_MOUNTED_THERMOSTAT_CHANNEL",
+                "pl": "Ważna uwaga: ogranicz żądania kontroli do absolutnego minimum, ponieważ EQ-3 zaczął blokować adresy IP, gdy robisz za dużo!\nDodaj obsługę WALL_MOUNTED_THERMOSTAT_CHANNEL",
+                "zh-cn": "重要说明：请将控制请求限制在最低限度，因为当您执行过多操作时，EQ-3就会开始阻止IP！\n添加对WALL_MOUNTED_THERMOSTAT_CHANNEL的支持"
+            },
             "1.5.2": {
                 "en": "ignore DEVICE_CHANNEL_EVENT for now and also log as debug to not flood log",
                 "de": "Ignorieren Sie DEVICE_CHANNEL_EVENT vorerst und protokollieren Sie auch als Debug, um das Protokoll nicht zu überfluten",
@@ -230,18 +242,6 @@
                 "es": "corrige el manejo incorrecto del estado",
                 "pl": "naprawia nieprawidłową obsługę stanu",
                 "zh-cn": "修复错误的状态处理"
-            },
-            "0.0.6": {
-                "en": "fixes for more devices, alarm handling",
-                "de": "Korrekturen für mehr Geräte, Alarmbehandlung",
-                "ru": "исправления для большего количества устройств, обработка сигналов тревоги",
-                "pt": "correções para mais dispositivos, manipulação de alarmes",
-                "nl": "reparaties voor meer apparaten, alarmafhandeling",
-                "fr": "corrections pour plus d'appareils, gestion des alarmes",
-                "it": "correzioni per più dispositivi, gestione allarmi",
-                "es": "Reparaciones para más dispositivos, manejo de alarmas.",
-                "pl": "poprawki dla większej liczby urządzeń, obsługa alarmów",
-                "zh-cn": "修复了更多设备，报警处理"
             }
         },
         "title": "HomeMaticIP Cloud AccessPoint",
