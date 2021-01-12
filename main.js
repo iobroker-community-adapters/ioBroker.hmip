@@ -333,7 +333,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         this.log.info("ws connection opened");
     }
 
-    _closed(code, reason) { 
+    _closed(code, reason) {
         this.log.warn("ws connection closed - code: " + code + " - reason: " + reason);
     }
 
@@ -391,7 +391,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 } else {
                     this.log.debug('Read Home for SECURITY_JOURNAL_CHANGED: ' + JSON.stringify(ev));
                     let state = await this._api.callRestApi('home/getCurrentState', this._api._clientCharacteristics);
-                    state && await this._updateHomeStates(state.home);
+                    state && state.home && await this._updateHomeStates(state.home);
                 }
                 break;
             case 'DEVICE_CHANNEL_EVENT':
@@ -459,7 +459,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     break;
                 case 'PASSAGE_DETECTOR_CHANNEL':
                     promises.push(...this._updatePassageDetectorChannelStates(device, i));
-                    break;           
+                    break;
                 case 'DEVICE_GLOBAL_PUMP_CONTROL':
                     promises.push(...this._updateDeviceGlobalPumpControlStates(device, i));
                     break;
@@ -525,7 +525,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     break;
                 case 'WALL_MOUNTED_THERMOSTAT_WITHOUT_DISPLAY_CHANNEL':
                     promises.push(...this._updateWallMountedThermostatWithoutDisplayStates(device, i));
-                    break; 
+                    break;
                 case 'WALL_MOUNTED_THERMOSTAT_PRO_CHANNEL':
                 case 'WALL_MOUNTED_THERMOSTAT_CHANNEL':
                     promises.push(...this._updateWallMountedThermostatProChannelStates(device, i));
@@ -1048,7 +1048,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.valveActualTemperature', device.functionalChannels[channel].valveActualTemperature, true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.valveState', device.functionalChannels[channel].valveState, true));
         return promises;
-    
+
     }
 
     _updateClimateSensorChannelStates(device, channel) {
@@ -1136,7 +1136,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 	    case 'SECURITY_ZONE': {
 		promises.push(this.secureSetStateAsync('groups.' + group.id + '.active', group.active, true));
                 break;
-            }			
+            }
         }
 
         return Promise.all(promises);
@@ -1419,7 +1419,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.simpleRGBColorState', { type: 'state', common: { name: 'simpleRGBColorState', type: 'string', role: 'text', read: true, write: true }, native: {id: device.id, channel: channel, parameter: 'setRgbDimLevel'} }));
         return promises;
     }
-	
+
     _createDoorChannel(device, channel) {
         let promises = [];
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.doorState', { type: 'state', common: { name: 'doorState', type: 'string', role: 'info', read: true, write: false }, native: {} }));
@@ -1944,7 +1944,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             case 'SECURITY_ZONE' : {
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.active', { type: 'state', common: { name: 'active', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
                 break;
-            }			
+            }
         }
 
         return Promise.all(promises);
