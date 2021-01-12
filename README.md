@@ -53,7 +53,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
-### __WORK IN PROGRESS__
+### 1.6.1 (2021-01-12)
 * (Apollon77) Prevent crash case (Sentry IOBROKER-HMIP-1N)
 
 ### 1.6.0 (2020-12-24)
