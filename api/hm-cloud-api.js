@@ -78,6 +78,9 @@ class HmCloudAPI {
             this._urlREST = res.urlREST;
             this._urlWebSocket = res.urlWebSocket;
         }
+        if (!this._urlREST || !this._urlWebSocket) {
+            throw "Could not get host details. Please check the SGTIN.";
+        }
     }
 
     // =========== API for Token generation ===========
@@ -273,7 +276,7 @@ class HmCloudAPI {
         let data = { "deviceId": deviceId, "on": on, "channelIndex": channelIndex };
         await this.callRestApi('device/control/setSwitchState', data);
     }
-    
+
     //door commands as number: 1 = open; 2 = stop; 3 = close; 4 = ventilation position
     async deviceControlSendDoorCommand(deviceId, doorCommand, channelIndex = 1) {
         let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'doorCommand': doorCommand };
