@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "1.6.1",
+        "version": "1.6.2",
         "news": {
+            "1.6.2": {
+                "en": "Add check when HMIP domain could not be determined.",
+                "de": "Prüfung hinzufügen, wenn die HMIP-Domäne nicht ermittelt werden konnte.",
+                "ru": "Добавить проверку, когда не удалось определить HMIP-домен.",
+                "pt": "Adicionar verificação quando o domínio HMIP não puder ser determinado.",
+                "nl": "Voeg een vinkje toe als het HMIP-domein niet kon worden bepaald.",
+                "fr": "Ajoutez une vérification lorsque le domaine HMIP n'a pas pu être déterminé.",
+                "it": "Aggiungere un controllo quando non è stato possibile determinare il dominio HMIP.",
+                "es": "Agregue una marca cuando no se pudo determinar el dominio HMIP.",
+                "pl": "Dodaj sprawdzenie, gdy nie można określić domeny HMIP.",
+                "zh-cn": "无法确定HMIP域时添加检查。"
+            },
             "1.6.1": {
                 "en": "Prevent crash case (Sentry IOBROKER-HMIP-1N)",
                 "de": "Absturz verhindern (Sentry IOBROKER-HMIP-1N)",
@@ -230,18 +242,6 @@
                 "es": "Canal fullrx y operationlock",
                 "pl": "kanał fullrx i operationlock",
                 "zh-cn": "fullrx和operationlock通道"
-            },
-            "0.0.8": {
-                "en": "fixes a few devices",
-                "de": "behebt ein paar Geräte",
-                "ru": "исправляет несколько устройств",
-                "pt": "corrige alguns dispositivos",
-                "nl": "repareert een paar apparaten",
-                "fr": "corrige quelques appareils",
-                "it": "corregge alcuni dispositivi",
-                "es": "arregla algunos dispositivos",
-                "pl": "naprawia kilka urządzeń",
-                "zh-cn": "修复了一些设备"
             }
         },
         "title": "HomeMaticIP Cloud AccessPoint",

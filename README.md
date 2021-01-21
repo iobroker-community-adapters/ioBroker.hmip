@@ -53,7 +53,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
-### __WORK IN PROGRESS__
+### 1.6.2 (2021-01-21)
 * (Apollon77) Add check when HMIP domain could not be determined.
 
 ### 1.6.1 (2021-01-12)
