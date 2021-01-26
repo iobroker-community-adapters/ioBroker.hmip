@@ -435,6 +435,10 @@ class HmCloudAPI {
         await this.callRestApi('home/heating/activateAbsenceWithDuration', data);
     }
 
+    async homeHeatingActivateAbsencePermanent() {
+        await this.callRestApi('home/heating/activateAbsencePermanent');
+    }
+
     async homeHeatingDeactivateAbsence() {
         await this.callRestApi('home/heating/deactivateAbsence');
     }

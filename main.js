@@ -264,6 +264,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'deactivateAbsence':
                     await this._api.homeHeatingDeactivateAbsence();
                     break;
+                case 'setAbsencePermanent':
+                    await this._api.homeHeatingActivateAbsencePermanent();
+                    break;
                 case 'setIntrusionAlertThroughSmokeDetectors':
                     await this._api.homeSetIntrusionAlertThroughSmokeDetectors(state.val);
                     break;
@@ -541,6 +544,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     break;
                 case 'BLIND_CHANNEL':
                     promises.push(...this._updateBlindChannelStates(device, i));
+                    break;
+                case 'MULTI_MODE_INPUT_BLIND_CHANNEL':
+                    promises.push(...this._updateMultiModeInputBlindChannelStates(device, i));
                     break;
                 case 'ROTARY_HANDLE_CHANNEL':
                     promises.push(...this._updateRotaryHandleChannelStates(device, i));
@@ -911,6 +917,16 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.previousSlatsLevel', device.functionalChannels[channel].previousSlatsLevel, true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.slatsReferenceTime', device.functionalChannels[channel].slatsReferenceTime, true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.blindModeActive', device.functionalChannels[channel].blindModeActive, true));
+        return promises;
+    }
+
+    _updateMultiModeInputBlindChannelStates(device, channel) {
+        let promises = [];
+        promises.push(...this._updateBlindChannelStates(device, channel));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.binaryBehaviorType', device.functionalChannels[channel].binaryBehaviorType, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.multiModeInputMode', device.functionalChannels[channel].multiModeInputMode, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.favoritePrimaryShadingPosition', device.functionalChannels[channel].favoritePrimaryShadingPosition, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.favoriteSecondaryShadingPosition', device.functionalChannels[channel].favoriteSecondaryShadingPosition, true));
         return promises;
     }
 
@@ -1350,6 +1366,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'BLIND_CHANNEL':
                     promises.push(...this._createBlindChannel(device, i));
                     break;
+                case 'MULTI_MODE_INPUT_BLIND_CHANNEL':
+                    promises.push(...this._createMultiModeInputBlindChannel(device, i));
+                    break;
                 case 'ROTARY_HANDLE_CHANNEL':
                     promises.push(...this._createRotaryHandleChannel(device, i));
                     break;
@@ -1712,6 +1731,16 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         return promises;
     }
 
+    _createMultiModeInputBlindChannel(device, channel) {
+        let promises = [];
+        promises.push(...this._createBlindChannel(device, channel));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.binaryBehaviorType', { type: 'state', common: { name: 'binaryBehaviorType', type: 'string', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.multiModeInputMode', { type: 'state', common: { name: 'multiModeInputMode', type: 'string', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.favoritePrimaryShadingPosition', { type: 'state', common: { name: 'favoritePrimaryShadingPosition', type: 'number', role: 'level', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.favoriteSecondaryShadingPosition', { type: 'state', common: { name: 'favoriteSecondaryShadingPosition', type: 'number', role: 'level', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
     _createHeatingThermostatChannel(device, channel) {
         let promises = [];
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOffset', { type: 'state', common: { name: 'temperatureOffset', type: 'number', role: 'value', unit: '°C', read: true, write: false }, native: {} }));
@@ -2012,6 +2041,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.setAbsenceEndTime', { type: 'state', common: { name: 'setAbsenceEndTime', type: 'string', role: 'text', read: false, write: true }, native: { parameter: 'setAbsenceEndTime' } }));
         promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.setAbsenceDuration', { type: 'state', common: { name: 'setAbsenceDuration', type: 'string', role: 'text', read: false, write: true }, native: { parameter: 'setAbsenceDuration' } }));
         promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.deactivateAbsence', { type: 'state', common: { name: 'deactivateAbsence', type: 'boolean', role: 'button', read: false, write: true }, native: { parameter: 'deactivateAbsence' } }));
+        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.activateAbsencePermanent', { type: 'state', common: { name: 'activateAbsencePermanent', type: 'boolean', role: 'button', read: false, write: true }, native: { parameter: 'setAbsencePermanent' } }));
 
         promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.lightAndShadow.active', { type: 'state', common: { name: 'active', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
 

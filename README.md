@@ -53,6 +53,10 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
+### __WORK IN PROGRESS__
+* (Apollon77) add Heating Absence Permanent state and functionality
+* (Apollon77) add support for MULTI_MODE_INPUT_BLIND_CHANNEL
+
 ### 1.6.2 (2021-01-21)
 * (Apollon77) Add check when HMIP domain could not be determined.
 
