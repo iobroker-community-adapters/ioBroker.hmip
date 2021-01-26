@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "1.6.2",
+        "version": "1.7.0",
         "news": {
+            "1.7.0": {
+                "en": "add Heating Absence Permanent state and functionality\nadd support for MULTI_MODE_INPUT_BLIND_CHANNEL",
+                "de": "Heizungsabwesenheit hinzufügen Permanenter Status und Funktionalität\nUnterstützung für MULTI_MODE_INPUT_BLIND_CHANNEL hinzufügen",
+                "ru": "добавить Отопление Отсутствие Постоянное состояние и функциональность\nдобавить поддержку MULTI_MODE_INPUT_BLIND_CHANNEL",
+                "pt": "adicionar funcionalidade e estado permanente de ausência de aquecimento\nadicionar suporte para MULTI_MODE_INPUT_BLIND_CHANNEL",
+                "nl": "add Verwarming Afwezigheid Permanente staat en functionaliteit\nondersteuning toevoegen voor MULTI_MODE_INPUT_BLIND_CHANNEL",
+                "fr": "ajouter Absence de chauffage État permanent et fonctionnalité\najouter la prise en charge de MULTI_MODE_INPUT_BLIND_CHANNEL",
+                "it": "aggiungere lo stato e la funzionalità permanente dell'assenza di riscaldamento\naggiungi il supporto per MULTI_MODE_INPUT_BLIND_CHANNEL",
+                "es": "añadir estado y funcionalidad de ausencia de calefacción permanente\nagregar soporte para MULTI_MODE_INPUT_BLIND_CHANNEL",
+                "pl": "dodaj Brak ogrzewania Stały stan i funkcjonalność\ndodaj obsługę MULTI_MODE_INPUT_BLIND_CHANNEL",
+                "zh-cn": "添加加热缺席永久状态和功能\n添加对MULTI_MODE_INPUT_BLIND_CHANNEL的支持"
+            },
             "1.6.2": {
                 "en": "Add check when HMIP domain could not be determined.",
                 "de": "Prüfung hinzufügen, wenn die HMIP-Domäne nicht ermittelt werden konnte.",
@@ -230,18 +242,6 @@
                 "es": "añadido ping / pong, habilitar setBoots, más unidades, más hardware",
                 "pl": "dodano ping / pong, włącz setBoots, więcej jednostek, więcej sprzętu",
                 "zh-cn": "添加ping / pong，启用setBoots，更多单元，更多硬件"
-            },
-            "0.0.9": {
-                "en": "fullrx and operationlock channel",
-                "de": "Fullrx und Operationssperrenkanal",
-                "ru": "fullrx и канал блокировки операций",
-                "pt": "canal fullrx e operação",
-                "nl": "fullrx en operationlock-kanaal",
-                "fr": "canal fullrx et operationlock",
-                "it": "canale fullrx e operationlock",
-                "es": "Canal fullrx y operationlock",
-                "pl": "kanał fullrx i operationlock",
-                "zh-cn": "fullrx和operationlock通道"
             }
         },
         "title": "HomeMaticIP Cloud AccessPoint",
