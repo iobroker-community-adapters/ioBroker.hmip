@@ -30,6 +30,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         this._unloaded = false;
         this._requestTokenState = { state: 'idle' };
 
+        this.wsConnected = false;
+        this.wsConnectionErrorCounter = 0;
+
         this.sendUnknownInfos = {};
     }
 
@@ -334,14 +337,23 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _opened() {
         this.log.info("ws connection opened");
+        this.wsConnected = true;
     }
 
     _closed(code, reason) {
         this.log.warn("ws connection closed - code: " + code + " - reason: " + reason);
+        this.wsConnected = false;
+        if (this.wsConnectionErrorCounter > 10 && !this._unloaded) {
+            this._api.dispose();
+            this._ready();
+        }
     }
 
     _errored(error) {
         this.log.warn("ws connection error: " + error);
+        if (!this.wsConnected) {
+            this.wsConnectionErrorCounter++;
+        }
     }
 
     _requestError(error) {
