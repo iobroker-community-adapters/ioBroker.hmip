@@ -3,18 +3,6 @@
         "name": "hmip",
         "version": "1.7.1",
         "news": {
-            "1.7.1": {
-                "en": "Try to detect websocket connection failures start over",
-                "de": "Versuchen Sie, Fehler bei der Websocket-Verbindung zu erkennen",
-                "ru": "Попытайтесь обнаружить сбои подключения к веб-сокету, начните заново",
-                "pt": "Tente detectar falhas de conexão do websocket reinicie",
-                "nl": "Probeer opnieuw te beginnen met het detecteren van storingen in de websocket-verbinding",
-                "fr": "Essayez de détecter les échecs de connexion Websocket recommencer",
-                "it": "Prova a rilevare errori di connessione websocket ricominciare",
-                "es": "Intente detectar fallas de conexión de websocket comience de nuevo",
-                "pl": "Spróbuj wykryć awarie połączenia WebSocket, zacznij od nowa",
-                "zh-cn": "尝试检测Websocket连接失败重新开始"
-            },
             "1.7.0": {
                 "en": "add Heating Absence Permanent state and functionality\nadd support for MULTI_MODE_INPUT_BLIND_CHANNEL",
                 "de": "Heizungsabwesenheit hinzufügen Permanenter Status und Funktionalität\nUnterstützung für MULTI_MODE_INPUT_BLIND_CHANNEL hinzufügen",
