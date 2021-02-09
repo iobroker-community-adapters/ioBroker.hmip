@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "1.7.0",
+        "version": "1.7.1",
         "news": {
+            "1.7.1": {
+                "en": "Try to detect websocket connection failures start over",
+                "de": "Versuchen Sie, Fehler bei der Websocket-Verbindung zu erkennen",
+                "ru": "Попытайтесь обнаружить сбои подключения к веб-сокету, начните заново",
+                "pt": "Tente detectar falhas de conexão do websocket reinicie",
+                "nl": "Probeer opnieuw te beginnen met het detecteren van storingen in de websocket-verbinding",
+                "fr": "Essayez de détecter les échecs de connexion Websocket recommencer",
+                "it": "Prova a rilevare errori di connessione websocket ricominciare",
+                "es": "Intente detectar fallas de conexión de websocket comience de nuevo",
+                "pl": "Spróbuj wykryć awarie połączenia WebSocket, zacznij od nowa",
+                "zh-cn": "尝试检测Websocket连接失败重新开始"
+            },
             "1.7.0": {
                 "en": "add Heating Absence Permanent state and functionality\nadd support for MULTI_MODE_INPUT_BLIND_CHANNEL",
                 "de": "Heizungsabwesenheit hinzufügen Permanenter Status und Funktionalität\nUnterstützung für MULTI_MODE_INPUT_BLIND_CHANNEL hinzufügen",
@@ -230,18 +242,6 @@
                 "es": "múltiples correcciones",
                 "pl": "wiele poprawek",
                 "zh-cn": "多个修复程序"
-            },
-            "0.0.10": {
-                "en": "added ping/pong, enable setBoots, more units, more hardware",
-                "de": "Ping / Pong hinzugefügt, SetBoots aktiviert, mehr Einheiten, mehr Hardware",
-                "ru": "добавлен ping / pong, активирован setBoots, больше юнитов, больше оборудования",
-                "pt": "adicionado ping / pong, habilitar setBoots, mais unidades, mais hardware",
-                "nl": "ping / pong toegevoegd, setbooten inschakelen, meer eenheden, meer hardware",
-                "fr": "Ping / Pong ajouté, activer setBoots, plus d'unités, plus de matériel",
-                "it": "aggiunto ping / pong, abilita setBoots, più unità, più hardware",
-                "es": "añadido ping / pong, habilitar setBoots, más unidades, más hardware",
-                "pl": "dodano ping / pong, włącz setBoots, więcej jednostek, więcej sprzętu",
-                "zh-cn": "添加ping / pong，启用setBoots，更多单元，更多硬件"
             }
         },
         "title": "HomeMaticIP Cloud AccessPoint",
