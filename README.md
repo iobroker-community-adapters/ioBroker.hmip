@@ -53,7 +53,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
-### __WORK IN PROGRESS__
+### 1.7.2 (2021-02-09)
 * (Apollon77) Try to detect websocket connection failures start over
 
 ### 1.7.0 (2021-01-26)
