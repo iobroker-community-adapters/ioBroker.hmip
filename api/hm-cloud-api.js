@@ -9,7 +9,7 @@ const webSocket = require('ws');
 
 class HmCloudAPI {
     constructor(configDataOrApId, pin) {
-        if (configDataOrApId != null) {
+        if (configDataOrApId !== undefined) {
             this.parseConfigData(configDataOrApId, pin);
         }
 
@@ -189,7 +189,7 @@ class HmCloudAPI {
             }
             if (!this.isClosed) {
                 this._connectTimeout && clearTimeout(this._connectTimeout);
-                this._connectTimeout = setTimeout(() => this.connectWebsocket(), 1000);
+                this._connectTimeout = setTimeout(() => this.connectWebsocket(), 10000);
             }
         });
 
@@ -198,7 +198,7 @@ class HmCloudAPI {
                 this.errored(error);
             if (!this.isClosed) {
                 this._connectTimeout && clearTimeout(this._connectTimeout);
-                this._connectTimeout = setTimeout(() => this.connectWebsocket(), 1000);
+                this._connectTimeout = setTimeout(() => this.connectWebsocket(), 10000);
             }
         });
 
@@ -207,7 +207,7 @@ class HmCloudAPI {
                 this.unexpectedResponse(request, response);
             if (!this.isClosed) {
                 this._connectTimeout && clearTimeout(this._connectTimeout);
-                this._connectTimeout = setTimeout(() => this.connectWebsocket(), 1000);
+                this._connectTimeout = setTimeout(() => this.connectWebsocket(), 10000);
             }
         });
 
