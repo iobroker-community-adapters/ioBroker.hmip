@@ -1,6 +1,6 @@
 {
   "name": "iobroker.hmip",
-  "version": "1.7.2",
+  "version": "1.8.0",
   "description": "ioBroker Adapter to use the Homatic Cloud Ip AccessPoint via Homatic Cloud Rest API",
   "author": {
     "name": "jogibear9988",
@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@iobroker/adapter-core": "^2.4.0",
-    "delay": "^4.4.1",
+    "delay": "^5.0.0",
     "js-sha512": "^0.8.0",
     "request-promise-native": "^1.0.9",
     "request": "^2.88.2",
@@ -39,7 +39,7 @@
     "@alcalzone/release-script": "^1.8.3",
     "chai": "^4.3.0",
     "gulp": "^4.0.2",
-    "mocha": "^8.2.1",
+    "mocha": "^8.3.0",
     "@vitalets/google-translate-api": "github:vitalets/google-translate-api",
     "configstore": "^5.0.1",
     "axios": "^0.21.1",

@@ -34,6 +34,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         this.wsConnectionErrorCounter = 0;
 
         this.sendUnknownInfos = {};
+
+        this.currentValues = {};
+        this.delayTimeouts = {};
     }
 
     _unload(callback) {
@@ -182,77 +185,139 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         this.log.info('hmip adapter connected and ready');
     }
 
-    async _stateChange(id, state) {
-        if (!id || !state || state.ack) return;
+    round(value, step) {
+        step = step || 1.0;
+        const inv = 1.0 / step;
+        return Math.round(value * inv) / inv;
+    }
 
-        let o = await this.getObjectAsync(id);
-        if (o && o.native && o.native.parameter) {
-            this.log.info('state change - ' + o.native.parameter + ' - id ' + (o.native.id ? o.native.id : '') + ' - value ' + state.val);
+    async _doStateChange(id, o, state) {
+        try {
             switch (o.native.parameter) {
                 case 'switchState':
+                    if (state.val === this.currentValues[id]) {
+                        this.log.info(`Value unchanged, do not send this value`);
+                        return;
+                    }
                     await this._api.deviceControlSetSwitchState(o.native.id, state.val, o.native.channel);
                     break;
                 case 'sendDoorCommand':
+                    if (state.val === this.currentValues[id]) {
+                        this.log.info(`Value unchanged, do not send this value`);
+                        return;
+                    }
                     await this._api.deviceControlSendDoorCommand(o.native.id, state.val, o.native.channel);
                     break;
                 case 'resetEnergyCounter':
                     await this._api.deviceControlResetEnergyCounter(o.native.id, o.native.channel);
                     break;
                 case 'shutterlevel':
+                    if (state.val === this.currentValues[id]) {
+                        this.log.info(`Value unchanged, do not send this value`);
+                        return;
+                    }
                     await this._api.deviceControlSetShutterLevel(o.native.id, state.val, o.native.channel);
                     break;
                 case 'slatsLevel':
                     let slats = await this.getStateAsync('devices.' + o.native.id + '.channels.' + o.native.channel + '.slatsLevel');
                     let shutter = await this.getStateAsync('devices.' + o.native.id + '.channels.' + o.native.channel + '.shutterLevel');
+                    if (slats.val === this.currentValues['devices.' + o.native.id + '.channels.' + o.native.channel + '.slatsLevel'] && shutter.val === this.currentValues['devices.' + o.native.id + '.channels.' + o.native.channel + '.shutterLevel']) {
+                        this.log.info(`Value unchanged, do not send this value`);
+                        return;
+                    }
                     await this._api.deviceControlSetSlatsLevel(o.native.id, slats.val, shutter.val, o.native.channel);
                     break;
                 case 'setPrimaryShadingLevel':
+                    if (state.val === this.currentValues[id]) {
+                        this.log.info(`Value unchanged, do not send this value`);
+                        return;
+                    }
                     await this._api.deviceControlSetPrimaryShadingLevel(o.native.id, state.val, o.native.channel);
                     break;
                 case 'setSecondaryShadingLevel':
                     let primary = await this.getStateAsync('devices.' + o.native.id + '.channels.' + o.native.channel + '.primaryShadingLevel');
                     let secondary = await this.getStateAsync('devices.' + o.native.id + '.channels.' + o.native.channel + '.secondaryShadingLevel');
+                    if (primary.val === this.currentValues['devices.' + o.native.id + '.channels.' + o.native.channel + '.primaryShadingLevel'] && secondary.val === this.currentValues['devices.' + o.native.id + '.channels.' + o.native.channel + '.secondaryShadingLevel']) {
+                        this.log.info(`Value unchanged, do not send this value`);
+                        return;
+                    }
                     await this._api.deviceControlSetSecondaryShadingLevel(o.native.id, primary.val, secondary.val, o.native.channel);
                     break;
                 case 'stop':
                     await this._api.deviceControlStop(o.native.id, o.native.channel);
                     break;
                 case 'setPointTemperature':
+                    if (state.val === this.currentValues[id]) {
+                        this.log.info(`Value unchanged, do not send this value`);
+                        return;
+                    }
                     for (let id of o.native.id) {
                         await this._api.groupHeatingSetPointTemperature(id, state.val);
                     }
                     break;
                 case 'setBoost':
+                    if (state.val === this.currentValues[id]) {
+                        this.log.info(`Value unchanged, do not send this value`);
+                        return;
+                    }
                     for (let id of o.native.id) {
                         await this._api.groupHeatingSetBoost(id, state.val);
                     }
                     break;
                 case 'setActiveProfile':
+                    if (state.val === this.currentValues[id]) {
+                        this.log.info(`Value unchanged, do not send this value`);
+                        return;
+                    }
                     for (let id of o.native.id) {
                         await this._api.groupHeatingSetActiveProfile(id, state.val);
                     }
                     break;
                 case 'setControlMode':
+                    if (state.val === this.currentValues[id]) {
+                        this.log.info(`Value unchanged, do not send this value`);
+                        return;
+                    }
                     for (let id of o.native.id) {
                         await this._api.groupHeatingSetControlMode(id, state.val);
                     }
                     break;
                 case 'setOperationLock':
+                    if (state.val === this.currentValues[id]) {
+                        this.log.info(`Value unchanged, do not send this value`);
+                        return;
+                    }
                     await this._api.deviceConfigurationSetOperationLock(o.native.id, state.val, o.native.channel);
                     break;
                 case 'setClimateControlDisplay':
+                    if (state.val === this.currentValues[id]) {
+                        this.log.info(`Value unchanged, do not send this value`);
+                        return;
+                    }
                     await this._api.deviceConfigurationSetClimateControlDisplay(o.native.id, state.val, o.native.channel);
                     break;
                 case 'setMinimumFloorHeatingValvePosition':
+                    if (state.val === this.currentValues[id]) {
+                        this.log.info(`Value unchanged, do not send this value`);
+                        return;
+                    }
                     await this._api.deviceConfigurationSetMinimumFloorHeatingValvePosition(o.native.id, state.val, o.native.channel);
                     break;
                 case 'setDimLevel':
+                    if (state.val === this.currentValues[id]) {
+                        this.log.info(`Value unchanged, do not send this value`);
+                        return;
+                    }
                     await this._api.deviceControlSetDimLevel(o.native.id, state.val, o.native.channel);
                     break;
                 case 'setRgbDimLevel':
                     let rgb = await this.getStateAsync('devices.' + o.native.id + '.channels.' + o.native.channel + '.simpleRGBColorState');
                     let dimLevel = await this.getStateAsync('devices.' + o.native.id + '.channels.' + o.native.channel + '.dimLevel');
                     if (dimLevel > 1) dimLevel = dimLevel / 100;
+                    if (rgb.val === this.currentValues['devices.' + o.native.id + '.channels.' + o.native.channel + '.simpleRGBColorState'] && dimLevel.val === this.currentValues['devices.' + o.native.id + '.channels.' + o.native.channel + '.dimLevel']) {
+                        this.log.info(`Value unchanged, do not send this value`);
+                        return;
+                    }
                     await this._api.deviceControlSetRgbDimLevel(o.native.id, rgb.val, dimLevel.val, o.native.channel);
                     break;
                 case 'changeOverDelay':
@@ -271,6 +336,10 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     await this._api.homeHeatingActivateAbsencePermanent();
                     break;
                 case 'setIntrusionAlertThroughSmokeDetectors':
+                    if (state.val === this.currentValues[id]) {
+                        this.log.info(`Value unchanged, do not send this value`);
+                        return;
+                    }
                     await this._api.homeSetIntrusionAlertThroughSmokeDetectors(state.val);
                     break;
                 case 'activateVacation':
@@ -327,6 +396,61 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                         }
                     }
                     break;
+            }
+        } catch (err) {
+            this.log.warn(`${o.native.parameter} - id ${o.native.id ? o.native.id : ''} - state change error: ${err}`);
+        }
+    }
+
+    async _stateChange(id, state) {
+        if (!id || !state) return;
+
+        if (state.ack) { // remember last official value of the state
+            this.currentValues[id] = state.val;
+            return;
+        }
+
+        let o = await this.getObjectAsync(id);
+        if (o && o.native && o.native.parameter) {
+            if (o.native.step) {
+                state.val = this.round(state.val, o.native.step);
+                this.log.info(`state change - ${o.native.parameter} - id ${o.native.id ? o.native.id : ''} - value rounded to ${state.val} (step=${o.native.step} )`);
+            } else {
+                this.log.info(`state change - ${o.native.parameter} - id ${o.native.id ? o.native.id : ''} - value ${state.val}`);
+            }
+
+            if (o.native.debounce) {
+                // if debounce and value is the same, ignore call
+                if (this.delayTimeouts[id] && this.delayTimeouts[id].timeout && this.delayTimeouts[id].lastVal === state.val) {
+                    this.log.debug(`${o.native.parameter} - id ${o.native.id ? o.native.id : ''} - Debounce waiting - value stable`);
+                    return;
+                }
+            } else {
+                // if running timeout and not debounce, requests come in too fast
+                if (this.delayTimeouts[id] && this.delayTimeouts[id].timeout) {
+                    this.log.info(`${o.native.parameter} - id ${o.native.id ? o.native.id : ''} - Too fast value changes, change blocked!`);
+                    return;
+                }
+            }
+            this.delayTimeouts[id] = this.delayTimeouts[id] || {};
+            // clear timeout if one is running
+            if (this.delayTimeouts[id].timeout) {
+                clearTimeout(this.delayTimeouts[id].timeout);
+                delete this.delayTimeouts[id].timeout;
+            }
+            if (o.native.debounce) {
+                // debounce, delay sending command
+                this.delayTimeouts[id].lastVal = state.val;
+                this.delayTimeouts[id].timeout = setTimeout((id, o, state) => {
+                    this.delayTimeouts[id].timeout = null;
+                    this.log.debug(`${o.native.parameter} - id ${o.native.id ? o.native.id : ''} - Send debounced value ${state.val} now to HMIP`);
+                    this._doStateChange(id, o, state);
+                }, o.native.debounce, id, o, state)
+            } else {
+                this.delayTimeouts[id].timeout = setTimeout(() => {
+                    this.delayTimeouts[id].timeout = null;
+                }, o.native.throttle || 1000)
+                await this._doStateChange(id, o, state)
             }
         }
     }
@@ -544,6 +668,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'WALL_MOUNTED_THERMOSTAT_PRO_CHANNEL':
                 case 'WALL_MOUNTED_THERMOSTAT_CHANNEL':
                     promises.push(...this._updateWallMountedThermostatProChannelStates(device, i));
+                    break;
+                case 'ANALOG_ROOM_CONTROL_CHANNEL':
+                    promises.push(...this._updateAnalogRoomControlChannelStates(device, i));
                     break;
                 case 'CLIMATE_SENSOR_CHANNEL':
                     promises.push(...this._updateClimateSensorChannelStates(device, i));
@@ -1095,6 +1222,14 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         return promises;
     }
 
+    _updateAnalogRoomControlChannelStates(device, channel) {
+        let promises = [];
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.actualTemperature', device.functionalChannels[channel].actualTemperature, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOffset', device.functionalChannels[channel].temperatureOffset, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.setPointTemperature', device.functionalChannels[channel].setPointTemperature, true));
+        return promises;
+    }
+
     _updateWallMountedThermostatProChannelStates(device, channel) {
         let promises = [];
         promises.push(...this._updateWallMountedThermostatWithoutDisplayStates(device, channel));
@@ -1365,6 +1500,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'WALL_MOUNTED_THERMOSTAT_PRO_CHANNEL':
                 case 'WALL_MOUNTED_THERMOSTAT_CHANNEL':
                     promises.push(...this._createWallMountedThermostatProChannel(device, i));
+                    break;
+                case 'ANALOG_ROOM_CONTROL_CHANNEL':
+                    promises.push(...this._createAnalogRoomControlChannel(device, i));
                     break;
                 case 'CLIMATE_SENSOR_CHANNEL':
                     promises.push(...this._createClimateSensorChannel(device, i));
@@ -1757,7 +1895,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         let promises = [];
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOffset', { type: 'state', common: { name: 'temperatureOffset', type: 'number', role: 'value', unit: '°C', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.valvePosition', { type: 'state', common: { name: 'valvePosition', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'level.temperature', unit: '°C', read: true, write: true }, native: { id: device.functionalChannels[channel].groups, parameter: 'setPointTemperature' } }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'level.temperature', unit: '°C', read: true, write: true }, native: { id: device.functionalChannels[channel].groups, step: 0.5, debounce: 5000, parameter: 'setPointTemperature' } }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.valveActualTemperature', { type: 'state', common: { name: 'valveActualTemperature', type: 'number', role: 'value.temperature', unit: '°C', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.valveState', { type: 'state', common: { name: 'valveState', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         return promises;
@@ -1903,7 +2041,15 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         let promises = [];
         promises.push(...this._createClimateSensorChannel(device, channel));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOffset', { type: 'state', common: { name: 'temperatureOffset', type: 'number', role: 'thermo', unit: '°C', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'thermo', unit: '°C', read: true, write: true }, native: { id: device.functionalChannels[channel].groups, parameter: 'setPointTemperature' } }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'thermo', unit: '°C', read: true, write: true }, native: { id: device.functionalChannels[channel].groups, step: 0.5, debounce: 5000, parameter: 'setPointTemperature' } }));
+        return promises;
+    }
+
+    _createAnalogRoomControlChannel(device, channel) {
+        let promises = [];
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'value.temperature', unit: '°C', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOffset', { type: 'state', common: { name: 'temperatureOffset', type: 'number', role: 'thermo', unit: '°C', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'thermo', unit: '°C', read: true, write: true }, native: { id: device.functionalChannels[channel].groups, step: 0.5, debounce: 5000, parameter: 'setPointTemperature' } }));
         return promises;
     }
 
@@ -1943,7 +2089,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         switch (group.type) {
             case 'HEATING': {
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.windowOpenTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'thermo', unit: '°C', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'thermo', unit: '°C', read: true, write: true }, native: { id: [group.id], parameter: 'setPointTemperature' } }));
+                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'thermo', unit: '°C', read: true, write: true }, native: { id: [group.id], step: 0.5, debounce: 5000, parameter: 'setPointTemperature' } }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.minTemperature', { type: 'state', common: { name: 'minTemperature', type: 'number', role: 'thermo', unit: '°C', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.maxTemperature', { type: 'state', common: { name: 'maxTemperature', type: 'number', role: 'thermo', unit: '°C', read: true, write: false }, native: {} }));
                 promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.windowState', { type: 'state', common: { name: 'windowState', type: 'string', role: 'thermo', read: true, write: false }, native: {} }));

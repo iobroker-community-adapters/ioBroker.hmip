@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "hmip",
-        "version": "1.7.2",
+        "version": "1.8.0",
         "news": {
             "1.7.2": {
                 "en": "Try to detect websocket connection failures start over",
