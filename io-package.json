@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "1.8.0",
+        "version": "1.9.0",
         "news": {
+            "1.9.0": {
+                "en": "Round temperature values to nearest 0.5 degrees\nOnly send values to HMIP when changed (reduce traffic!)\nAdd debouncing to setPointTemperature changes (means value is sent out when \"stable\" for 5s!) (reduce traffic!)\nAdd throttling to other change requests (means other changes are blocked for 1s) (reduce traffic!)\nImplement ANALOG_ROOM_CONTROL_CHANNEL (Sentry IOBROKER-HMIP-1X)",
+                "de": "Runden Sie die Temperaturwerte auf 0,5 Grad ab\nSenden Sie Werte nur bei Änderung an HMIP (reduzieren Sie den Datenverkehr!)\nHinzufügen von Entprellen zu Änderungen von setPointTemperature (bedeutet, dass der Wert gesendet wird, wenn er 5 Sekunden lang \"stabil\" ist!) (Reduzieren Sie den Datenverkehr!)\nFügen Sie anderen Änderungsanforderungen eine Drosselung hinzu (bedeutet, dass andere Änderungen für 1 Sekunde blockiert sind) (reduzieren Sie den Datenverkehr!)\nImplementieren Sie ANALOG_ROOM_CONTROL_CHANNEL (Sentry IOBROKER-HMIP-1X)",
+                "ru": "Круглые значения температуры с точностью до 0,5 градуса\nОтправлять значения в HMIP только при изменении (уменьшить трафик!)\nДобавьте debouncing к изменениям setPointTemperature (означает, что значение отправляется, когда \"стабильно\" в течение 5 секунд!) (Уменьшите трафик!)\nДобавьте регулирование для других запросов на изменение (означает, что другие изменения заблокированы на 1 с) (уменьшите трафик!)\nВнедрить ANALOG_ROOM_CONTROL_CHANNEL (Sentry IOBROKER-HMIP-1X)",
+                "pt": "Arredondar os valores de temperatura para o próximo 0,5 grau\nSomente envie valores para HMIP quando alterados (reduza o tráfego!)\nAdicione debouncing às mudanças de setPointTemperature (significa que o valor é enviado quando \"estável\" por 5s!) (Reduza o tráfego!)\nAdicionar limitação a outras solicitações de alteração (significa que outras alterações são bloqueadas por 1s) (reduza o tráfego!)\nImplementar ANALOG_ROOM_CONTROL_CHANNEL (Sentry IOBROKER-HMIP-1X)",
+                "nl": "Rond temperatuurwaarden af op 0,5 graden\nStuur alleen waarden naar HMIP wanneer deze zijn gewijzigd (verminder verkeer!)\nVoeg debouncing toe aan setPointTemperature-wijzigingen (betekent dat de waarde wordt verzonden wanneer deze gedurende 5 seconden \"stabiel\" is!) (Verminder het verkeer!)\nVoeg beperking toe aan andere wijzigingsverzoeken (betekent dat andere wijzigingen gedurende 1 seconde worden geblokkeerd) (verminder verkeer!)\nImplementeer ANALOG_ROOM_CONTROL_CHANNEL (Sentry IOBROKER-HMIP-1X)",
+                "fr": "Arrondir les valeurs de température à 0,5 degré près\nN'envoyez les valeurs à HMIP que lorsqu'elles sont modifiées (réduisez le trafic!)\nAjouter un anti-rebond aux changements de setPointTemperature (signifie que la valeur est envoyée quand \"stable\" pendant 5s!) (Réduire le trafic!)\nAjoutez une limitation aux autres demandes de modification (signifie que les autres modifications sont bloquées pendant 1 s) (réduisez le trafic!)\nImplémenter ANALOG_ROOM_CONTROL_CHANNEL (Sentry IOBROKER-HMIP-1X)",
+                "it": "Arrotonda i valori di temperatura agli 0,5 gradi più vicini\nInvia valori a HMIP solo quando vengono modificati (riduci il traffico!)\nAggiungi l'antirimbalzo alle modifiche di setPointTemperature (significa che il valore viene inviato quando \"stabile\" per 5 secondi!) (Riduci il traffico!)\nAggiungi throttling ad altre richieste di modifica (significa che altre modifiche sono bloccate per 1 secondo) (riduci il traffico!)\nImplementa ANALOG_ROOM_CONTROL_CHANNEL (Sentry IOBROKER-HMIP-1X)",
+                "es": "Redondee los valores de temperatura a los 0,5 grados más cercanos\nSolo envíe valores a HMIP cuando se modifiquen (¡reduzca el tráfico!)\nAgregue antirrebote a los cambios de setPointTemperature (¡significa que el valor se envía cuando está \"estable\" durante 5 segundos!) (¡Reduzca el tráfico!)\nAgregue limitación a otras solicitudes de cambio (significa que otros cambios se bloquean durante 1 s) (¡reduzca el tráfico!)\nImplementar ANALOG_ROOM_CONTROL_CHANNEL (Sentry IOBROKER-HMIP-1X)",
+                "pl": "Zaokrąglić wartości temperatury do najbliższych 0,5 stopnia\nWysyłaj wartości do HMIP tylko po zmianie (zmniejsz ruch!)\nDodaj debouncing do zmian setPointTemperature (oznacza, że wartość jest wysyłana, gdy jest „stabilna” przez 5 s!) (Zmniejsz ruch!)\nDodaj ograniczanie do innych żądań zmiany (oznacza, że inne zmiany są blokowane na 1 s) (zmniejsz ruch!)\nWdrożenie ANALOG_ROOM_CONTROL_CHANNEL (Sentry IOBROKER-HMIP-1X)",
+                "zh-cn": "将温度值舍入到最接近的0.5度\n仅在更改时将值发送到HMIP（减少流量！）\n在setPointTemperature更改中添加防抖动功能（“稳定”状态持续5s时发送平均值）（减少流量！）\n将限制添加到其他更改请求中（意味着其他更改被阻止1秒）（减少流量！）\n实施ANALOG_ROOM_CONTROL_CHANNEL（哨兵IOBROKER-HMIP-1X）"
+            },
             "1.7.2": {
                 "en": "Try to detect websocket connection failures start over",
                 "de": "Versuchen Sie, Fehler bei der Websocket-Verbindung zu erkennen",
@@ -220,18 +232,6 @@
                 "zh-cn": "多项修复，为气象站专业版添加了vaporValue，因为准备好了凹凸版"
             },
             "0.0.12": {
-                "en": "multiple fixes",
-                "de": "mehrfache Verlegenheiten",
-                "ru": "несколько исправлений",
-                "pt": "várias correções",
-                "nl": "meerdere fixes",
-                "fr": "plusieurs corrections",
-                "it": "correzioni multiple",
-                "es": "múltiples correcciones",
-                "pl": "wiele poprawek",
-                "zh-cn": "多个修复程序"
-            },
-            "0.0.11": {
                 "en": "multiple fixes",
                 "de": "mehrfache Verlegenheiten",
                 "ru": "несколько исправлений",
