@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "@alcalzone/release-script": "^1.8.3",
-    "chai": "^4.3.3",
+    "chai": "^4.3.4",
     "gulp": "^4.0.2",
     "mocha": "^8.3.1",
     "@vitalets/google-translate-api": "github:vitalets/google-translate-api",
