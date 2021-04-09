@@ -632,6 +632,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'WATER_SENSOR_CHANNEL':
                     promises.push(...this._updateWaterSensorChannelStates(device, i));
                     break;
+                case 'TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL':
+                    promises.push(...this._updateTemperatureSensor2ExternalDeltaChannelStates(device, i));
+                    break;
                 case 'SHADING_CHANNEL':
                     promises.push(...this._updateShadingChannelStates(device, i));
                     break;
@@ -1100,6 +1103,14 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         return promises;
     }
 
+    _updateTemperatureSensor2ExternalDeltaChannelStates(device, channel) {
+        let promises = [];
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.temperatureExternalOne', device.functionalChannels[channel].temperatureExternalOne, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.temperatureExternalTwo', device.functionalChannels[channel].temperatureExternalTwo, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.temperatureExternalDelta', device.functionalChannels[channel].temperatureExternalDelta, true));
+        return promises;
+    }
+
     _updateWaterSensorChannelStates(device, channel) {
         let promises = [];
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.moistureDetected', device.functionalChannels[channel].moistureDetected, true));
@@ -1463,6 +1474,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     break;
                 case 'SHADING_CHANNEL':
                     promises.push(...this._createShadingChannel(device, i));
+                    break;
+                case 'TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL':
+                    promises.push(...this._createTemperatureSensor2ExternalDeltaChannel(device, i));
                     break;
                 case 'WATER_SENSOR_CHANNEL':
                     promises.push(...this._createWaterSensorChannel(device, i));
@@ -1941,6 +1955,14 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.shadingDriveVersion', { type: 'state', common: { name: 'shadingDriveVersion', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.manualDriveSpeed', { type: 'state', common: { name: 'manualDriveSpeed', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.automationDriveSpeed', { type: 'state', common: { name: 'automationDriveSpeed', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
+    _createTemperatureSensor2ExternalDeltaChannel(device, channel) {
+        let promises = [];
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.temperatureExternalOne', { type: 'state', common: { name: 'temperatureExternalOne', type: 'number', role: 'value.temperature', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.temperatureExternalTwo', { type: 'state', common: { name: 'temperatureExternalTwo', type: 'number', role: 'value.temperature', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.temperatureExternalDelta', { type: 'state', common: { name: 'temperatureExternalDelta', type: 'number', role: 'value.temperature', read: true, write: false }, native: {} }));
         return promises;
     }
 
