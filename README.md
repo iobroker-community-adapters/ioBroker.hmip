@@ -54,7 +54,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 ## Changelog
 
 ### __WORK IN PROGRESS__
-* (Apollon77) Implement TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL
+* (Apollon77) Implement TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL, DOOR_LOCK_CHANNEL and ACCESS_AUTHORIZATION_CHANNEL
 
 ### 1.9.0 (2021-02-16)
 * (Apollon77) Round temperature values to nearest 0.5 degrees

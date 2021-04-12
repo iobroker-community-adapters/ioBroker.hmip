@@ -54,7 +54,7 @@ function readWordJs(src) {
         }
         words = words.substring(words.indexOf('{'), words.length);
         words = words.substring(0, words.lastIndexOf(';'));
-     
+
         const resultFunc = new Function("return " + words + ";");
 
         return resultFunc();

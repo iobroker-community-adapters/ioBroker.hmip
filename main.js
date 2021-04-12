@@ -732,6 +732,12 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'DOOR_CHANNEL':
                     promises.push(...this._updateDoorChannelStates(device, i));
                     break;
+                case 'DOOR_LOCK_CHANNEL':
+                    promises.push(...this._updateDoorLockChannelStates(device, i));
+                    break;
+                case 'ACCESS_AUTHORIZATION_CHANNEL':
+                    promises.push(...this._updateAccessAuthorizationChannelStates(device, i));
+                    break;
                 case 'MAINS_FAILURE_CHANNEL':
                     promises.push(...this._updateMainsFailureChannelStates(device, i));
                     break;
@@ -770,6 +776,19 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.doorState', device.functionalChannels[channel].doorState, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.doorCommand', device.functionalChannels[channel].doorCommand, true));
         promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.ventilationPositionSupported', device.functionalChannels[channel].ventilationPositionSupported, true));
+        return promises;
+    }
+
+    _updateDoorLockChannelStates(device, channel) {
+        let promises = [];
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.lockState', device.functionalChannels[channel].lockState, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.motorState', device.functionalChannels[channel].motorState, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.autoRelockEnabled', device.functionalChannels[channel].autoRelockEnabled, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.doorLockDirection', device.functionalChannels[channel].doorLockDirection, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.doorLockNeutralPosition', device.functionalChannels[channel].doorLockNeutralPosition, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.doorLockTurns', device.functionalChannels[channel].doorLockTurns, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.doorHandleType', device.functionalChannels[channel].doorHandleType, true));
+        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.autoRelockDelay', device.functionalChannels[channel].autoRelockDelay, true));
         return promises;
     }
 
@@ -822,6 +841,12 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _updateSmokeDetectorChannelStates(device, channel) {
         let promises = [];
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.smokeDetectorAlarmType', device.functionalChannels[channel].smokeDetectorAlarmType, true));
+        return promises;
+    }
+
+    _updateAccessAuthorizationChannelStates(device, channel) {
+        let promises = [];
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.authorized', device.functionalChannels[channel].authorized, true));
         return promises;
     }
 
@@ -1575,6 +1600,12 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'DOOR_CHANNEL':
                     promises.push(...this._createDoorChannel(device, i));
                     break;
+                case 'DOOR_LOCK_CHANNEL':
+                    promises.push(...this._createDoorLockChannel(device, i));
+                    break;
+                case 'ACCESS_AUTHORIZATION_CHANNEL':
+                    promises.push(...this._createAccessAuthorizationChannel(device, i));
+                    break;
                 case 'MAINS_FAILURE_CHANNEL':
                     promises.push(...this._createMainsFailureChannel(device, i));
                     break;
@@ -1610,7 +1641,20 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.processing', { type: 'state', common: { name: 'processing', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.ventilationPositionSupported', { type: 'state', common: { name: 'ventilationPositionSupported', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.doorCommand', { type: 'state', common: { name: 'doorCommand', type: 'number', role: 'value', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'sendDoorCommand' } }));
-	return promises;
+        return promises;
+    }
+
+    _createDoorLockChannel(device, channel) {
+        let promises = [];
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.lockState', { type: 'state', common: { name: 'lockState', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.motorState', { type: 'state', common: { name: 'motorState', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.autoRelockEnabled', { type: 'state', common: { name: 'autoRelockEnabled', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.doorLockDirection', { type: 'state', common: { name: 'doorLockDirection', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.doorLockNeutralPosition', { type: 'state', common: { name: 'doorLockNeutralPosition', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.doorLockTurns', { type: 'state', common: { name: 'doorLockTurns', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.doorHandleType', { type: 'state', common: { name: 'doorHandleType', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.autoRelockDelay', { type: 'state', common: { name: 'autoRelockDelay', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        return promises;
     }
 
     _createLightSensorChannel(device, channel) {
@@ -1654,6 +1698,12 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _createSmokeDetectorChannel(device, channel) {
         let promises = [];
         promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.smokeDetectorAlarmType', { type: 'state', common: { name: 'smokeDetectorAlarmType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
+    _createAccessAuthorizationChannel(device, channel) {
+        let promises = [];
+        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.authorized', { type: 'state', common: { name: 'authorized', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} })); // assumed datatype
         return promises;
     }
 
