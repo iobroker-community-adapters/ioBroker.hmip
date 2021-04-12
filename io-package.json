@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "1.9.0",
+        "version": "1.10.0",
         "news": {
+            "1.10.0": {
+                "en": "Implement TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL, DOOR_LOCK_CHANNEL and ACCESS_AUTHORIZATION_CHANNEL",
+                "de": "Implementieren Sie TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL, DOOR_LOCK_CHANNEL und ACCESS_AUTHORIZATION_CHANNEL",
+                "ru": "Реализуйте TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL, DOOR_LOCK_CHANNEL и ACCESS_AUTHORIZATION_CHANNEL",
+                "pt": "Implementar TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL, DOOR_LOCK_CHANNEL e ACCESS_AUTHORIZATION_CHANNEL",
+                "nl": "Implementeer TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL, DOOR_LOCK_CHANNEL en ACCESS_AUTHORIZATION_CHANNEL",
+                "fr": "Mettre en œuvre TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL, DOOR_LOCK_CHANNEL et ACCESS_AUTHORIZATION_CHANNEL",
+                "it": "Implementa TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL, DOOR_LOCK_CHANNEL e ACCESS_AUTHORIZATION_CHANNEL",
+                "es": "Implementar TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL, DOOR_LOCK_CHANNEL y ACCESS_AUTHORIZATION_CHANNEL",
+                "pl": "Wdrożenie TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL, DOOR_LOCK_CHANNEL i ACCESS_AUTHORIZATION_CHANNEL",
+                "zh-cn": "实施TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL，DOOR_LOCK_CHANNEL和ACCESS_AUTHORIZATION_CHANNEL"
+            },
             "1.9.0": {
                 "en": "Round temperature values to nearest 0.5 degrees\nOnly send values to HMIP when changed (reduce traffic!)\nAdd debouncing to setPointTemperature changes (means value is sent out when \"stable\" for 5s!) (reduce traffic!)\nAdd throttling to other change requests (means other changes are blocked for 1s) (reduce traffic!)\nImplement ANALOG_ROOM_CONTROL_CHANNEL (Sentry IOBROKER-HMIP-1X)",
                 "de": "Runden Sie die Temperaturwerte auf 0,5 Grad ab\nSenden Sie Werte nur bei Änderung an HMIP (reduzieren Sie den Datenverkehr!)\nHinzufügen von Entprellen zu Änderungen von setPointTemperature (bedeutet, dass der Wert gesendet wird, wenn er 5 Sekunden lang \"stabil\" ist!) (Reduzieren Sie den Datenverkehr!)\nFügen Sie anderen Änderungsanforderungen eine Drosselung hinzu (bedeutet, dass andere Änderungen für 1 Sekunde blockiert sind) (reduzieren Sie den Datenverkehr!)\nImplementieren Sie ANALOG_ROOM_CONTROL_CHANNEL (Sentry IOBROKER-HMIP-1X)",
@@ -230,18 +242,6 @@
                 "es": "Varias correcciones, vaporValue agregado para la estación meteorológica pro, versión de prueba porque está lista",
                 "pl": "Kilka poprawek, dodano vaporValue dla stacji pogodowej pro, wersja wypukła, ponieważ jest gotowa",
                 "zh-cn": "多项修复，为气象站专业版添加了vaporValue，因为准备好了凹凸版"
-            },
-            "0.0.12": {
-                "en": "multiple fixes",
-                "de": "mehrfache Verlegenheiten",
-                "ru": "несколько исправлений",
-                "pt": "várias correções",
-                "nl": "meerdere fixes",
-                "fr": "plusieurs corrections",
-                "it": "correzioni multiple",
-                "es": "múltiples correcciones",
-                "pl": "wiele poprawek",
-                "zh-cn": "多个修复程序"
             }
         },
         "title": "HomeMaticIP Cloud AccessPoint",
