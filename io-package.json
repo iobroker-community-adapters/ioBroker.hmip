@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "1.10.0",
+        "version": "1.11.0",
         "news": {
+            "1.11.0": {
+                "en": "Implement CARBON_DIOXIDE_SENSOR_CHANNEL",
+                "de": "Implementieren Sie CARBON_DIOXIDE_SENSOR_CHANNEL",
+                "ru": "Внедрить CARBON_DIOXIDE_SENSOR_CHANNEL",
+                "pt": "Implementar CARBON_DIOXIDE_SENSOR_CHANNEL",
+                "nl": "Implementeer CARBON_DIOXIDE_SENSOR_CHANNEL",
+                "fr": "Mettre en œuvre CARBON_DIOXIDE_SENSOR_CHANNEL",
+                "it": "Implementa CARBON_DIOXIDE_SENSOR_CHANNEL",
+                "es": "Implementar CARBON_DIOXIDE_SENSOR_CHANNEL",
+                "pl": "Wdróż CARBON_DIOXIDE_SENSOR_CHANNEL",
+                "zh-cn": "实施CARBON_DIOXIDE_SENSOR_CHANNEL"
+            },
             "1.10.0": {
                 "en": "Implement TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL, DOOR_LOCK_CHANNEL and ACCESS_AUTHORIZATION_CHANNEL",
                 "de": "Implementieren Sie TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL, DOOR_LOCK_CHANNEL und ACCESS_AUTHORIZATION_CHANNEL",
@@ -230,18 +242,6 @@
                 "es": "casos de fallo arreglados",
                 "pl": "naprawiono awarie",
                 "zh-cn": "崩溃情况已修复"
-            },
-            "1.0.0": {
-                "en": "Several fixes, vaporValue added for weather station pro, bump version because ready",
-                "de": "Mehrere Korrekturen, vaporValue für Wetterstation Pro hinzugefügt, Bump-Version, weil bereit",
-                "ru": "Несколько исправлений, добавлен vaporValue для метеостанции pro, бамп-версия, потому что готово",
-                "pt": "Várias correções, vaporValue adicionado para a estação meteorológica pro, versão bump, porque pronto",
-                "nl": "Verschillende oplossingen, vaporValue toegevoegd voor weerstation pro, bump-versie omdat klaar",
-                "fr": "Plusieurs corrections, vaporValue ajouté pour la station météo pro, version bump car prêt",
-                "it": "Diverse correzioni, vaporValue aggiunto per la stazione meteorologica pro, versione bump perché pronta",
-                "es": "Varias correcciones, vaporValue agregado para la estación meteorológica pro, versión de prueba porque está lista",
-                "pl": "Kilka poprawek, dodano vaporValue dla stacji pogodowej pro, wersja wypukła, ponieważ jest gotowa",
-                "zh-cn": "多项修复，为气象站专业版添加了vaporValue，因为准备好了凹凸版"
             }
         },
         "title": "HomeMaticIP Cloud AccessPoint",

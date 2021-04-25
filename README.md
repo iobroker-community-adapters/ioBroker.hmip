@@ -55,7 +55,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
-### __WORK IN PROGRESS__
+### 1.11.0 (2021-04-25)
 * (Apollon77) Implement CARBON_DIOXIDE_SENSOR_CHANNEL
 
 ### 1.10.0 (2021-04-12)
