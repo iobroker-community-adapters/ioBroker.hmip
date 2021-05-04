@@ -1433,16 +1433,16 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _createObjectsForDevice(device) {
         this.log.silly("createObjectsForDevice - " + device.type + " - " + JSON.stringify(device));
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id, { type: 'device', common: { name: device.label }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.info.type', { type: 'state', common: { name: 'type', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.info.modelType', { type: 'state', common: { name: 'type', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.info.label', { type: 'state', common: { name: 'type', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.info.firmwareVersion', { type: 'state', common: { name: 'type', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.info.updateState', { type: 'state', common: { name: 'type', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id, { type: 'device', common: { name: device.label }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.info.type', { type: 'state', common: { name: 'type', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.info.modelType', { type: 'state', common: { name: 'type', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.info.label', { type: 'state', common: { name: 'type', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.info.firmwareVersion', { type: 'state', common: { name: 'type', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.info.updateState', { type: 'state', common: { name: 'type', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         switch (device.type) {
             /*case 'PLUGABLE_SWITCH': {
-                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1', { type: 'channel', common: {}, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.1.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: 1, parameter: 'switchState' } }));
+                promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.1', { type: 'channel', common: {}, native: {} }));
+                promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.1.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: 1, parameter: 'switchState' } }));
                 break;
             }*/
             default:
@@ -1453,8 +1453,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 continue;
             }
             let fc = device.functionalChannels[i];
-            promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + i, { type: 'channel', common: {}, native: {} }));
-            promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + i + '.functionalChannelType', { type: 'state', common: { name: 'functionalChannelType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+            promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + i, { type: 'channel', common: {}, native: {} }));
+            promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + i + '.functionalChannelType', { type: 'state', common: { name: 'functionalChannelType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
             switch (fc.functionalChannelType) {
 
                 case 'DEVICE_OPERATIONLOCK':
@@ -1635,539 +1635,539 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     /* Start Channel Types */
     _createMainsFailureChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.powerMainsFailure', { type: 'state', common: { name: 'powerMainsFailure', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.genericAlarmSignal', { type: 'state', common: { name: 'genericAlarmSignal', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.powerMainsFailure', { type: 'state', common: { name: 'powerMainsFailure', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.genericAlarmSignal', { type: 'state', common: { name: 'genericAlarmSignal', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createNotificationLightChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'indicator', read: true, write: true }, native: {id: device.id, channel: channel, parameter: 'switchState'} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.dimLevel', { type: 'state', common: { name: 'dimLevel', type: 'number', role: 'value', read: true, write: true }, native: {id: device.id, channel: channel, parameter: 'setRgbDimLevel'} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.simpleRGBColorState', { type: 'state', common: { name: 'simpleRGBColorState', type: 'string', role: 'text', read: true, write: true }, native: {id: device.id, channel: channel, parameter: 'setRgbDimLevel'} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'indicator', read: true, write: true }, native: {id: device.id, channel: channel, parameter: 'switchState'} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.dimLevel', { type: 'state', common: { name: 'dimLevel', type: 'number', role: 'value', read: true, write: true }, native: {id: device.id, channel: channel, parameter: 'setRgbDimLevel'} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.simpleRGBColorState', { type: 'state', common: { name: 'simpleRGBColorState', type: 'string', role: 'text', read: true, write: true }, native: {id: device.id, channel: channel, parameter: 'setRgbDimLevel'} }));
         return promises;
     }
 
     _createDoorChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.doorState', { type: 'state', common: { name: 'doorState', type: 'string', role: 'info', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.processing', { type: 'state', common: { name: 'processing', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.ventilationPositionSupported', { type: 'state', common: { name: 'ventilationPositionSupported', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.doorCommand', { type: 'state', common: { name: 'doorCommand', type: 'number', role: 'value', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'sendDoorCommand' } }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.doorState', { type: 'state', common: { name: 'doorState', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.processing', { type: 'state', common: { name: 'processing', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.ventilationPositionSupported', { type: 'state', common: { name: 'ventilationPositionSupported', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.doorCommand', { type: 'state', common: { name: 'doorCommand', type: 'number', role: 'value', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'sendDoorCommand' } }));
         return promises;
     }
 
     _createDoorLockChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.lockState', { type: 'state', common: { name: 'lockState', type: 'string', role: 'info', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.motorState', { type: 'state', common: { name: 'motorState', type: 'string', role: 'info', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.autoRelockEnabled', { type: 'state', common: { name: 'autoRelockEnabled', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.doorLockDirection', { type: 'state', common: { name: 'doorLockDirection', type: 'string', role: 'info', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.doorLockNeutralPosition', { type: 'state', common: { name: 'doorLockNeutralPosition', type: 'string', role: 'info', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.doorLockTurns', { type: 'state', common: { name: 'doorLockTurns', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.doorHandleType', { type: 'state', common: { name: 'doorHandleType', type: 'string', role: 'info', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.autoRelockDelay', { type: 'state', common: { name: 'autoRelockDelay', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.lockState', { type: 'state', common: { name: 'lockState', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.motorState', { type: 'state', common: { name: 'motorState', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.autoRelockEnabled', { type: 'state', common: { name: 'autoRelockEnabled', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.doorLockDirection', { type: 'state', common: { name: 'doorLockDirection', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.doorLockNeutralPosition', { type: 'state', common: { name: 'doorLockNeutralPosition', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.doorLockTurns', { type: 'state', common: { name: 'doorLockTurns', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.doorHandleType', { type: 'state', common: { name: 'doorHandleType', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.autoRelockDelay', { type: 'state', common: { name: 'autoRelockDelay', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createLightSensorChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.currentIllumination', { type: 'state', common: { name: 'currentIllumination', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.averageIllumination', { type: 'state', common: { name: 'averageIllumination', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.lowestIllumination', { type: 'state', common: { name: 'lowestIllumination', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.highestIllumination', { type: 'state', common: { name: 'highestIllumination', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.currentIllumination', { type: 'state', common: { name: 'currentIllumination', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.averageIllumination', { type: 'state', common: { name: 'averageIllumination', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.lowestIllumination', { type: 'state', common: { name: 'lowestIllumination', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.highestIllumination', { type: 'state', common: { name: 'highestIllumination', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createTiltVibrationSensorChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.accelerationSensorMode', { type: 'state', common: { name: 'accelerationSensorMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.accelerationSensorTriggered', { type: 'state', common: { name: 'accelerationSensorTriggered', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.accelerationSensorSensitivity', { type: 'state', common: { name: 'accelerationSensorSensitivity', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.accelerationSensorTriggerAngle', { type: 'state', common: { name: 'accelerationSensorTriggerAngle', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.accelerationSensorEventFilterPeriod', { type: 'state', common: { name: 'accelerationSensorEventFilterPeriod', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.accelerationSensorMode', { type: 'state', common: { name: 'accelerationSensorMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.accelerationSensorTriggered', { type: 'state', common: { name: 'accelerationSensorTriggered', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.accelerationSensorSensitivity', { type: 'state', common: { name: 'accelerationSensorSensitivity', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.accelerationSensorTriggerAngle', { type: 'state', common: { name: 'accelerationSensorTriggerAngle', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.accelerationSensorEventFilterPeriod', { type: 'state', common: { name: 'accelerationSensorEventFilterPeriod', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createAccelerationSensorChannel(device, channel) {
         let promises = [];
         promises.push(...this._createTiltVibrationSensorChannel(device, channel));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.accelerationSensorNeutralPosition', { type: 'state', common: { name: 'accelerationSensorNeutralPosition', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.notificationSoundTypeHighToLow', { type: 'state', common: { name: 'notificationSoundTypeHighToLow', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.notificationSoundTypeLowToHigh', { type: 'state', common: { name: 'notificationSoundTypeLowToHigh', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.accelerationSensorNeutralPosition', { type: 'state', common: { name: 'accelerationSensorNeutralPosition', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.notificationSoundTypeHighToLow', { type: 'state', common: { name: 'notificationSoundTypeHighToLow', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.notificationSoundTypeLowToHigh', { type: 'state', common: { name: 'notificationSoundTypeLowToHigh', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createInternalSwitchChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.frostProtectionTemperature', { type: 'state', common: { name: 'frostProtectionTemperature', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.heatingValveType', { type: 'state', common: { name: 'heatingValveType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.internalSwitchOutputEnabled', { type: 'state', common: { name: 'internalSwitchOutputEnabled', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionDuration', { type: 'state', common: { name: 'valveProtectionDuration', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionSwitchingInterval', { type: 'state', common: { name: 'valveProtectionSwitchingInterval', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.frostProtectionTemperature', { type: 'state', common: { name: 'frostProtectionTemperature', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.heatingValveType', { type: 'state', common: { name: 'heatingValveType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.internalSwitchOutputEnabled', { type: 'state', common: { name: 'internalSwitchOutputEnabled', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionDuration', { type: 'state', common: { name: 'valveProtectionDuration', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionSwitchingInterval', { type: 'state', common: { name: 'valveProtectionSwitchingInterval', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createSmokeDetectorChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.smokeDetectorAlarmType', { type: 'state', common: { name: 'smokeDetectorAlarmType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.smokeDetectorAlarmType', { type: 'state', common: { name: 'smokeDetectorAlarmType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createAccessAuthorizationChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.authorized', { type: 'state', common: { name: 'authorized', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} })); // assumed datatype
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.authorized', { type: 'state', common: { name: 'authorized', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} })); // assumed datatype
         return promises;
     }
 
     _createMultiModeInputChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.binaryBehaviorType', { type: 'state', common: { name: 'binaryBehaviorType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.multiModeInputMode', { type: 'state', common: { name: 'multiModeInputMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windowState', { type: 'state', common: { name: 'windowState', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windowOpen', { type: 'state', common: { name: 'windowOpen', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.binaryBehaviorType', { type: 'state', common: { name: 'binaryBehaviorType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.multiModeInputMode', { type: 'state', common: { name: 'multiModeInputMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.windowState', { type: 'state', common: { name: 'windowState', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.windowOpen', { type: 'state', common: { name: 'windowOpen', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createMultiModeInputSwitchChannel(device, channel) {
         let promises = [];
         promises.push(...this._createSwitchChannel(device, channel));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.binaryBehaviorType', { type: 'state', common: { name: 'binaryBehaviorType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.multiModeInputMode', { type: 'state', common: { name: 'multiModeInputMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.binaryBehaviorType', { type: 'state', common: { name: 'binaryBehaviorType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.multiModeInputMode', { type: 'state', common: { name: 'multiModeInputMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createRotaryWheelChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.rotationDirection', { type: 'state', common: { name: 'rotationDirection', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.rotationDirection', { type: 'state', common: { name: 'rotationDirection', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createRainDetectionChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.raining', { type: 'state', common: { name: 'raining', type: 'boolean', role: 'sensor.rain', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.rainSensorSensitivity', { type: 'state', common: { name: 'rainSensorSensitivity', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.raining', { type: 'state', common: { name: 'raining', type: 'boolean', role: 'sensor.rain', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.rainSensorSensitivity', { type: 'state', common: { name: 'rainSensorSensitivity', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createMultiModeInputDimmerChannel(device, channel) {
         let promises = [];
         promises.push(...this._createMultiModeInputSwitchChannel(device, channel));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.dimLevel', { type: 'state', common: { name: 'dimLevel', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverloaded', { type: 'state', common: { name: 'deviceOverloaded', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.coProFaulty', { type: 'state', common: { name: 'coProFaulty', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.coProRestartNeeded', { type: 'state', common: { name: 'coProRestartNeeded', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverheated', { type: 'state', common: { name: 'deviceOverheated', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.dimLevel', { type: 'state', common: { name: 'dimLevel', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverloaded', { type: 'state', common: { name: 'deviceOverloaded', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.coProFaulty', { type: 'state', common: { name: 'coProFaulty', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.coProRestartNeeded', { type: 'state', common: { name: 'coProRestartNeeded', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverheated', { type: 'state', common: { name: 'deviceOverheated', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createDeviceBaseChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.configPending', { type: 'state', common: { name: 'configPending', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.dutyCycle', { type: 'state', common: { name: 'dutyCycle', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.lowBat', { type: 'state', common: { name: 'lowBat', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.routerModuleEnabled', { type: 'state', common: { name: 'routerModuleEnabled', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.routerModuleSupported', { type: 'state', common: { name: 'routerModuleSupported', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.rssiDeviceValue', { type: 'state', common: { name: 'rssiDeviceValue', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.rssiPeerValue', { type: 'state', common: { name: 'rssiPeerValue', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.unreach', { type: 'state', common: { name: 'unreach', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.configPending', { type: 'state', common: { name: 'configPending', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.dutyCycle', { type: 'state', common: { name: 'dutyCycle', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.lowBat', { type: 'state', common: { name: 'lowBat', type: 'boolean', role: 'indicator.maintenance.lowbat', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.routerModuleEnabled', { type: 'state', common: { name: 'routerModuleEnabled', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.routerModuleSupported', { type: 'state', common: { name: 'routerModuleSupported', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.rssiDeviceValue', { type: 'state', common: { name: 'rssiDeviceValue', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.rssiPeerValue', { type: 'state', common: { name: 'rssiPeerValue', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.unreach', { type: 'state', common: { name: 'unreach', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createDeviceSabotageChannel(device, channel) {
         let promises = [];
         promises.push(...this._createDeviceBaseChannel(device, channel));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.sabotage', { type: 'state', common: { name: 'sabotage', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.sabotage', { type: 'state', common: { name: 'sabotage', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createDeviceReacheargableWithSabotageChannel(device, channel) {
         let promises = [];
         promises.push(...this._createDeviceSabotageChannel(device, channel));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.badBatteryHealth', { type: 'state', common: { name: 'badBatteryHealth', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.badBatteryHealth', { type: 'state', common: { name: 'badBatteryHealth', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createAccessControllerChannel(device, channel) {
         let promises = [];
         promises.push(...this._createDeviceBaseChannel(device, channel));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.signalBrightness', { type: 'state', common: { name: 'signalBrightness', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.accessPointPriority', { type: 'state', common: { name: 'accessPointPriority', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.dutyCycleLevel', { type: 'state', common: { name: 'dutyCycleLevel', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.carrierSenseLevel', { type: 'state', common: { name: 'carrierSenseLevel', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.signalBrightness', { type: 'state', common: { name: 'signalBrightness', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.accessPointPriority', { type: 'state', common: { name: 'accessPointPriority', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.dutyCycleLevel', { type: 'state', common: { name: 'dutyCycleLevel', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.carrierSenseLevel', { type: 'state', common: { name: 'carrierSenseLevel', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createAccessControllerWiredChannel(device, channel) {
         let promises = [];
         promises.push(...this._createDeviceBaseChannel(device, channel));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.signalBrightness', { type: 'state', common: { name: 'signalBrightness', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.accessPointPriority', { type: 'state', common: { name: 'accessPointPriority', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.busConfigMismatch', { type: 'state', common: { name: 'busConfigMismatch', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.powerShortCircuit', { type: 'state', common: { name: 'powerShortCircuit', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.shortCircuitDataLine', { type: 'state', common: { name: 'shortCircuitDataLine', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.busMode', { type: 'state', common: { name: 'busMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.powerSupplyCurrent', { type: 'state', common: { name: 'powerSupplyCurrent', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.signalBrightness', { type: 'state', common: { name: 'signalBrightness', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.accessPointPriority', { type: 'state', common: { name: 'accessPointPriority', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.busConfigMismatch', { type: 'state', common: { name: 'busConfigMismatch', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.powerShortCircuit', { type: 'state', common: { name: 'powerShortCircuit', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.shortCircuitDataLine', { type: 'state', common: { name: 'shortCircuitDataLine', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.busMode', { type: 'state', common: { name: 'busMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.powerSupplyCurrent', { type: 'state', common: { name: 'powerSupplyCurrent', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createPresenceDetectionChannel(device, channel) {
         let promises = [];
         promises.push(...this._createDeviceBaseChannel(device, channel));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.presenceDetected', { type: 'state', common: { name: 'presenceDetected', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.illumination', { type: 'state', common: { name: 'illumination', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.currentIllumination', { type: 'state', common: { name: 'currentIllumination', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.numberOfBrightnessMeasurements', { type: 'state', common: { name: 'numberOfBrightnessMeasurements', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.motionDetectionSendInterval', { type: 'state', common: { name: 'motionDetectionSendInterval', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.motionBufferActive', { type: 'state', common: { name: 'motionBufferActive', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.presenceDetected', { type: 'state', common: { name: 'presenceDetected', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.illumination', { type: 'state', common: { name: 'illumination', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.currentIllumination', { type: 'state', common: { name: 'currentIllumination', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.numberOfBrightnessMeasurements', { type: 'state', common: { name: 'numberOfBrightnessMeasurements', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.motionDetectionSendInterval', { type: 'state', common: { name: 'motionDetectionSendInterval', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.motionBufferActive', { type: 'state', common: { name: 'motionBufferActive', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createPassageDetectorChannel(device, channel) {
         let promises = [];
         promises.push(...this._createDeviceBaseChannel(device, channel));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.leftCounter', { type: 'state', common: { name: 'leftCounter', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.leftRightCounterDelta', { type: 'state', common: { name: 'leftRightCounterDelta', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.passageBlindtime', { type: 'state', common: { name: 'passageBlindtime', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.passageDirection', { type: 'state', common: { name: 'passageDirection', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.passageSensorSensitivity', { type: 'state', common: { name: 'passageSensorSensitivity', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.passageTimeout', { type: 'state', common: { name: 'passageTimeout', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.rightCounter', { type: 'state', common: { name: 'rightCounter', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.leftCounter', { type: 'state', common: { name: 'leftCounter', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.leftRightCounterDelta', { type: 'state', common: { name: 'leftRightCounterDelta', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.passageBlindtime', { type: 'state', common: { name: 'passageBlindtime', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.passageDirection', { type: 'state', common: { name: 'passageDirection', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.passageSensorSensitivity', { type: 'state', common: { name: 'passageSensorSensitivity', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.passageTimeout', { type: 'state', common: { name: 'passageTimeout', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.rightCounter', { type: 'state', common: { name: 'rightCounter', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createDeviceGlobalPumpControl(device, channel) {
         let promises = [];
         promises.push(...this._createDeviceBaseChannel(device, channel));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverloaded', { type: 'state', common: { name: 'deviceOverloaded', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.deviceUndervoltage', { type: 'state', common: { name: 'deviceUndervoltage', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverheated', { type: 'state', common: { name: 'deviceOverheated', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOutOfRange', { type: 'state', common: { name: 'temperatureOutOfRange', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionDuration', { type: 'state', common: { name: 'valveProtectionDuration', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionSwitchingInterval', { type: 'state', common: { name: 'valveProtectionSwitchingInterval', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.frostProtectionTemperature', { type: 'state', common: { name: 'frostProtectionTemperature', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.coolingEmergencyValue', { type: 'state', common: { name: 'coolingEmergencyValue', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.heatingEmergencyValue', { type: 'state', common: { name: 'heatingEmergencyValue', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.globalPumpControl', { type: 'state', common: { name: 'globalPumpControl', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.heatingValveType', { type: 'state', common: { name: 'heatingValveType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.heatingLoadType', { type: 'state', common: { name: 'heatingLoadType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverloaded', { type: 'state', common: { name: 'deviceOverloaded', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.deviceUndervoltage', { type: 'state', common: { name: 'deviceUndervoltage', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverheated', { type: 'state', common: { name: 'deviceOverheated', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOutOfRange', { type: 'state', common: { name: 'temperatureOutOfRange', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionDuration', { type: 'state', common: { name: 'valveProtectionDuration', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionSwitchingInterval', { type: 'state', common: { name: 'valveProtectionSwitchingInterval', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.frostProtectionTemperature', { type: 'state', common: { name: 'frostProtectionTemperature', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.coolingEmergencyValue', { type: 'state', common: { name: 'coolingEmergencyValue', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.heatingEmergencyValue', { type: 'state', common: { name: 'heatingEmergencyValue', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.globalPumpControl', { type: 'state', common: { name: 'globalPumpControl', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.heatingValveType', { type: 'state', common: { name: 'heatingValveType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.heatingLoadType', { type: 'state', common: { name: 'heatingLoadType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createFloorTerminalBlockLockPumpChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.pumpLeadTime', { type: 'state', common: { name: 'pumpLeadTime', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.pumpFollowUpTime', { type: 'state', common: { name: 'pumpFollowUpTime', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.pumpProtectionDuration', { type: 'state', common: { name: 'pumpProtectionDuration', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.pumpProtectionSwitchingInterval', { type: 'state', common: { name: 'pumpProtectionSwitchingInterval', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.pumpLeadTime', { type: 'state', common: { name: 'pumpLeadTime', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.pumpFollowUpTime', { type: 'state', common: { name: 'pumpFollowUpTime', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.pumpProtectionDuration', { type: 'state', common: { name: 'pumpProtectionDuration', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.pumpProtectionSwitchingInterval', { type: 'state', common: { name: 'pumpProtectionSwitchingInterval', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createFloorTerminalBlockMechanicChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.valveState', { type: 'state', common: { name: 'valveState', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.valveState', { type: 'state', common: { name: 'valveState', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createAnalogOutputChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.analogOutputLevel', { type: 'state', common: { name: 'analogOutputLevel', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.analogOutputLevel', { type: 'state', common: { name: 'analogOutputLevel', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createDeviceBaseFloorHeatingChannel(device, channel) {
         let promises = [];
         promises.push(...this._createDeviceBaseChannel(device, channel));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionDuration', { type: 'state', common: { name: 'valveProtectionDuration', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionSwitchingInterval', { type: 'state', common: { name: 'valveProtectionSwitchingInterval', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.frostProtectionTemperature', { type: 'state', common: { name: 'frostProtectionTemperature', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.coolingEmergencyValue', { type: 'state', common: { name: 'coolingEmergencyValue', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.heatingEmergencyValue', { type: 'state', common: { name: 'heatingEmergencyValue', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.minimumFloorHeatingValvePosition', { type: 'state', common: { name: 'minimumFloorHeatingValvePosition', type: 'number', role: 'value', read: true, write: true }, native: {id: device.id, channel: channel, parameter: 'setMinimumFloorHeatingValvePosition'} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.pulseWidthModulationAtLowFloorHeatingValvePositionEnabled', { type: 'state', common: { name: 'pulseWidthModulationAtLowFloorHeatingValvePositionEnabled', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionDuration', { type: 'state', common: { name: 'valveProtectionDuration', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionSwitchingInterval', { type: 'state', common: { name: 'valveProtectionSwitchingInterval', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.frostProtectionTemperature', { type: 'state', common: { name: 'frostProtectionTemperature', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.coolingEmergencyValue', { type: 'state', common: { name: 'coolingEmergencyValue', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.heatingEmergencyValue', { type: 'state', common: { name: 'heatingEmergencyValue', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.minimumFloorHeatingValvePosition', { type: 'state', common: { name: 'minimumFloorHeatingValvePosition', type: 'number', role: 'value', read: true, write: true }, native: {id: device.id, channel: channel, parameter: 'setMinimumFloorHeatingValvePosition'} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.pulseWidthModulationAtLowFloorHeatingValvePositionEnabled', { type: 'state', common: { name: 'pulseWidthModulationAtLowFloorHeatingValvePositionEnabled', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createDeviceIncorrectPositioned(device, channel) {
         let promises = [];
         promises.push(...this._createDeviceBaseChannel(device, channel));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverloaded', { type: 'state', common: { name: 'deviceOverloaded', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.coProUpdateFailure', { type: 'state', common: { name: 'coProUpdateFailure', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.coProFaulty', { type: 'state', common: { name: 'coProFaulty', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.coProRestartNeeded', { type: 'state', common: { name: 'coProRestartNeeded', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-		promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.deviceUndervoltage', { type: 'state', common: { name: 'deviceUndervoltage', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverheated', { type: 'state', common: { name: 'deviceOverheated', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOutOfRange', { type: 'state', common: { name: 'temperatureOutOfRange', boolean: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.incorrectPositioned', { type: 'state', common: { name: 'incorrectPositioned', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverloaded', { type: 'state', common: { name: 'deviceOverloaded', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.coProUpdateFailure', { type: 'state', common: { name: 'coProUpdateFailure', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.coProFaulty', { type: 'state', common: { name: 'coProFaulty', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.coProRestartNeeded', { type: 'state', common: { name: 'coProRestartNeeded', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+		promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.deviceUndervoltage', { type: 'state', common: { name: 'deviceUndervoltage', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverheated', { type: 'state', common: { name: 'deviceOverheated', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOutOfRange', { type: 'state', common: { name: 'temperatureOutOfRange', boolean: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.incorrectPositioned', { type: 'state', common: { name: 'incorrectPositioned', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createDeviceContactInterfaceChannel(device, channel) {
         let promises = [];
         promises.push(...this._createDeviceBaseChannel(device, channel));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windowState', { type: 'state', common: { name: 'windowState', type: 'string', role: 'sensor.window', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.contactType', { type: 'state', common: { name: 'contactType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.alarmContactType', { type: 'state', common: { name: 'alarmContactType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.eventDelay', { type: 'state', common: { name: 'eventDelay', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.windowState', { type: 'state', common: { name: 'windowState', type: 'string', role: 'sensor.window', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.contactType', { type: 'state', common: { name: 'contactType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.alarmContactType', { type: 'state', common: { name: 'alarmContactType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.eventDelay', { type: 'state', common: { name: 'eventDelay', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createDeviceOperationLockChannel(device, channel) {
         let promises = [];
         promises.push(...this._createDeviceBaseChannel(device, channel));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.operationLockActive', { type: 'state', common: { name: 'operationLockActive', type: 'boolean', role: 'indicator', read: true, write: true }, native: {id: device.id, channel: channel, parameter: 'setOperationLock'} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.operationLockActive', { type: 'state', common: { name: 'operationLockActive', type: 'boolean', role: 'indicator', read: true, write: true }, native: {id: device.id, channel: channel, parameter: 'setOperationLock'} }));
         return promises;
     }
 
     _createDevicePermanentFullRxChannel(device, channel) {
         let promises = [];
         promises.push(...this._createDeviceBaseChannel(device, channel));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.permanentFullRx', { type: 'state', common: { name: 'permanentFullRx', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.permanentFullRx', { type: 'state', common: { name: 'permanentFullRx', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createRotaryHandleChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windowState', { type: 'state', common: { name: 'windowState', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windowOpen', { type: 'state', common: { name: 'windowOpen', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.eventDelay', { type: 'state', common: { name: 'eventDelay', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.windowState', { type: 'state', common: { name: 'windowState', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.windowOpen', { type: 'state', common: { name: 'windowOpen', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.eventDelay', { type: 'state', common: { name: 'eventDelay', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createBlindChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.stop', { type: 'state', common: { name: 'on', type: 'boolean', role: 'button', read: false, write: true }, native: { id: device.id, channel: channel, parameter: 'stop' } }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.previousShutterLevel', { type: 'state', common: { name: 'previousShutterLevel', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.processing', { type: 'state', common: { name: 'processing', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.selfCalibrationInProgress', { type: 'state', common: { name: 'selfCalibrationInProgress', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.topToBottomReferenceTime', { type: 'state', common: { name: 'topToBottomReferenceTime', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.bottomToTopReferenceTime', { type: 'state', common: { name: 'bottomToTopReferenceTime', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.changeOverDelay', { type: 'state', common: { name: 'changeOverDelay', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.supportingSelfCalibration', { type: 'state', common: { name: 'supportingSelfCalibration', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.endpositionAutoDetectionEnabled', { type: 'state', common: { name: 'endpositionAutoDetectionEnabled', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.supportingEndpositionAutoDetection', { type: 'state', common: { name: 'supportingEndpositionAutoDetection', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.delayCompensationValue', { type: 'state', common: { name: 'delayCompensationValue', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.supportingDelayCompensation', { type: 'state', common: { name: 'supportingDelayCompensation', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.profileMode', { type: 'state', common: { name: 'profileMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.userDesiredProfileMode', { type: 'state', common: { name: 'userDesiredProfileMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.previousSlatsLevel', { type: 'state', common: { name: 'previousSlatsLevel', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.slatsReferenceTime', { type: 'state', common: { name: 'slatsReferenceTime', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.blindModeActive', { type: 'state', common: { name: 'blindModeActive', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.slatsLevel', { type: 'state', common: { name: 'slatsLevel', type: 'number', role: 'value', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'slatsLevel' } }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.shutterLevel', { type: 'state', common: { name: 'shutterLevel', type: 'number', role: 'value', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'slatsLevel' } }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.stop', { type: 'state', common: { name: 'on', type: 'boolean', role: 'button', read: false, write: true }, native: { id: device.id, channel: channel, parameter: 'stop' } }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.previousShutterLevel', { type: 'state', common: { name: 'previousShutterLevel', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.processing', { type: 'state', common: { name: 'processing', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.selfCalibrationInProgress', { type: 'state', common: { name: 'selfCalibrationInProgress', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.topToBottomReferenceTime', { type: 'state', common: { name: 'topToBottomReferenceTime', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.bottomToTopReferenceTime', { type: 'state', common: { name: 'bottomToTopReferenceTime', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.changeOverDelay', { type: 'state', common: { name: 'changeOverDelay', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.supportingSelfCalibration', { type: 'state', common: { name: 'supportingSelfCalibration', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.endpositionAutoDetectionEnabled', { type: 'state', common: { name: 'endpositionAutoDetectionEnabled', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.supportingEndpositionAutoDetection', { type: 'state', common: { name: 'supportingEndpositionAutoDetection', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.delayCompensationValue', { type: 'state', common: { name: 'delayCompensationValue', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.supportingDelayCompensation', { type: 'state', common: { name: 'supportingDelayCompensation', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.profileMode', { type: 'state', common: { name: 'profileMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.userDesiredProfileMode', { type: 'state', common: { name: 'userDesiredProfileMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.previousSlatsLevel', { type: 'state', common: { name: 'previousSlatsLevel', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.slatsReferenceTime', { type: 'state', common: { name: 'slatsReferenceTime', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.blindModeActive', { type: 'state', common: { name: 'blindModeActive', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.slatsLevel', { type: 'state', common: { name: 'slatsLevel', type: 'number', role: 'value', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'slatsLevel' } }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.shutterLevel', { type: 'state', common: { name: 'shutterLevel', type: 'number', role: 'value', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'slatsLevel' } }));
         return promises;
     }
 
     _createMultiModeInputBlindChannel(device, channel) {
         let promises = [];
         promises.push(...this._createBlindChannel(device, channel));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.binaryBehaviorType', { type: 'state', common: { name: 'binaryBehaviorType', type: 'string', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.multiModeInputMode', { type: 'state', common: { name: 'multiModeInputMode', type: 'string', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.favoritePrimaryShadingPosition', { type: 'state', common: { name: 'favoritePrimaryShadingPosition', type: 'number', role: 'level', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.favoriteSecondaryShadingPosition', { type: 'state', common: { name: 'favoriteSecondaryShadingPosition', type: 'number', role: 'level', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.binaryBehaviorType', { type: 'state', common: { name: 'binaryBehaviorType', type: 'string', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.multiModeInputMode', { type: 'state', common: { name: 'multiModeInputMode', type: 'string', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.favoritePrimaryShadingPosition', { type: 'state', common: { name: 'favoritePrimaryShadingPosition', type: 'number', role: 'level', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.favoriteSecondaryShadingPosition', { type: 'state', common: { name: 'favoriteSecondaryShadingPosition', type: 'number', role: 'level', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createHeatingThermostatChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOffset', { type: 'state', common: { name: 'temperatureOffset', type: 'number', role: 'value', unit: '°C', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.valvePosition', { type: 'state', common: { name: 'valvePosition', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'level.temperature', unit: '°C', read: true, write: true }, native: { id: device.functionalChannels[channel].groups, step: 0.5, debounce: 5000, parameter: 'setPointTemperature' } }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.valveActualTemperature', { type: 'state', common: { name: 'valveActualTemperature', type: 'number', role: 'value.temperature', unit: '°C', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.valveState', { type: 'state', common: { name: 'valveState', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOffset', { type: 'state', common: { name: 'temperatureOffset', type: 'number', role: 'value', unit: '°C', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.valvePosition', { type: 'state', common: { name: 'valvePosition', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'level.temperature', unit: '°C', read: true, write: true }, native: { id: device.functionalChannels[channel].groups, step: 0.5, debounce: 5000, parameter: 'setPointTemperature' } }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.valveActualTemperature', { type: 'state', common: { name: 'valveActualTemperature', type: 'number', role: 'value.temperature', unit: '°C', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.valveState', { type: 'state', common: { name: 'valveState', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createShutterContactChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windowState', { type: 'state', common: { name: 'windowState', type: 'string', role: 'sensor.window', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windowOpen', { type: 'state', common: { name: 'windowOpen', type: 'boolean', role: 'sensor.window', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.eventDelay', { type: 'state', common: { name: 'eventDelay', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.windowState', { type: 'state', common: { name: 'windowState', type: 'string', role: 'sensor.window', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.windowOpen', { type: 'state', common: { name: 'windowOpen', type: 'boolean', role: 'sensor.window', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.eventDelay', { type: 'state', common: { name: 'eventDelay', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createDimmerChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.dimLevel', { type: 'state', common: { name: 'dimLevel', type: 'number', role: 'level.dimmer', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'setDimLevel' } }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'switchState' } }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.dimLevel', { type: 'state', common: { name: 'dimLevel', type: 'number', role: 'level.dimmer', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'setDimLevel' } }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'switchState' } }));
         return promises;
     }
 
     _createShadingChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.primaryShadingLevel', { type: 'state', common: { name: 'primaryShadingLevel', type: 'number', role: 'value', unit: '%', read: true, write: true }, native: {id: device.id, channel: channel, parameter: 'setPrimaryShadingLevel'} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.previousPrimaryShadingLevel', { type: 'state', common: { name: 'previousPrimaryShadingLevel', type: 'number', role: 'value', unit: '%', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.primaryShadingStateType', { type: 'state', common: { name: 'primaryShadingStateType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.processing', { type: 'state', common: { name: 'processing', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.secondaryShadingLevel', { type: 'state', common: { name: 'secondaryShadingLevel', type: 'number', role: 'value', unit: '%', read: true, write: true }, native: {id: device.id, channel: channel, parameter: 'setSecondaryShadingLevel'} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.previousSecondaryShadingLevel', { type: 'state', common: { name: 'previousSecondaryShadingLevel', type: 'number', role: 'value', unit: '%', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.secondaryShadingStateType', { type: 'state', common: { name: 'secondaryShadingStateType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.profileMode', { type: 'state', common: { name: 'profileMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.userDesiredProfileMode', { type: 'state', common: { name: 'userDesiredProfileMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.shadingPackagePosition', { type: 'state', common: { name: 'shadingPackagePosition', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.primaryOpenAdjustable', { type: 'state', common: { name: 'primaryOpenAdjustable', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.primaryCloseAdjustable', { type: 'state', common: { name: 'primaryCloseAdjustable', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.secondaryOpenAdjustable', { type: 'state', common: { name: 'secondaryOpenAdjustable', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.secondaryCloseAdjustable', { type: 'state', common: { name: 'secondaryCloseAdjustable', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.shadingPositionAdjustmentActive', { type: 'state', common: { name: 'shadingPositionAdjustmentActive', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.shadingPositionAdjustmentClientId', { type: 'state', common: { name: 'shadingPositionAdjustmentClientId', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.favoritePrimaryShadingPosition', { type: 'state', common: { name: 'favoritePrimaryShadingPosition', type: 'number', role: 'value', unit: '%', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.favoriteSecondaryShadingPosition', { type: 'state', common: { name: 'favoriteSecondaryShadingPosition', type: 'number', role: 'value', unit: '%', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.productId', { type: 'state', common: { name: 'productId', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.identifyOemSupported', { type: 'state', common: { name: 'identifyOemSupported', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.shadingDriveVersion', { type: 'state', common: { name: 'shadingDriveVersion', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.manualDriveSpeed', { type: 'state', common: { name: 'manualDriveSpeed', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.automationDriveSpeed', { type: 'state', common: { name: 'automationDriveSpeed', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.primaryShadingLevel', { type: 'state', common: { name: 'primaryShadingLevel', type: 'number', role: 'value', unit: '%', read: true, write: true }, native: {id: device.id, channel: channel, parameter: 'setPrimaryShadingLevel'} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.previousPrimaryShadingLevel', { type: 'state', common: { name: 'previousPrimaryShadingLevel', type: 'number', role: 'value', unit: '%', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.primaryShadingStateType', { type: 'state', common: { name: 'primaryShadingStateType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.processing', { type: 'state', common: { name: 'processing', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.secondaryShadingLevel', { type: 'state', common: { name: 'secondaryShadingLevel', type: 'number', role: 'value', unit: '%', read: true, write: true }, native: {id: device.id, channel: channel, parameter: 'setSecondaryShadingLevel'} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.previousSecondaryShadingLevel', { type: 'state', common: { name: 'previousSecondaryShadingLevel', type: 'number', role: 'value', unit: '%', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.secondaryShadingStateType', { type: 'state', common: { name: 'secondaryShadingStateType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.profileMode', { type: 'state', common: { name: 'profileMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.userDesiredProfileMode', { type: 'state', common: { name: 'userDesiredProfileMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.shadingPackagePosition', { type: 'state', common: { name: 'shadingPackagePosition', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.primaryOpenAdjustable', { type: 'state', common: { name: 'primaryOpenAdjustable', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.primaryCloseAdjustable', { type: 'state', common: { name: 'primaryCloseAdjustable', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.secondaryOpenAdjustable', { type: 'state', common: { name: 'secondaryOpenAdjustable', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.secondaryCloseAdjustable', { type: 'state', common: { name: 'secondaryCloseAdjustable', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.shadingPositionAdjustmentActive', { type: 'state', common: { name: 'shadingPositionAdjustmentActive', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.shadingPositionAdjustmentClientId', { type: 'state', common: { name: 'shadingPositionAdjustmentClientId', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.favoritePrimaryShadingPosition', { type: 'state', common: { name: 'favoritePrimaryShadingPosition', type: 'number', role: 'value', unit: '%', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.favoriteSecondaryShadingPosition', { type: 'state', common: { name: 'favoriteSecondaryShadingPosition', type: 'number', role: 'value', unit: '%', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.productId', { type: 'state', common: { name: 'productId', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.identifyOemSupported', { type: 'state', common: { name: 'identifyOemSupported', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.shadingDriveVersion', { type: 'state', common: { name: 'shadingDriveVersion', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.manualDriveSpeed', { type: 'state', common: { name: 'manualDriveSpeed', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.automationDriveSpeed', { type: 'state', common: { name: 'automationDriveSpeed', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createTemperatureSensor2ExternalDeltaChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.temperatureExternalOne', { type: 'state', common: { name: 'temperatureExternalOne', type: 'number', role: 'value.temperature', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.temperatureExternalTwo', { type: 'state', common: { name: 'temperatureExternalTwo', type: 'number', role: 'value.temperature', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.temperatureExternalDelta', { type: 'state', common: { name: 'temperatureExternalDelta', type: 'number', role: 'value.temperature', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.temperatureExternalOne', { type: 'state', common: { name: 'temperatureExternalOne', type: 'number', role: 'value.temperature', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.temperatureExternalTwo', { type: 'state', common: { name: 'temperatureExternalTwo', type: 'number', role: 'value.temperature', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.temperatureExternalDelta', { type: 'state', common: { name: 'temperatureExternalDelta', type: 'number', role: 'value.temperature', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createWaterSensorChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.moistureDetected', { type: 'state', common: { name: 'moistureDetected', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.waterlevelDetected', { type: 'state', common: { name: 'waterlevelDetected', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.sirenWaterAlarmTrigger', { type: 'state', common: { name: 'sirenWaterAlarmTrigger', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.inAppWaterAlarmTrigger', { type: 'state', common: { name: 'inAppWaterAlarmTrigger', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.acousticAlarmSignal', { type: 'state', common: { name: 'acousticAlarmSignal', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.acousticAlarmTiming', { type: 'state', common: { name: 'acousticAlarmTiming', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.acousticWaterAlarmTrigger', { type: 'state', common: { name: 'acousticWaterAlarmTrigger', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.moistureDetected', { type: 'state', common: { name: 'moistureDetected', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.waterlevelDetected', { type: 'state', common: { name: 'waterlevelDetected', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.sirenWaterAlarmTrigger', { type: 'state', common: { name: 'sirenWaterAlarmTrigger', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.inAppWaterAlarmTrigger', { type: 'state', common: { name: 'inAppWaterAlarmTrigger', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.acousticAlarmSignal', { type: 'state', common: { name: 'acousticAlarmSignal', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.acousticAlarmTiming', { type: 'state', common: { name: 'acousticAlarmTiming', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.acousticWaterAlarmTrigger', { type: 'state', common: { name: 'acousticWaterAlarmTrigger', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createWeatherSensorChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'value.temperature', read: true, write: false }, native: {} }));
-	    promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.humidity', { type: 'state', common: { name: 'humidity', type: 'number', role: 'value.humidity', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.illumination', { type: 'state', common: { name: 'illumination', type: 'number', role: 'value.brightness', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.illuminationThresholdSunshine', { type: 'state', common: { name: 'illuminationThresholdSunshine', type: 'number', role: 'level', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.storm', { type: 'state', common: { name: 'storm', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.sunshine', { type: 'state', common: { name: 'sunshine', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.todaySunshineDuration', { type: 'state', common: { name: 'todaySunshineDuration', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.totalSunshineDuration', { type: 'state', common: { name: 'totalSunshineDuration', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windSpeed', { type: 'state', common: { name: 'windSpeed', type: 'number', role: 'value.speed', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windValueType', { type: 'state', common: { name: 'windValueType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.yesterdaySunshineDuration', { type: 'state', common: { name: 'yesterdaySunshineDuration', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'value.temperature', read: true, write: false }, native: {} }));
+	    promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.humidity', { type: 'state', common: { name: 'humidity', type: 'number', role: 'value.humidity', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.illumination', { type: 'state', common: { name: 'illumination', type: 'number', role: 'value.brightness', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.illuminationThresholdSunshine', { type: 'state', common: { name: 'illuminationThresholdSunshine', type: 'number', role: 'level', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.storm', { type: 'state', common: { name: 'storm', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.sunshine', { type: 'state', common: { name: 'sunshine', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.todaySunshineDuration', { type: 'state', common: { name: 'todaySunshineDuration', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.totalSunshineDuration', { type: 'state', common: { name: 'totalSunshineDuration', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.windSpeed', { type: 'state', common: { name: 'windSpeed', type: 'number', role: 'value.speed', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.windValueType', { type: 'state', common: { name: 'windValueType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.yesterdaySunshineDuration', { type: 'state', common: { name: 'yesterdaySunshineDuration', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createWeatherSensorPlusChannel(device, channel) {
         let promises = [];
         promises.push(...this._createWeatherSensorChannel(device, channel));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.raining', { type: 'state', common: { name: 'raining', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.todayRainCounter', { type: 'state', common: { name: 'todayRainCounter', type: 'number', role: 'value.rain.today', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.totalRainCounter', { type: 'state', common: { name: 'totalRainCounter', type: 'number', role: 'level', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.yesterdayRainCounter', { type: 'state', common: { name: 'yesterdayRainCounter', type: 'number', role: 'level', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.raining', { type: 'state', common: { name: 'raining', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.todayRainCounter', { type: 'state', common: { name: 'todayRainCounter', type: 'number', role: 'value.rain.today', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.totalRainCounter', { type: 'state', common: { name: 'totalRainCounter', type: 'number', role: 'level', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.yesterdayRainCounter', { type: 'state', common: { name: 'yesterdayRainCounter', type: 'number', role: 'level', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createWeatherSensorProChannel(device, channel) {
         let promises = [];
         promises.push(...this._createWeatherSensorPlusChannel(device, channel));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.weathervaneAlignmentNeeded', { type: 'state', common: { name: 'weathervaneAlignmentNeeded', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windDirection', { type: 'state', common: { name: 'windDirection', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.windDirectionVariation', { type: 'state', common: { name: 'windDirectionVariation', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.vaporAmount', { type: 'state', common: { name: 'vaporAmount', type: 'number', role: 'level', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.weathervaneAlignmentNeeded', { type: 'state', common: { name: 'weathervaneAlignmentNeeded', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.windDirection', { type: 'state', common: { name: 'windDirection', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.windDirectionVariation', { type: 'state', common: { name: 'windDirectionVariation', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.vaporAmount', { type: 'state', common: { name: 'vaporAmount', type: 'number', role: 'level', read: true, write: false }, native: {} }));
 	  return promises;
     }
 
     _createShutterChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.stop', { type: 'state', common: { name: 'on', type: 'boolean', role: 'button', read: false, write: true }, native: { id: device.id, channel: channel, parameter: 'stop' } }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.shutterLevel', { type: 'state', common: { name: 'shutterLevel', type: 'number', role: 'level', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'shutterlevel' } }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.previousShutterLevel', { type: 'state', common: { name: 'previousShutterLevel', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.processing', { type: 'state', common: { name: 'processing', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.selfCalibrationInProgress', { type: 'state', common: { name: 'selfCalibrationInProgress', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.topToBottomReferenceTime', { type: 'state', common: { name: 'topToBottomReferenceTime', type: 'number', role: 'seconds', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.bottomToTopReferenceTime', { type: 'state', common: { name: 'bottomToTopReferenceTime', type: 'number', role: 'seconds', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.changeOverDelay', { type: 'state', common: { name: 'changeOverDelay', type: 'number', role: 'seconds', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'changeOverDelay' } }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.endpositionAutoDetectionEnabled', { type: 'state', common: { name: 'endpositionAutoDetectionEnabled', type: 'string', role: 'switch', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'switchState' } }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.stop', { type: 'state', common: { name: 'on', type: 'boolean', role: 'button', read: false, write: true }, native: { id: device.id, channel: channel, parameter: 'stop' } }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.shutterLevel', { type: 'state', common: { name: 'shutterLevel', type: 'number', role: 'level', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'shutterlevel' } }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.previousShutterLevel', { type: 'state', common: { name: 'previousShutterLevel', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.processing', { type: 'state', common: { name: 'processing', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.selfCalibrationInProgress', { type: 'state', common: { name: 'selfCalibrationInProgress', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.topToBottomReferenceTime', { type: 'state', common: { name: 'topToBottomReferenceTime', type: 'number', role: 'seconds', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.bottomToTopReferenceTime', { type: 'state', common: { name: 'bottomToTopReferenceTime', type: 'number', role: 'seconds', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.changeOverDelay', { type: 'state', common: { name: 'changeOverDelay', type: 'number', role: 'seconds', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'changeOverDelay' } }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.endpositionAutoDetectionEnabled', { type: 'state', common: { name: 'endpositionAutoDetectionEnabled', type: 'string', role: 'switch', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'switchState' } }));
         return promises;
     }
 
     _createSingleKeyChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { } }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { } }));
         return promises;
     }
 
     _createSwitchChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'switchState' } }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.profileMode', { type: 'state', common: { name: 'profileMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.userDesiredProfileMode', { type: 'state', common: { name: 'userDesiredProfileMode', type: 'string', role: 'button', read: false, write: true }, native: { id: device.id, channel: channel, parameter: 'resetEnergyCounter' } }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'switchState' } }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.profileMode', { type: 'state', common: { name: 'profileMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.userDesiredProfileMode', { type: 'state', common: { name: 'userDesiredProfileMode', type: 'string', role: 'button', read: false, write: true }, native: { id: device.id, channel: channel, parameter: 'resetEnergyCounter' } }));
         return promises;
     }
 
     _createSwitchMeasuringChannel(device, channel) {
         let promises = [];
         promises.push(...this._createSwitchChannel(device, channel));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.energyCounter', { type: 'state', common: { name: 'energyCounter', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.currentPowerConsumption', { type: 'state', common: { name: 'currentPowerConsumption', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.resetEnergyCounter', { type: 'state', common: { name: 'on', type: 'boolean', role: 'button', read: false, write: true }, native: { id: device.id, channel: channel, parameter: 'resetEnergyCounter' } }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.energyCounter', { type: 'state', common: { name: 'energyCounter', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.currentPowerConsumption', { type: 'state', common: { name: 'currentPowerConsumption', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.resetEnergyCounter', { type: 'state', common: { name: 'on', type: 'boolean', role: 'button', read: false, write: true }, native: { id: device.id, channel: channel, parameter: 'resetEnergyCounter' } }));
         return promises;
     }
 
     _createClimateSensorChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'value.temperature', unit: '°C', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.humidity', { type: 'state', common: { name: 'humidity', type: 'number', role: 'value.humidity', unit: '%', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.vaporAmount', { type: 'state', common: { name: 'vaporAmount', type: 'number', role: 'level', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'value.temperature', unit: '°C', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.humidity', { type: 'state', common: { name: 'humidity', type: 'number', role: 'value.humidity', unit: '%', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.vaporAmount', { type: 'state', common: { name: 'vaporAmount', type: 'number', role: 'level', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createWallMountedThermostatWithoutDisplay(device, channel) {
         let promises = [];
         promises.push(...this._createClimateSensorChannel(device, channel));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOffset', { type: 'state', common: { name: 'temperatureOffset', type: 'number', role: 'value', unit: '°C', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'level.temperature', unit: '°C', read: true, write: true }, native: { id: device.functionalChannels[channel].groups, step: 0.5, debounce: 5000, parameter: 'setPointTemperature' } }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOffset', { type: 'state', common: { name: 'temperatureOffset', type: 'number', role: 'value', unit: '°C', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'level.temperature', unit: '°C', read: true, write: true }, native: { id: device.functionalChannels[channel].groups, step: 0.5, debounce: 5000, parameter: 'setPointTemperature' } }));
         return promises;
     }
 
     _createCarbonDioxideSensorChannel(device, channel) {
         let promises = [];
         promises.push(...this._createClimateSensorChannel(device, channel));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.carbonDioxideVisualisationEnabled', { type: 'state', common: { name: 'carbonDioxideVisualisationEnabled', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.carbonDioxideConcentration', { type: 'state', common: { name: 'carbonDioxideConcentration', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.carbonDioxideVisualisationEnabled', { type: 'state', common: { name: 'carbonDioxideVisualisationEnabled', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.carbonDioxideConcentration', { type: 'state', common: { name: 'carbonDioxideConcentration', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         return promises;
     }
 
     _createAnalogRoomControlChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'value.temperature', unit: '°C', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOffset', { type: 'state', common: { name: 'temperatureOffset', type: 'number', role: 'value', unit: '°C', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'level.temperature', unit: '°C', read: true, write: true }, native: { id: device.functionalChannels[channel].groups, step: 0.5, debounce: 5000, parameter: 'setPointTemperature' } }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'value.temperature', unit: '°C', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOffset', { type: 'state', common: { name: 'temperatureOffset', type: 'number', role: 'value', unit: '°C', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'level.temperature', unit: '°C', read: true, write: true }, native: { id: device.functionalChannels[channel].groups, step: 0.5, debounce: 5000, parameter: 'setPointTemperature' } }));
         return promises;
     }
 
     _createWallMountedThermostatProChannel(device, channel) {
         let promises = [];
         promises.push(...this._createWallMountedThermostatWithoutDisplay(device, channel));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.display', { type: 'state', common: { name: 'display', type: 'string', role: 'text', read: true, write: true }, native: {id: device.id, channel: channel, parameter: 'setClimateControlDisplay'} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.display', { type: 'state', common: { name: 'display', type: 'string', role: 'text', read: true, write: true }, native: {id: device.id, channel: channel, parameter: 'setClimateControlDisplay'} }));
         return promises;
     }
 
     _createAlarmSirenChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'switchState' } }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'switchState' } }));
         return promises;
     }
 
     _createMotionDetectionChannel(device, channel) {
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.motionDetected', { type: 'state', common: { name: 'motionDetected', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.illumination', { type: 'state', common: { name: 'illumination', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.currentIllumination', { type: 'state', common: { name: 'currentIllumination', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.motionDetectionSendInterval', { type: 'state', common: { name: 'motionDetectionSendInterval', type: 'string', role: 'text', read: false, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.motionBufferActive', { type: 'state', common: { name: 'motionBufferActive', type: 'boolean', role: 'switch', read: false, write: true }, native: { id: device.id, channel: channel, parameter: 'switchState' } }));
-        promises.push(this.setObjectNotExistsAsync('devices.' + device.id + '.channels.' + channel + '.numberOfBrightnessMeasurements', { type: 'state', common: { name: 'numberOfBrightnessMeasurements', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.motionDetected', { type: 'state', common: { name: 'motionDetected', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.illumination', { type: 'state', common: { name: 'illumination', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.currentIllumination', { type: 'state', common: { name: 'currentIllumination', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.motionDetectionSendInterval', { type: 'state', common: { name: 'motionDetectionSendInterval', type: 'string', role: 'text', read: false, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.motionBufferActive', { type: 'state', common: { name: 'motionBufferActive', type: 'boolean', role: 'switch', read: false, write: true }, native: { id: device.id, channel: channel, parameter: 'switchState' } }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.numberOfBrightnessMeasurements', { type: 'state', common: { name: 'numberOfBrightnessMeasurements', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         return promises;
     }
 
@@ -2176,54 +2176,54 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _createObjectsForGroup(group) {
         this.log.silly("createObjectsForGroup - " + JSON.stringify(group));
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('groups.' + group.id, { type: 'device', common: { name: group.label }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.info.type', { type: 'state', common: { name: 'type', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.info.label', { type: 'state', common: { name: 'label', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('groups.' + group.id, { type: 'device', common: { name: group.label }, native: {} }));
+        promises.push(this.extendObjectAsync('groups.' + group.id + '.info.type', { type: 'state', common: { name: 'type', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('groups.' + group.id + '.info.label', { type: 'state', common: { name: 'label', type: 'string', role: 'text', read: true, write: false }, native: {} }));
 
         switch (group.type) {
             case 'HEATING': {
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.windowOpenTemperature', { type: 'state', common: { name: 'windowOpenTemperature', type: 'number', role: 'value', unit: '°C', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'level.temperature', unit: '°C', read: true, write: true }, native: { id: [group.id], step: 0.5, debounce: 5000, parameter: 'setPointTemperature' } }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.minTemperature', { type: 'state', common: { name: 'minTemperature', type: 'number', role: 'value', unit: '°C', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.maxTemperature', { type: 'state', common: { name: 'maxTemperature', type: 'number', role: 'value', unit: '°C', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.windowState', { type: 'state', common: { name: 'windowState', type: 'string', role: 'value', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.cooling', { type: 'state', common: { name: 'cooling', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.partyMode', { type: 'state', common: { name: 'partyMode', type: 'string', role: 'value', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.controlMode', { type: 'state', common: { name: 'controlMode', type: 'string', role: 'text', read: true, write: true }, native:  { id: [group.id], parameter: 'setControlMode' } }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.boostMode', { type: 'state', common: { name: 'boostMode', type: 'boolean', role: 'switch', read: true, write: true }, native:  { id: [group.id], parameter: 'setBoost' } }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.activeProfile', { type: 'state', common: { name: 'activeProfile', type: 'string', role: 'text', read: true, write: true }, native:  { id: [group.id], parameter: 'setActiveProfile' } }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.boostDuration', { type: 'state', common: { name: 'boostDuration', type: 'number', role: 'value', unit: 'min', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'value.temperature', unit: '°C', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.humidity', { type: 'state', common: { name: 'humidity', type: 'number', role: 'value.humidity', unit: '%', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.coolingAllowed', { type: 'state', common: { name: 'coolingAllowed', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.coolingIgnored', { type: 'state', common: { name: 'coolingIgnored', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.ecoAllowed', { type: 'state', common: { name: 'ecoAllowed', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.ecoIgnored', { type: 'state', common: { name: 'ecoIgnored', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.controllable', { type: 'state', common: { name: 'controllable', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.floorHeatingMode', { type: 'state', common: { name: 'floorHeatingMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.humidityLimitEnabled', { type: 'state', common: { name: 'humidityLimitEnabled', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.humidityLimitValue', { type: 'state', common: { name: 'humidityLimitValue', type: 'number', role: 'value', unit: '%', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.externalClockEnabled', { type: 'state', common: { name: 'externalClockEnabled', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.externalClockHeatingTemperature', { type: 'state', common: { name: 'externalClockHeatingTemperature', type: 'number', role: 'value', unit: '°C', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.externalClockCoolingTemperature', { type: 'state', common: { name: 'externalClockCoolingTemperature', type: 'number', role: 'value', unit: '°C', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.valvePosition', { type: 'state', common: { name: 'valvePosition', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.sabotage', { type: 'state', common: { name: 'sabotage', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.windowOpenTemperature', { type: 'state', common: { name: 'windowOpenTemperature', type: 'number', role: 'value', unit: '°C', read: true, write: false }, native: {} }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.setPointTemperature', { type: 'state', common: { name: 'setPointTemperature', type: 'number', role: 'level.temperature', unit: '°C', read: true, write: true }, native: { id: [group.id], step: 0.5, debounce: 5000, parameter: 'setPointTemperature' } }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.minTemperature', { type: 'state', common: { name: 'minTemperature', type: 'number', role: 'value', unit: '°C', read: true, write: false }, native: {} }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.maxTemperature', { type: 'state', common: { name: 'maxTemperature', type: 'number', role: 'value', unit: '°C', read: true, write: false }, native: {} }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.windowState', { type: 'state', common: { name: 'windowState', type: 'string', role: 'value', read: true, write: false }, native: {} }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.cooling', { type: 'state', common: { name: 'cooling', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.partyMode', { type: 'state', common: { name: 'partyMode', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.controlMode', { type: 'state', common: { name: 'controlMode', type: 'string', role: 'text', read: true, write: true }, native:  { id: [group.id], parameter: 'setControlMode' } }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.boostMode', { type: 'state', common: { name: 'boostMode', type: 'boolean', role: 'switch', read: true, write: true }, native:  { id: [group.id], parameter: 'setBoost' } }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.activeProfile', { type: 'state', common: { name: 'activeProfile', type: 'string', role: 'text', read: true, write: true }, native:  { id: [group.id], parameter: 'setActiveProfile' } }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.boostDuration', { type: 'state', common: { name: 'boostDuration', type: 'number', role: 'value', unit: 'min', read: true, write: false }, native: {} }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.actualTemperature', { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'value.temperature', unit: '°C', read: true, write: false }, native: {} }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.humidity', { type: 'state', common: { name: 'humidity', type: 'number', role: 'value.humidity', unit: '%', read: true, write: false }, native: {} }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.coolingAllowed', { type: 'state', common: { name: 'coolingAllowed', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.coolingIgnored', { type: 'state', common: { name: 'coolingIgnored', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.ecoAllowed', { type: 'state', common: { name: 'ecoAllowed', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.ecoIgnored', { type: 'state', common: { name: 'ecoIgnored', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.controllable', { type: 'state', common: { name: 'controllable', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.floorHeatingMode', { type: 'state', common: { name: 'floorHeatingMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.humidityLimitEnabled', { type: 'state', common: { name: 'humidityLimitEnabled', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.humidityLimitValue', { type: 'state', common: { name: 'humidityLimitValue', type: 'number', role: 'value', unit: '%', read: true, write: false }, native: {} }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.externalClockEnabled', { type: 'state', common: { name: 'externalClockEnabled', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.externalClockHeatingTemperature', { type: 'state', common: { name: 'externalClockHeatingTemperature', type: 'number', role: 'value', unit: '°C', read: true, write: false }, native: {} }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.externalClockCoolingTemperature', { type: 'state', common: { name: 'externalClockCoolingTemperature', type: 'number', role: 'value', unit: '°C', read: true, write: false }, native: {} }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.valvePosition', { type: 'state', common: { name: 'valvePosition', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.sabotage', { type: 'state', common: { name: 'sabotage', type: 'string', role: 'text', read: true, write: false }, native: {} }));
                 break;
             }
             case 'ALARM_SWITCHING': {
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.setOnTime', { type: 'state', common: { name: 'setOnTime', type: 'string', role: 'text', read: true, write: true }, native: { id: [group.id], parameter: 'setOnTime' } }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.testSignalOptical', { type: 'state', common: { name: 'testSignalOptical', type: 'string', role: 'text', read: true, write: true, states: { DISABLE_OPTICAL_SIGNAL: 'DISABLE_OPTICAL_SIGNAL', BLINKING_ALTERNATELY_REPEATING: 'BLINKING_ALTERNATELY_REPEATING', BLINKING_BOTH_REPEATING: 'BLINKING_BOTH_REPEATING', DOUBLE_FLASHING_REPEATING: 'DOUBLE_FLASHING_REPEATING', FLASHING_BOTH_REPEATING: 'FLASHING_BOTH_REPEATING', CONFIRMATION_SIGNAL_0: 'CONFIRMATION_SIGNAL_0', CONFIRMATION_SIGNAL_1: 'CONFIRMATION_SIGNAL_1', CONFIRMATION_SIGNAL_2: 'CONFIRMATION_SIGNAL_2' } }, native: { id: [group.id], parameter: 'testSignalOptical' } }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.setSignalOptical', { type: 'state', common: { name: 'setSignalOptical', type: 'string', role: 'text', read: true, write: true, states: { DISABLE_OPTICAL_SIGNAL: 'DISABLE_OPTICAL_SIGNAL', BLINKING_ALTERNATELY_REPEATING: 'BLINKING_ALTERNATELY_REPEATING', BLINKING_BOTH_REPEATING: 'BLINKING_BOTH_REPEATING', DOUBLE_FLASHING_REPEATING: 'DOUBLE_FLASHING_REPEATING', FLASHING_BOTH_REPEATING: 'FLASHING_BOTH_REPEATING', CONFIRMATION_SIGNAL_0: 'CONFIRMATION_SIGNAL_0', CONFIRMATION_SIGNAL_1: 'CONFIRMATION_SIGNAL_1', CONFIRMATION_SIGNAL_2: 'CONFIRMATION_SIGNAL_2' } }, native: { id: [group.id], parameter: 'setSignalOptical' } }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.testSignalAcoustic', { type: 'state', common: { name: 'testSignalAcoustic', type: 'string', role: 'text', read: true, write: true, states: { DISABLE_ACOUSTIC_SIGNAL: 'DISABLE_ACOUSTIC_SIGNAL', FREQUENCY_RISING: 'FREQUENCY_RISING', FREQUENCY_FALLING: 'FREQUENCY_FALLING', FREQUENCY_RISING_AND_FALLING: 'FREQUENCY_RISING_AND_FALLING', FREQUENCY_ALTERNATING_LOW_HIGH: 'FREQUENCY_ALTERNATING_LOW_HIGH', FREQUENCY_ALTERNATING_LOW_MID_HIGH: 'FREQUENCY_ALTERNATING_LOW_MID_HIGH', FREQUENCY_HIGHON_OFF: 'FREQUENCY_HIGHON_OFF', FREQUENCY_HIGHON_LONGOFF: 'FREQUENCY_HIGHON_LONGOFF', FREQUENCY_LOWON_OFF_HIGHON_OFF: 'FREQUENCY_LOWON_OFF_HIGHON_OFF', FREQUENCY_LOWON_LONGOFF_HIGHON_LONGOFF: 'FREQUENCY_LOWON_LONGOFF_HIGHON_LONGOFF', LOW_BATTERY: 'LOW_BATTERY', DISARMED: 'DISARMED', INTERNALLY_ARMED: 'INTERNALLY_ARMED', EXTERNALLY_ARMED: 'EXTERNALLY_ARMED', DELAYED_INTERNALLY_ARMED: 'DELAYED_INTERNALLY_ARMED', DELAYED_EXTERNALLY_ARMED: 'DELAYED_EXTERNALLY_ARMED', EVENT: 'EVENT', ERROR: 'ERROR' } }, native: { id: [group.id], parameter: 'testSignalAcoustic' } }));
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.setSignalAcoustic', { type: 'state', common: { name: 'setSignalAcoustic', type: 'string', role: 'text', read: true, write: true, states: { DISABLE_ACOUSTIC_SIGNAL: 'DISABLE_ACOUSTIC_SIGNAL', FREQUENCY_RISING: 'FREQUENCY_RISING', FREQUENCY_FALLING: 'FREQUENCY_FALLING', FREQUENCY_RISING_AND_FALLING: 'FREQUENCY_RISING_AND_FALLING', FREQUENCY_ALTERNATING_LOW_HIGH: 'FREQUENCY_ALTERNATING_LOW_HIGH', FREQUENCY_ALTERNATING_LOW_MID_HIGH: 'FREQUENCY_ALTERNATING_LOW_MID_HIGH', FREQUENCY_HIGHON_OFF: 'FREQUENCY_HIGHON_OFF', FREQUENCY_HIGHON_LONGOFF: 'FREQUENCY_HIGHON_LONGOFF', FREQUENCY_LOWON_OFF_HIGHON_OFF: 'FREQUENCY_LOWON_OFF_HIGHON_OFF', FREQUENCY_LOWON_LONGOFF_HIGHON_LONGOFF: 'FREQUENCY_LOWON_LONGOFF_HIGHON_LONGOFF', LOW_BATTERY: 'LOW_BATTERY', DISARMED: 'DISARMED', INTERNALLY_ARMED: 'INTERNALLY_ARMED', EXTERNALLY_ARMED: 'EXTERNALLY_ARMED', DELAYED_INTERNALLY_ARMED: 'DELAYED_INTERNALLY_ARMED', DELAYED_EXTERNALLY_ARMED: 'DELAYED_EXTERNALLY_ARMED', EVENT: 'EVENT', ERROR: 'ERROR' } }, native: { id: [group.id], parameter: 'setSignalAcoustic' } }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.setOnTime', { type: 'state', common: { name: 'setOnTime', type: 'string', role: 'text', read: true, write: true }, native: { id: [group.id], parameter: 'setOnTime' } }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.testSignalOptical', { type: 'state', common: { name: 'testSignalOptical', type: 'string', role: 'text', read: true, write: true, states: { DISABLE_OPTICAL_SIGNAL: 'DISABLE_OPTICAL_SIGNAL', BLINKING_ALTERNATELY_REPEATING: 'BLINKING_ALTERNATELY_REPEATING', BLINKING_BOTH_REPEATING: 'BLINKING_BOTH_REPEATING', DOUBLE_FLASHING_REPEATING: 'DOUBLE_FLASHING_REPEATING', FLASHING_BOTH_REPEATING: 'FLASHING_BOTH_REPEATING', CONFIRMATION_SIGNAL_0: 'CONFIRMATION_SIGNAL_0', CONFIRMATION_SIGNAL_1: 'CONFIRMATION_SIGNAL_1', CONFIRMATION_SIGNAL_2: 'CONFIRMATION_SIGNAL_2' } }, native: { id: [group.id], parameter: 'testSignalOptical' } }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.setSignalOptical', { type: 'state', common: { name: 'setSignalOptical', type: 'string', role: 'text', read: true, write: true, states: { DISABLE_OPTICAL_SIGNAL: 'DISABLE_OPTICAL_SIGNAL', BLINKING_ALTERNATELY_REPEATING: 'BLINKING_ALTERNATELY_REPEATING', BLINKING_BOTH_REPEATING: 'BLINKING_BOTH_REPEATING', DOUBLE_FLASHING_REPEATING: 'DOUBLE_FLASHING_REPEATING', FLASHING_BOTH_REPEATING: 'FLASHING_BOTH_REPEATING', CONFIRMATION_SIGNAL_0: 'CONFIRMATION_SIGNAL_0', CONFIRMATION_SIGNAL_1: 'CONFIRMATION_SIGNAL_1', CONFIRMATION_SIGNAL_2: 'CONFIRMATION_SIGNAL_2' } }, native: { id: [group.id], parameter: 'setSignalOptical' } }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.testSignalAcoustic', { type: 'state', common: { name: 'testSignalAcoustic', type: 'string', role: 'text', read: true, write: true, states: { DISABLE_ACOUSTIC_SIGNAL: 'DISABLE_ACOUSTIC_SIGNAL', FREQUENCY_RISING: 'FREQUENCY_RISING', FREQUENCY_FALLING: 'FREQUENCY_FALLING', FREQUENCY_RISING_AND_FALLING: 'FREQUENCY_RISING_AND_FALLING', FREQUENCY_ALTERNATING_LOW_HIGH: 'FREQUENCY_ALTERNATING_LOW_HIGH', FREQUENCY_ALTERNATING_LOW_MID_HIGH: 'FREQUENCY_ALTERNATING_LOW_MID_HIGH', FREQUENCY_HIGHON_OFF: 'FREQUENCY_HIGHON_OFF', FREQUENCY_HIGHON_LONGOFF: 'FREQUENCY_HIGHON_LONGOFF', FREQUENCY_LOWON_OFF_HIGHON_OFF: 'FREQUENCY_LOWON_OFF_HIGHON_OFF', FREQUENCY_LOWON_LONGOFF_HIGHON_LONGOFF: 'FREQUENCY_LOWON_LONGOFF_HIGHON_LONGOFF', LOW_BATTERY: 'LOW_BATTERY', DISARMED: 'DISARMED', INTERNALLY_ARMED: 'INTERNALLY_ARMED', EXTERNALLY_ARMED: 'EXTERNALLY_ARMED', DELAYED_INTERNALLY_ARMED: 'DELAYED_INTERNALLY_ARMED', DELAYED_EXTERNALLY_ARMED: 'DELAYED_EXTERNALLY_ARMED', EVENT: 'EVENT', ERROR: 'ERROR' } }, native: { id: [group.id], parameter: 'testSignalAcoustic' } }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.setSignalAcoustic', { type: 'state', common: { name: 'setSignalAcoustic', type: 'string', role: 'text', read: true, write: true, states: { DISABLE_ACOUSTIC_SIGNAL: 'DISABLE_ACOUSTIC_SIGNAL', FREQUENCY_RISING: 'FREQUENCY_RISING', FREQUENCY_FALLING: 'FREQUENCY_FALLING', FREQUENCY_RISING_AND_FALLING: 'FREQUENCY_RISING_AND_FALLING', FREQUENCY_ALTERNATING_LOW_HIGH: 'FREQUENCY_ALTERNATING_LOW_HIGH', FREQUENCY_ALTERNATING_LOW_MID_HIGH: 'FREQUENCY_ALTERNATING_LOW_MID_HIGH', FREQUENCY_HIGHON_OFF: 'FREQUENCY_HIGHON_OFF', FREQUENCY_HIGHON_LONGOFF: 'FREQUENCY_HIGHON_LONGOFF', FREQUENCY_LOWON_OFF_HIGHON_OFF: 'FREQUENCY_LOWON_OFF_HIGHON_OFF', FREQUENCY_LOWON_LONGOFF_HIGHON_LONGOFF: 'FREQUENCY_LOWON_LONGOFF_HIGHON_LONGOFF', LOW_BATTERY: 'LOW_BATTERY', DISARMED: 'DISARMED', INTERNALLY_ARMED: 'INTERNALLY_ARMED', EXTERNALLY_ARMED: 'EXTERNALLY_ARMED', DELAYED_INTERNALLY_ARMED: 'DELAYED_INTERNALLY_ARMED', DELAYED_EXTERNALLY_ARMED: 'DELAYED_EXTERNALLY_ARMED', EVENT: 'EVENT', ERROR: 'ERROR' } }, native: { id: [group.id], parameter: 'setSignalAcoustic' } }));
                 break;
             }
             case 'SWITCHING': {
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { } }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { } }));
                 break;
             }
             case 'SECURITY_ZONE' : {
-                promises.push(this.setObjectNotExistsAsync('groups.' + group.id + '.active', { type: 'state', common: { name: 'active', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.active', { type: 'state', common: { name: 'active', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
                 break;
             }
         }
@@ -2234,70 +2234,70 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _createObjectsForClient(client) {
         this.log.silly("createObjectsForClient - " + JSON.stringify(client));
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('clients.' + client.id, { type: 'device', common: { name: client.label }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('clients.' + client.id + '.info.label', { type: 'state', common: { name: 'label', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('clients.' + client.id, { type: 'device', common: { name: client.label }, native: {} }));
+        promises.push(this.extendObjectAsync('clients.' + client.id + '.info.label', { type: 'state', common: { name: 'label', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         return Promise.all(promises);
     }
 
     _createObjectsForHome(home) {
         this.log.silly("createObjectsForHome - " + JSON.stringify(home));
         let promises = [];
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id, { type: 'device', common: {}, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id, { type: 'device', common: {}, native: {} }));
 
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.weather.temperature', { type: 'state', common: { name: 'temperature', type: 'number', role: 'value.temperature', unit: '°C', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.weather.weatherCondition', { type: 'state', common: { name: 'weatherCondition', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.weather.weatherDayTime', { type: 'state', common: { name: 'weatherDayTime', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.weather.minTemperature', { type: 'state', common: { name: 'minTemperature', type: 'number', role: 'value.temperature.min', unit: '°C', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.weather.maxTemperature', { type: 'state', common: { name: 'maxTemperature', type: 'number', role: 'value.temperature.max', unit: '°C', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.weather.humidity', { type: 'state', common: { name: 'humidity', type: 'number', role: 'value.humidity', unit: '%', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.weather.windSpeed', { type: 'state', common: { name: 'windSpeed', type: 'number', role: 'value.speed.wind', unit: 'km/h', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.weather.windDirection', { type: 'state', common: { name: 'windDirection', type: 'number', role: 'value.direction.wind',unit: '°', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.weather.temperature', { type: 'state', common: { name: 'temperature', type: 'number', role: 'value.temperature', unit: '°C', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.weather.weatherCondition', { type: 'state', common: { name: 'weatherCondition', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.weather.weatherDayTime', { type: 'state', common: { name: 'weatherDayTime', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.weather.minTemperature', { type: 'state', common: { name: 'minTemperature', type: 'number', role: 'value.temperature.min', unit: '°C', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.weather.maxTemperature', { type: 'state', common: { name: 'maxTemperature', type: 'number', role: 'value.temperature.max', unit: '°C', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.weather.humidity', { type: 'state', common: { name: 'humidity', type: 'number', role: 'value.humidity', unit: '%', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.weather.windSpeed', { type: 'state', common: { name: 'windSpeed', type: 'number', role: 'value.speed.wind', unit: 'km/h', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.weather.windDirection', { type: 'state', common: { name: 'windDirection', type: 'number', role: 'value.direction.wind',unit: '°', read: true, write: false }, native: {} }));
 
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventTimestamp', { type: 'state', common: { name: 'alarmEventTimestamp', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventDeviceId', { type: 'state', common: { name: 'alarmEventDeviceId', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventTriggerId', { type: 'state', common: { name: 'alarmEventTriggerId', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventDeviceChannel', { type: 'state', common: { name: 'alarmEventDeviceChannel', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmSecurityJournalEntryType', { type: 'state', common: { name: 'alarmSecurityJournalEntryType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmActive', { type: 'state', common: { name: 'alarmActive', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.zoneActivationDelay', { type: 'state', common: { name: 'zoneActivationDelay', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.intrusionAlertThroughSmokeDetectors', { type: 'state', common: { name: 'intrusionAlertThroughSmokeDetectors', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.securityZoneActivationMode', { type: 'state', common: { name: 'securityZoneActivationMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.solution', { type: 'state', common: { name: 'solution', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.activationInProgress', { type: 'state', common: { name: 'activationInProgress', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.active', { type: 'state', common: { name: 'active', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventTimestamp', { type: 'state', common: { name: 'alarmEventTimestamp', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventDeviceId', { type: 'state', common: { name: 'alarmEventDeviceId', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventTriggerId', { type: 'state', common: { name: 'alarmEventTriggerId', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventDeviceChannel', { type: 'state', common: { name: 'alarmEventDeviceChannel', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmSecurityJournalEntryType', { type: 'state', common: { name: 'alarmSecurityJournalEntryType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmActive', { type: 'state', common: { name: 'alarmActive', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.zoneActivationDelay', { type: 'state', common: { name: 'zoneActivationDelay', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.intrusionAlertThroughSmokeDetectors', { type: 'state', common: { name: 'intrusionAlertThroughSmokeDetectors', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.securityZoneActivationMode', { type: 'state', common: { name: 'securityZoneActivationMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.solution', { type: 'state', common: { name: 'solution', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.activationInProgress', { type: 'state', common: { name: 'activationInProgress', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.active', { type: 'state', common: { name: 'active', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
 
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.setOnTime', { type: 'state', common: { name: 'setOnTime', type: 'string', role: 'text', read: true, write: true }, native: { id: home.functionalHomes.SECURITY_AND_ALARM.functionalGroups, parameter: 'setOnTime' } }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.testSignalOptical', { type: 'state', common: { name: 'testSignalOptical', type: 'string', role: 'text', read: true, write: true, states: { DISABLE_OPTICAL_SIGNAL: 'DISABLE_OPTICAL_SIGNAL', BLINKING_ALTERNATELY_REPEATING: 'BLINKING_ALTERNATELY_REPEATING', BLINKING_BOTH_REPEATING: 'BLINKING_BOTH_REPEATING', DOUBLE_FLASHING_REPEATING: 'DOUBLE_FLASHING_REPEATING', FLASHING_BOTH_REPEATING: 'FLASHING_BOTH_REPEATING', CONFIRMATION_SIGNAL_0: 'CONFIRMATION_SIGNAL_0', CONFIRMATION_SIGNAL_1: 'CONFIRMATION_SIGNAL_1', CONFIRMATION_SIGNAL_2: 'CONFIRMATION_SIGNAL_2' } }, native: { id: home.functionalHomes.SECURITY_AND_ALARM.securitySwitchingGroups, parameter: 'testSignalOptical' } }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.setSignalOptical', { type: 'state', common: { name: 'setSignalOptical', type: 'string', role: 'text', read: true, write: true, states: { DISABLE_OPTICAL_SIGNAL: 'DISABLE_OPTICAL_SIGNAL', BLINKING_ALTERNATELY_REPEATING: 'BLINKING_ALTERNATELY_REPEATING', BLINKING_BOTH_REPEATING: 'BLINKING_BOTH_REPEATING', DOUBLE_FLASHING_REPEATING: 'DOUBLE_FLASHING_REPEATING', FLASHING_BOTH_REPEATING: 'FLASHING_BOTH_REPEATING', CONFIRMATION_SIGNAL_0: 'CONFIRMATION_SIGNAL_0', CONFIRMATION_SIGNAL_1: 'CONFIRMATION_SIGNAL_1', CONFIRMATION_SIGNAL_2: 'CONFIRMATION_SIGNAL_2' } }, native: { id: home.functionalHomes.SECURITY_AND_ALARM.securitySwitchingGroups, parameter: 'setSignalOptical' } }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.testSignalAcoustic', { type: 'state', common: { name: 'testSignalAcoustic', type: 'string', role: 'text', read: true, write: true, states: { DISABLE_ACOUSTIC_SIGNAL: 'DISABLE_ACOUSTIC_SIGNAL', FREQUENCY_RISING: 'FREQUENCY_RISING', FREQUENCY_FALLING: 'FREQUENCY_FALLING', FREQUENCY_RISING_AND_FALLING: 'FREQUENCY_RISING_AND_FALLING', FREQUENCY_ALTERNATING_LOW_HIGH: 'FREQUENCY_ALTERNATING_LOW_HIGH', FREQUENCY_ALTERNATING_LOW_MID_HIGH: 'FREQUENCY_ALTERNATING_LOW_MID_HIGH', FREQUENCY_HIGHON_OFF: 'FREQUENCY_HIGHON_OFF', FREQUENCY_HIGHON_LONGOFF: 'FREQUENCY_HIGHON_LONGOFF', FREQUENCY_LOWON_OFF_HIGHON_OFF: 'FREQUENCY_LOWON_OFF_HIGHON_OFF', FREQUENCY_LOWON_LONGOFF_HIGHON_LONGOFF: 'FREQUENCY_LOWON_LONGOFF_HIGHON_LONGOFF', LOW_BATTERY: 'LOW_BATTERY', DISARMED: 'DISARMED', INTERNALLY_ARMED: 'INTERNALLY_ARMED', EXTERNALLY_ARMED: 'EXTERNALLY_ARMED', DELAYED_INTERNALLY_ARMED: 'DELAYED_INTERNALLY_ARMED', DELAYED_EXTERNALLY_ARMED: 'DELAYED_EXTERNALLY_ARMED', EVENT: 'EVENT', ERROR: 'ERROR' } }, native: { id: home.functionalHomes.SECURITY_AND_ALARM.securitySwitchingGroups, parameter: 'testSignalAcoustic' } }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.setSignalAcoustic', { type: 'state', common: { name: 'setSignalAcoustic', type: 'string', role: 'text', read: true, write: true, states: { DISABLE_ACOUSTIC_SIGNAL: 'DISABLE_ACOUSTIC_SIGNAL', FREQUENCY_RISING: 'FREQUENCY_RISING', FREQUENCY_FALLING: 'FREQUENCY_FALLING', FREQUENCY_RISING_AND_FALLING: 'FREQUENCY_RISING_AND_FALLING', FREQUENCY_ALTERNATING_LOW_HIGH: 'FREQUENCY_ALTERNATING_LOW_HIGH', FREQUENCY_ALTERNATING_LOW_MID_HIGH: 'FREQUENCY_ALTERNATING_LOW_MID_HIGH', FREQUENCY_HIGHON_OFF: 'FREQUENCY_HIGHON_OFF', FREQUENCY_HIGHON_LONGOFF: 'FREQUENCY_HIGHON_LONGOFF', FREQUENCY_LOWON_OFF_HIGHON_OFF: 'FREQUENCY_LOWON_OFF_HIGHON_OFF', FREQUENCY_LOWON_LONGOFF_HIGHON_LONGOFF: 'FREQUENCY_LOWON_LONGOFF_HIGHON_LONGOFF', LOW_BATTERY: 'LOW_BATTERY', DISARMED: 'DISARMED', INTERNALLY_ARMED: 'INTERNALLY_ARMED', EXTERNALLY_ARMED: 'EXTERNALLY_ARMED', DELAYED_INTERNALLY_ARMED: 'DELAYED_INTERNALLY_ARMED', DELAYED_EXTERNALLY_ARMED: 'DELAYED_EXTERNALLY_ARMED', EVENT: 'EVENT', ERROR: 'ERROR' } }, native: { id: home.functionalHomes.SECURITY_AND_ALARM.securitySwitchingGroups, parameter: 'setSignalAcoustic' } }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.setOnTime', { type: 'state', common: { name: 'setOnTime', type: 'string', role: 'text', read: true, write: true }, native: { id: home.functionalHomes.SECURITY_AND_ALARM.functionalGroups, parameter: 'setOnTime' } }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.testSignalOptical', { type: 'state', common: { name: 'testSignalOptical', type: 'string', role: 'text', read: true, write: true, states: { DISABLE_OPTICAL_SIGNAL: 'DISABLE_OPTICAL_SIGNAL', BLINKING_ALTERNATELY_REPEATING: 'BLINKING_ALTERNATELY_REPEATING', BLINKING_BOTH_REPEATING: 'BLINKING_BOTH_REPEATING', DOUBLE_FLASHING_REPEATING: 'DOUBLE_FLASHING_REPEATING', FLASHING_BOTH_REPEATING: 'FLASHING_BOTH_REPEATING', CONFIRMATION_SIGNAL_0: 'CONFIRMATION_SIGNAL_0', CONFIRMATION_SIGNAL_1: 'CONFIRMATION_SIGNAL_1', CONFIRMATION_SIGNAL_2: 'CONFIRMATION_SIGNAL_2' } }, native: { id: home.functionalHomes.SECURITY_AND_ALARM.securitySwitchingGroups, parameter: 'testSignalOptical' } }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.setSignalOptical', { type: 'state', common: { name: 'setSignalOptical', type: 'string', role: 'text', read: true, write: true, states: { DISABLE_OPTICAL_SIGNAL: 'DISABLE_OPTICAL_SIGNAL', BLINKING_ALTERNATELY_REPEATING: 'BLINKING_ALTERNATELY_REPEATING', BLINKING_BOTH_REPEATING: 'BLINKING_BOTH_REPEATING', DOUBLE_FLASHING_REPEATING: 'DOUBLE_FLASHING_REPEATING', FLASHING_BOTH_REPEATING: 'FLASHING_BOTH_REPEATING', CONFIRMATION_SIGNAL_0: 'CONFIRMATION_SIGNAL_0', CONFIRMATION_SIGNAL_1: 'CONFIRMATION_SIGNAL_1', CONFIRMATION_SIGNAL_2: 'CONFIRMATION_SIGNAL_2' } }, native: { id: home.functionalHomes.SECURITY_AND_ALARM.securitySwitchingGroups, parameter: 'setSignalOptical' } }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.testSignalAcoustic', { type: 'state', common: { name: 'testSignalAcoustic', type: 'string', role: 'text', read: true, write: true, states: { DISABLE_ACOUSTIC_SIGNAL: 'DISABLE_ACOUSTIC_SIGNAL', FREQUENCY_RISING: 'FREQUENCY_RISING', FREQUENCY_FALLING: 'FREQUENCY_FALLING', FREQUENCY_RISING_AND_FALLING: 'FREQUENCY_RISING_AND_FALLING', FREQUENCY_ALTERNATING_LOW_HIGH: 'FREQUENCY_ALTERNATING_LOW_HIGH', FREQUENCY_ALTERNATING_LOW_MID_HIGH: 'FREQUENCY_ALTERNATING_LOW_MID_HIGH', FREQUENCY_HIGHON_OFF: 'FREQUENCY_HIGHON_OFF', FREQUENCY_HIGHON_LONGOFF: 'FREQUENCY_HIGHON_LONGOFF', FREQUENCY_LOWON_OFF_HIGHON_OFF: 'FREQUENCY_LOWON_OFF_HIGHON_OFF', FREQUENCY_LOWON_LONGOFF_HIGHON_LONGOFF: 'FREQUENCY_LOWON_LONGOFF_HIGHON_LONGOFF', LOW_BATTERY: 'LOW_BATTERY', DISARMED: 'DISARMED', INTERNALLY_ARMED: 'INTERNALLY_ARMED', EXTERNALLY_ARMED: 'EXTERNALLY_ARMED', DELAYED_INTERNALLY_ARMED: 'DELAYED_INTERNALLY_ARMED', DELAYED_EXTERNALLY_ARMED: 'DELAYED_EXTERNALLY_ARMED', EVENT: 'EVENT', ERROR: 'ERROR' } }, native: { id: home.functionalHomes.SECURITY_AND_ALARM.securitySwitchingGroups, parameter: 'testSignalAcoustic' } }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.setSignalAcoustic', { type: 'state', common: { name: 'setSignalAcoustic', type: 'string', role: 'text', read: true, write: true, states: { DISABLE_ACOUSTIC_SIGNAL: 'DISABLE_ACOUSTIC_SIGNAL', FREQUENCY_RISING: 'FREQUENCY_RISING', FREQUENCY_FALLING: 'FREQUENCY_FALLING', FREQUENCY_RISING_AND_FALLING: 'FREQUENCY_RISING_AND_FALLING', FREQUENCY_ALTERNATING_LOW_HIGH: 'FREQUENCY_ALTERNATING_LOW_HIGH', FREQUENCY_ALTERNATING_LOW_MID_HIGH: 'FREQUENCY_ALTERNATING_LOW_MID_HIGH', FREQUENCY_HIGHON_OFF: 'FREQUENCY_HIGHON_OFF', FREQUENCY_HIGHON_LONGOFF: 'FREQUENCY_HIGHON_LONGOFF', FREQUENCY_LOWON_OFF_HIGHON_OFF: 'FREQUENCY_LOWON_OFF_HIGHON_OFF', FREQUENCY_LOWON_LONGOFF_HIGHON_LONGOFF: 'FREQUENCY_LOWON_LONGOFF_HIGHON_LONGOFF', LOW_BATTERY: 'LOW_BATTERY', DISARMED: 'DISARMED', INTERNALLY_ARMED: 'INTERNALLY_ARMED', EXTERNALLY_ARMED: 'EXTERNALLY_ARMED', DELAYED_INTERNALLY_ARMED: 'DELAYED_INTERNALLY_ARMED', DELAYED_EXTERNALLY_ARMED: 'DELAYED_EXTERNALLY_ARMED', EVENT: 'EVENT', ERROR: 'ERROR' } }, native: { id: home.functionalHomes.SECURITY_AND_ALARM.securitySwitchingGroups, parameter: 'setSignalAcoustic' } }));
 
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.setIntrusionAlertThroughSmokeDetectors', { type: 'state', common: { name: 'setIntrusionAlertThroughSmokeDetectors', type: 'boolean', role: 'button', read: false, write: true }, native: { parameter: 'setIntrusionAlertThroughSmokeDetectors' } }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.setSecurityZonesActivationNone', { type: 'state', common: { name: 'setSecurityZonesActivationNone', type: 'boolean', role: 'button', read: false, write: true }, native: { parameter: 'setSecurityZonesActivationNone' } }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.setSecurityZonesActivationInternal', { type: 'state', common: { name: 'setSecurityZonesActivationInternal', type: 'boolean', role: 'button', read: false, write: true }, native: { parameter: 'setSecurityZonesActivationInternal' } }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.setSecurityZonesActivationExternal', { type: 'state', common: { name: 'setSecurityZonesActivationExternal', type: 'boolean', role: 'button', read: false, write: true }, native: { parameter: 'setSecurityZonesActivationExternal' } }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.setSecurityZonesActivationInternalAndExternal', { type: 'state', common: { name: 'setSecurityZonesActivationInternalAndExternal', type: 'boolean', role: 'button', read: false, write: true }, native: { parameter: 'setSecurityZonesActivationInternalAndExternal' } }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.setIntrusionAlertThroughSmokeDetectors', { type: 'state', common: { name: 'setIntrusionAlertThroughSmokeDetectors', type: 'boolean', role: 'button', read: false, write: true }, native: { parameter: 'setIntrusionAlertThroughSmokeDetectors' } }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.setSecurityZonesActivationNone', { type: 'state', common: { name: 'setSecurityZonesActivationNone', type: 'boolean', role: 'button', read: false, write: true }, native: { parameter: 'setSecurityZonesActivationNone' } }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.setSecurityZonesActivationInternal', { type: 'state', common: { name: 'setSecurityZonesActivationInternal', type: 'boolean', role: 'button', read: false, write: true }, native: { parameter: 'setSecurityZonesActivationInternal' } }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.setSecurityZonesActivationExternal', { type: 'state', common: { name: 'setSecurityZonesActivationExternal', type: 'boolean', role: 'button', read: false, write: true }, native: { parameter: 'setSecurityZonesActivationExternal' } }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.setSecurityZonesActivationInternalAndExternal', { type: 'state', common: { name: 'setSecurityZonesActivationInternalAndExternal', type: 'boolean', role: 'button', read: false, write: true }, native: { parameter: 'setSecurityZonesActivationInternalAndExternal' } }));
 
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.absenceType', { type: 'state', common: { name: 'absenceType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.absenceEndTime', { type: 'state', common: { name: 'absenceEndTime', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.ecoTemperature', { type: 'state', common: { name: 'ecoTemperature', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.coolingEnabled', { type: 'state', common: { name: 'coolingEnabled', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.ecoDuration', { type: 'state', common: { name: 'ecoDuration', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.optimumStartStopEnabled', { type: 'state', common: { name: 'optimumStartStopEnabled', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.solution', { type: 'state', common: { name: 'solution', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.active', { type: 'state', common: { name: 'active', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.indoorClimate.absenceType', { type: 'state', common: { name: 'absenceType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.indoorClimate.absenceEndTime', { type: 'state', common: { name: 'absenceEndTime', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.indoorClimate.ecoTemperature', { type: 'state', common: { name: 'ecoTemperature', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.indoorClimate.coolingEnabled', { type: 'state', common: { name: 'coolingEnabled', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.indoorClimate.ecoDuration', { type: 'state', common: { name: 'ecoDuration', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.indoorClimate.optimumStartStopEnabled', { type: 'state', common: { name: 'optimumStartStopEnabled', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.indoorClimate.solution', { type: 'state', common: { name: 'solution', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.indoorClimate.active', { type: 'state', common: { name: 'active', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
 
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.vacationTemperature', { type: 'state', common: { name: 'vacationTemperature', type: 'number', role: 'level', read: true, write: false }, native: {} }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.activateVacationWithEndTime', { type: 'state', common: { name: 'activateVacationWithEndTime', type: 'string', role: 'text', read: false, write: true }, native: { id: home.id, parameter: 'activateVacation' } }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.deactivateVacation', { type: 'state', common: { name: 'deactivateVacation', type: 'boolean', role: 'button', read: false, write: true }, native: { parameter: 'deactivateVacation' } }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.setAbsenceEndTime', { type: 'state', common: { name: 'setAbsenceEndTime', type: 'string', role: 'text', read: false, write: true }, native: { parameter: 'setAbsenceEndTime' } }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.setAbsenceDuration', { type: 'state', common: { name: 'setAbsenceDuration', type: 'string', role: 'text', read: false, write: true }, native: { parameter: 'setAbsenceDuration' } }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.deactivateAbsence', { type: 'state', common: { name: 'deactivateAbsence', type: 'boolean', role: 'button', read: false, write: true }, native: { parameter: 'deactivateAbsence' } }));
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.indoorClimate.activateAbsencePermanent', { type: 'state', common: { name: 'activateAbsencePermanent', type: 'boolean', role: 'button', read: false, write: true }, native: { parameter: 'setAbsencePermanent' } }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.indoorClimate.vacationTemperature', { type: 'state', common: { name: 'vacationTemperature', type: 'number', role: 'level', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.indoorClimate.activateVacationWithEndTime', { type: 'state', common: { name: 'activateVacationWithEndTime', type: 'string', role: 'text', read: false, write: true }, native: { id: home.id, parameter: 'activateVacation' } }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.indoorClimate.deactivateVacation', { type: 'state', common: { name: 'deactivateVacation', type: 'boolean', role: 'button', read: false, write: true }, native: { parameter: 'deactivateVacation' } }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.indoorClimate.setAbsenceEndTime', { type: 'state', common: { name: 'setAbsenceEndTime', type: 'string', role: 'text', read: false, write: true }, native: { parameter: 'setAbsenceEndTime' } }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.indoorClimate.setAbsenceDuration', { type: 'state', common: { name: 'setAbsenceDuration', type: 'string', role: 'text', read: false, write: true }, native: { parameter: 'setAbsenceDuration' } }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.indoorClimate.deactivateAbsence', { type: 'state', common: { name: 'deactivateAbsence', type: 'boolean', role: 'button', read: false, write: true }, native: { parameter: 'deactivateAbsence' } }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.indoorClimate.activateAbsencePermanent', { type: 'state', common: { name: 'activateAbsencePermanent', type: 'boolean', role: 'button', read: false, write: true }, native: { parameter: 'setAbsencePermanent' } }));
 
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.lightAndShadow.active', { type: 'state', common: { name: 'active', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.lightAndShadow.active', { type: 'state', common: { name: 'active', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
 
-        promises.push(this.setObjectNotExistsAsync('homes.' + home.id + '.functionalHomes.weatherAndEnvironment.active', { type: 'state', common: { name: 'active', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('homes.' + home.id + '.functionalHomes.weatherAndEnvironment.active', { type: 'state', common: { name: 'active', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
 
         return Promise.all(promises);
     }
