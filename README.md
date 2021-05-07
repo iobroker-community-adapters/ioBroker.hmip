@@ -55,7 +55,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
-### __WORK IN PROGRESS__
+### 1.11.1 (2021-05-08)
 * (Apollon77) IMPORTANT: The adapter now requires js-controller 3.1 at least!
 * (Apollon77) Update objects on startup to make sure definition is current
 * (Apollon77) prevent warnings in js-controller 3.3

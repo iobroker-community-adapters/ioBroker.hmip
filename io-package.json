@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "1.11.0",
+        "version": "1.11.1",
         "news": {
+            "1.11.1": {
+                "en": "IMPORTANT: The adapter now requires js-controller 3.1 at least!\nUpdate objects on startup to make sure definition is current\nprevent warnings in js-controller 3.3",
+                "de": "WICHTIG: Der Adapter benötigt jetzt mindestens js-controller 3.1!\nAktualisieren Sie die Objekte beim Start, um sicherzustellen, dass die Definition aktuell ist\nWarnungen in js-controller verhindern 3.3",
+                "ru": "ВАЖНО: Теперь для адаптера требуется js-controller не ниже 3.1!\nОбновлять объекты при запуске, чтобы убедиться, что определение актуально\nпредотвратить предупреждения в js-controller 3.3",
+                "pt": "IMPORTANTE: O adaptador agora requer pelo menos js-controller 3.1!\nAtualize os objetos na inicialização para garantir que a definição seja a atual\nevitar avisos no js-controller 3.3",
+                "nl": "BELANGRIJK: De adapter vereist nu minimaal js-controller 3.1!\nWerk objecten bij bij het opstarten om ervoor te zorgen dat de definitie actueel is\nwaarschuwingen voorkomen in js-controller 3.3",
+                "fr": "IMPORTANT: l'adaptateur nécessite maintenant au moins js-controller 3.1!\nMettez à jour les objets au démarrage pour vous assurer que la définition est à jour\nempêcher les avertissements dans js-controller 3.3",
+                "it": "IMPORTANTE: l'adattatore ora richiede almeno js-controller 3.1!\nAggiorna gli oggetti all'avvio per assicurarti che la definizione sia attuale\nprevenire avvisi in js-controller 3.3",
+                "es": "IMPORTANTE: ¡El adaptador ahora requiere js-controller 3.1 al menos!\nActualice los objetos al inicio para asegurarse de que la definición esté actualizada\nprevenir advertencias en js-controller 3.3",
+                "pl": "WAŻNE: adapter wymaga teraz co najmniej kontrolera js 3.1!\nZaktualizuj obiekty podczas uruchamiania, aby upewnić się, że definicja jest aktualna\nZapobiegaj ostrzeżeniom w js-controller 3.3",
+                "zh-cn": "重要信息：适配器现在至少需要js-controller 3.1！\n在启动时更新对象以确保定义是最新的\n防止在js-controller 3.3中出现警告"
+            },
             "1.11.0": {
                 "en": "Implement CARBON_DIOXIDE_SENSOR_CHANNEL",
                 "de": "Implementieren Sie CARBON_DIOXIDE_SENSOR_CHANNEL",
@@ -230,18 +242,6 @@
                 "es": "Recuerde que ya envió información de canales desconocidos para no enviar correo no deseado a Centinela\nEl mango se reconecta mejor (Sentry IOBROKER-HMIP-G)\nIntente evitar bloqueos en las respuestas válidas del servidor, la advertencia se registra\nAgregar HMIP-SPDR (PASSAGE_DETECTOR_CHANNEL)",
                 "pl": "Pamiętaj, że wysłałem już nieznane informacje o kanale, aby nie spamować Strażnika\nUchwyt ponownie łączy się lepiej (Sentry IOBROKER-HMIP-G)\nStaraj się zapobiegać awariom przy prawidłowych odpowiedziach serwera, ostrzeżenie jest rejestrowane\nDodaj HMIP-SPDR (PASSAGE_DETECTOR_CHANNEL)",
                 "zh-cn": "记住已经向未知垃圾邮件发送了未知的频道信息\n手柄重新连接更好（Sentry IOBROKER-HMIP-G）\n尝试防止在有效服务器响应上崩溃，并记录警告\n添加HMIP-SPDR（PASSAGE_DETECTOR_CHANNEL）"
-            },
-            "1.0.1": {
-                "en": "crash cases fixed",
-                "de": "Absturzfälle behoben",
-                "ru": "исправлены случаи аварий",
-                "pt": "casos de travamento corrigidos",
-                "nl": "crashgevallen opgelost",
-                "fr": "cas de crash corrigés",
-                "it": "casi di crash risolti",
-                "es": "casos de fallo arreglados",
-                "pl": "naprawiono awarie",
-                "zh-cn": "崩溃情况已修复"
             }
         },
         "title": "HomeMaticIP Cloud AccessPoint",
