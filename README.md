@@ -38,8 +38,8 @@ If you are looking for the information, if the alarm settings are active you hav
 
 ## Important Info what can be done with this adapter
 
-!!! You can only trigger events with this adapater that can be triggered thru the original Homematic IP app. 
-For example direct connections between devices have no events in the app and can also not be triggert thru this adapter!!! 
+!!! You can only trigger events with this adapter that can be triggered through the original Homematic IP app. 
+For example direct connections between devices have no events in the app and can also not be triggert through this adapter!!! 
 
 ## Settings
 * enter your SGTIN (back of the Access Point) and the PIN (if set before), and validate the data via press of the blue LED Button. This will create an Authentication token.
@@ -186,7 +186,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 ## License
 The MIT License (MIT)
 
-Copyright (c) 2018-2019 jogibear9988 <jochen.kuehner@gmx.de>
+Copyright (c) 2018-2021 jogibear9988 <jochen.kuehner@gmx.de>, Apollon77
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
