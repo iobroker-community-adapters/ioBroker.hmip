@@ -55,7 +55,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
-### __WORK IN PROGRESS__
+### 1.12.0 (2021-05-13)
 * (Apollon77) Implement NOTIFICATION_MP3_SOUND_CHANNEL
 
 ### 1.11.1 (2021-05-08)
