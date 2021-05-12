@@ -729,6 +729,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'NOTIFICATION_LIGHT_CHANNEL':
                     promises.push(...this._updateNotificationLightChannelStates(device, i));
                     break;
+                case 'NOTIFICATION_MP3_SOUND_CHANNEL':
+                    promises.push(...this._updateNotificationMp3SoundChannelStates(device, i));
+                    break;
                 case 'DOOR_CHANNEL':
                     promises.push(...this._updateDoorChannelStates(device, i));
                     break;
@@ -800,6 +803,15 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.on', device.functionalChannels[channel].on, true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.dimLevel', device.functionalChannels[channel].dimLevel, true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.simpleRGBColorState', device.functionalChannels[channel].simpleRGBColorState, true));
+        return promises;
+    }
+
+    _updateNotificationMp3SoundChannelStates(device, channel) {
+        let promises = [];
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.volumeLevel', device.functionalChannels[channel].volumeLevel, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.soundFile', device.functionalChannels[channel].soundFile, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.profileMode', device.functionalChannels[channel].profileMode, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.userDesiredProfileMode', device.functionalChannels[channel].userDesiredProfileMode, true));
         return promises;
     }
 
@@ -1608,6 +1620,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'NOTIFICATION_LIGHT_CHANNEL':
                     promises.push(...this._createNotificationLightChannel(device, i));
                     break;
+                case 'NOTIFICATION_MP3_SOUND_CHANNEL':
+                    promises.push(...this._createNotificationMp3SoundChannel(device, i));
+                    break;
                 case 'DOOR_CHANNEL':
                     promises.push(...this._createDoorChannel(device, i));
                     break;
@@ -1637,6 +1652,15 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         let promises = [];
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.powerMainsFailure', { type: 'state', common: { name: 'powerMainsFailure', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.genericAlarmSignal', { type: 'state', common: { name: 'genericAlarmSignal', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
+    _createNotificationMp3SoundChannel(device, channel) {
+        let promises = [];
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.volumeLevel', { type: 'state', common: { name: 'volumeLevel', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.soundFile', { type: 'state', common: { name: 'soundFile', type: 'string', role: 'text', read: true, write: true }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.profileMode', { type: 'state', common: { name: 'profileMode', type: 'string', role: 'text', read: true, write: true }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.userDesiredProfileMode', { type: 'state', common: { name: 'userDesiredProfileMode', type: 'string', role: 'text', read: true, write: true }, native: {} }));
         return promises;
     }
 
