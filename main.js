@@ -1922,7 +1922,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.coProRestartNeeded', { type: 'state', common: { name: 'coProRestartNeeded', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
 		promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.deviceUndervoltage', { type: 'state', common: { name: 'deviceUndervoltage', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverheated', { type: 'state', common: { name: 'deviceOverheated', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOutOfRange', { type: 'state', common: { name: 'temperatureOutOfRange', boolean: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOutOfRange', { type: 'state', common: { name: 'temperatureOutOfRange', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.incorrectPositioned', { type: 'state', common: { name: 'incorrectPositioned', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         return promises;
     }
