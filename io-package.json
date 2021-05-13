@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "1.12.0",
+        "version": "1.12.1",
         "news": {
+            "1.12.1": {
+                "en": "Fix a warning in js-controller 3.3",
+                "de": "Korrigieren Sie eine Warnung in js-controller 3.3",
+                "ru": "Исправить предупреждение в js-controller 3.3",
+                "pt": "Corrigir um aviso no js-controller 3.3",
+                "nl": "Herstel een waarschuwing in js-controller 3.3",
+                "fr": "Correction d'un avertissement dans js-controller 3.3",
+                "it": "Risolto un avviso in js-controller 3.3",
+                "es": "Arreglar una advertencia en js-controller 3.3",
+                "pl": "Napraw ostrzeżenie w js-controller 3.3",
+                "zh-cn": "修复js-controller 3.3中的警告"
+            },
             "1.12.0": {
                 "en": "Implement NOTIFICATION_MP3_SOUND_CHANNEL",
                 "de": "Implementieren Sie NOTIFICATION_MP3_SOUND_CHANNEL",
@@ -230,18 +242,6 @@
                 "es": "Se agregó una propiedad activa a grupos INTERNOS y EXTERNOS para zonas de alarma\n(marcus0303 / slix185) agregó propiedades DOOR_CHANNEL",
                 "pl": "Dodano aktywną właściwość grupy WEWNĘTRZNE i ZEWNĘTRZNE dla stref alarmowych\n(marcus0303 / slix185) dodano właściwości DOOR_CHANNEL",
                 "zh-cn": "为警报区域添加了活动属性“内部”和“外部”组\n（marcus0303 / slix185）添加了DOOR_CHANNEL属性"
-            },
-            "1.1.1": {
-                "en": "Crash prevented if object is deleted by state changed (Sentry IOBROKER-HMIP-Y)",
-                "de": "Absturz verhindert, wenn Objekt durch Statusänderung gelöscht wird (Sentry IOBROKER-HMIP-Y)",
-                "ru": "Сбой предотвращается, если объект удаляется при изменении состояния (Sentry IOBROKER-HMIP-Y)",
-                "pt": "Falha evitada se o objeto for excluído por estado alterado (Sentry IOBROKER-HMIP-Y)",
-                "nl": "Crash voorkomen als object wordt verwijderd door gewijzigde status (Sentry IOBROKER-HMIP-Y)",
-                "fr": "Crash évité si l'objet est supprimé par changement d'état (Sentry IOBROKER-HMIP-Y)",
-                "it": "Blocco impedito se l'oggetto viene eliminato dallo stato modificato (Sentry IOBROKER-HMIP-Y)",
-                "es": "Bloqueo evitado si el objeto es eliminado por el estado cambiado (Sentry IOBROKER-HMIP-Y)",
-                "pl": "Zapobieganie awariom, jeśli obiekt zostanie usunięty po zmianie stanu (Sentry IOBROKER-HMIP-Y)",
-                "zh-cn": "如果通过状态更改删除对象，可以防止崩溃（Sentry IOBROKER-HMIP-Y）"
             }
         },
         "title": "HomeMaticIP Cloud AccessPoint",
