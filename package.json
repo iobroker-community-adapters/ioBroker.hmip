@@ -27,7 +27,7 @@
     "node": ">=8.6.0"
   },
   "dependencies": {
-    "@iobroker/adapter-core": "^2.4.0",
+    "@iobroker/adapter-core": "^2.5.0",
     "delay": "^5.0.0",
     "js-sha512": "^0.8.0",
     "request-promise-native": "^1.0.9",
