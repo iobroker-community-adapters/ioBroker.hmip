@@ -55,7 +55,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
-### __WORK IN PROGRESS__
+### 1.12.2 (2021-06-04)
 * (Apollon77) Fix a warning in js-controller 3.3
 
 ### 1.12.1 (2021-05-13)
