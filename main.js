@@ -714,6 +714,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'ANALOG_OUTPUT_CHANNEL':
                     promises.push(...this._updateAnalogOutputChannelStates(device, i));
                     break;
+                case 'IMPULSE_OUTPUT_CHANNEL':
+                    promises.push(...this._updateImpulseOutputChannelStates(device, i));
+                    break;
                 case 'TILT_VIBRATION_SENSOR_CHANNEL':
                     promises.push(...this._updateTiltVibrationSensorChannelStates(device, i));
                     break;
@@ -986,6 +989,13 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _updateFloorTerminalBlockMechanicChannelStates(device, channel) {
         let promises = [];
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.valveState', device.functionalChannels[channel].valveState, true));
+        return promises;
+    }
+
+    _updateImpulseOutputChannelStates(device, channel) {
+        let promises = [];
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.processing', device.functionalChannels[channel].processing, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.impulseDuration', device.functionalChannels[channel].impulseDuration, true));
         return promises;
     }
 
@@ -1605,6 +1615,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'ANALOG_OUTPUT_CHANNEL':
                     promises.push(...this._createAnalogOutputChannel(device, i));
                     break;
+                case 'IMPULSE_OUTPUT_CHANNEL':
+                    promises.push(...this._createImpulseOutputChannel(device, i));
+                    break;
                 case 'TILT_VIBRATION_SENSOR_CHANNEL':
                     promises.push(...this._createTiltVibrationSensorChannel(device, i));
                     break;
@@ -1897,6 +1910,13 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _createAnalogOutputChannel(device, channel) {
         let promises = [];
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.analogOutputLevel', { type: 'state', common: { name: 'analogOutputLevel', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
+    _createImpulseOutputChannel(device, channel) {
+        let promises = [];
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.processing', { type: 'state', common: { name: 'processing', type: 'boolean', role: 'indicator.working', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.impulseDuration', { type: 'state', common: { name: 'impulseDuration', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         return promises;
     }
 
