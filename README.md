@@ -55,7 +55,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
 
-### __WORK IN PROGRESS__
+### 1.13.0 (2021-06-23)
 * (Apollon77) Add support for HM-WGC/IMPULSE_OUTPUT_CHANNEL
 
 ### 1.12.2 (2021-06-04)

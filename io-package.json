@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "1.12.2",
+        "version": "1.13.0",
         "news": {
+            "1.13.0": {
+                "en": "Add support for HM-WGC/IMPULSE_OUTPUT_CHANNEL",
+                "de": "Unterstützung für HM-WGC/IMPULSE_OUTPUT_CHANNEL hinzufügen",
+                "ru": "Добавить поддержку HM-WGC / IMPULSE_OUTPUT_CHANNEL",
+                "pt": "Adicionar suporte para HM-WGC / IMPULSE_OUTPUT_CHANNEL",
+                "nl": "Ondersteuning toevoegen voor HM-WGC/IMPULSE_OUTPUT_CHANNEL",
+                "fr": "Ajout de la prise en charge de HM-WGC/IMPULSE_OUTPUT_CHANNEL",
+                "it": "Aggiungi il supporto per HM-WGC/IMPULSE_OUTPUT_CHANNEL",
+                "es": "Agregar soporte para HM-WGC / IMPULSE_OUTPUT_CHANNEL",
+                "pl": "Dodaj obsługę HM-WGC/IMPULSE_OUTPUT_CHANNEL",
+                "zh-cn": "添加对 HM-WGC/IMPULSE_OUTPUT_CHANNEL 的支持"
+            },
             "1.12.2": {
                 "en": "Fix a warning in js-controller 3.3",
                 "de": "Beheben Sie eine Warnung in js-controller 3.3",
@@ -230,18 +242,6 @@
                 "es": "Caso de prevención de accidentes (Sentry IOBROKER-HMIP-1B)",
                 "pl": "Zapobiegaj przypadkowi Crash (Sentry IOBROKER-HMIP-1B)",
                 "zh-cn": "防止崩溃情况（Sentry IOBROKER-HMIP-1B）"
-            },
-            "1.2.1": {
-                "en": "Fix pairing process",
-                "de": "Pairing-Prozess korrigieren",
-                "ru": "Исправить процесс сопряжения",
-                "pt": "Corrigir processo de emparelhamento",
-                "nl": "Herstel het koppelingsproces",
-                "fr": "Correction du processus de couplage",
-                "it": "Correggi il processo di accoppiamento",
-                "es": "Arreglar el proceso de emparejamiento",
-                "pl": "Napraw proces parowania",
-                "zh-cn": "修复配对过程"
             }
         },
         "title": "HomeMaticIP Cloud AccessPoint",
