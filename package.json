@@ -33,7 +33,7 @@
     "request-promise-native": "^1.0.9",
     "request": "^2.88.2",
     "uuid": "^8.3.2",
-    "ws": "^7.5.2"
+    "ws": "^7.5.3"
   },
   "devDependencies": {
     "@alcalzone/release-script": "^2.2.0",
