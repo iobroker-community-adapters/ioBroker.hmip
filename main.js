@@ -1815,7 +1815,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _createDeviceSabotageChannel(device, channel) {
         let promises = [];
         promises.push(...this._createDeviceBaseChannel(device, channel));
-        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.sabotage', { type: 'state', common: { name: 'sabotage', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.sabotage', { type: 'state', common: { name: 'sabotage', type: 'boolean', role: 'indicator.alarm', read: true, write: false }, native: {} }));
         return promises;
     }
 
@@ -2251,7 +2251,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.extendObjectAsync('groups.' + group.id + '.externalClockHeatingTemperature', { type: 'state', common: { name: 'externalClockHeatingTemperature', type: 'number', role: 'value', unit: '°C', read: true, write: false }, native: {} }));
                 promises.push(this.extendObjectAsync('groups.' + group.id + '.externalClockCoolingTemperature', { type: 'state', common: { name: 'externalClockCoolingTemperature', type: 'number', role: 'value', unit: '°C', read: true, write: false }, native: {} }));
                 promises.push(this.extendObjectAsync('groups.' + group.id + '.valvePosition', { type: 'state', common: { name: 'valvePosition', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-                promises.push(this.extendObjectAsync('groups.' + group.id + '.sabotage', { type: 'state', common: { name: 'sabotage', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.sabotage', { type: 'state', common: { name: 'sabotage', type: 'boolean', role: 'indicator.alarm', read: true, write: false }, native: {} }));
                 break;
             }
             case 'ALARM_SWITCHING': {
