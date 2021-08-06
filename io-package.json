@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "hmip",
-        "version": "1.13.0",
+        "version": "1.13.1",
         "news": {
+            "1.13.1": {
+                "en": "Fix warning on js-controller 3.3 with \"sabotage\" datapoint",
+                "de": "Warnung auf js-Controller 3.3 mit \"Sabotage\"-Datenpunkt behoben",
+                "ru": "Исправить предупреждение на js-controller 3.3 с датапоинтом \"саботаж\"",
+                "pt": "Correção de aviso no js-controller 3.3 com ponto de dados \"sabotagem\"",
+                "nl": "Fix waarschuwing op js-controller 3.3 met \"sabotage\" datapunt",
+                "fr": "Correction d'un avertissement sur js-controller 3.3 avec le point de données \"sabotage\"",
+                "it": "Correzione dell'avviso su js-controller 3.3 con datapoint \"sabotaggio\"",
+                "es": "Se corrigió la advertencia en js-controller 3.3 con el punto de datos de \"sabotaje\"",
+                "pl": "Naprawiono ostrzeżenie na js-controllerze 3.3 z punktem danych „sabotaż”",
+                "zh-cn": "使用“破坏”数据点修复 js-controller 3.3 上的警告"
+            },
             "1.13.0": {
                 "en": "Add support for HM-WGC/IMPULSE_OUTPUT_CHANNEL",
                 "de": "Unterstützung für HM-WGC/IMPULSE_OUTPUT_CHANNEL hinzufügen",
@@ -230,18 +242,6 @@
                 "es": "Agregar MAINS_FAILURE_CHANNEL\nAñadir DEVICE_RECHARGEABLE_WITH_SABOTAGE, ACCESS_CONTROLLER_CHANNEL, FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL, DEVICE_BASE_FLOOR_HEATING, MULTI_MODE_INPUT_DIMMER_CHANNEL, MULTI_MODE_INPUT_SWITCH_CHANNEL, ANALOG_OUTPUT_CHANNEL, ACCELERATION_SENSOR_CHANNEL, TILT_VIBRATION_SENSOR_CHANNEL, SHADING_CHANNEL\nintente agregar soporte dim / rgb para NotificationLight. Es posible que deba eliminar / volver a crear los estados si no funciona.\nagregue funciones adicionales para setOperationLock, setClimateControlDisplay, setMinimumFloorHeatingValvePosition, setRgbDimLevel. Es posible que deba eliminar / volver a crear los estados si no funciona.\najustó algunos roles. Es posible que deba eliminar / volver a crear los estados si no funciona.",
                 "pl": "Dodaj MAINS_FAILURE_CHANNEL\nDodaj DEVICE_RECHARGEABLE_WITH_SABOTAGE, ACCESS_CONTROLLER_CHANNEL, FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL, DEVICE_BASE_FLOOR_HEATING, MULTI_MODE_INPUT_DIMMER_CHANNEL, MULTI_MODE_INPUT_SWITCH_CHANNEL, ANALOG_OUTPUT_CHANNEL, ACCELERATION_SENSOR_CHANNEL, TILT_VIBRATION_SENSOR_CHANNEL, SHADING_CHANNEL\nspróbuj dodać obsługę dim / rgb dla NotificationLight. Może być konieczne usunięcie / ponowne utworzenie stanów, jeśli nie działa.\ndodaj dodatkowe funkcje dla setOperationLock, setClimateControlDisplay, setMinimumFloorHeatingValvePosition, setRgbDimLevel. Może być konieczne usunięcie / ponowne utworzenie stanów, jeśli nie działa.\ndostosowałem niektóre role. Może być konieczne usunięcie / ponowne utworzenie stanów, jeśli nie działa.",
                 "zh-cn": "添加MAINS_FAILURE_CHANNEL\n添加DEVICE_RECHARGEABLE_WITH_SABOTAGE，ACCESS_CONTROLLER_CHANNEL，FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL，DEVICE_BASE_FLOOR_HEATING，MULTI_MODE_INPUT_DIMMER_CHANNEL，MULTI_MODE_INPUT_SWITCH_CHANNEL_CHAN_RATION_CHANS，CHANNEL_NELS，\n尝试为NotificationLight添加dim / rgb支持。如果它不起作用，则可能需要删除/重新创建状态。\n为setOperationLock，setClimateControlDisplay，setMinimumFloorHeatingValvePosition，setRgbDimLevel添加其他功能。如果它不起作用，则可能需要删除/重新创建状态。\n调整了一些角色。如果它不起作用，则可能需要删除/重新创建状态。"
-            },
-            "1.2.2": {
-                "en": "Prevent Crash case (Sentry IOBROKER-HMIP-1B)",
-                "de": "Absturz verhindern (Sentry IOBROKER-HMIP-1B)",
-                "ru": "Кейс Prevent Crash (Sentry IOBROKER-HMIP-1B)",
-                "pt": "Prevenir caso de falha (Sentry IOBROKER-HMIP-1B)",
-                "nl": "Voorkom een crashcase (Sentry IOBROKER-HMIP-1B)",
-                "fr": "Empêcher le cas de crash (Sentry IOBROKER-HMIP-1B)",
-                "it": "Prevent Crash case (Sentry IOBROKER-HMIP-1B)",
-                "es": "Caso de prevención de accidentes (Sentry IOBROKER-HMIP-1B)",
-                "pl": "Zapobiegaj przypadkowi Crash (Sentry IOBROKER-HMIP-1B)",
-                "zh-cn": "防止崩溃情况（Sentry IOBROKER-HMIP-1B）"
             }
         },
         "title": "HomeMaticIP Cloud AccessPoint",
