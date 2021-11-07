@@ -889,10 +889,6 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         let promises = [];
         promises.push(...this._updateMultiModeInputSwitchChannelStates(device, channel));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.dimLevel', device.functionalChannels[channel].dimLevel, true));
-        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverloaded', device.functionalChannels[channel].deviceOverloaded, true));
-        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.coProFaulty', device.functionalChannels[channel].coProFaulty, true));
-        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.coProRestartNeeded', device.functionalChannels[channel].coProRestartNeeded, true));
-        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverheated', device.functionalChannels[channel].deviceOverheated, true));
         return promises;
     }
 
@@ -962,10 +958,6 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _updateDeviceGlobalPumpControlStates(device, channel) {
         let promises = [];
         promises.push(...this._updateDeviceBaseChannelStates(device, channel));
-        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverloaded', device.functionalChannels[channel].deviceOverloaded, true));
-        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.deviceUndervoltage', device.functionalChannels[channel].deviceUndervoltage, true));
-        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverheated', device.functionalChannels[channel].deviceOverheated, true));
-        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOutOfRange', device.functionalChannels[channel].temperatureOutOfRange, true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionDuration', device.functionalChannels[channel].valveProtectionDuration, true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionSwitchingInterval', device.functionalChannels[channel].valveProtectionSwitchingInterval, true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.frostProtectionTemperature', device.functionalChannels[channel].frostProtectionTemperature, true));
@@ -1021,13 +1013,6 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _updateDeviceIncorrectPositionedStates(device, channel) {
         let promises = [];
         promises.push(...this._updateDeviceBaseChannelStates(device, channel));
-        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverloaded', device.functionalChannels[channel].deviceOverloaded, true));
-        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.coProUpdateFailure', device.functionalChannels[channel].coProUpdateFailure, true));
-        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.coProFaulty', device.functionalChannels[channel].coProFaulty, true));
-        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.coProRestartNeeded', device.functionalChannels[channel].coProRestartNeeded, true));
-        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.deviceUndervoltage', device.functionalChannels[channel].deviceUndervoltage, true));
-        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverheated', device.functionalChannels[channel].deviceOverheated, true));
-        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOutOfRange', device.functionalChannels[channel].temperatureOutOfRange, true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.incorrectPositioned', device.functionalChannels[channel].incorrectPositioned, true));
         return promises;
     }
@@ -1802,10 +1787,6 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         let promises = [];
         promises.push(...this._createMultiModeInputSwitchChannel(device, channel));
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.dimLevel', { type: 'state', common: { name: 'dimLevel', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverloaded', { type: 'state', common: { name: 'deviceOverloaded', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.coProFaulty', { type: 'state', common: { name: 'coProFaulty', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.coProRestartNeeded', { type: 'state', common: { name: 'coProRestartNeeded', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverheated', { type: 'state', common: { name: 'deviceOverheated', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         return promises;
     }
 
@@ -1887,10 +1868,6 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _createDeviceGlobalPumpControl(device, channel) {
         let promises = [];
         promises.push(...this._createDeviceBaseChannel(device, channel));
-        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverloaded', { type: 'state', common: { name: 'deviceOverloaded', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.deviceUndervoltage', { type: 'state', common: { name: 'deviceUndervoltage', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverheated', { type: 'state', common: { name: 'deviceOverheated', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOutOfRange', { type: 'state', common: { name: 'temperatureOutOfRange', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionDuration', { type: 'state', common: { name: 'valveProtectionDuration', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.valveProtectionSwitchingInterval', { type: 'state', common: { name: 'valveProtectionSwitchingInterval', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.frostProtectionTemperature', { type: 'state', common: { name: 'frostProtectionTemperature', type: 'number', role: 'value', read: true, write: false }, native: {} }));
@@ -1946,13 +1923,6 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _createDeviceIncorrectPositioned(device, channel) {
         let promises = [];
         promises.push(...this._createDeviceBaseChannel(device, channel));
-        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverloaded', { type: 'state', common: { name: 'deviceOverloaded', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.coProUpdateFailure', { type: 'state', common: { name: 'coProUpdateFailure', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.coProFaulty', { type: 'state', common: { name: 'coProFaulty', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.coProRestartNeeded', { type: 'state', common: { name: 'coProRestartNeeded', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-		promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.deviceUndervoltage', { type: 'state', common: { name: 'deviceUndervoltage', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.deviceOverheated', { type: 'state', common: { name: 'deviceOverheated', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.temperatureOutOfRange', { type: 'state', common: { name: 'temperatureOutOfRange', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.incorrectPositioned', { type: 'state', common: { name: 'incorrectPositioned', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         return promises;
     }

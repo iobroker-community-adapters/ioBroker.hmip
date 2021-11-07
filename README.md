@@ -58,6 +58,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 ### __WORK IN PROGRESS__
 * (Apollon77) Lower loglevel for state change logs to debug
 * (Apollon77) Add verification when reading some data to prevent crashes
+* (Apollon77) Removed some generic (error/info) states that only exists on chosen devices to re-add later in a generic way
 
 ### 1.13.2 (2021-08-25)
 * (Apollon77) Fix warning on js-controller 3.3 with two datapoints
