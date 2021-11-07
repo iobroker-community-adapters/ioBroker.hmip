@@ -414,9 +414,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         if (o && o.native && o.native.parameter) {
             if (o.native.step) {
                 state.val = this.round(state.val, o.native.step);
-                this.log.info(`state change - ${o.native.parameter} - id ${o.native.id ? o.native.id : ''} - value rounded to ${state.val} (step=${o.native.step} )`);
+                this.log.debug(`state change - ${o.native.parameter} - id ${o.native.id ? o.native.id : ''} - value rounded to ${state.val} (step=${o.native.step} )`);
             } else {
-                this.log.info(`state change - ${o.native.parameter} - id ${o.native.id ? o.native.id : ''} - value ${state.val}`);
+                this.log.debug(`state change - ${o.native.parameter} - id ${o.native.id ? o.native.id : ''} - value ${state.val}`);
             }
 
             if (o.native.debounce) {
@@ -1385,37 +1385,47 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         this.log.silly("_updateHomeStates - " + JSON.stringify(home));
         let promises = [];
 
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.weather.temperature', home.weather.temperature, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.weather.weatherCondition', home.weather.weatherCondition, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.weather.weatherDayTime', home.weather.weatherDayTime, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.weather.minTemperature', home.weather.minTemperature, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.weather.maxTemperature', home.weather.maxTemperature, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.weather.humidity', home.weather.humidity, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.weather.windSpeed', home.weather.windSpeed, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.weather.windDirection', home.weather.windDirection, true));
+        if (home.weather) {
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.weather.temperature', home.weather.temperature, true));
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.weather.weatherCondition', home.weather.weatherCondition, true));
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.weather.weatherDayTime', home.weather.weatherDayTime, true));
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.weather.minTemperature', home.weather.minTemperature, true));
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.weather.maxTemperature', home.weather.maxTemperature, true));
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.weather.humidity', home.weather.humidity, true));
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.weather.windSpeed', home.weather.windSpeed, true));
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.weather.windDirection', home.weather.windDirection, true));
+        }
 
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventTimestamp', home.functionalHomes.SECURITY_AND_ALARM.alarmEventTimestamp, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventDeviceId', home.functionalHomes.SECURITY_AND_ALARM.alarmEventDeviceId, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventTriggerId', home.functionalHomes.SECURITY_AND_ALARM.alarmEventTriggerId, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventDeviceChannel', home.functionalHomes.SECURITY_AND_ALARM.alarmEventDeviceChannel, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmSecurityJournalEntryType', home.functionalHomes.SECURITY_AND_ALARM.alarmSecurityJournalEntryType, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmActive', home.functionalHomes.SECURITY_AND_ALARM.alarmActive, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.zoneActivationDelay', home.functionalHomes.SECURITY_AND_ALARM.zoneActivationDelay, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.intrusionAlertThroughSmokeDetectors', home.functionalHomes.SECURITY_AND_ALARM.intrusionAlertThroughSmokeDetectors, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.securityZoneActivationMode', home.functionalHomes.SECURITY_AND_ALARM.securityZoneActivationMode, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.solution', home.functionalHomes.SECURITY_AND_ALARM.solution, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.activationInProgress', home.functionalHomes.SECURITY_AND_ALARM.activationInProgress, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.active', home.functionalHomes.SECURITY_AND_ALARM.active, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.absenceType', home.functionalHomes.INDOOR_CLIMATE.absenceType, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.absenceEndTime', home.functionalHomes.INDOOR_CLIMATE.absenceEndTime, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.ecoTemperature', home.functionalHomes.INDOOR_CLIMATE.ecoTemperature, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.coolingEnabled', home.functionalHomes.INDOOR_CLIMATE.coolingEnabled, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.ecoDuration', home.functionalHomes.INDOOR_CLIMATE.ecoDuration, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.optimumStartStopEnabled', home.functionalHomes.INDOOR_CLIMATE.optimumStartStopEnabled, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.solution', home.functionalHomes.INDOOR_CLIMATE.solution, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.active', home.functionalHomes.INDOOR_CLIMATE.active, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.lightAndShadow.active', home.functionalHomes.LIGHT_AND_SHADOW.active, true));
-        promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.weatherAndEnvironment.active', home.functionalHomes.WEATHER_AND_ENVIRONMENT.active, true));
+        if (home.functionalHomes.SECURITY_AND_ALARM) {
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventTimestamp', home.functionalHomes.SECURITY_AND_ALARM.alarmEventTimestamp, true));
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventDeviceId', home.functionalHomes.SECURITY_AND_ALARM.alarmEventDeviceId, true));
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventTriggerId', home.functionalHomes.SECURITY_AND_ALARM.alarmEventTriggerId, true));
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmEventDeviceChannel', home.functionalHomes.SECURITY_AND_ALARM.alarmEventDeviceChannel, true));
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmSecurityJournalEntryType', home.functionalHomes.SECURITY_AND_ALARM.alarmSecurityJournalEntryType, true));
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.alarmActive', home.functionalHomes.SECURITY_AND_ALARM.alarmActive, true));
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.zoneActivationDelay', home.functionalHomes.SECURITY_AND_ALARM.zoneActivationDelay, true));
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.intrusionAlertThroughSmokeDetectors', home.functionalHomes.SECURITY_AND_ALARM.intrusionAlertThroughSmokeDetectors, true));
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.securityZoneActivationMode', home.functionalHomes.SECURITY_AND_ALARM.securityZoneActivationMode, true));
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.solution', home.functionalHomes.SECURITY_AND_ALARM.solution, true));
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.activationInProgress', home.functionalHomes.SECURITY_AND_ALARM.activationInProgress, true));
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.securityAndAlarm.active', home.functionalHomes.SECURITY_AND_ALARM.active, true));
+        }
+        if (home.functionalHomes.INDOOR_CLIMATE) {
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.absenceType', home.functionalHomes.INDOOR_CLIMATE.absenceType, true));
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.absenceEndTime', home.functionalHomes.INDOOR_CLIMATE.absenceEndTime, true));
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.ecoTemperature', home.functionalHomes.INDOOR_CLIMATE.ecoTemperature, true));
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.coolingEnabled', home.functionalHomes.INDOOR_CLIMATE.coolingEnabled, true));
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.ecoDuration', home.functionalHomes.INDOOR_CLIMATE.ecoDuration, true));
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.optimumStartStopEnabled', home.functionalHomes.INDOOR_CLIMATE.optimumStartStopEnabled, true));
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.solution', home.functionalHomes.INDOOR_CLIMATE.solution, true));
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.indoorClimate.active', home.functionalHomes.INDOOR_CLIMATE.active, true));
+        }
+        if (home.functionalHomes.LIGHT_AND_SHADOW) {
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.lightAndShadow.active', home.functionalHomes.LIGHT_AND_SHADOW.active, true));
+        }
+        if (home.functionalHomes.WEATHER_AND_ENVIRONMENT) {
+            promises.push(this.secureSetStateAsync('homes.' + home.id + '.functionalHomes.weatherAndEnvironment.active', home.functionalHomes.WEATHER_AND_ENVIRONMENT.active, true));
+        }
 
         return Promise.all(promises);
     }
