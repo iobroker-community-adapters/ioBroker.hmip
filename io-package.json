@@ -1,338 +1,182 @@
 {
-    "common": {
-        "name": "hmip",
-        "version": "1.13.2",
-        "news": {
-            "1.13.2": {
-                "en": "Fix warning on js-controller 3.3 with two datapoints",
-                "de": "Warnung auf js-controller 3.3 mit zwei Datenpunkten behoben",
-                "ru": "Исправить предупреждение на js-controller 3.3 с двумя точками данных",
-                "pt": "Correção de aviso no js-controller 3.3 com dois pontos de dados",
-                "nl": "Fix waarschuwing op js-controller 3.3 met twee datapunten",
-                "fr": "Correction d'un avertissement sur js-controller 3.3 avec deux points de données",
-                "it": "Correzione dell'avviso su js-controller 3.3 con due punti dati",
-                "es": "Corregir la advertencia en js-controller 3.3 con dos puntos de datos",
-                "pl": "Napraw ostrzeżenie na kontrolerze js 3.3 z dwoma punktami danych",
-                "zh-cn": "使用两个数据点修复 js-controller 3.3 上的警告"
-            },
-            "1.13.1": {
-                "en": "Fix warning on js-controller 3.3 with \"sabotage\" datapoint",
-                "de": "Warnung auf js-Controller 3.3 mit \"Sabotage\"-Datenpunkt behoben",
-                "ru": "Исправить предупреждение на js-controller 3.3 с датапоинтом \"саботаж\"",
-                "pt": "Correção de aviso no js-controller 3.3 com ponto de dados \"sabotagem\"",
-                "nl": "Fix waarschuwing op js-controller 3.3 met \"sabotage\" datapunt",
-                "fr": "Correction d'un avertissement sur js-controller 3.3 avec le point de données \"sabotage\"",
-                "it": "Correzione dell'avviso su js-controller 3.3 con datapoint \"sabotaggio\"",
-                "es": "Se corrigió la advertencia en js-controller 3.3 con el punto de datos de \"sabotaje\"",
-                "pl": "Naprawiono ostrzeżenie na js-controllerze 3.3 z punktem danych „sabotaż”",
-                "zh-cn": "使用“破坏”数据点修复 js-controller 3.3 上的警告"
-            },
-            "1.13.0": {
-                "en": "Add support for HM-WGC/IMPULSE_OUTPUT_CHANNEL",
-                "de": "Unterstützung für HM-WGC/IMPULSE_OUTPUT_CHANNEL hinzufügen",
-                "ru": "Добавить поддержку HM-WGC / IMPULSE_OUTPUT_CHANNEL",
-                "pt": "Adicionar suporte para HM-WGC / IMPULSE_OUTPUT_CHANNEL",
-                "nl": "Ondersteuning toevoegen voor HM-WGC/IMPULSE_OUTPUT_CHANNEL",
-                "fr": "Ajout de la prise en charge de HM-WGC/IMPULSE_OUTPUT_CHANNEL",
-                "it": "Aggiungi il supporto per HM-WGC/IMPULSE_OUTPUT_CHANNEL",
-                "es": "Agregar soporte para HM-WGC / IMPULSE_OUTPUT_CHANNEL",
-                "pl": "Dodaj obsługę HM-WGC/IMPULSE_OUTPUT_CHANNEL",
-                "zh-cn": "添加对 HM-WGC/IMPULSE_OUTPUT_CHANNEL 的支持"
-            },
-            "1.12.2": {
-                "en": "Fix a warning in js-controller 3.3",
-                "de": "Beheben Sie eine Warnung in js-controller 3.3",
-                "ru": "Исправить предупреждение в js-controller 3.3",
-                "pt": "Corrigir um aviso no js-controller 3.3",
-                "nl": "Herstel een waarschuwing in js-controller 3.3",
-                "fr": "Correction d'un avertissement dans js-controller 3.3",
-                "it": "Risolto un avviso in js-controller 3.3",
-                "es": "Corregir una advertencia en js-controller 3.3",
-                "pl": "Napraw ostrzeżenie w js-controllerze 3.3",
-                "zh-cn": "修复 js-controller 3.3 中的警告"
-            },
-            "1.12.1": {
-                "en": "Fix a warning in js-controller 3.3",
-                "de": "Korrigieren Sie eine Warnung in js-controller 3.3",
-                "ru": "Исправить предупреждение в js-controller 3.3",
-                "pt": "Corrigir um aviso no js-controller 3.3",
-                "nl": "Herstel een waarschuwing in js-controller 3.3",
-                "fr": "Correction d'un avertissement dans js-controller 3.3",
-                "it": "Risolto un avviso in js-controller 3.3",
-                "es": "Arreglar una advertencia en js-controller 3.3",
-                "pl": "Napraw ostrzeżenie w js-controller 3.3",
-                "zh-cn": "修复js-controller 3.3中的警告"
-            },
-            "1.12.0": {
-                "en": "Implement NOTIFICATION_MP3_SOUND_CHANNEL",
-                "de": "Implementieren Sie NOTIFICATION_MP3_SOUND_CHANNEL",
-                "ru": "Реализовать NOTIFICATION_MP3_SOUND_CHANNEL",
-                "pt": "Implementar NOTIFICATION_MP3_SOUND_CHANNEL",
-                "nl": "Implementeer NOTIFICATION_MP3_SOUND_CHANNEL",
-                "fr": "Mettre en œuvre NOTIFICATION_MP3_SOUND_CHANNEL",
-                "it": "Implementa NOTIFICATION_MP3_SOUND_CHANNEL",
-                "es": "Implementar NOTIFICATION_MP3_SOUND_CHANNEL",
-                "pl": "Zaimplementuj NOTIFICATION_MP3_SOUND_CHANNEL",
-                "zh-cn": "实施NOTIFICATION_MP3_SOUND_CHANNEL"
-            },
-            "1.11.1": {
-                "en": "IMPORTANT: The adapter now requires js-controller 3.1 at least!\nUpdate objects on startup to make sure definition is current\nprevent warnings in js-controller 3.3",
-                "de": "WICHTIG: Der Adapter benötigt jetzt mindestens js-controller 3.1!\nAktualisieren Sie die Objekte beim Start, um sicherzustellen, dass die Definition aktuell ist\nWarnungen in js-controller verhindern 3.3",
-                "ru": "ВАЖНО: Теперь для адаптера требуется js-controller не ниже 3.1!\nОбновлять объекты при запуске, чтобы убедиться, что определение актуально\nпредотвратить предупреждения в js-controller 3.3",
-                "pt": "IMPORTANTE: O adaptador agora requer pelo menos js-controller 3.1!\nAtualize os objetos na inicialização para garantir que a definição seja a atual\nevitar avisos no js-controller 3.3",
-                "nl": "BELANGRIJK: De adapter vereist nu minimaal js-controller 3.1!\nWerk objecten bij bij het opstarten om ervoor te zorgen dat de definitie actueel is\nwaarschuwingen voorkomen in js-controller 3.3",
-                "fr": "IMPORTANT: l'adaptateur nécessite maintenant au moins js-controller 3.1!\nMettez à jour les objets au démarrage pour vous assurer que la définition est à jour\nempêcher les avertissements dans js-controller 3.3",
-                "it": "IMPORTANTE: l'adattatore ora richiede almeno js-controller 3.1!\nAggiorna gli oggetti all'avvio per assicurarti che la definizione sia attuale\nprevenire avvisi in js-controller 3.3",
-                "es": "IMPORTANTE: ¡El adaptador ahora requiere js-controller 3.1 al menos!\nActualice los objetos al inicio para asegurarse de que la definición esté actualizada\nprevenir advertencias en js-controller 3.3",
-                "pl": "WAŻNE: adapter wymaga teraz co najmniej kontrolera js 3.1!\nZaktualizuj obiekty podczas uruchamiania, aby upewnić się, że definicja jest aktualna\nZapobiegaj ostrzeżeniom w js-controller 3.3",
-                "zh-cn": "重要信息：适配器现在至少需要js-controller 3.1！\n在启动时更新对象以确保定义是最新的\n防止在js-controller 3.3中出现警告"
-            },
-            "1.11.0": {
-                "en": "Implement CARBON_DIOXIDE_SENSOR_CHANNEL",
-                "de": "Implementieren Sie CARBON_DIOXIDE_SENSOR_CHANNEL",
-                "ru": "Внедрить CARBON_DIOXIDE_SENSOR_CHANNEL",
-                "pt": "Implementar CARBON_DIOXIDE_SENSOR_CHANNEL",
-                "nl": "Implementeer CARBON_DIOXIDE_SENSOR_CHANNEL",
-                "fr": "Mettre en œuvre CARBON_DIOXIDE_SENSOR_CHANNEL",
-                "it": "Implementa CARBON_DIOXIDE_SENSOR_CHANNEL",
-                "es": "Implementar CARBON_DIOXIDE_SENSOR_CHANNEL",
-                "pl": "Wdróż CARBON_DIOXIDE_SENSOR_CHANNEL",
-                "zh-cn": "实施CARBON_DIOXIDE_SENSOR_CHANNEL"
-            },
-            "1.10.0": {
-                "en": "Implement TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL, DOOR_LOCK_CHANNEL and ACCESS_AUTHORIZATION_CHANNEL",
-                "de": "Implementieren Sie TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL, DOOR_LOCK_CHANNEL und ACCESS_AUTHORIZATION_CHANNEL",
-                "ru": "Реализуйте TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL, DOOR_LOCK_CHANNEL и ACCESS_AUTHORIZATION_CHANNEL",
-                "pt": "Implementar TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL, DOOR_LOCK_CHANNEL e ACCESS_AUTHORIZATION_CHANNEL",
-                "nl": "Implementeer TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL, DOOR_LOCK_CHANNEL en ACCESS_AUTHORIZATION_CHANNEL",
-                "fr": "Mettre en œuvre TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL, DOOR_LOCK_CHANNEL et ACCESS_AUTHORIZATION_CHANNEL",
-                "it": "Implementa TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL, DOOR_LOCK_CHANNEL e ACCESS_AUTHORIZATION_CHANNEL",
-                "es": "Implementar TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL, DOOR_LOCK_CHANNEL y ACCESS_AUTHORIZATION_CHANNEL",
-                "pl": "Wdrożenie TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL, DOOR_LOCK_CHANNEL i ACCESS_AUTHORIZATION_CHANNEL",
-                "zh-cn": "实施TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL，DOOR_LOCK_CHANNEL和ACCESS_AUTHORIZATION_CHANNEL"
-            },
-            "1.9.0": {
-                "en": "Round temperature values to nearest 0.5 degrees\nOnly send values to HMIP when changed (reduce traffic!)\nAdd debouncing to setPointTemperature changes (means value is sent out when \"stable\" for 5s!) (reduce traffic!)\nAdd throttling to other change requests (means other changes are blocked for 1s) (reduce traffic!)\nImplement ANALOG_ROOM_CONTROL_CHANNEL (Sentry IOBROKER-HMIP-1X)",
-                "de": "Runden Sie die Temperaturwerte auf 0,5 Grad ab\nSenden Sie Werte nur bei Änderung an HMIP (reduzieren Sie den Datenverkehr!)\nHinzufügen von Entprellen zu Änderungen von setPointTemperature (bedeutet, dass der Wert gesendet wird, wenn er 5 Sekunden lang \"stabil\" ist!) (Reduzieren Sie den Datenverkehr!)\nFügen Sie anderen Änderungsanforderungen eine Drosselung hinzu (bedeutet, dass andere Änderungen für 1 Sekunde blockiert sind) (reduzieren Sie den Datenverkehr!)\nImplementieren Sie ANALOG_ROOM_CONTROL_CHANNEL (Sentry IOBROKER-HMIP-1X)",
-                "ru": "Круглые значения температуры с точностью до 0,5 градуса\nОтправлять значения в HMIP только при изменении (уменьшить трафик!)\nДобавьте debouncing к изменениям setPointTemperature (означает, что значение отправляется, когда \"стабильно\" в течение 5 секунд!) (Уменьшите трафик!)\nДобавьте регулирование для других запросов на изменение (означает, что другие изменения заблокированы на 1 с) (уменьшите трафик!)\nВнедрить ANALOG_ROOM_CONTROL_CHANNEL (Sentry IOBROKER-HMIP-1X)",
-                "pt": "Arredondar os valores de temperatura para o próximo 0,5 grau\nSomente envie valores para HMIP quando alterados (reduza o tráfego!)\nAdicione debouncing às mudanças de setPointTemperature (significa que o valor é enviado quando \"estável\" por 5s!) (Reduza o tráfego!)\nAdicionar limitação a outras solicitações de alteração (significa que outras alterações são bloqueadas por 1s) (reduza o tráfego!)\nImplementar ANALOG_ROOM_CONTROL_CHANNEL (Sentry IOBROKER-HMIP-1X)",
-                "nl": "Rond temperatuurwaarden af op 0,5 graden\nStuur alleen waarden naar HMIP wanneer deze zijn gewijzigd (verminder verkeer!)\nVoeg debouncing toe aan setPointTemperature-wijzigingen (betekent dat de waarde wordt verzonden wanneer deze gedurende 5 seconden \"stabiel\" is!) (Verminder het verkeer!)\nVoeg beperking toe aan andere wijzigingsverzoeken (betekent dat andere wijzigingen gedurende 1 seconde worden geblokkeerd) (verminder verkeer!)\nImplementeer ANALOG_ROOM_CONTROL_CHANNEL (Sentry IOBROKER-HMIP-1X)",
-                "fr": "Arrondir les valeurs de température à 0,5 degré près\nN'envoyez les valeurs à HMIP que lorsqu'elles sont modifiées (réduisez le trafic!)\nAjouter un anti-rebond aux changements de setPointTemperature (signifie que la valeur est envoyée quand \"stable\" pendant 5s!) (Réduire le trafic!)\nAjoutez une limitation aux autres demandes de modification (signifie que les autres modifications sont bloquées pendant 1 s) (réduisez le trafic!)\nImplémenter ANALOG_ROOM_CONTROL_CHANNEL (Sentry IOBROKER-HMIP-1X)",
-                "it": "Arrotonda i valori di temperatura agli 0,5 gradi più vicini\nInvia valori a HMIP solo quando vengono modificati (riduci il traffico!)\nAggiungi l'antirimbalzo alle modifiche di setPointTemperature (significa che il valore viene inviato quando \"stabile\" per 5 secondi!) (Riduci il traffico!)\nAggiungi throttling ad altre richieste di modifica (significa che altre modifiche sono bloccate per 1 secondo) (riduci il traffico!)\nImplementa ANALOG_ROOM_CONTROL_CHANNEL (Sentry IOBROKER-HMIP-1X)",
-                "es": "Redondee los valores de temperatura a los 0,5 grados más cercanos\nSolo envíe valores a HMIP cuando se modifiquen (¡reduzca el tráfico!)\nAgregue antirrebote a los cambios de setPointTemperature (¡significa que el valor se envía cuando está \"estable\" durante 5 segundos!) (¡Reduzca el tráfico!)\nAgregue limitación a otras solicitudes de cambio (significa que otros cambios se bloquean durante 1 s) (¡reduzca el tráfico!)\nImplementar ANALOG_ROOM_CONTROL_CHANNEL (Sentry IOBROKER-HMIP-1X)",
-                "pl": "Zaokrąglić wartości temperatury do najbliższych 0,5 stopnia\nWysyłaj wartości do HMIP tylko po zmianie (zmniejsz ruch!)\nDodaj debouncing do zmian setPointTemperature (oznacza, że wartość jest wysyłana, gdy jest „stabilna” przez 5 s!) (Zmniejsz ruch!)\nDodaj ograniczanie do innych żądań zmiany (oznacza, że inne zmiany są blokowane na 1 s) (zmniejsz ruch!)\nWdrożenie ANALOG_ROOM_CONTROL_CHANNEL (Sentry IOBROKER-HMIP-1X)",
-                "zh-cn": "将温度值舍入到最接近的0.5度\n仅在更改时将值发送到HMIP（减少流量！）\n在setPointTemperature更改中添加防抖动功能（“稳定”状态持续5s时发送平均值）（减少流量！）\n将限制添加到其他更改请求中（意味着其他更改被阻止1秒）（减少流量！）\n实施ANALOG_ROOM_CONTROL_CHANNEL（哨兵IOBROKER-HMIP-1X）"
-            },
-            "1.7.2": {
-                "en": "Try to detect websocket connection failures start over",
-                "de": "Versuchen Sie, Fehler bei der Websocket-Verbindung zu erkennen",
-                "ru": "Попытайтесь обнаружить сбои подключения к веб-сокету, начните заново",
-                "pt": "Tente detectar falhas de conexão do websocket reinicie",
-                "nl": "Probeer opnieuw te beginnen met het detecteren van storingen in de websocket-verbinding",
-                "fr": "Essayez de détecter les échecs de connexion Websocket recommencer",
-                "it": "Prova a rilevare errori di connessione websocket ricominciare",
-                "es": "Intente detectar fallas de conexión de websocket comience de nuevo",
-                "pl": "Spróbuj wykryć awarie połączenia WebSocket, zacznij od nowa",
-                "zh-cn": "尝试检测Websocket连接失败重新开始"
-            },
-            "1.7.0": {
-                "en": "add Heating Absence Permanent state and functionality\nadd support for MULTI_MODE_INPUT_BLIND_CHANNEL",
-                "de": "Heizungsabwesenheit hinzufügen Permanenter Status und Funktionalität\nUnterstützung für MULTI_MODE_INPUT_BLIND_CHANNEL hinzufügen",
-                "ru": "добавить Отопление Отсутствие Постоянное состояние и функциональность\nдобавить поддержку MULTI_MODE_INPUT_BLIND_CHANNEL",
-                "pt": "adicionar funcionalidade e estado permanente de ausência de aquecimento\nadicionar suporte para MULTI_MODE_INPUT_BLIND_CHANNEL",
-                "nl": "add Verwarming Afwezigheid Permanente staat en functionaliteit\nondersteuning toevoegen voor MULTI_MODE_INPUT_BLIND_CHANNEL",
-                "fr": "ajouter Absence de chauffage État permanent et fonctionnalité\najouter la prise en charge de MULTI_MODE_INPUT_BLIND_CHANNEL",
-                "it": "aggiungere lo stato e la funzionalità permanente dell'assenza di riscaldamento\naggiungi il supporto per MULTI_MODE_INPUT_BLIND_CHANNEL",
-                "es": "añadir estado y funcionalidad de ausencia de calefacción permanente\nagregar soporte para MULTI_MODE_INPUT_BLIND_CHANNEL",
-                "pl": "dodaj Brak ogrzewania Stały stan i funkcjonalność\ndodaj obsługę MULTI_MODE_INPUT_BLIND_CHANNEL",
-                "zh-cn": "添加加热缺席永久状态和功能\n添加对MULTI_MODE_INPUT_BLIND_CHANNEL的支持"
-            },
-            "1.6.2": {
-                "en": "Add check when HMIP domain could not be determined.",
-                "de": "Prüfung hinzufügen, wenn die HMIP-Domäne nicht ermittelt werden konnte.",
-                "ru": "Добавить проверку, когда не удалось определить HMIP-домен.",
-                "pt": "Adicionar verificação quando o domínio HMIP não puder ser determinado.",
-                "nl": "Voeg een vinkje toe als het HMIP-domein niet kon worden bepaald.",
-                "fr": "Ajoutez une vérification lorsque le domaine HMIP n'a pas pu être déterminé.",
-                "it": "Aggiungere un controllo quando non è stato possibile determinare il dominio HMIP.",
-                "es": "Agregue una marca cuando no se pudo determinar el dominio HMIP.",
-                "pl": "Dodaj sprawdzenie, gdy nie można określić domeny HMIP.",
-                "zh-cn": "无法确定HMIP域时添加检查。"
-            },
-            "1.6.1": {
-                "en": "Prevent crash case (Sentry IOBROKER-HMIP-1N)",
-                "de": "Absturz verhindern (Sentry IOBROKER-HMIP-1N)",
-                "ru": "Предотвращение сбоя (Sentry IOBROKER-HMIP-1N)",
-                "pt": "Prevenir caso de travamento (Sentry IOBROKER-HMIP-1N)",
-                "nl": "Voorkom crash case (Sentry IOBROKER-HMIP-1N)",
-                "fr": "Prévenir les cas de crash (Sentry IOBROKER-HMIP-1N)",
-                "it": "Prevenire il crash case (Sentry IOBROKER-HMIP-1N)",
-                "es": "Prevenir caso de accidente (Sentry IOBROKER-HMIP-1N)",
-                "pl": "Zapobiegaj awariom (Sentry IOBROKER-HMIP-1N)",
-                "zh-cn": "防止发生崩溃情况（Sentry IOBROKER-HMIP-1N）"
-            },
-            "1.6.0": {
-                "en": "Important note: Please limit control requests to the bare minimum because EQ-3 started to block IPs when you do too much!\nAdd support for WALL_MOUNTED_THERMOSTAT_CHANNEL",
-                "de": "Wichtiger Hinweis: Bitte beschränken Sie Steuerungsanfragen auf das Nötigste, da EQ-3 IPs blockiert, wenn Sie zu viel tun!\nUnterstützung für WALL_MOUNTED_THERMOSTAT_CHANNEL hinzufügen",
-                "ru": "Важное примечание: пожалуйста, ограничьте запросы на управление до минимума, потому что EQ-3 начал блокировать IP-адреса, когда вы делаете слишком много!\nДобавить поддержку для WALL_MOUNTED_THERMOSTAT_CHANNEL",
-                "pt": "Observação importante: limite as solicitações de controle ao mínimo, pois o EQ-3 começou a bloquear IPs quando você faz muito!\nAdicionar suporte para WALL_MOUNTED_THERMOSTAT_CHANNEL",
-                "nl": "Belangrijke opmerking: Beperk controleverzoeken tot het absolute minimum, want EQ-3 begon IP's te blokkeren als je te veel deed!\nOndersteuning toevoegen voor WALL_MOUNTED_THERMOSTAT_CHANNEL",
-                "fr": "Remarque importante: veuillez limiter les demandes de contrôle au strict minimum car EQ-3 a commencé à bloquer les adresses IP lorsque vous en faites trop!\nAjouter la prise en charge de WALL_MOUNTED_THERMOSTAT_CHANNEL",
-                "it": "Nota importante: per favore limita le richieste di controllo al minimo indispensabile perché EQ-3 ha iniziato a bloccare gli IP quando fai troppo!\nAggiungi supporto per WALL_MOUNTED_THERMOSTAT_CHANNEL",
-                "es": "Nota importante: limite las solicitudes de control al mínimo porque EQ-3 comenzó a bloquear las direcciones IP cuando hace demasiado.\nAgregar soporte para WALL_MOUNTED_THERMOSTAT_CHANNEL",
-                "pl": "Ważna uwaga: ogranicz żądania kontroli do absolutnego minimum, ponieważ EQ-3 zaczął blokować adresy IP, gdy robisz za dużo!\nDodaj obsługę WALL_MOUNTED_THERMOSTAT_CHANNEL",
-                "zh-cn": "重要说明：请将控制请求限制在最低限度，因为当您执行过多操作时，EQ-3就会开始阻止IP！\n添加对WALL_MOUNTED_THERMOSTAT_CHANNEL的支持"
-            },
-            "1.5.2": {
-                "en": "ignore DEVICE_CHANNEL_EVENT for now and also log as debug to not flood log",
-                "de": "Ignorieren Sie DEVICE_CHANNEL_EVENT vorerst und protokollieren Sie auch als Debug, um das Protokoll nicht zu überfluten",
-                "ru": "пока игнорируйте DEVICE_CHANNEL_EVENT, а также регистрируйте как отладку, чтобы не заливать журнал",
-                "pt": "ignore DEVICE_CHANNEL_EVENT por enquanto e também registre como depuração para não inundar o log",
-                "nl": "negeer DEVICE_CHANNEL_EVENT voorlopig en log ook in als debug om het logboek niet te laten overstromen",
-                "fr": "ignorer DEVICE_CHANNEL_EVENT pour le moment et également se connecter en tant que débogage pour ne pas inonder le journal",
-                "it": "ignora DEVICE_CHANNEL_EVENT per ora e accedi anche come debug per non inondare il log",
-                "es": "ignore DEVICE_CHANNEL_EVENT por ahora y también registre como depuración para no inundar el registro",
-                "pl": "zignoruj na razie DEVICE_CHANNEL_EVENT, a także zaloguj się jako debug, aby nie zalać dziennika",
-                "zh-cn": "现在暂时忽略DEVICE_CHANNEL_EVENT，并作为调试记录，以不淹没日志"
-            },
-            "1.5.0": {
-                "en": "Add control options for primary/secondaryShadingLevel datapoints",
-                "de": "Fügen Sie Steuerungsoptionen für primäre / sekundäre ShadingLevel-Datenpunkte hinzu",
-                "ru": "Добавить параметры управления для первичных / вторичных точек данных ShadingLevel",
-                "pt": "Adicionar opções de controle para pontos de dados primário / secundárioShadingLevel",
-                "nl": "Voeg besturingsopties toe voor primaire / secundaire ShadingLevel-datapunten",
-                "fr": "Ajouter des options de contrôle pour les points de données primary / secondaryShadingLevel",
-                "it": "Aggiungi opzioni di controllo per i punti dati Primary / SecondaryShadingLevel",
-                "es": "Agregar opciones de control para puntos de datos de nivel primario / secundario",
-                "pl": "Dodaj opcje kontrolne dla podstawowych / drugorzędnych punktów danych ShadingLevel",
-                "zh-cn": "为primary / secondaryShadingLevel数据点添加控制选项"
-            },
-            "1.4.1": {
-                "en": "fix potential crash case (Sentry IOBROKER-HMIP-1N)",
-                "de": "Behebung eines möglichen Absturzfalls (Sentry IOBROKER-HMIP-1N)",
-                "ru": "исправить потенциальный сбой (Sentry IOBROKER-HMIP-1N)",
-                "pt": "corrigir possível caso de falha (Sentry IOBROKER-HMIP-1N)",
-                "nl": "mogelijke crash case repareren (Sentry IOBROKER-HMIP-1N)",
-                "fr": "correction d'un cas de crash potentiel (Sentry IOBROKER-HMIP-1N)",
-                "it": "risolvere potenziali casi di crash (Sentry IOBROKER-HMIP-1N)",
-                "es": "reparar un posible caso de bloqueo (Sentry IOBROKER-HMIP-1N)",
-                "pl": "napraw potencjalną awarię (Sentry IOBROKER-HMIP-1N)",
-                "zh-cn": "修复潜在的崩溃案例（Sentry IOBROKER-HMIP-1N）"
-            },
-            "1.4.0": {
-                "en": "Add ROTARY_WHEEL_CHANNEL and RAIN_DETECTION_CHANNEL, ACCESS_CONTROLLER_WIRED_CHANNEL\nRead home anew if no home object is provided for SECURITY_JOURNAL_CHANGED event",
-                "de": "Fügen Sie ROTARY_WHEEL_CHANNEL und RAIN_DETECTION_CHANNEL, ACCESS_CONTROLLER_WIRED_CHANNEL hinzu\nLesen Sie home erneut, wenn für das Ereignis SECURITY_JOURNAL_CHANGED kein Home-Objekt angegeben ist",
-                "ru": "Добавьте ROTARY_WHEEL_CHANNEL и RAIN_DETECTION_CHANNEL, ACCESS_CONTROLLER_WIRED_CHANNEL\nПрочитать заново, если для события SECURITY_JOURNAL_CHANGED не указан домашний объект",
-                "pt": "Adicionar ROTARY_WHEEL_CHANNEL e RAIN_DETECTION_CHANNEL, ACCESS_CONTROLLER_WIRED_CHANNEL\nLeia a página inicial novamente se nenhum objeto inicial for fornecido para o evento SECURITY_JOURNAL_CHANGED",
-                "nl": "Voeg ROTARY_WHEEL_CHANNEL en RAIN_DETECTION_CHANNEL, ACCESS_CONTROLLER_WIRED_CHANNEL toe\nLees home opnieuw als er geen home-object is opgegeven voor de gebeurtenis SECURITY_JOURNAL_CHANGED",
-                "fr": "Ajouter ROTARY_WHEEL_CHANNEL et RAIN_DETECTION_CHANNEL, ACCESS_CONTROLLER_WIRED_CHANNEL\nRelisez l'accueil si aucun objet d'accueil n'est fourni pour l'événement SECURITY_JOURNAL_CHANGED",
-                "it": "Aggiungi ROTARY_WHEEL_CHANNEL e RAIN_DETECTION_CHANNEL, ACCESS_CONTROLLER_WIRED_CHANNEL\nLeggi di nuovo home se non viene fornito alcun oggetto home per l'evento SECURITY_JOURNAL_CHANGED",
-                "es": "Agregar ROTARY_WHEEL_CHANNEL y RAIN_DETECTION_CHANNEL, ACCESS_CONTROLLER_WIRED_CHANNEL\nLeer inicio de nuevo si no se proporciona ningún objeto de inicio para el evento SECURITY_JOURNAL_CHANGED",
-                "pl": "Dodaj ROTARY_WHEEL_CHANNEL i RAIN_DETECTION_CHANNEL, ACCESS_CONTROLLER_WIRED_CHANNEL\nPrzeczytaj ponownie stronę główną, jeśli nie podano obiektu głównego dla zdarzenia SECURITY_JOURNAL_CHANGED",
-                "zh-cn": "添加ROTARY_WHEEL_CHANNEL和RAIN_DETECTION_CHANNEL，ACCESS_CONTROLLER_WIRED_CHANNEL\n如果没有为SECURITY_JOURNAL_CHANGED事件提供原始对象，请重新读取原始位置"
-            },
-            "1.3.1": {
-                "en": "Fix missing write permission for Notification Light \"On\" channel",
-                "de": "Fehlende Schreibberechtigung für Notification Light \"On\" -Kanal behoben",
-                "ru": "Исправить отсутствие разрешения на запись для канала \"Вкл.\"",
-                "pt": "Corrigir a falta de permissão de gravação para o canal Notification Light \"On\"",
-                "nl": "Herstel ontbrekende schrijfmachtiging voor meldingslampje \"Aan\" -kanaal",
-                "fr": "Correction de l'autorisation d'écriture manquante pour le canal Notification Light \"On\"",
-                "it": "Correzione dell'autorizzazione di scrittura mancante per il canale \"On\" della spia di notifica",
-                "es": "Se corrigió el permiso de escritura que faltaba para el canal \"Encendido\" de la luz de notificación",
-                "pl": "Napraw brakujące uprawnienia do zapisu dla kanału „Włączony” wskaźnik powiadomień",
-                "zh-cn": "修复缺少通知灯“打开”通道的写权限"
-            }
-        },
-        "title": "HomeMaticIP Cloud AccessPoint",
-        "titleLang": {
-            "en": "HomeMaticIP Cloud AccessPoint",
-            "de": "HomeMatic IP Cloud-Zugriffspunkt",
-            "ru": "Точка доступа HomeMatic IP Cloud",
-            "pt": "Ponto de acesso da nuvem IP da HomeMatic",
-            "nl": "HomeMatic IP Cloud Access Point",
-            "fr": "Point d'accès IP HomeMatic Cloud",
-            "it": "HomeMatic IP Cloud Access Point",
-            "es": "Punto de acceso HomeMatic IP Cloud",
-            "pl": "Punkt dostępu do chmury internetowej HomeMatic",
-            "zh-cn": "HomeMatic IP云接入点"
-        },
-        "desc": {
-            "en": "HomeMaticIP Cloud AccessPoint",
-            "de": "HomeMatic IP Cloud-Zugriffspunkt",
-            "ru": "Точка доступа HomeMatic IP Cloud",
-            "pt": "Ponto de acesso da nuvem IP da HomeMatic",
-            "nl": "HomeMatic IP Cloud Access Point",
-            "fr": "Point d'accès IP HomeMatic Cloud",
-            "it": "HomeMatic IP Cloud Access Point",
-            "es": "Punto de acceso HomeMatic IP Cloud",
-            "pl": "Punkt dostępu do chmury internetowej HomeMatic",
-            "zh-cn": "HomeMatic IP云接入点"
-        },
-        "authors": [
-            "jogibear9988 <jochen.kuehner@gmx.de>"
-        ],
-        "platform": "Javascript/Node.js",
-        "mode": "daemon",
-        "compact": true,
-        "icon": "homematic.png",
-        "materialize": true,
-        "enabled": true,
-        "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.hmip/master/admin/homematic.png",
-        "keywords": [
-            "hardware",
-            "homematic",
-            "hm"
-        ],
-        "readme": "https://github.com/iobroker-community-adapters/ioBroker.hmip/blob/master/README.md",
-        "loglevel": "info",
-        "type": "hardware",
-        "license": "MIT",
-        "messagebox": true,
-        "plugins": {
-            "sentry": {
-                "dsn": "https://1716d7389af84920bddc96d2f1e8e421@sentry.iobroker.net/73"
-            }
-        },
-        "dependencies": [
-            {
-                "js-controller": ">=3.1.0"
-            }
-        ],
-        "tier": 2,
-        "connectionType": "cloud",
-        "dataSource": "push"
+  "common": {
+    "name": "hmip",
+    "version": "1.14.0",
+    "news": {
+      "1.14.0": {
+        "en": "Lower loglevel for state change logs to debug\nAdd verification when reading some data to prevent crashes\nRemoved some generic (error/info) states that only exists on chosen devices to re-add later in a generic way",
+        "de": "Niedrigeres Loglevel für Statusänderungsprotokolle zum Debuggen\nFügen Sie beim Lesen einiger Daten eine Überprüfung hinzu, um Abstürze zu vermeiden\nEinige generische (Fehler-/Info-)Zustände entfernt, die nur auf ausgewählten Geräten vorhanden sind, um sie später auf generische Weise wieder hinzuzufügen",
+        "ru": "Более низкий уровень журнала для журналов изменения состояния для отладки\nДобавьте проверку при чтении некоторых данных, чтобы предотвратить сбои\nУдалены некоторые общие (ошибка / информация) состояния, которые существуют только на выбранных устройствах, для повторного добавления позже обычным способом.",
+        "pt": "Nível de log inferior para logs de mudança de estado para depurar\nAdicionar verificação ao ler alguns dados para evitar travamentos\nRemovidos alguns estados genéricos (erro / informações) que só existem em dispositivos escolhidos para serem adicionados posteriormente de forma genérica",
+        "nl": "Lager logniveau voor statuswijzigingslogboeken om te debuggen\nVoeg verificatie toe bij het lezen van sommige gegevens om crashes te voorkomen\nEnkele generieke (fout/info)-statussen verwijderd die alleen op gekozen apparaten bestaan om later op een generieke manier opnieuw toe te voegen",
+        "fr": "Niveau de journalisation inférieur pour les journaux de changement d'état à déboguer\nAjouter une vérification lors de la lecture de certaines données pour éviter les plantages\nSuppression de certains états génériques (erreur/info) qui n'existent que sur les appareils choisis pour les rajouter plus tard de manière générique",
+        "it": "Livello di registro inferiore per i registri di modifica dello stato di cui eseguire il debug\nAggiungi la verifica durante la lettura di alcuni dati per evitare arresti anomali\nRimossi alcuni stati generici (errore/info) che esistono solo sui dispositivi scelti per riaggiungerli in seguito in modo generico",
+        "es": "Nivel de registro más bajo para los registros de cambios de estado para depurar\nAgregue verificación al leer algunos datos para evitar fallas\nSe eliminaron algunos estados genéricos (error / información) que solo existen en los dispositivos elegidos para volver a agregarlos más tarde de una manera genérica",
+        "pl": "Niższy poziom logowania dla dzienników zmian stanu do debugowania\nDodaj weryfikację podczas odczytywania niektórych danych, aby zapobiec awariom\nUsunięto niektóre ogólne (błąd/informacje) stany, które istnieją tylko na wybranych urządzeniach, aby móc je ponownie dodać później w ogólny sposób",
+        "zh-cn": "用于调试的状态更改日志的较低日志级别\n读取一些数据时添加验证以防止崩溃\n删除了一些仅存在于所选设备上的通用（错误/信息）状态，以便稍后以通用方式重新添加"
+      },
+      "1.13.2": {
+        "en": "Fix warning on js-controller 3.3 with two datapoints",
+        "de": "Warnung auf js-controller 3.3 mit zwei Datenpunkten behoben",
+        "ru": "Исправить предупреждение на js-controller 3.3 с двумя точками данных",
+        "pt": "Correção de aviso no js-controller 3.3 com dois pontos de dados",
+        "nl": "Fix waarschuwing op js-controller 3.3 met twee datapunten",
+        "fr": "Correction d'un avertissement sur js-controller 3.3 avec deux points de données",
+        "it": "Correzione dell'avviso su js-controller 3.3 con due punti dati",
+        "es": "Corregir la advertencia en js-controller 3.3 con dos puntos de datos",
+        "pl": "Napraw ostrzeżenie na kontrolerze js 3.3 z dwoma punktami danych",
+        "zh-cn": "使用两个数据点修复 js-controller 3.3 上的警告"
+      },
+      "1.13.1": {
+        "en": "Fix warning on js-controller 3.3 with \"sabotage\" datapoint",
+        "de": "Warnung auf js-Controller 3.3 mit \"Sabotage\"-Datenpunkt behoben",
+        "ru": "Исправить предупреждение на js-controller 3.3 с датапоинтом \"саботаж\"",
+        "pt": "Correção de aviso no js-controller 3.3 com ponto de dados \"sabotagem\"",
+        "nl": "Fix waarschuwing op js-controller 3.3 met \"sabotage\" datapunt",
+        "fr": "Correction d'un avertissement sur js-controller 3.3 avec le point de données \"sabotage\"",
+        "it": "Correzione dell'avviso su js-controller 3.3 con datapoint \"sabotaggio\"",
+        "es": "Se corrigió la advertencia en js-controller 3.3 con el punto de datos de \"sabotaje\"",
+        "pl": "Naprawiono ostrzeżenie na js-controllerze 3.3 z punktem danych „sabotaż”",
+        "zh-cn": "使用“破坏”数据点修复 js-controller 3.3 上的警告"
+      },
+      "1.13.0": {
+        "en": "Add support for HM-WGC/IMPULSE_OUTPUT_CHANNEL",
+        "de": "Unterstützung für HM-WGC/IMPULSE_OUTPUT_CHANNEL hinzufügen",
+        "ru": "Добавить поддержку HM-WGC / IMPULSE_OUTPUT_CHANNEL",
+        "pt": "Adicionar suporte para HM-WGC / IMPULSE_OUTPUT_CHANNEL",
+        "nl": "Ondersteuning toevoegen voor HM-WGC/IMPULSE_OUTPUT_CHANNEL",
+        "fr": "Ajout de la prise en charge de HM-WGC/IMPULSE_OUTPUT_CHANNEL",
+        "it": "Aggiungi il supporto per HM-WGC/IMPULSE_OUTPUT_CHANNEL",
+        "es": "Agregar soporte para HM-WGC / IMPULSE_OUTPUT_CHANNEL",
+        "pl": "Dodaj obsługę HM-WGC/IMPULSE_OUTPUT_CHANNEL",
+        "zh-cn": "添加对 HM-WGC/IMPULSE_OUTPUT_CHANNEL 的支持"
+      },
+      "1.12.2": {
+        "en": "Fix a warning in js-controller 3.3",
+        "de": "Beheben Sie eine Warnung in js-controller 3.3",
+        "ru": "Исправить предупреждение в js-controller 3.3",
+        "pt": "Corrigir um aviso no js-controller 3.3",
+        "nl": "Herstel een waarschuwing in js-controller 3.3",
+        "fr": "Correction d'un avertissement dans js-controller 3.3",
+        "it": "Risolto un avviso in js-controller 3.3",
+        "es": "Corregir una advertencia en js-controller 3.3",
+        "pl": "Napraw ostrzeżenie w js-controllerze 3.3",
+        "zh-cn": "修复 js-controller 3.3 中的警告"
+      },
+      "1.12.1": {
+        "en": "Fix a warning in js-controller 3.3",
+        "de": "Korrigieren Sie eine Warnung in js-controller 3.3",
+        "ru": "Исправить предупреждение в js-controller 3.3",
+        "pt": "Corrigir um aviso no js-controller 3.3",
+        "nl": "Herstel een waarschuwing in js-controller 3.3",
+        "fr": "Correction d'un avertissement dans js-controller 3.3",
+        "it": "Risolto un avviso in js-controller 3.3",
+        "es": "Arreglar una advertencia en js-controller 3.3",
+        "pl": "Napraw ostrzeżenie w js-controller 3.3",
+        "zh-cn": "修复js-controller 3.3中的警告"
+      },
+      "1.12.0": {
+        "en": "Implement NOTIFICATION_MP3_SOUND_CHANNEL",
+        "de": "Implementieren Sie NOTIFICATION_MP3_SOUND_CHANNEL",
+        "ru": "Реализовать NOTIFICATION_MP3_SOUND_CHANNEL",
+        "pt": "Implementar NOTIFICATION_MP3_SOUND_CHANNEL",
+        "nl": "Implementeer NOTIFICATION_MP3_SOUND_CHANNEL",
+        "fr": "Mettre en œuvre NOTIFICATION_MP3_SOUND_CHANNEL",
+        "it": "Implementa NOTIFICATION_MP3_SOUND_CHANNEL",
+        "es": "Implementar NOTIFICATION_MP3_SOUND_CHANNEL",
+        "pl": "Zaimplementuj NOTIFICATION_MP3_SOUND_CHANNEL",
+        "zh-cn": "实施NOTIFICATION_MP3_SOUND_CHANNEL"
+      }
     },
-    "native": {
-        "deviceName": "iobroker",
-        "authToken": "",
-        "clientAuthToken": "",
-        "clientId": "",
-        "accessPointSgtin": "",
-        "pin": ""
+    "title": "HomeMaticIP Cloud AccessPoint",
+    "titleLang": {
+      "en": "HomeMaticIP Cloud AccessPoint",
+      "de": "HomeMatic IP Cloud-Zugriffspunkt",
+      "ru": "Точка доступа HomeMatic IP Cloud",
+      "pt": "Ponto de acesso da nuvem IP da HomeMatic",
+      "nl": "HomeMatic IP Cloud Access Point",
+      "fr": "Point d'accès IP HomeMatic Cloud",
+      "it": "HomeMatic IP Cloud Access Point",
+      "es": "Punto de acceso HomeMatic IP Cloud",
+      "pl": "Punkt dostępu do chmury internetowej HomeMatic",
+      "zh-cn": "HomeMatic IP云接入点"
     },
-    "objects": [],
-    "instanceObjects": [
-        {
-            "_id": "info",
-            "type": "channel",
-            "common": {
-                "name": "Information"
-            },
-            "native": {}
-        },
-        {
-            "_id": "info.connection",
-            "type": "state",
-            "common": {
-                "role": "indicator.connected",
-                "name": "If connected to Cloud",
-                "type": "boolean",
-                "read": true,
-                "write": false,
-                "def": false
-            },
-            "native": {}
-        }
-    ]
+    "desc": {
+      "en": "HomeMaticIP Cloud AccessPoint",
+      "de": "HomeMatic IP Cloud-Zugriffspunkt",
+      "ru": "Точка доступа HomeMatic IP Cloud",
+      "pt": "Ponto de acesso da nuvem IP da HomeMatic",
+      "nl": "HomeMatic IP Cloud Access Point",
+      "fr": "Point d'accès IP HomeMatic Cloud",
+      "it": "HomeMatic IP Cloud Access Point",
+      "es": "Punto de acceso HomeMatic IP Cloud",
+      "pl": "Punkt dostępu do chmury internetowej HomeMatic",
+      "zh-cn": "HomeMatic IP云接入点"
+    },
+    "authors": [
+      "jogibear9988 <jochen.kuehner@gmx.de>"
+    ],
+    "platform": "Javascript/Node.js",
+    "mode": "daemon",
+    "compact": true,
+    "icon": "homematic.png",
+    "materialize": true,
+    "enabled": true,
+    "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.hmip/master/admin/homematic.png",
+    "keywords": [
+      "hardware",
+      "homematic",
+      "hm"
+    ],
+    "readme": "https://github.com/iobroker-community-adapters/ioBroker.hmip/blob/master/README.md",
+    "loglevel": "info",
+    "type": "hardware",
+    "license": "MIT",
+    "messagebox": true,
+    "plugins": {
+      "sentry": {
+        "dsn": "https://1716d7389af84920bddc96d2f1e8e421@sentry.iobroker.net/73"
+      }
+    },
+    "dependencies": [
+      {
+        "js-controller": ">=3.1.0"
+      }
+    ],
+    "tier": 2,
+    "connectionType": "cloud",
+    "dataSource": "push"
+  },
+  "native": {
+    "deviceName": "iobroker",
+    "authToken": "",
+    "clientAuthToken": "",
+    "clientId": "",
+    "accessPointSgtin": "",
+    "pin": ""
+  },
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "role": "indicator.connected",
+        "name": "If connected to Cloud",
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    }
+  ]
 }
