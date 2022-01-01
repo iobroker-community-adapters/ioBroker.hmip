@@ -229,6 +229,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                             return;
                     }
                     const pin = await this.getStateAsync('devices.' + o.native.id + '.channels.' + o.native.channel + '.pin');
+                    this.log.info(`Call setLockState for ${state.val} with PIN ${pin}`);
                     await this._api.deviceControlSetLockState(o.native.id, state.val, pin ? pin.val : '', o.native.channel);
                     break;
                 case 'resetEnergyCounter':
@@ -1712,6 +1713,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'HEAT_DEMAND_CHANNEL':
                 case 'DEHUMIDIFIER_DEMAND_CHANNEL':
                 case 'CHANGE_OVER_CHANNEL':
+                case 'FLOOR_TERMINAL_BLOCK_CHANNEL':
                     this.log.silly(`Ignore channel type ${fc.functionalChannelType} - ${JSON.stringify(device)}`);
                     break;
                 default:
