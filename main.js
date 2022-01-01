@@ -229,7 +229,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                             return;
                     }
                     const pin = await this.getStateAsync('devices.' + o.native.id + '.channels.' + o.native.channel + '.pin');
-                    this.log.info(`Call setLockState for ${state.val} with PIN ${pin}`);
+                    this.log.info(`Call setLockState for ${state.val} with PIN ${pin ? pin.val : ''}`);
                     await this._api.deviceControlSetLockState(o.native.id, state.val, pin ? pin.val : '', o.native.channel);
                     break;
                 case 'resetEnergyCounter':
