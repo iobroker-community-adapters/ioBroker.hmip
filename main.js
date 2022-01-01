@@ -449,21 +449,21 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         if (o && o.native && o.native.parameter) {
             if (o.native.step) {
                 state.val = this.round(state.val, o.native.step);
-                this.log.debug(`state change - ${o.native.parameter} - id ${o.native.id ? o.native.id : ''} - value rounded to ${state.val} (step=${o.native.step} )`);
+                this.log.debug(`state change - ${o.native.parameter} - id ${o.native.id ? JSON.stringify(o.native.id) : ''} - value rounded to ${state.val} (step=${o.native.step} )`);
             } else {
-                this.log.debug(`state change - ${o.native.parameter} - id ${o.native.id ? o.native.id : ''} - value ${state.val}`);
+                this.log.debug(`state change - ${o.native.parameter} - id ${o.native.id ? JSON.stringify(o.native.id) : ''} - value ${state.val}`);
             }
 
             if (o.native.debounce) {
                 // if debounce and value is the same, ignore call
                 if (this.delayTimeouts[id] && this.delayTimeouts[id].timeout && this.delayTimeouts[id].lastVal === state.val) {
-                    this.log.debug(`${o.native.parameter} - id ${o.native.id ? o.native.id : ''} - Debounce waiting - value stable`);
+                    this.log.debug(`${o.native.parameter} - id ${o.native.id ? JSON.stringify(o.native.id) : ''} - Debounce waiting - value stable`);
                     return;
                 }
             } else {
                 // if running timeout and not debounce, requests come in too fast
                 if (this.delayTimeouts[id] && this.delayTimeouts[id].timeout) {
-                    this.log.info(`${o.native.parameter} - id ${o.native.id ? o.native.id : ''} - Too fast value changes, change blocked!`);
+                    this.log.info(`${o.native.parameter} - id ${o.native.id ? JSON.stringify(o.native.id) : ''} - Too fast value changes, change blocked!`);
                     return;
                 }
             }
@@ -478,7 +478,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 this.delayTimeouts[id].lastVal = state.val;
                 this.delayTimeouts[id].timeout = setTimeout((id, o, state) => {
                     this.delayTimeouts[id].timeout = null;
-                    this.log.debug(`${o.native.parameter} - id ${o.native.id ? o.native.id : ''} - Send debounced value ${state.val} now to HMIP`);
+                    this.log.debug(`${o.native.parameter} - id ${o.native.id ? JSON.stringify(o.native.id) : ''} - Send debounced value ${state.val} now to HMIP`);
                     this._doStateChange(id, o, state);
                 }, o.native.debounce, id, o, state)
             } else {
@@ -1473,6 +1473,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     async _createObjectsForDevices() {
+        this.log.silly(`Devices: ${JSON.stringify(this._api.devices)}`);
         for (let i in this._api.devices) {
             if (!this._api.devices.hasOwnProperty(i)) {
                 continue;
@@ -1482,6 +1483,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     async _createObjectsForGroups() {
+        this.log.silly(`Groups: ${JSON.stringify(this._api.groups)}`);
         for (let i in this._api.groups) {
             if (!this._api.groups.hasOwnProperty(i)) {
                 continue;
@@ -1491,6 +1493,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     async _createObjectsForClients() {
+        this.log.silly(`Clients: ${JSON.stringify(this._api.clients)}`);
         for (let i in this._api.clients) {
             if (!this._api.clients.hasOwnProperty(i)) {
                 continue;
@@ -1500,6 +1503,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     async _createObjectsForHomes() {
+        this.log.silly(`Home: ${JSON.stringify(this._api.home)}`);
         await this._createObjectsForHome(this._api.home);
     }
 
