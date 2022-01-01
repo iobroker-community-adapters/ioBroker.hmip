@@ -57,6 +57,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 
 ### __WORK IN PROGRESS__
 * (Apollon77) Optimize WebSocket reconnection Logic
+* (Apollon77) Optimize current value handling and re-set value if a state change is not processed because of an unchanged value
 
 ### 1.14.0 (2021-11-07)
 * (Apollon77) Lower loglevel for state change logs to debug

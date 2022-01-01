@@ -198,6 +198,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'switchState':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
+                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
                         return;
                     }
                     await this._api.deviceControlSetSwitchState(o.native.id, state.val, o.native.channel);
@@ -205,6 +206,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'sendDoorCommand':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
+                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
                         return;
                     }
                     await this._api.deviceControlSendDoorCommand(o.native.id, state.val, o.native.channel);
@@ -215,6 +217,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'shutterlevel':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
+                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
                         return;
                     }
                     await this._api.deviceControlSetShutterLevel(o.native.id, state.val, o.native.channel);
@@ -224,6 +227,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     let shutter = await this.getStateAsync('devices.' + o.native.id + '.channels.' + o.native.channel + '.shutterLevel');
                     if (slats.val === this.currentValues['devices.' + o.native.id + '.channels.' + o.native.channel + '.slatsLevel'] && shutter.val === this.currentValues['devices.' + o.native.id + '.channels.' + o.native.channel + '.shutterLevel']) {
                         this.log.info(`Value unchanged, do not send this value`);
+                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
                         return;
                     }
                     await this._api.deviceControlSetSlatsLevel(o.native.id, slats.val, shutter.val, o.native.channel);
@@ -231,6 +235,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'setPrimaryShadingLevel':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
+                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
                         return;
                     }
                     await this._api.deviceControlSetPrimaryShadingLevel(o.native.id, state.val, o.native.channel);
@@ -240,6 +245,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     let secondary = await this.getStateAsync('devices.' + o.native.id + '.channels.' + o.native.channel + '.secondaryShadingLevel');
                     if (primary.val === this.currentValues['devices.' + o.native.id + '.channels.' + o.native.channel + '.primaryShadingLevel'] && secondary.val === this.currentValues['devices.' + o.native.id + '.channels.' + o.native.channel + '.secondaryShadingLevel']) {
                         this.log.info(`Value unchanged, do not send this value`);
+                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
                         return;
                     }
                     await this._api.deviceControlSetSecondaryShadingLevel(o.native.id, primary.val, secondary.val, o.native.channel);
@@ -250,6 +256,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'setPointTemperature':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
+                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
                         return;
                     }
                     for (let id of o.native.id) {
@@ -259,6 +266,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'setBoost':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
+                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
                         return;
                     }
                     for (let id of o.native.id) {
@@ -268,6 +276,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'setActiveProfile':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
+                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
                         return;
                     }
                     for (let id of o.native.id) {
@@ -277,6 +286,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'setControlMode':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
+                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
                         return;
                     }
                     for (let id of o.native.id) {
@@ -286,6 +296,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'setOperationLock':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
+                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
                         return;
                     }
                     await this._api.deviceConfigurationSetOperationLock(o.native.id, state.val, o.native.channel);
@@ -293,6 +304,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'setClimateControlDisplay':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
+                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
                         return;
                     }
                     await this._api.deviceConfigurationSetClimateControlDisplay(o.native.id, state.val, o.native.channel);
@@ -300,6 +312,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'setMinimumFloorHeatingValvePosition':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
+                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
                         return;
                     }
                     await this._api.deviceConfigurationSetMinimumFloorHeatingValvePosition(o.native.id, state.val, o.native.channel);
@@ -307,6 +320,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'setDimLevel':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
+                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
                         return;
                     }
                     await this._api.deviceControlSetDimLevel(o.native.id, state.val, o.native.channel);
@@ -317,6 +331,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     if (dimLevel > 1) dimLevel = dimLevel / 100;
                     if (rgb.val === this.currentValues['devices.' + o.native.id + '.channels.' + o.native.channel + '.simpleRGBColorState'] && dimLevel.val === this.currentValues['devices.' + o.native.id + '.channels.' + o.native.channel + '.dimLevel']) {
                         this.log.info(`Value unchanged, do not send this value`);
+                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
                         return;
                     }
                     await this._api.deviceControlSetRgbDimLevel(o.native.id, rgb.val, dimLevel.val, o.native.channel);
@@ -339,6 +354,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'setIntrusionAlertThroughSmokeDetectors':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
+                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
                         return;
                     }
                     await this._api.homeSetIntrusionAlertThroughSmokeDetectors(state.val);
@@ -405,11 +421,6 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     async _stateChange(id, state) {
         if (!id || !state) return;
-
-        if (state.ack) { // remember last official value of the state
-            this.currentValues[id] = state.val;
-            return;
-        }
 
         let o = await this.getObjectAsync(id);
         if (o && o.native && o.native.parameter) {
@@ -549,14 +560,17 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         }
     }
 
-    secureSetStateAsync(id, value, ack) {
+    async secureSetStateAsync(id, value, ack) {
         if (value && typeof value === 'object') {
             value = value.val;
         }
         if (value === undefined) {
             value = null;
         }
-        return this.setStateAsync(id, value, ack);
+        await this.setStateAsync(id, value, ack);
+        if (ack) {
+            this.currentValues[`${this.namespace}.${id}`] = value;
+        }
     }
 
     _updateDeviceStates(device) {
@@ -781,31 +795,31 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     /* Start Channel Types */
     _updateMainsFailureChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.powerMainsFailure', device.functionalChannels[channel].powerMainsFailure, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.genericAlarmSignal', device.functionalChannels[channel].genericAlarmSignal, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.powerMainsFailure', device.functionalChannels[channel].powerMainsFailure, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.genericAlarmSignal', device.functionalChannels[channel].genericAlarmSignal, true));
         return promises;
     }
 
     _updateDoorChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.on', device.functionalChannels[channel].on, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.processing', device.functionalChannels[channel].processing, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.doorState', device.functionalChannels[channel].doorState, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.doorCommand', device.functionalChannels[channel].doorCommand, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.ventilationPositionSupported', device.functionalChannels[channel].ventilationPositionSupported, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.on', device.functionalChannels[channel].on, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.processing', device.functionalChannels[channel].processing, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.doorState', device.functionalChannels[channel].doorState, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.doorCommand', device.functionalChannels[channel].doorCommand, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.ventilationPositionSupported', device.functionalChannels[channel].ventilationPositionSupported, true));
         return promises;
     }
 
     _updateDoorLockChannelStates(device, channel) {
         let promises = [];
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.lockState', device.functionalChannels[channel].lockState, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.motorState', device.functionalChannels[channel].motorState, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.autoRelockEnabled', device.functionalChannels[channel].autoRelockEnabled, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.doorLockDirection', device.functionalChannels[channel].doorLockDirection, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.doorLockNeutralPosition', device.functionalChannels[channel].doorLockNeutralPosition, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.doorLockTurns', device.functionalChannels[channel].doorLockTurns, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.doorHandleType', device.functionalChannels[channel].doorHandleType, true));
-        promises.push(this.setStateAsync('devices.' + device.id + '.channels.' + channel + '.autoRelockDelay', device.functionalChannels[channel].autoRelockDelay, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.lockState', device.functionalChannels[channel].lockState, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.motorState', device.functionalChannels[channel].motorState, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.autoRelockEnabled', device.functionalChannels[channel].autoRelockEnabled, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.doorLockDirection', device.functionalChannels[channel].doorLockDirection, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.doorLockNeutralPosition', device.functionalChannels[channel].doorLockNeutralPosition, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.doorLockTurns', device.functionalChannels[channel].doorLockTurns, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.doorHandleType', device.functionalChannels[channel].doorHandleType, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.autoRelockDelay', device.functionalChannels[channel].autoRelockDelay, true));
         return promises;
     }
 
