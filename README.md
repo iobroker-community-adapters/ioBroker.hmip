@@ -54,6 +54,10 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
+
+### __WORK IN PROGRESS__
+* (Apollon77) Optimize WebSocket reconnection Logic
+
 ### 1.14.0 (2021-11-07)
 * (Apollon77) Lower loglevel for state change logs to debug
 * (Apollon77) Add verification when reading some data to prevent crashes
