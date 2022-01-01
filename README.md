@@ -44,9 +44,14 @@ For example direct connections between devices have no events in the app and can
 ## Settings
 * enter your SGTIN (back of the Access Point) and the PIN (if set before), and validate the data via press of the blue LED Button. This will create an Authentication token.
 
-## Thanks
-to coreGreenberet for his python lib (https://github.com/coreGreenberet/homematicip-rest-api)
+## Special settings
 
+### HMIP-DLD (Door Lock Drive)
+If you have assigned a PIN to the lock in HmIP app (Settings / Access authorizations) then the PIN needs to be set in the pin state of the devices objects
+
+## Thanks
+* to @coreGreenberet for his python lib (https://github.com/coreGreenberet/homematicip-rest-api)
+* 
 ## Diskussion in ioBroker Forum
 https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 
@@ -59,7 +64,8 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 * (Apollon77) Optimize WebSocket reconnection Logic
 * (Apollon77) Optimize current value handling and re-set value if a state change is not processed because of an unchanged value
 * (Apollon77) Implement startImpulse call for ImpulseOutputChannels for e.g. HM-WGC
-* 
+* (Apollon77) Implement support for HMIP-DLD to set the lock state and also an option PIN if needed (see notes above)
+
 ### 1.14.0 (2021-11-07)
 * (Apollon77) Lower loglevel for state change logs to debug
 * (Apollon77) Add verification when reading some data to prevent crashes

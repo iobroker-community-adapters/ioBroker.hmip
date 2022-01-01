@@ -204,12 +204,31 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     await this._api.deviceControlSetSwitchState(o.native.id, state.val, o.native.channel);
                     break;
                 case 'sendDoorCommand':
-                    if (state.val === this.currentValues[id]) {
-                        this.log.info(`Value unchanged, do not send this value`);
-                        await this.secureSetStateAsync(id, this.currentValues[id], true);
-                        return;
+                    //door commands as number: 1 = open; 2 = stop; 3 = close; 4 = ventilation position
+                    switch (state.val) {
+                        case 1: //state.val = 'OPEN'; break;
+                        case 2: //state.val = 'STOP'; break;
+                        case 3: //state.val = 'CLOSE'; break;
+                        case 4: //state.val = 'VENTILATION_POSITION'; break;
+                            break; // Send as before
+                        default:
+                            this.log.info('Ignore invalid value for doorCommand.');
+                            return;
                     }
                     await this._api.deviceControlSendDoorCommand(o.native.id, state.val, o.native.channel);
+                    break;
+                case 'setLockState':
+                    //door commands as number: 1 = open; 2 = locked; 3 = unlocked
+                    switch (state.val) {
+                        case 1: state.val = 'OPEN'; break;
+                        case 2: state.val = 'LOCKED'; break;
+                        case 3: state.val = 'UNLOCKED'; break;
+                        default:
+                            this.log.info('Ignore invalid value for setLockState.');
+                            return;
+                    }
+                    const pin = await this.getStateAsync('devices.' + o.native.id + '.channels.' + o.native.channel + '.pin');
+                    await this._api.deviceControlSetLockState(o.native.id, state.val, pin ? pin.val : '', o.native.channel);
                     break;
                 case 'resetEnergyCounter':
                     await this._api.deviceControlResetEnergyCounter(o.native.id, o.native.channel);
@@ -808,7 +827,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.on', device.functionalChannels[channel].on, true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.processing', device.functionalChannels[channel].processing, true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.doorState', device.functionalChannels[channel].doorState, true));
-        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.doorCommand', device.functionalChannels[channel].doorCommand, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.doorCommand', null, true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.ventilationPositionSupported', device.functionalChannels[channel].ventilationPositionSupported, true));
         return promises;
     }
@@ -823,6 +842,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.doorLockTurns', device.functionalChannels[channel].doorLockTurns, true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.doorHandleType', device.functionalChannels[channel].doorHandleType, true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.autoRelockDelay', device.functionalChannels[channel].autoRelockDelay, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.setLockState', null, true));
         return promises;
     }
 
@@ -1712,7 +1732,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.processing', { type: 'state', common: { name: 'processing', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.ventilationPositionSupported', { type: 'state', common: { name: 'ventilationPositionSupported', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.doorCommand', { type: 'state', common: { name: 'doorCommand', type: 'number', role: 'value', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'sendDoorCommand' } }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.doorCommand', { type: 'state', common: { name: 'doorCommand', type: 'number', role: 'value', read: true, write: true, states: {1: 'OPEN', 2: 'STOP', 3:'CLOSE', 4:'VENTILATION_POSITION'} }, native: { id: device.id, channel: channel, parameter: 'sendDoorCommand' } }));
         return promises;
     }
 
@@ -1726,6 +1746,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.doorLockTurns', { type: 'state', common: { name: 'doorLockTurns', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.doorHandleType', { type: 'state', common: { name: 'doorHandleType', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.autoRelockDelay', { type: 'state', common: { name: 'autoRelockDelay', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.pin', { type: 'state', common: { name: 'pin', type: 'string', role: 'state', read: true, write: true }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.setLockState', { type: 'state', common: { name: 'setLockState', type: 'number', role: 'value', read: true, write: true, states: {1: 'OPEN', 2: 'LOCKED', 3:'UNLOCKED'} }, native: { id: device.id, channel: channel, parameter: 'setLockState' } }));
         return promises;
     }
 

@@ -283,6 +283,11 @@ class HmCloudAPI {
         await this.callRestApi('device/control/sendDoorCommand', data);
     }
 
+    async deviceControlSetLockState(deviceId, lockState, pin, channelIndex = 1) {
+        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'authorizationPin': pin || '', 'targetLockState': lockState };
+        await this.callRestApi('device/control/setLockState', data);
+    }
+
     async deviceControlResetEnergyCounter(deviceId, channelIndex = 1) {
         let data = { "deviceId": deviceId, "channelIndex": channelIndex };
         await this.callRestApi('device/control/resetEnergyCounter', data);
