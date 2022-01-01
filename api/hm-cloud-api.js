@@ -152,6 +152,9 @@ class HmCloudAPI {
 
     dispose() {
         this.isClosed = true;
+        if (this._ws) {
+            this._ws.close();
+        }
         if (this._connectTimeout)
             clearTimeout(this._connectTimeout);
         if (this._pingInterval)
