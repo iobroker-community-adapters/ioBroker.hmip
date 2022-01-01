@@ -38,6 +38,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
         this.currentValues = {};
         this.delayTimeouts = {};
+        this.initializedChannels = {};
     }
 
     _unload(callback) {
@@ -111,26 +112,32 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
         if (this.config.accessPointSgtin && this.config.authToken && this.config.clientAuthToken && this.config.clientId) {
             try {
-                await this._startupHomematic();
+                this._api.parseConfigData({
+                    authToken: this.config.authToken,
+                    clientAuthToken: this.config.clientAuthToken,
+                    clientId: this.config.clientId,
+                    accessPointSgtin: this.config.accessPointSgtin,
+                    pin: this.config.pin
+                });
+                await this._api.getHomematicHosts();
+
+                await this._initData();
             } catch (err) {
                 this.log.error('error starting homematic: ' +  err);
                 this.log.error('Try reconnect in 30s');
                 this.reInitTimeout = setTimeout(() => this._ready(), 30000);
             }
+            this.log.debug('subscribeStates');
+            this.subscribeStates('*');
+
+            this.setState('info.connection', true, true);
+            this.log.info('hmip adapter connected and ready');
         } else {
             this.log.info('token not yet created');
         }
     }
 
-    async _startupHomematic() {
-        this._api.parseConfigData({
-            authToken: this.config.authToken,
-            clientAuthToken: this.config.clientAuthToken,
-            clientId: this.config.clientId,
-            accessPointSgtin: this.config.accessPointSgtin,
-            pin: this.config.pin
-        });
-        await this._api.getHomematicHosts();
+    async _initData() {
         await this._api.loadCurrentConfig();
         this.log.debug('createObjectsForDevices');
         await this._createObjectsForDevices();
@@ -178,12 +185,6 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         } else {
             this.log.debug('No home');
         }
-
-        this.log.debug('subscribeStates');
-        this.subscribeStates('*');
-
-        this.setState('info.connection', true, true);
-        this.log.info('hmip adapter connected and ready');
     }
 
     round(value, step) {
@@ -595,7 +596,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         }
     }
 
-    _updateDeviceStates(device) {
+    async _updateDeviceStates(device) {
         this.log.silly("updateDeviceStates - " + device.type + " - " + JSON.stringify(device));
         let promises = [];
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.info.type', device.type, true));
@@ -613,12 +614,17 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             }
         }
 
+        let unknownChannelDetected = false;
         for (let i in device.functionalChannels) {
             if (!device.functionalChannels.hasOwnProperty(i)) {
                 continue;
             }
             let fc = device.functionalChannels[i];
             promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + i + '.functionalChannelType', fc.functionalChannelType, true));
+            if (!this.initializedChannels[`${device.id}.channels.${i}`]) {
+                unknownChannelDetected = true;
+                continue;
+            }
 
             switch (fc.functionalChannelType) {
 
@@ -811,7 +817,12 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     break;
             }
         }
-        return Promise.all(promises);
+        await Promise.all(promises);
+
+        if (unknownChannelDetected) {
+            this.log.info('New devices or channels detected ... reinitialize ...');
+            await this._initData();
+        }
     }
 
     /* Start Channel Types */
@@ -1517,6 +1528,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             }
             let fc = device.functionalChannels[i];
             promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + i, { type: 'channel', common: {}, native: {} }));
+            this.initializedChannels[`${device.id}.channels.${i}`] = true;
+
             promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + i + '.functionalChannelType', { type: 'state', common: { name: 'functionalChannelType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
             switch (fc.functionalChannelType) {
 
@@ -1695,7 +1708,6 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 default:
                     this.log.info("unknown channel type - " + fc.functionalChannelType + " - " + JSON.stringify(device));
                     break;
-
             }
         }
         return Promise.all(promises);

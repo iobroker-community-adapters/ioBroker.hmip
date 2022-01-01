@@ -65,6 +65,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 * (Apollon77) Optimize current value handling and re-set value if a state change is not processed because of an unchanged value
 * (Apollon77) Implement startImpulse call for ImpulseOutputChannels for e.g. HM-WGC
 * (Apollon77) Implement support for HMIP-DLD to set the lock state and also an option PIN if needed (see notes above)
+* (Apollon77) Detect new and unknown devices and channels and reinitialize the structure to add the new objects on the fly
 
 ### 1.14.0 (2021-11-07)
 * (Apollon77) Lower loglevel for state change logs to debug
