@@ -198,7 +198,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'switchState':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
-                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
+                        await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
                     await this._api.deviceControlSetSwitchState(o.native.id, state.val, o.native.channel);
@@ -206,7 +206,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'sendDoorCommand':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
-                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
+                        await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
                     await this._api.deviceControlSendDoorCommand(o.native.id, state.val, o.native.channel);
@@ -217,7 +217,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'shutterlevel':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
-                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
+                        await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
                     await this._api.deviceControlSetShutterLevel(o.native.id, state.val, o.native.channel);
@@ -227,7 +227,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     let shutter = await this.getStateAsync('devices.' + o.native.id + '.channels.' + o.native.channel + '.shutterLevel');
                     if (slats.val === this.currentValues['devices.' + o.native.id + '.channels.' + o.native.channel + '.slatsLevel'] && shutter.val === this.currentValues['devices.' + o.native.id + '.channels.' + o.native.channel + '.shutterLevel']) {
                         this.log.info(`Value unchanged, do not send this value`);
-                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
+                        await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
                     await this._api.deviceControlSetSlatsLevel(o.native.id, slats.val, shutter.val, o.native.channel);
@@ -235,7 +235,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'setPrimaryShadingLevel':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
-                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
+                        await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
                     await this._api.deviceControlSetPrimaryShadingLevel(o.native.id, state.val, o.native.channel);
@@ -245,7 +245,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     let secondary = await this.getStateAsync('devices.' + o.native.id + '.channels.' + o.native.channel + '.secondaryShadingLevel');
                     if (primary.val === this.currentValues['devices.' + o.native.id + '.channels.' + o.native.channel + '.primaryShadingLevel'] && secondary.val === this.currentValues['devices.' + o.native.id + '.channels.' + o.native.channel + '.secondaryShadingLevel']) {
                         this.log.info(`Value unchanged, do not send this value`);
-                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
+                        await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
                     await this._api.deviceControlSetSecondaryShadingLevel(o.native.id, primary.val, secondary.val, o.native.channel);
@@ -256,7 +256,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'setPointTemperature':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
-                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
+                        await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
                     for (let id of o.native.id) {
@@ -266,7 +266,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'setBoost':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
-                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
+                        await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
                     for (let id of o.native.id) {
@@ -276,7 +276,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'setActiveProfile':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
-                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
+                        await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
                     for (let id of o.native.id) {
@@ -286,7 +286,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'setControlMode':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
-                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
+                        await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
                     for (let id of o.native.id) {
@@ -296,7 +296,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'setOperationLock':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
-                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
+                        await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
                     await this._api.deviceConfigurationSetOperationLock(o.native.id, state.val, o.native.channel);
@@ -304,7 +304,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'setClimateControlDisplay':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
-                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
+                        await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
                     await this._api.deviceConfigurationSetClimateControlDisplay(o.native.id, state.val, o.native.channel);
@@ -312,7 +312,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'setMinimumFloorHeatingValvePosition':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
-                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
+                        await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
                     await this._api.deviceConfigurationSetMinimumFloorHeatingValvePosition(o.native.id, state.val, o.native.channel);
@@ -320,7 +320,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'setDimLevel':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
-                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
+                        await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
                     await this._api.deviceControlSetDimLevel(o.native.id, state.val, o.native.channel);
@@ -331,7 +331,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     if (dimLevel > 1) dimLevel = dimLevel / 100;
                     if (rgb.val === this.currentValues['devices.' + o.native.id + '.channels.' + o.native.channel + '.simpleRGBColorState'] && dimLevel.val === this.currentValues['devices.' + o.native.id + '.channels.' + o.native.channel + '.dimLevel']) {
                         this.log.info(`Value unchanged, do not send this value`);
-                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
+                        await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
                     await this._api.deviceControlSetRgbDimLevel(o.native.id, rgb.val, dimLevel.val, o.native.channel);
@@ -354,7 +354,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'setIntrusionAlertThroughSmokeDetectors':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
-                        await this.secureSetStateAsync(id, this.currentValues[`${this.namespace}.${id}`], true);
+                        await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
                     await this._api.homeSetIntrusionAlertThroughSmokeDetectors(state.val);
