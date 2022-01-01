@@ -96,7 +96,7 @@ class HmCloudAPI {
         } catch (err) {
             this.requestError && this.requestError(err);
         }
-        if (!res || res.statusCode != 200)
+        if (!res || res.statusCode !== 200)
             throw "error";
     }
 
@@ -109,7 +109,7 @@ class HmCloudAPI {
         } catch (err) {
             this.requestError && this.requestError(err);
         }
-        return res && typeof res === 'object' && res.statusCode == 200;
+        return res && typeof res === 'object' && res.statusCode === 200;
     }
 
     async auth3requestAuthToken() {
@@ -318,6 +318,11 @@ class HmCloudAPI {
         await this.callRestApi('device/control/setShutterLevel', data);
     }
 
+    async deviceControlStartImpulse(deviceId, channelIndex = 1) {
+        let data = { "deviceId": deviceId, "channelIndex": channelIndex };
+        await this.callRestApi('device/control/startImpulse', data);
+    }
+
     async deviceControlSetSlatsLevel(deviceId, slatsLevel, shutterLevel, channelIndex = 1) {
         let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'slatsLevel': slatsLevel, 'shutterLevel': shutterLevel };
         await this.callRestApi('device/control/setSlatsLevel', data);
@@ -461,6 +466,6 @@ class HmCloudAPI {
         let data = { "zonesActivation": { "INTERNAL": internal, "EXTERNAL": external } };
         await this.callRestApi('home/security/setZonesActivation', data);
     }
-};
+}
 
 module.exports = HmCloudAPI;

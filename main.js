@@ -214,6 +214,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'resetEnergyCounter':
                     await this._api.deviceControlResetEnergyCounter(o.native.id, o.native.channel);
                     break;
+                case 'startImpulse':
+                    await this._api.deviceControlStartImpulse(o.native.id, o.native.channel);
+                    break;
                 case 'shutterlevel':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
@@ -1010,6 +1013,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         let promises = [];
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.processing', device.functionalChannels[channel].processing, true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.impulseDuration', device.functionalChannels[channel].impulseDuration, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.startImpulse', false, true));
         return promises;
     }
 
@@ -1926,6 +1930,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         let promises = [];
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.processing', { type: 'state', common: { name: 'processing', type: 'boolean', role: 'indicator.working', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.impulseDuration', { type: 'state', common: { name: 'impulseDuration', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.startImpulse', { type: 'state', common: { name: 'startImpulse', type: 'boolean', role: 'button', read: false, write: true }, native: {id: device.id, channel: channel, parameter: 'startImpulse'} }));
         return promises;
     }
 
