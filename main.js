@@ -1709,6 +1709,11 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'CARBON_DIOXIDE_SENSOR_CHANNEL':
                     promises.push(...this._createCarbonDioxideSensorChannel(device, i));
                     break;
+                case 'HEAT_DEMAND_CHANNEL':
+                case 'DEHUMIDIFIER_DEMAND_CHANNEL':
+                case 'CHANGE_OVER_CHANNEL':
+                    this.log.silly(`Ignore channel type ${fc.functionalChannelType} - ${JSON.stringify(device)}`);
+                    break;
                 default:
                     this.log.info("unknown channel type - " + fc.functionalChannelType + " - " + JSON.stringify(device));
                     break;
