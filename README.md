@@ -47,7 +47,7 @@ For example direct connections between devices have no events in the app and can
 ## Special settings
 
 ### HMIP-DLD (Door Lock Drive)
-If you have assigned a PIN to the lock in HmIP app (Settings / Access authorizations) then the PIN needs to be set in the pin state of the devices objects.
+If you have assigned a PIN to the lock in HmIP app (Settings / Access authorizations - German: "Zutrittsberechtigungen") then the PIN needs to be set in the pin state of the devices objects. It is NOT your system PIN!! if you have not set a PIN in settings you can also leave empty in the pin state.
 Additionally please add "iobroker" client to the list of access control clients in HmIP app settings!
 
 ## Thanks
