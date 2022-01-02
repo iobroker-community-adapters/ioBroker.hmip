@@ -77,6 +77,9 @@ class HmCloudAPI {
         if (res && typeof res === 'object') {
             this._urlREST = res.urlREST;
             this._urlWebSocket = res.urlWebSocket;
+            if (this._urlWebSocket.startsWith('http')) {
+                this._urlWebSocket = 'ws' + this._urlWebSocket.substring(4); // make sure it is ws:// or wss://
+            }
         }
         if (!this._urlREST || !this._urlWebSocket) {
             throw "Could not get host details. Please check the SGTIN.";
@@ -185,7 +188,7 @@ class HmCloudAPI {
 
         this._ws.on('close', (code, reason) => {
             if (this.closed)
-                this.closed(code, reason);
+                this.closed(code, reason.toString('utf8'));
             if (this._pingInterval) {
                 clearInterval(this._pingInterval);
                 this._pingInterval = null;
@@ -287,7 +290,7 @@ class HmCloudAPI {
     }
 
     async deviceControlSetLockState(deviceId, lockState, pin, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'authorizationPin': pin.toString() || '', 'targetLockState': lockState };
+        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'authorizationPin': pin.toString(), 'targetLockState': lockState };
         await this.callRestApi('device/control/setLockState', data);
     }
 

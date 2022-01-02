@@ -47,7 +47,8 @@ For example direct connections between devices have no events in the app and can
 ## Special settings
 
 ### HMIP-DLD (Door Lock Drive)
-If you have assigned a PIN to the lock in HmIP app (Settings / Access authorizations) then the PIN needs to be set in the pin state of the devices objects
+If you have assigned a PIN to the lock in HmIP app (Settings / Access authorizations) then the PIN needs to be set in the pin state of the devices objects.
+Additionally please add "iobroker" client to the list of access control clients in HmIP app settings!
 
 ## Thanks
 * to @coreGreenberet for his python lib (https://github.com/coreGreenberet/homematicip-rest-api)
@@ -61,10 +62,11 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 ## Changelog
 
 ### __WORK IN PROGRESS__
+* Node.js 10.x is now minimum required version for this adapter
 * (Apollon77) Optimize WebSocket reconnection Logic
 * (Apollon77) Optimize current value handling and re-set value if a state change is not processed because of an unchanged value
 * (Apollon77) Implement startImpulse call for ImpulseOutputChannels for e.g. HM-WGC
-* (Apollon77) Implement support for HMIP-DLD to set the lock state and also an option PIN if needed (see notes above)
+* (Apollon77) Implement experimental support for HMIP-DLD to set the lock state and also an option PIN if needed (see notes above)
 * (Apollon77) Detect new and unknown devices and channels and reinitialize the structure to add the new objects on the fly
 * (Apollon77) Implement DOOR_LOCK_SENSOR_CHANNEL
 * (Apollon77) Ignore HEAT_DEMAND_CHANNEL, DEHUMIDIFIER_DEMAND_CHANNEL, FLOOR_TERMINAL_BLOCK_CHANNEL and CHANGE_OVER_CHANNEL because no data to prevent logs
@@ -224,7 +226,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 ## License
 The MIT License (MIT)
 
-Copyright (c) 2018-2021 jogibear9988 <jochen.kuehner@gmx.de>, Apollon77
+Copyright (c) 2018-2022 jogibear9988 <jochen.kuehner@gmx.de>, Apollon77
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

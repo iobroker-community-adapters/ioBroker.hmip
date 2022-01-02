@@ -444,7 +444,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     async _stateChange(id, state) {
-        if (!id || !state || this._unloaded) return;
+        if (!id || !state || state.ack || this._unloaded) return;
 
         let o = await this.getObjectAsync(id);
         if (o && o.native && o.native.parameter) {
