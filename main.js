@@ -795,6 +795,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'DOOR_LOCK_CHANNEL':
                     promises.push(...this._updateDoorLockChannelStates(device, i));
                     break;
+                case 'DOOR_LOCK_SENSOR_CHANNEL':
+                    promises.push(...this._updateDoorLockSensorChannelStates(device, i));
+                    break;
                 case 'ACCESS_AUTHORIZATION_CHANNEL':
                     promises.push(...this._updateAccessAuthorizationChannelStates(device, i));
                     break;
@@ -858,6 +861,15 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.doorHandleType', device.functionalChannels[channel].doorHandleType, true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.autoRelockDelay', device.functionalChannels[channel].autoRelockDelay, true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.setLockState', null, true));
+        return promises;
+    }
+
+    _updateDoorLockSensorChannelStates(device, channel) {
+        let promises = [];
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.lockState', device.functionalChannels[channel].lockState, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.doorLockDirection', device.functionalChannels[channel].doorLockDirection, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.doorLockNeutralPosition', device.functionalChannels[channel].doorLockNeutralPosition, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.doorLockTurns', device.functionalChannels[channel].doorLockTurns, true));
         return promises;
     }
 
@@ -1704,6 +1716,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'DOOR_LOCK_CHANNEL':
                     promises.push(...this._createDoorLockChannel(device, i));
                     break;
+                case 'DOOR_LOCK_SENSOR_CHANNEL':
+                    promises.push(...this._createDoorLockSensorChannel(device, i));
+                    break;
                 case 'ACCESS_AUTHORIZATION_CHANNEL':
                     promises.push(...this._createAccessAuthorizationChannel(device, i));
                     break;
@@ -1774,6 +1789,15 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.autoRelockDelay', { type: 'state', common: { name: 'autoRelockDelay', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.pin', { type: 'state', common: { name: 'pin', type: 'string', role: 'state', read: true, write: true }, native: {} }));
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.setLockState', { type: 'state', common: { name: 'setLockState', type: 'number', role: 'value', read: true, write: true, states: {1: 'OPEN', 2: 'LOCKED', 3:'UNLOCKED'} }, native: { id: device.id, channel: channel, parameter: 'setLockState' } }));
+        return promises;
+    }
+
+    _createDoorLockSensorChannel(device, channel) {
+        let promises = [];
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.lockState', { type: 'state', common: { name: 'lockState', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.doorLockDirection', { type: 'state', common: { name: 'doorLockDirection', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.doorLockNeutralPosition', { type: 'state', common: { name: 'doorLockNeutralPosition', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.doorLockTurns', { type: 'state', common: { name: 'doorLockTurns', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         return promises;
     }
 

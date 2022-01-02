@@ -66,6 +66,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 * (Apollon77) Implement startImpulse call for ImpulseOutputChannels for e.g. HM-WGC
 * (Apollon77) Implement support for HMIP-DLD to set the lock state and also an option PIN if needed (see notes above)
 * (Apollon77) Detect new and unknown devices and channels and reinitialize the structure to add the new objects on the fly
+* (Apollon77) Implement DOOR_LOCK_SENSOR_CHANNEL
 * (Apollon77) Ignore HEAT_DEMAND_CHANNEL, DEHUMIDIFIER_DEMAND_CHANNEL, FLOOR_TERMINAL_BLOCK_CHANNEL and CHANGE_OVER_CHANNEL because no data to prevent logs
 * (Apollon77) optimize unload handling
 
