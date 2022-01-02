@@ -128,7 +128,7 @@ class HmCloudAPI {
     }
 
     async callRestApi(path, data) {
-        let headers = { 'content-type': 'application/json', 'accept': 'application/json', 'VERSION': '12', 'AUTHTOKEN': this._authToken, 'CLIENTAUTH': this._clientAuthToken };
+        let headers = { 'content-type': 'application/json', 'accept': 'application/json', 'VERSION': '12', 'AUTHTOKEN': this._authToken, 'CLIENTAUTH': this._clientAuthToken};
         let res;
         try {
             res = await rq(this._urlREST + "/hmip/" + path, { method: 'POST', json: true, body: data, headers: headers });
@@ -287,7 +287,7 @@ class HmCloudAPI {
     }
 
     async deviceControlSetLockState(deviceId, lockState, pin, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'authorizationPin': pin || '', 'targetLockState': lockState };
+        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'authorizationPin': pin.toString() || '', 'targetLockState': lockState };
         await this.callRestApi('device/control/setLockState', data);
     }
 
