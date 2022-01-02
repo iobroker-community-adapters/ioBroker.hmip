@@ -12,7 +12,7 @@
 **This adapter uses Sentry libraries to automatically report exceptions and code errors to the developers.** For more details and for information how to disable the error reporting see [Sentry-Plugin Documentation](https://github.com/ioBroker/plugin-sentry#plugin-sentry)! Sentry reporting is used starting with js-controller 3.0.
 
 ## Description
-This adapter allows to communicate with a HomematicIP CloudAccessPoint via the Rest API of the Homematic IP Cloud
+This adapter allows the communication with a HomematicIP CloudAccessPoint via the Rest API of the Homematic IP Cloud
 
 **Important note:** Please limit control requests to the bare minimum because EQ-3 started to block IPs when you do too much!
 
