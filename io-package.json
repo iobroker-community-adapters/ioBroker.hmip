@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.15.0",
+    "version": "1.15.1",
     "news": {
+      "1.15.1": {
+        "en": "Wait 10s until no new \"unknown state update\" was received before updating the whole system",
+        "de": "Warten Sie 10 Sekunden, bis kein neues \"Unbekanntes Statusupdate\" empfangen wurde, bevor Sie das gesamte System aktualisieren",
+        "ru": "Подождите 10 секунд, пока не будет получено новое «обновление неизвестного состояния», прежде чем обновлять всю систему.",
+        "pt": "Aguarde 10s até que nenhuma nova \"atualização de estado desconhecido\" seja recebida antes de atualizar todo o sistema",
+        "nl": "Wacht 10 seconden totdat er geen nieuwe \"onbekende statusupdate\" is ontvangen voordat u het hele systeem bijwerkt",
+        "fr": "Attendez 10 s jusqu'à ce qu'aucune nouvelle \"mise à jour d'état inconnu\" ne soit reçue avant de mettre à jour l'ensemble du système",
+        "it": "Attendi 10 secondi fino a quando non è stato ricevuto alcun nuovo \"aggiornamento dello stato sconosciuto\" prima di aggiornare l'intero sistema",
+        "es": "Espere 10 segundos hasta que no se reciba una nueva \"actualización de estado desconocido\" antes de actualizar todo el sistema",
+        "pl": "Poczekaj 10 sekund, aż nie zostanie odebrana nowa „aktualizacja nieznanego stanu”, zanim zaktualizujesz cały system",
+        "zh-cn": "等待 10 秒，直到没有收到新的“未知状态更新”，然后才更新整个系统"
+      },
       "1.15.0": {
         "en": "Node.js 10.x is now minimum required version for this adapter\nOptimize WebSocket reconnection Logic\nOptimize current value handling and re-set value if a state change is not processed because of an unchanged value\nImplement startImpulse call for ImpulseOutputChannels for e.g. HM-WGC\nImplement experimental support for HMIP-DLD to set the lock state and also an option PIN if needed (see notes above)\nDetect new and unknown devices and channels and reinitialize the structure to add the new objects on the fly\nImplement DOOR_LOCK_SENSOR_CHANNEL\nIgnore HEAT_DEMAND_CHANNEL, DEHUMIDIFIER_DEMAND_CHANNEL, FLOOR_TERMINAL_BLOCK_CHANNEL and CHANGE_OVER_CHANNEL because no data to prevent logs\noptimize unload handling",
         "de": "Node.js 10.x ist jetzt die erforderliche Mindestversion für diesen Adapter\nOptimieren Sie die WebSocket-Wiederverbindungslogik\nOptimieren Sie das Istwert-Handling und setzen Sie den Wert zurück, wenn eine Zustandsänderung aufgrund eines unveränderten Wertes nicht verarbeitet wird\nImplementieren Sie den startImpulse-Aufruf für ImpulseOutputChannels für z.B. HM-WGC\nImplementieren Sie experimentelle Unterstützung für HMIP-DLD, um den Sperrstatus und bei Bedarf auch eine Options-PIN festzulegen (siehe Hinweise oben)\nErkennen Sie neue und unbekannte Geräte und Kanäle und initialisieren Sie die Struktur neu, um die neuen Objekte im Handumdrehen hinzuzufügen\nImplementieren von DOOR_LOCK_SENSOR_CHANNEL\nIgnoriere HEAT_DEMAND_CHANNEL, DEHUMIDIFIER_DEMAND_CHANNEL, FLOOR_TERMINAL_BLOCK_CHANNEL und CHANGE_OVER_CHANNEL, da keine Daten zum Verhindern von Protokollen vorhanden sind\nEntladehandling optimieren",
@@ -74,18 +86,6 @@
         "es": "Corregir una advertencia en js-controller 3.3",
         "pl": "Napraw ostrzeżenie w js-controllerze 3.3",
         "zh-cn": "修复 js-controller 3.3 中的警告"
-      },
-      "1.12.1": {
-        "en": "Fix a warning in js-controller 3.3",
-        "de": "Korrigieren Sie eine Warnung in js-controller 3.3",
-        "ru": "Исправить предупреждение в js-controller 3.3",
-        "pt": "Corrigir um aviso no js-controller 3.3",
-        "nl": "Herstel een waarschuwing in js-controller 3.3",
-        "fr": "Correction d'un avertissement dans js-controller 3.3",
-        "it": "Risolto un avviso in js-controller 3.3",
-        "es": "Arreglar una advertencia en js-controller 3.3",
-        "pl": "Napraw ostrzeżenie w js-controller 3.3",
-        "zh-cn": "修复js-controller 3.3中的警告"
       }
     },
     "title": "HomeMaticIP Cloud AccessPoint",
