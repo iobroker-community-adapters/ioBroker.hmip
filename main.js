@@ -39,11 +39,13 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         this.currentValues = {};
         this.delayTimeouts = {};
         this.initializedChannels = {};
+        this.reInitDataTimeout = null;
     }
 
     _unload(callback) {
         this._unloaded = true;
         this.reInitTimeout && clearTimeout(this.reInitTimeout);
+        this.reInitDataTimeout && clearTimeout(this.reInitDataTimeout);
         this._api.dispose();
         try {
             this.log.info('cleaned everything up...');
@@ -828,7 +830,11 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
         if (unknownChannelDetected) {
             this.log.info('New devices or channels detected ... reinitialize ...');
-            await this._initData();
+            this.reInitDataTimeout && clearTimeout(this.reInitDataTimeout);
+            this.reInitDataTimeout = setTimeout(async () => {
+                this.reInitDataTimeout = null;
+                await this._initData();
+            }, 10000);
         }
     }
 
