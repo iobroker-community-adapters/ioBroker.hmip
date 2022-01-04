@@ -60,7 +60,7 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
-### 1.15.1 (2022-01-04)
+### __WORK IN PROGRESS__
 * (Apollon77) Wait 10s until no new "unknown state update" was received before updating the whole system
 
 ### 1.15.0 (2022-01-02)
