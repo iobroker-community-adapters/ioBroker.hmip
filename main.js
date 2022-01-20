@@ -127,6 +127,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             } catch (err) {
                 this.log.error('error starting homematic: ' +  err);
                 this.log.error('Try reconnect in 30s');
+                this.reInitTimeout && clearTimeout(this.reInitTimeout);
                 this.reInitTimeout = setTimeout(() => this._ready(), 30000);
             }
             this.log.debug('subscribeStates');
@@ -512,7 +513,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         }
         this.log.warn("ws connection closed (" + this.wsConnectionErrorCounter + ") - code: " + code + " - reason: " + reason);
         this.wsConnected = false;
-        if (this.wsConnectionErrorCounter > 10 && !this._unloaded) {
+        if (this.wsConnectionErrorCounter > 6 && !this._unloaded) {
             this._api.dispose();
             this._ready();
         }
@@ -566,14 +567,14 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             case 'CLIENT_REMOVED':
                 break;
             case 'HOME_CHANGED':
-                if (ev.home) {
+                if (ev && ev.home) {
                     await this._updateHomeStates(ev.home);
                 } else {
                     this.log.warn('No home in HOME_CHANGED: ' + JSON.stringify(ev));
                 }
                 break;
             case 'SECURITY_JOURNAL_CHANGED':
-                if (ev.home) {
+                if (ev && ev.home) {
                     await this._updateHomeStates(ev.home);
                 } else {
                     this.log.debug('Read Home for SECURITY_JOURNAL_CHANGED: ' + JSON.stringify(ev));
@@ -833,7 +834,14 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             this.reInitDataTimeout && clearTimeout(this.reInitDataTimeout);
             this.reInitDataTimeout = setTimeout(async () => {
                 this.reInitDataTimeout = null;
-                await this._initData();
+                try {
+                    await this._initData();
+                } catch (err) {
+                    this.log.error('error updating homematic for unknown states: ' +  err);
+                    this.log.error('Try reconnect in 30s');
+                    this.reInitTimeout && clearTimeout(this.reInitTimeout);
+                    this.reInitTimeout = setTimeout(() => this._ready(), 30000);
+                }
             }, 10000);
         }
     }
@@ -1125,6 +1133,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         let promises = [];
         promises.push(...this._updateDeviceBaseChannelStates(device, channel));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.windowState', device.functionalChannels[channel].windowState, true));
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.windowOpen', device.functionalChannels[channel].windowState === 'OPEN', true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.contactType', device.functionalChannels[channel].contactType, true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.alarmContactType', device.functionalChannels[channel].alarmContactType, true));
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.eventDelay', device.functionalChannels[channel].eventDelay, true));
@@ -1402,6 +1411,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.secureSetStateAsync('groups.' + group.id + '.minTemperature', group.minTemperature, true));
                 promises.push(this.secureSetStateAsync('groups.' + group.id + '.maxTemperature', group.maxTemperature, true));
                 promises.push(this.secureSetStateAsync('groups.' + group.id + '.windowState', group.windowState, true));
+                promises.push(this.secureSetStateAsync('groups.' + group.id + '.windowOpen', group.windowState === 'OPEN', true));
                 promises.push(this.secureSetStateAsync('groups.' + group.id + '.cooling', group.cooling, true));
                 promises.push(this.secureSetStateAsync('groups.' + group.id + '.partyMode', group.partyMode, true));
                 promises.push(this.secureSetStateAsync('groups.' + group.id + '.controlMode', group.controlMode, true));
@@ -2036,6 +2046,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         let promises = [];
         promises.push(...this._createDeviceBaseChannel(device, channel));
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.windowState', { type: 'state', common: { name: 'windowState', type: 'string', role: 'sensor.window', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.windowOpen', { type: 'state', common: { name: 'windowOpen', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.contactType', { type: 'state', common: { name: 'contactType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.alarmContactType', { type: 'state', common: { name: 'alarmContactType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.eventDelay', { type: 'state', common: { name: 'eventDelay', type: 'number', role: 'value', read: true, write: false }, native: {} }));
@@ -2316,6 +2327,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 promises.push(this.extendObjectAsync('groups.' + group.id + '.minTemperature', { type: 'state', common: { name: 'minTemperature', type: 'number', role: 'value', unit: '°C', read: true, write: false }, native: {} }));
                 promises.push(this.extendObjectAsync('groups.' + group.id + '.maxTemperature', { type: 'state', common: { name: 'maxTemperature', type: 'number', role: 'value', unit: '°C', read: true, write: false }, native: {} }));
                 promises.push(this.extendObjectAsync('groups.' + group.id + '.windowState', { type: 'state', common: { name: 'windowState', type: 'string', role: 'value', read: true, write: false }, native: {} }));
+                promises.push(this.extendObjectAsync('groups.' + group.id + '.windowOpen', { type: 'state', common: { name: 'windowOpen', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
                 promises.push(this.extendObjectAsync('groups.' + group.id + '.cooling', { type: 'state', common: { name: 'cooling', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
                 promises.push(this.extendObjectAsync('groups.' + group.id + '.partyMode', { type: 'state', common: { name: 'partyMode', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
                 promises.push(this.extendObjectAsync('groups.' + group.id + '.controlMode', { type: 'state', common: { name: 'controlMode', type: 'string', role: 'text', read: true, write: true }, native:  { id: [group.id], parameter: 'setControlMode' } }));

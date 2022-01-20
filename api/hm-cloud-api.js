@@ -145,10 +145,15 @@ class HmCloudAPI {
 
     async loadCurrentConfig() {
         let state = await this.callRestApi('home/getCurrentState', this._clientCharacteristics);
-        this.home = state.home;
-        this.groups = state.groups;
-        this.clients = state.clients;
-        this.devices = state.devices;
+        if (state)
+        {
+            this.home = state.home;
+            this.groups = state.groups;
+            this.clients = state.clients;
+            this.devices = state.devices;
+        } else {
+            throw new Error('No current State received');
+        }
     }
 
     // =========== Event Handling ===========
