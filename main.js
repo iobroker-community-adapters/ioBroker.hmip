@@ -833,20 +833,20 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             unknownChannelDetected = true;
         }
 
-        if (unknownChannelDetected) {
-            this.log.info('New devices or channels detected ... reinitialize ...');
-            this.reInitDataTimeout && clearTimeout(this.reInitDataTimeout);
+        if (unknownChannelDetected && !this.reInitDataTimeout) {
+            this.log.info(`New devices or channels detected ... reinitialize in 5s... ${device.id}`);
+            this._api.dispose();
             this.reInitDataTimeout = setTimeout(async () => {
                 this.reInitDataTimeout = null;
                 try {
                     await this._initData();
                 } catch (err) {
-                    this.log.error('error updating homematic for unknown states: ' +  err);
+                    this.log.error('error updating homematic ip for unknown states: ' +  err);
                     this.log.error('Try reconnect in 30s');
                     this.reInitTimeout && clearTimeout(this.reInitTimeout);
                     this.reInitTimeout = setTimeout(() => this._ready(), 30000);
                 }
-            }, 10000);
+            }, 5000);
         }
     }
 
