@@ -605,229 +605,233 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     async _updateDeviceStates(device) {
         this.log.silly("updateDeviceStates - " + device.type + " - " + JSON.stringify(device));
-        let promises = [];
-        promises.push(this.secureSetStateAsync('devices.' + device.id + '.info.type', device.type, true));
-        promises.push(this.secureSetStateAsync('devices.' + device.id + '.info.modelType', device.modelType, true));
-        promises.push(this.secureSetStateAsync('devices.' + device.id + '.info.label', device.label, true));
-        promises.push(this.secureSetStateAsync('devices.' + device.id + '.info.firmwareVersion', device.firmwareVersion, true));
-        promises.push(this.secureSetStateAsync('devices.' + device.id + '.info.updateState', device.updateState, true));
-        switch (device.type) {
-            /*case 'PLUGABLE_SWITCH': {
-                promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.1.on', device.functionalChannels['1'].on, true));
-                break;
-            }*/
-            default: {
-                break;
-            }
-        }
-
         let unknownChannelDetected = false;
-        for (let i in device.functionalChannels) {
-            if (!device.functionalChannels.hasOwnProperty(i)) {
-                continue;
-            }
-            let fc = device.functionalChannels[i];
-            promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + i + '.functionalChannelType', fc.functionalChannelType, true));
-            if (!this.initializedChannels[`${device.id}.channels.${i}`]) {
-                unknownChannelDetected = true;
-                continue;
+        if (this.initializedChannels[`${device.id}`]) {
+            let promises = [];
+            promises.push(this.secureSetStateAsync('devices.' + device.id + '.info.type', device.type, true));
+            promises.push(this.secureSetStateAsync('devices.' + device.id + '.info.modelType', device.modelType, true));
+            promises.push(this.secureSetStateAsync('devices.' + device.id + '.info.label', device.label, true));
+            promises.push(this.secureSetStateAsync('devices.' + device.id + '.info.firmwareVersion', device.firmwareVersion, true));
+            promises.push(this.secureSetStateAsync('devices.' + device.id + '.info.updateState', device.updateState, true));
+            switch (device.type) {
+                /*case 'PLUGABLE_SWITCH': {
+                    promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.1.on', device.functionalChannels['1'].on, true));
+                    break;
+                }*/
+                default: {
+                    break;
+                }
             }
 
-            switch (fc.functionalChannelType) {
+            for (let i in device.functionalChannels) {
+                if (!device.functionalChannels.hasOwnProperty(i)) {
+                    continue;
+                }
+                let fc = device.functionalChannels[i];
+                promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + i + '.functionalChannelType', fc.functionalChannelType, true));
+                if (!this.initializedChannels[`${device.id}.channels.${i}`]) {
+                    unknownChannelDetected = true;
+                    continue;
+                }
 
-                case 'DEVICE_OPERATIONLOCK':
-                    promises.push(...this._updateDeviceOperationLockChannelStates(device, i));
-                    break;
-                case 'DEVICE_SABOTAGE':
-                    promises.push(...this._updateDeviceSabotageChannelStates(device, i));
-                    break;
-                case 'DEVICE_RECHARGEABLE_WITH_SABOTAGE':
-                    promises.push(...this._updateDeviceRechargeableWithSabotageChannelStates(device, i));
-                    break;
-                case 'ACCESS_CONTROLLER_CHANNEL':
-                    promises.push(...this._updateAccessControllerChannelStates(device, i));
-                    break;
-                case 'ACCESS_CONTROLLER_WIRED_CHANNEL':
-                    promises.push(...this._updateAccessControllerWiredChannelStates(device, i));
-                    break;
-                case 'PRESENCE_DETECTION_CHANNEL':
-                    promises.push(...this._updatePresenceDetectionChannelStates(device, i));
-                    break;
-                case 'PASSAGE_DETECTOR_CHANNEL':
-                    promises.push(...this._updatePassageDetectorChannelStates(device, i));
-                    break;
-                case 'DEVICE_GLOBAL_PUMP_CONTROL':
-                    promises.push(...this._updateDeviceGlobalPumpControlStates(device, i));
-                    break;
-                case 'FLOOR_TERMINAL_BLOCK_LOCAL_PUMP_CHANNEL':
-                    promises.push(...this._updateFloorTerminalBlockLockPumpChannelStates(device, i));
-                    break;
-                case 'FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL':
-                    promises.push(...this._updateFloorTerminalBlockMechanicChannelStates(device, i));
-                    break;
-                case 'DEVICE_BASE_FLOOR_HEATING':
-                    promises.push(...this._updateDeviceBaseFloorHeatingChannelStates(device, i));
-                    break;
-                case 'DEVICE_INCORRECT_POSITIONED':
-                    promises.push(...this._updateDeviceIncorrectPositionedStates(device, i));
-                    break;
-                case 'CONTACT_INTERFACE_CHANNEL':
-                    promises.push(...this._updateContactInterfaceChannelStates(device, i));
-                    break;
-                case 'HEATING_THERMOSTAT_CHANNEL':
-                    promises.push(...this._updateHeatingThermostatChannelStates(device, i));
-                    break;
-                case 'SHUTTER_CONTACT_CHANNEL':
-                    promises.push(...this._updateShutterContactChannelStates(device, i));
-                    break;
-                case 'SMOKE_DETECTOR':
-                    promises.push(...this._updateSmokeDetectorChannelStates(device, i));
-                    break;
-                case 'DIMMER_CHANNEL':
-                    promises.push(...this._updateDimmerChannelStates(device, i));
-                    break;
-                case 'WATER_SENSOR_CHANNEL':
-                    promises.push(...this._updateWaterSensorChannelStates(device, i));
-                    break;
-                case 'TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL':
-                    promises.push(...this._updateTemperatureSensor2ExternalDeltaChannelStates(device, i));
-                    break;
-                case 'SHADING_CHANNEL':
-                    promises.push(...this._updateShadingChannelStates(device, i));
-                    break;
-                case 'WEATHER_SENSOR_CHANNEL':
-                    promises.push(...this._updateWeatherSensorChannelStates(device, i));
-                    break;
-                case 'WEATHER_SENSOR_PLUS_CHANNEL':
-                    promises.push(...this._updateWeatherSensorPlusChannelStates(device, i));
-                    break;
-                case 'WEATHER_SENSOR_PRO_CHANNEL':
-                    promises.push(...this._updateWeatherSensorProChannelStates(device, i));
-                    break;
-                case 'SHUTTER_CHANNEL':
-                    promises.push(...this._updateShutterChannelStates(device, i));
-                    break;
-                case 'MOTION_DETECTION_CHANNEL':
-                    promises.push(...this._updateMotionDetectionChannelStates(device, i));
-                    break;
-                case 'ALARM_SIREN_CHANNEL':
-                    promises.push(...this._updateAlarmSirenChannelStates(device, i));
-                    break;
-                case 'DEVICE_PERMANENT_FULL_RX':
-                    promises.push(...this._updateDevicePermanentFullRxChannelStates(device, i));
-                    break;
-                case 'SINGLE_KEY_CHANNEL':
-                    promises.push(...this._updateSingleKeyChannelStates(device, i));
-                    break;
-                case 'DEVICE_BASE':
-                    promises.push(...this._updateDeviceBaseChannelStates(device, i));
-                    break;
-                case 'WALL_MOUNTED_THERMOSTAT_WITHOUT_DISPLAY_CHANNEL':
-                    promises.push(...this._updateWallMountedThermostatWithoutDisplayStates(device, i));
-                    break;
-                case 'WALL_MOUNTED_THERMOSTAT_PRO_CHANNEL':
-                case 'WALL_MOUNTED_THERMOSTAT_CHANNEL':
-                    promises.push(...this._updateWallMountedThermostatProChannelStates(device, i));
-                    break;
-                case 'ANALOG_ROOM_CONTROL_CHANNEL':
-                    promises.push(...this._updateAnalogRoomControlChannelStates(device, i));
-                    break;
-                case 'CLIMATE_SENSOR_CHANNEL':
-                    promises.push(...this._updateClimateSensorChannelStates(device, i));
-                    break;
-                case 'SWITCH_MEASURING_CHANNEL':
-                    promises.push(...this._updateSwitchMeasuringChannelStates(device, i));
-                    break;
-                case 'SWITCH_CHANNEL':
-                    promises.push(...this._updateSwitchChannelStates(device, i));
-                    break;
-                case 'BLIND_CHANNEL':
-                    promises.push(...this._updateBlindChannelStates(device, i));
-                    break;
-                case 'MULTI_MODE_INPUT_BLIND_CHANNEL':
-                    promises.push(...this._updateMultiModeInputBlindChannelStates(device, i));
-                    break;
-                case 'ROTARY_HANDLE_CHANNEL':
-                    promises.push(...this._updateRotaryHandleChannelStates(device, i));
-                    break;
-                case 'MULTI_MODE_INPUT_CHANNEL':
-                    promises.push(...this._updateMultiModeInputChannelStates(device, i));
-                    break;
-                case 'MULTI_MODE_INPUT_DIMMER_CHANNEL':
-                    promises.push(...this._updateMultiModeInputDimmerChannelStates(device, i));
-                    break;
-                case 'MULTI_MODE_INPUT_SWITCH_CHANNEL':
-                    promises.push(...this._updateMultiModeInputSwitchChannelStates(device, i));
-                    break;
-                case 'SMOKE_DETECTOR_CHANNEL':
-                    promises.push(...this._updateSmokeDetectorChannelStates(device, i));
-                    break;
-                case 'INTERNAL_SWITCH_CHANNEL':
-                    promises.push(...this._updateInternalSwitchChannelStates(device, i));
-                    break;
-                case 'LIGHT_SENSOR_CHANNEL':
-                    promises.push(...this._updateLightSensorChannelStates(device, i));
-                    break;
-                case 'ANALOG_OUTPUT_CHANNEL':
-                    promises.push(...this._updateAnalogOutputChannelStates(device, i));
-                    break;
-                case 'IMPULSE_OUTPUT_CHANNEL':
-                    promises.push(...this._updateImpulseOutputChannelStates(device, i));
-                    break;
-                case 'TILT_VIBRATION_SENSOR_CHANNEL':
-                    promises.push(...this._updateTiltVibrationSensorChannelStates(device, i));
-                    break;
-                case 'ROTARY_WHEEL_CHANNEL':
-                    promises.push(...this._updateRotaryWheelChannelStates(device, i));
-                    break;
-                case 'RAIN_DETECTION_CHANNEL':
-                    promises.push(...this._updateRainDetectionChannelStates(device, i));
-                    break;
-                case 'ACCELERATION_SENSOR_CHANNEL':
-                    promises.push(...this._updateAccelerationSensorChannelStates(device, i));
-                    break;
-                case 'NOTIFICATION_LIGHT_CHANNEL':
-                    promises.push(...this._updateNotificationLightChannelStates(device, i));
-                    break;
-                case 'NOTIFICATION_MP3_SOUND_CHANNEL':
-                    promises.push(...this._updateNotificationMp3SoundChannelStates(device, i));
-                    break;
-                case 'DOOR_CHANNEL':
-                    promises.push(...this._updateDoorChannelStates(device, i));
-                    break;
-                case 'DOOR_LOCK_CHANNEL':
-                    promises.push(...this._updateDoorLockChannelStates(device, i));
-                    break;
-                case 'DOOR_LOCK_SENSOR_CHANNEL':
-                    promises.push(...this._updateDoorLockSensorChannelStates(device, i));
-                    break;
-                case 'ACCESS_AUTHORIZATION_CHANNEL':
-                    promises.push(...this._updateAccessAuthorizationChannelStates(device, i));
-                    break;
-                case 'MAINS_FAILURE_CHANNEL':
-                    promises.push(...this._updateMainsFailureChannelStates(device, i));
-                    break;
-                case 'CARBON_DIOXIDE_SENSOR_CHANNEL':
-                    promises.push(...this._updateCarbonDioxideSensorStates(device, i));
-                    break;
-                default:
-                    if (Object.keys(fc).length <= 6) { // we only have the minimum fields, so nothing to display
+                switch (fc.functionalChannelType) {
+
+                    case 'DEVICE_OPERATIONLOCK':
+                        promises.push(...this._updateDeviceOperationLockChannelStates(device, i));
                         break;
-                    }
-                    this.log.info("unknown channel type - " + fc.functionalChannelType + " - " + JSON.stringify(device));
-                    if (!this.sendUnknownInfos[fc.functionalChannelType]) {
-                        this.sendUnknownInfos[fc.functionalChannelType] = true;
-                        this.Sentry && this.Sentry.withScope(scope => {
-                            scope.setLevel('info');
-                            scope.setExtra('channelData', JSON.stringify(device));
-                            this.Sentry.captureMessage('Unknown Channel type ' + fc.functionalChannelType, 'info');
-                        });
-                    }
+                    case 'DEVICE_SABOTAGE':
+                        promises.push(...this._updateDeviceSabotageChannelStates(device, i));
+                        break;
+                    case 'DEVICE_RECHARGEABLE_WITH_SABOTAGE':
+                        promises.push(...this._updateDeviceRechargeableWithSabotageChannelStates(device, i));
+                        break;
+                    case 'ACCESS_CONTROLLER_CHANNEL':
+                        promises.push(...this._updateAccessControllerChannelStates(device, i));
+                        break;
+                    case 'ACCESS_CONTROLLER_WIRED_CHANNEL':
+                        promises.push(...this._updateAccessControllerWiredChannelStates(device, i));
+                        break;
+                    case 'PRESENCE_DETECTION_CHANNEL':
+                        promises.push(...this._updatePresenceDetectionChannelStates(device, i));
+                        break;
+                    case 'PASSAGE_DETECTOR_CHANNEL':
+                        promises.push(...this._updatePassageDetectorChannelStates(device, i));
+                        break;
+                    case 'DEVICE_GLOBAL_PUMP_CONTROL':
+                        promises.push(...this._updateDeviceGlobalPumpControlStates(device, i));
+                        break;
+                    case 'FLOOR_TERMINAL_BLOCK_LOCAL_PUMP_CHANNEL':
+                        promises.push(...this._updateFloorTerminalBlockLockPumpChannelStates(device, i));
+                        break;
+                    case 'FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL':
+                        promises.push(...this._updateFloorTerminalBlockMechanicChannelStates(device, i));
+                        break;
+                    case 'DEVICE_BASE_FLOOR_HEATING':
+                        promises.push(...this._updateDeviceBaseFloorHeatingChannelStates(device, i));
+                        break;
+                    case 'DEVICE_INCORRECT_POSITIONED':
+                        promises.push(...this._updateDeviceIncorrectPositionedStates(device, i));
+                        break;
+                    case 'CONTACT_INTERFACE_CHANNEL':
+                        promises.push(...this._updateContactInterfaceChannelStates(device, i));
+                        break;
+                    case 'HEATING_THERMOSTAT_CHANNEL':
+                        promises.push(...this._updateHeatingThermostatChannelStates(device, i));
+                        break;
+                    case 'SHUTTER_CONTACT_CHANNEL':
+                        promises.push(...this._updateShutterContactChannelStates(device, i));
+                        break;
+                    case 'SMOKE_DETECTOR':
+                        promises.push(...this._updateSmokeDetectorChannelStates(device, i));
+                        break;
+                    case 'DIMMER_CHANNEL':
+                        promises.push(...this._updateDimmerChannelStates(device, i));
+                        break;
+                    case 'WATER_SENSOR_CHANNEL':
+                        promises.push(...this._updateWaterSensorChannelStates(device, i));
+                        break;
+                    case 'TEMPERATURE_SENSOR_2_EXTERNAL_DELTA_CHANNEL':
+                        promises.push(...this._updateTemperatureSensor2ExternalDeltaChannelStates(device, i));
+                        break;
+                    case 'SHADING_CHANNEL':
+                        promises.push(...this._updateShadingChannelStates(device, i));
+                        break;
+                    case 'WEATHER_SENSOR_CHANNEL':
+                        promises.push(...this._updateWeatherSensorChannelStates(device, i));
+                        break;
+                    case 'WEATHER_SENSOR_PLUS_CHANNEL':
+                        promises.push(...this._updateWeatherSensorPlusChannelStates(device, i));
+                        break;
+                    case 'WEATHER_SENSOR_PRO_CHANNEL':
+                        promises.push(...this._updateWeatherSensorProChannelStates(device, i));
+                        break;
+                    case 'SHUTTER_CHANNEL':
+                        promises.push(...this._updateShutterChannelStates(device, i));
+                        break;
+                    case 'MOTION_DETECTION_CHANNEL':
+                        promises.push(...this._updateMotionDetectionChannelStates(device, i));
+                        break;
+                    case 'ALARM_SIREN_CHANNEL':
+                        promises.push(...this._updateAlarmSirenChannelStates(device, i));
+                        break;
+                    case 'DEVICE_PERMANENT_FULL_RX':
+                        promises.push(...this._updateDevicePermanentFullRxChannelStates(device, i));
+                        break;
+                    case 'SINGLE_KEY_CHANNEL':
+                        promises.push(...this._updateSingleKeyChannelStates(device, i));
+                        break;
+                    case 'DEVICE_BASE':
+                        promises.push(...this._updateDeviceBaseChannelStates(device, i));
+                        break;
+                    case 'WALL_MOUNTED_THERMOSTAT_WITHOUT_DISPLAY_CHANNEL':
+                        promises.push(...this._updateWallMountedThermostatWithoutDisplayStates(device, i));
+                        break;
+                    case 'WALL_MOUNTED_THERMOSTAT_PRO_CHANNEL':
+                    case 'WALL_MOUNTED_THERMOSTAT_CHANNEL':
+                        promises.push(...this._updateWallMountedThermostatProChannelStates(device, i));
+                        break;
+                    case 'ANALOG_ROOM_CONTROL_CHANNEL':
+                        promises.push(...this._updateAnalogRoomControlChannelStates(device, i));
+                        break;
+                    case 'CLIMATE_SENSOR_CHANNEL':
+                        promises.push(...this._updateClimateSensorChannelStates(device, i));
+                        break;
+                    case 'SWITCH_MEASURING_CHANNEL':
+                        promises.push(...this._updateSwitchMeasuringChannelStates(device, i));
+                        break;
+                    case 'SWITCH_CHANNEL':
+                        promises.push(...this._updateSwitchChannelStates(device, i));
+                        break;
+                    case 'BLIND_CHANNEL':
+                        promises.push(...this._updateBlindChannelStates(device, i));
+                        break;
+                    case 'MULTI_MODE_INPUT_BLIND_CHANNEL':
+                        promises.push(...this._updateMultiModeInputBlindChannelStates(device, i));
+                        break;
+                    case 'ROTARY_HANDLE_CHANNEL':
+                        promises.push(...this._updateRotaryHandleChannelStates(device, i));
+                        break;
+                    case 'MULTI_MODE_INPUT_CHANNEL':
+                        promises.push(...this._updateMultiModeInputChannelStates(device, i));
+                        break;
+                    case 'MULTI_MODE_INPUT_DIMMER_CHANNEL':
+                        promises.push(...this._updateMultiModeInputDimmerChannelStates(device, i));
+                        break;
+                    case 'MULTI_MODE_INPUT_SWITCH_CHANNEL':
+                        promises.push(...this._updateMultiModeInputSwitchChannelStates(device, i));
+                        break;
+                    case 'SMOKE_DETECTOR_CHANNEL':
+                        promises.push(...this._updateSmokeDetectorChannelStates(device, i));
+                        break;
+                    case 'INTERNAL_SWITCH_CHANNEL':
+                        promises.push(...this._updateInternalSwitchChannelStates(device, i));
+                        break;
+                    case 'LIGHT_SENSOR_CHANNEL':
+                        promises.push(...this._updateLightSensorChannelStates(device, i));
+                        break;
+                    case 'ANALOG_OUTPUT_CHANNEL':
+                        promises.push(...this._updateAnalogOutputChannelStates(device, i));
+                        break;
+                    case 'IMPULSE_OUTPUT_CHANNEL':
+                        promises.push(...this._updateImpulseOutputChannelStates(device, i));
+                        break;
+                    case 'TILT_VIBRATION_SENSOR_CHANNEL':
+                        promises.push(...this._updateTiltVibrationSensorChannelStates(device, i));
+                        break;
+                    case 'ROTARY_WHEEL_CHANNEL':
+                        promises.push(...this._updateRotaryWheelChannelStates(device, i));
+                        break;
+                    case 'RAIN_DETECTION_CHANNEL':
+                        promises.push(...this._updateRainDetectionChannelStates(device, i));
+                        break;
+                    case 'ACCELERATION_SENSOR_CHANNEL':
+                        promises.push(...this._updateAccelerationSensorChannelStates(device, i));
+                        break;
+                    case 'NOTIFICATION_LIGHT_CHANNEL':
+                        promises.push(...this._updateNotificationLightChannelStates(device, i));
+                        break;
+                    case 'NOTIFICATION_MP3_SOUND_CHANNEL':
+                        promises.push(...this._updateNotificationMp3SoundChannelStates(device, i));
+                        break;
+                    case 'DOOR_CHANNEL':
+                        promises.push(...this._updateDoorChannelStates(device, i));
+                        break;
+                    case 'DOOR_LOCK_CHANNEL':
+                        promises.push(...this._updateDoorLockChannelStates(device, i));
+                        break;
+                    case 'DOOR_LOCK_SENSOR_CHANNEL':
+                        promises.push(...this._updateDoorLockSensorChannelStates(device, i));
+                        break;
+                    case 'ACCESS_AUTHORIZATION_CHANNEL':
+                        promises.push(...this._updateAccessAuthorizationChannelStates(device, i));
+                        break;
+                    case 'MAINS_FAILURE_CHANNEL':
+                        promises.push(...this._updateMainsFailureChannelStates(device, i));
+                        break;
+                    case 'CARBON_DIOXIDE_SENSOR_CHANNEL':
+                        promises.push(...this._updateCarbonDioxideSensorStates(device, i));
+                        break;
+                    default:
+                        if (Object.keys(fc).length <= 6) { // we only have the minimum fields, so nothing to display
+                            break;
+                        }
+                        this.log.info("unknown channel type - " + fc.functionalChannelType + " - " + JSON.stringify(device));
+                        if (!this.sendUnknownInfos[fc.functionalChannelType]) {
+                            this.sendUnknownInfos[fc.functionalChannelType] = true;
+                            this.Sentry && this.Sentry.withScope(scope => {
+                                scope.setLevel('info');
+                                scope.setExtra('channelData', JSON.stringify(device));
+                                this.Sentry.captureMessage('Unknown Channel type ' + fc.functionalChannelType, 'info');
+                            });
+                        }
 
-                    break;
+                        break;
+                }
             }
+            await Promise.all(promises);
+        } else {
+            unknownChannelDetected = true;
         }
-        await Promise.all(promises);
 
         if (unknownChannelDetected) {
             this.log.info('New devices or channels detected ... reinitialize ...');
@@ -1549,6 +1553,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.extendObjectAsync('devices.' + device.id + '.info.label', { type: 'state', common: { name: 'type', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync('devices.' + device.id + '.info.firmwareVersion', { type: 'state', common: { name: 'type', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync('devices.' + device.id + '.info.updateState', { type: 'state', common: { name: 'type', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        this.initializedChannels[`${device.id}`] = true;
         switch (device.type) {
             /*case 'PLUGABLE_SWITCH': {
                 promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.1', { type: 'channel', common: {}, native: {} }));
