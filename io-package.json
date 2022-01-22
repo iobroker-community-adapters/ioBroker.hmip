@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.15.2",
+    "version": "1.15.3",
     "news": {
+      "1.15.3": {
+        "en": "Add windowOpen indicator to two more places\nOptimize reconnection handling\nOptimize automatic initialization of unknown devices and channels",
+        "de": "WindowOpen-Indikator an zwei weiteren Stellen hinzufügen\nOptimieren Sie die Handhabung der Wiederverbindung\nOptimieren Sie die automatische Initialisierung unbekannter Geräte und Kanäle",
+        "ru": "Добавить индикатор windowOpen еще в два места\nОптимизация обработки повторного подключения\nОптимизация автоматической инициализации неизвестных устройств и каналов",
+        "pt": "Adicione o indicador windowOpen a mais dois lugares\nOtimize o tratamento de reconexão\nOtimize a inicialização automática de dispositivos e canais desconhecidos",
+        "nl": "VensterOpen indicator toevoegen aan nog twee plaatsen\nOptimaliseer de afhandeling van herverbinding\nOptimaliseer automatische initialisatie van onbekende apparaten en kanalen",
+        "fr": "Ajouter un indicateur de fenêtre ouverte à deux autres endroits\nOptimiser la gestion des reconnexions\nOptimiser l'initialisation automatique des appareils et canaux inconnus",
+        "it": "Aggiungi finestraIndicatore di apertura in altre due posizioni\nOttimizza la gestione della riconnessione\nOttimizza l'inizializzazione automatica di dispositivi e canali sconosciuti",
+        "es": "Agregar indicador de ventanaAbrir en dos lugares más\nOptimizar el manejo de reconexión\nOptimice la inicialización automática de dispositivos y canales desconocidos",
+        "pl": "Dodaj oknoOtwórz wskaźnik w dwóch kolejnych miejscach\nZoptymalizuj obsługę ponownego połączenia\nZoptymalizuj automatyczną inicjalizację nieznanych urządzeń i kanałów",
+        "zh-cn": "将 windowOpen 指示器添加到另外两个地方\n优化重连处理\n优化未知设备和通道的自动初始化"
+      },
       "1.15.2": {
         "en": "Wait 10s until no new \"unknown state update\" was received before updating the whole system",
         "de": "Warten Sie 10 Sekunden, bis kein neues \"Unbekanntes Statusupdate\" empfangen wurde, bevor Sie das gesamte System aktualisieren",
@@ -74,18 +86,6 @@
         "es": "Agregar soporte para HM-WGC / IMPULSE_OUTPUT_CHANNEL",
         "pl": "Dodaj obsługę HM-WGC/IMPULSE_OUTPUT_CHANNEL",
         "zh-cn": "添加对 HM-WGC/IMPULSE_OUTPUT_CHANNEL 的支持"
-      },
-      "1.12.2": {
-        "en": "Fix a warning in js-controller 3.3",
-        "de": "Beheben Sie eine Warnung in js-controller 3.3",
-        "ru": "Исправить предупреждение в js-controller 3.3",
-        "pt": "Corrigir um aviso no js-controller 3.3",
-        "nl": "Herstel een waarschuwing in js-controller 3.3",
-        "fr": "Correction d'un avertissement dans js-controller 3.3",
-        "it": "Risolto un avviso in js-controller 3.3",
-        "es": "Corregir una advertencia en js-controller 3.3",
-        "pl": "Napraw ostrzeżenie w js-controllerze 3.3",
-        "zh-cn": "修复 js-controller 3.3 中的警告"
       }
     },
     "title": "HomeMaticIP Cloud AccessPoint",
