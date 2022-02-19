@@ -210,10 +210,10 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'sendDoorCommand':
                     //door commands as number: 1 = open; 2 = stop; 3 = close; 4 = ventilation position
                     switch (state.val) {
-                        case 1: //state.val = 'OPEN'; break;
-                        case 2: //state.val = 'STOP'; break;
-                        case 3: //state.val = 'CLOSE'; break;
-                        case 4: //state.val = 'VENTILATION_POSITION'; break;
+                        case 0: //state.val = 'OPEN'; break;
+                        case 1: //state.val = 'STOP'; break;
+                        case 2: //state.val = 'CLOSE'; break;
+                        case 3: //state.val = 'VENTILATION_POSITION'; break;
                             break; // Send as before
                         default:
                             this.log.info('Ignore invalid value for doorCommand.');
@@ -1794,7 +1794,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.on', { type: 'state', common: { name: 'on', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.processing', { type: 'state', common: { name: 'processing', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.ventilationPositionSupported', { type: 'state', common: { name: 'ventilationPositionSupported', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.doorCommand', { type: 'state', common: { name: 'doorCommand', type: 'number', role: 'value', read: true, write: true, states: {1: 'OPEN', 2: 'STOP', 3:'CLOSE', 4:'VENTILATION_POSITION'} }, native: { id: device.id, channel: channel, parameter: 'sendDoorCommand' } }));
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.doorCommand', { type: 'state', common: { name: 'doorCommand', type: 'number', role: 'value', read: true, write: true, states: {0: 'OPEN', 1: 'STOP', 2:'CLOSE', 3:'VENTILATION_POSITION'} }, native: { id: device.id, channel: channel, parameter: 'sendDoorCommand' } }));
         return promises;
     }
 
