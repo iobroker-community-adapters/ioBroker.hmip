@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.15.3",
+    "version": "1.15.4",
     "news": {
+      "1.15.4": {
+        "en": "Fix sendDoorCommand for HmIP-MOD-HO",
+        "de": "sendDoorCommand für HmIP-MOD-HO korrigiert",
+        "ru": "Исправление sendDoorCommand для HmIP-MOD-HO",
+        "pt": "Corrigir sendDoorCommand para HmIP-MOD-HO",
+        "nl": "Fix sendDoorCommand voor HmIP-MOD-HO",
+        "fr": "Correction de sendDoorCommand pour HmIP-MOD-HO",
+        "it": "Risolto il problema con sendDoorCommand per HmIP-MOD-HO",
+        "es": "Arreglar sendDoorCommand para HmIP-MOD-HO",
+        "pl": "Napraw sendDoorCommand dla HmIP-MOD-HO",
+        "zh-cn": "修复 HmIP-MOD-HO 的 sendDoorCommand"
+      },
       "1.15.3": {
         "en": "Add windowOpen indicator to two more places\nOptimize reconnection handling\nOptimize automatic initialization of unknown devices and channels",
         "de": "WindowOpen-Indikator an zwei weiteren Stellen hinzufügen\nOptimieren Sie die Handhabung der Wiederverbindung\nOptimieren Sie die automatische Initialisierung unbekannter Geräte und Kanäle",
@@ -74,18 +86,6 @@
         "es": "Se corrigió la advertencia en js-controller 3.3 con el punto de datos de \"sabotaje\"",
         "pl": "Naprawiono ostrzeżenie na js-controllerze 3.3 z punktem danych „sabotaż”",
         "zh-cn": "使用“破坏”数据点修复 js-controller 3.3 上的警告"
-      },
-      "1.13.0": {
-        "en": "Add support for HM-WGC/IMPULSE_OUTPUT_CHANNEL",
-        "de": "Unterstützung für HM-WGC/IMPULSE_OUTPUT_CHANNEL hinzufügen",
-        "ru": "Добавить поддержку HM-WGC / IMPULSE_OUTPUT_CHANNEL",
-        "pt": "Adicionar suporte para HM-WGC / IMPULSE_OUTPUT_CHANNEL",
-        "nl": "Ondersteuning toevoegen voor HM-WGC/IMPULSE_OUTPUT_CHANNEL",
-        "fr": "Ajout de la prise en charge de HM-WGC/IMPULSE_OUTPUT_CHANNEL",
-        "it": "Aggiungi il supporto per HM-WGC/IMPULSE_OUTPUT_CHANNEL",
-        "es": "Agregar soporte para HM-WGC / IMPULSE_OUTPUT_CHANNEL",
-        "pl": "Dodaj obsługę HM-WGC/IMPULSE_OUTPUT_CHANNEL",
-        "zh-cn": "添加对 HM-WGC/IMPULSE_OUTPUT_CHANNEL 的支持"
       }
     },
     "title": "HomeMaticIP Cloud AccessPoint",
