@@ -60,6 +60,10 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
+
+### __WORK IN PROGRESS__
+* (Apollon77) Optimize reconnection handling
+
 ### 1.15.4 (2022-02-19)
 * (Apollon77) Fix sendDoorCommand for HmIP-MOD-HO
 

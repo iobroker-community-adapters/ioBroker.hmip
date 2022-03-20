@@ -207,6 +207,10 @@ class HmCloudAPI {
         this._ws.on('error', (error) => {
             if (this.errored)
                 this.errored(error);
+            if (this._pingInterval) {
+                clearInterval(this._pingInterval);
+                this._pingInterval = null;
+            }
             if (!this.isClosed) {
                 this._connectTimeout && clearTimeout(this._connectTimeout);
                 this._connectTimeout = setTimeout(() => this.connectWebsocket(), 10000);
@@ -216,6 +220,10 @@ class HmCloudAPI {
         this._ws.on('unexpected-response', (request, response) => {
             if (this.unexpectedResponse)
                 this.unexpectedResponse(request, response);
+            if (this._pingInterval) {
+                clearInterval(this._pingInterval);
+                this._pingInterval = null;
+            }
             if (!this.isClosed) {
                 this._connectTimeout && clearTimeout(this._connectTimeout);
                 this._connectTimeout = setTimeout(() => this.connectWebsocket(), 10000);
