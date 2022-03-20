@@ -60,8 +60,7 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
-
-### __WORK IN PROGRESS__
+### 1.15.5 (2022-03-20)
 * (Apollon77) Optimize reconnection handling
 
 ### 1.15.4 (2022-02-19)

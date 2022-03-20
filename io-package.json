@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.15.4",
+    "version": "1.15.5",
     "news": {
+      "1.15.5": {
+        "en": "Optimize reconnection handling",
+        "de": "Optimieren Sie die Handhabung der Wiederverbindung",
+        "ru": "Оптимизация обработки повторного подключения",
+        "pt": "Otimize o tratamento de reconexão",
+        "nl": "Optimaliseer de afhandeling van herverbinding",
+        "fr": "Optimiser la gestion des reconnexions",
+        "it": "Ottimizza la gestione della riconnessione",
+        "es": "Optimizar el manejo de reconexión",
+        "pl": "Zoptymalizuj obsługę ponownego połączenia",
+        "zh-cn": "优化重连处理"
+      },
       "1.15.4": {
         "en": "Fix sendDoorCommand for HmIP-MOD-HO",
         "de": "sendDoorCommand für HmIP-MOD-HO korrigiert",
@@ -74,18 +86,6 @@
         "es": "Corregir la advertencia en js-controller 3.3 con dos puntos de datos",
         "pl": "Napraw ostrzeżenie na kontrolerze js 3.3 z dwoma punktami danych",
         "zh-cn": "使用两个数据点修复 js-controller 3.3 上的警告"
-      },
-      "1.13.1": {
-        "en": "Fix warning on js-controller 3.3 with \"sabotage\" datapoint",
-        "de": "Warnung auf js-Controller 3.3 mit \"Sabotage\"-Datenpunkt behoben",
-        "ru": "Исправить предупреждение на js-controller 3.3 с датапоинтом \"саботаж\"",
-        "pt": "Correção de aviso no js-controller 3.3 com ponto de dados \"sabotagem\"",
-        "nl": "Fix waarschuwing op js-controller 3.3 met \"sabotage\" datapunt",
-        "fr": "Correction d'un avertissement sur js-controller 3.3 avec le point de données \"sabotage\"",
-        "it": "Correzione dell'avviso su js-controller 3.3 con datapoint \"sabotaggio\"",
-        "es": "Se corrigió la advertencia en js-controller 3.3 con el punto de datos de \"sabotaje\"",
-        "pl": "Naprawiono ostrzeżenie na js-controllerze 3.3 z punktem danych „sabotaż”",
-        "zh-cn": "使用“破坏”数据点修复 js-controller 3.3 上的警告"
       }
     },
     "title": "HomeMaticIP Cloud AccessPoint",
