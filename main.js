@@ -102,6 +102,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     async _ready() {
+        this.reInitTimeout && clearTimeout(this.reInitTimeout);
         this.log.debug('ready');
         this.setState('info.connection', false, true);
 
@@ -128,7 +129,11 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 this.log.error('error starting homematic: ' +  err);
                 this.log.error('Try reconnect in 30s');
                 this.reInitTimeout && clearTimeout(this.reInitTimeout);
-                this.reInitTimeout = setTimeout(() => this._ready(), 30000);
+                this.reInitTimeout = setTimeout(() => {
+                    this.reInitTimeout = null;
+                    this._ready()
+                }, 30000);
+                return;
             }
             this.log.debug('subscribeStates');
             this.subscribeStates('*');
@@ -510,12 +515,20 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _closed(code, reason) {
         if (this.wsConnectionStableTimeout) {
             this.wsConnectionErrorCounter++;
+        } else {
+            this.wsConnectionErrorCounter = 0;
         }
         this.log.warn("ws connection closed (" + this.wsConnectionErrorCounter + ") - code: " + code + " - reason: " + reason);
         this.wsConnected = false;
         if (this.wsConnectionErrorCounter > 6 && !this._unloaded) {
             this._api.dispose();
-            this._ready();
+            this.log.error('error updating homematic ip for unknown states: ' +  err);
+            this.log.error('Try reconnect in 30s');
+            this.reInitTimeout && clearTimeout(this.reInitTimeout);
+            this.reInitTimeout = setTimeout(() => {
+                this.reInitTimeout = null;
+                this._ready()
+            }, 30000);
         }
     }
 
@@ -781,6 +794,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     case 'ROTARY_WHEEL_CHANNEL':
                         promises.push(...this._updateRotaryWheelChannelStates(device, i));
                         break;
+                    case 'GENERIC_INPUT_CHANNEL':
+                        promises.push(...this._updateGenericInputChannelStates(device, i));
+                        break;
                     case 'RAIN_DETECTION_CHANNEL':
                         promises.push(...this._updateRainDetectionChannelStates(device, i));
                         break;
@@ -844,7 +860,10 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     this.log.error('error updating homematic ip for unknown states: ' +  err);
                     this.log.error('Try reconnect in 30s');
                     this.reInitTimeout && clearTimeout(this.reInitTimeout);
-                    this.reInitTimeout = setTimeout(() => this._ready(), 30000);
+                    this.reInitTimeout = setTimeout(() => {
+                        this.reInitTimeout = null;
+                        this._ready()
+                    }, 30000);
                 }
             }, 5000);
         }
@@ -1012,6 +1031,12 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _updateRotaryWheelChannelStates(device, channel) {
         let promises = [];
         promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.rotationDirection', device.functionalChannels[channel].rotationDirection, true));
+        return promises;
+    }
+
+    _updateGenericInputChannelStates(device, channel) {
+        let promises = [];
+        promises.push(this.secureSetStateAsync('devices.' + device.id + '.channels.' + channel + '.digitalInputMode', device.functionalChannels[channel].digitalInputMode, true));
         return promises;
     }
 
@@ -1719,6 +1744,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'ROTARY_WHEEL_CHANNEL':
                     promises.push(...this._createRotaryWheelChannel(device, i));
                     break;
+                case 'GENERIC_INPUT_CHANNEL':
+                    promises.push(...this._createGenericInputChannel(device, i));
+                    break;
                 case 'RAIN_DETECTION_CHANNEL':
                     promises.push(...this._createRainDetectionChannel(device, i));
                     break;
@@ -1892,6 +1920,12 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _createRotaryWheelChannel(device, channel) {
         let promises = [];
         promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.rotationDirection', { type: 'state', common: { name: 'rotationDirection', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
+    _createGenericInputChannel(device, channel) {
+        let promises = [];
+        promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.' + channel + '.digitalInputMode', { type: 'state', common: { name: 'digitalInputMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         return promises;
     }
 

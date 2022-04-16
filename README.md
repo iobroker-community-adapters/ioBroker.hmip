@@ -60,6 +60,10 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
+### __WORK IN PROGRESS__
+* (Apollon77) Optimize websocket reconnection handling
+* (Apollon77) Add support for GENERIC_INPUT_CHANNEL
+
 ### 1.15.5 (2022-03-20)
 * (Apollon77) Optimize reconnection handling
 
