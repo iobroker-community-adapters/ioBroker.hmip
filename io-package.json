@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.15.5",
+    "version": "1.16.0",
     "news": {
+      "1.16.0": {
+        "en": "Optimize websocket reconnection handling\nAdd support for GENERIC_INPUT_CHANNEL",
+        "de": "Optimieren Sie die Handhabung der Websocket-Wiederverbindung\nUnterstützung für GENERIC_INPUT_CHANNEL hinzufügen",
+        "ru": "Оптимизация обработки повторного подключения через веб-сокет\nДобавить поддержку GENERIC_INPUT_CHANNEL",
+        "pt": "Otimize o manuseio de reconexão do websocket\nAdicionar suporte para GENERIC_INPUT_CHANNEL",
+        "nl": "Optimaliseer de afhandeling van het opnieuw verbinden van de websocket\nOndersteuning toevoegen voor GENERIC_INPUT_CHANNEL",
+        "fr": "Optimiser la gestion de la reconnexion des websockets\nAjouter la prise en charge de GENERIC_INPUT_CHANNEL",
+        "it": "Ottimizza la gestione della riconnessione del websocket\nAggiungi il supporto per GENERIC_INPUT_CHANNEL",
+        "es": "Optimizar el manejo de reconexión de websocket\nAgregar soporte para GENERIC_INPUT_CHANNEL",
+        "pl": "Zoptymalizuj obsługę ponownego połączenia websocket\nDodaj obsługę GENERIC_INPUT_CHANNEL",
+        "zh-cn": "优化 websocket 重连处理\n添加对 GENERIC_INPUT_CHANNEL 的支持"
+      },
       "1.15.5": {
         "en": "Optimize reconnection handling",
         "de": "Optimieren Sie die Handhabung der Wiederverbindung",
@@ -74,18 +86,6 @@
         "es": "Nivel de registro más bajo para los registros de cambios de estado para depurar\nAgregue verificación al leer algunos datos para evitar fallas\nSe eliminaron algunos estados genéricos (error / información) que solo existen en los dispositivos elegidos para volver a agregarlos más tarde de una manera genérica",
         "pl": "Niższy poziom logowania dla dzienników zmian stanu do debugowania\nDodaj weryfikację podczas odczytywania niektórych danych, aby zapobiec awariom\nUsunięto niektóre ogólne (błąd/informacje) stany, które istnieją tylko na wybranych urządzeniach, aby móc je ponownie dodać później w ogólny sposób",
         "zh-cn": "用于调试的状态更改日志的较低日志级别\n读取一些数据时添加验证以防止崩溃\n删除了一些仅存在于所选设备上的通用（错误/信息）状态，以便稍后以通用方式重新添加"
-      },
-      "1.13.2": {
-        "en": "Fix warning on js-controller 3.3 with two datapoints",
-        "de": "Warnung auf js-controller 3.3 mit zwei Datenpunkten behoben",
-        "ru": "Исправить предупреждение на js-controller 3.3 с двумя точками данных",
-        "pt": "Correção de aviso no js-controller 3.3 com dois pontos de dados",
-        "nl": "Fix waarschuwing op js-controller 3.3 met twee datapunten",
-        "fr": "Correction d'un avertissement sur js-controller 3.3 avec deux points de données",
-        "it": "Correzione dell'avviso su js-controller 3.3 con due punti dati",
-        "es": "Corregir la advertencia en js-controller 3.3 con dos puntos de datos",
-        "pl": "Napraw ostrzeżenie na kontrolerze js 3.3 z dwoma punktami danych",
-        "zh-cn": "使用两个数据点修复 js-controller 3.3 上的警告"
       }
     },
     "title": "HomeMaticIP Cloud AccessPoint",
