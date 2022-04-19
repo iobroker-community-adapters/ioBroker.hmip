@@ -60,8 +60,7 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
-
-### __WORK IN PROGRESS__
+### 1.16.1 (2022-04-19)
 * (Apollon77) Fix crash case introduced by last version
 
 ### 1.16.0 (2022-04-16)

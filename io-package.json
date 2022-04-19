@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.16.0",
+    "version": "1.16.1",
     "news": {
+      "1.16.1": {
+        "en": "Fix crash case introduced by last version",
+        "de": "Absturzfall behoben, der in der letzten Version eingeführt wurde",
+        "ru": "Исправить случай сбоя, появившийся в последней версии",
+        "pt": "Corrigir caso de falha introduzido pela última versão",
+        "nl": "Fix crash case geïntroduceerd door de laatste versie",
+        "fr": "Correction du cas de crash introduit par la dernière version",
+        "it": "Risolto il caso di crash introdotto dall'ultima versione",
+        "es": "Arreglar el caso de bloqueo introducido por la última versión",
+        "pl": "Napraw przypadek awarii wprowadzony przez ostatnią wersję",
+        "zh-cn": "修复上一版本引入的崩溃案例"
+      },
       "1.16.0": {
         "en": "Optimize websocket reconnection handling\nAdd support for GENERIC_INPUT_CHANNEL",
         "de": "Optimieren Sie die Handhabung der Websocket-Wiederverbindung\nUnterstützung für GENERIC_INPUT_CHANNEL hinzufügen",
@@ -74,18 +86,6 @@
         "es": "Node.js 10.x es ahora la versión mínima requerida para este adaptador\nOptimizar la lógica de reconexión de WebSocket\nOptimice el manejo del valor actual y restablezca el valor si no se procesa un cambio de estado debido a un valor sin cambios\nImplementar la llamada startImpulse para ImpulseOutputChannels para p. Ej. HM-WGC\nImplemente soporte experimental para HMIP-DLD para establecer el estado de bloqueo y también un PIN de opción si es necesario (consulte las notas anteriores)\nDetecte dispositivos y canales nuevos y desconocidos y reinicialice la estructura para agregar los nuevos objetos sobre la marcha\nImplementar DOOR_LOCK_SENSOR_CHANNEL\nIgnore HEAT_DEMAND_CHANNEL, DEHUMIDIFIER_DEMAND_CHANNEL, FLOOR_TERMINAL_BLOCK_CHANNEL y CHANGE_OVER_CHANNEL porque no hay datos para evitar registros\noptimizar el manejo de descarga",
         "pl": "Node.js 10.x jest teraz minimalną wymaganą wersją dla tego adaptera\nZoptymalizuj logikę ponownego połączenia WebSocket\nZoptymalizuj obsługę bieżącej wartości i zresetuj wartość, jeśli zmiana stanu nie jest przetwarzana z powodu niezmienionej wartości\nZaimplementuj wywołanie startImpulse dla ImpulseOutputChannels dla np. HM-WGC\nZaimplementuj eksperymentalne wsparcie dla HMIP-DLD, aby ustawić stan blokady, a w razie potrzeby także PIN opcji (patrz uwagi powyżej)\nWykryj nowe i nieznane urządzenia i kanały oraz ponownie zainicjuj strukturę, aby dodać nowe obiekty w locie\nZaimplementuj DOOR_LOCK_SENSOR_CHANNEL\nIgnoruj HEAT_DEMAND_CHANNEL, DEHUMIDIFIER_DEMAND_CHANNEL, FLOOR_TERMINAL_BLOCK_CHANNEL i CHANGE_OVER_CHANNEL, ponieważ nie ma danych uniemożliwiających rejestrowanie\nzoptymalizować obsługę rozładunku",
         "zh-cn": "Node.js 10.x 现在是此适配器所需的最低版本\n优化 WebSocket 重连逻辑\n如果由于值未更改而未处理状态更改，则优化当前值处理并重新设置值\n为 ImpulseOutputChannels 实现 startImpulse 调用，例如HM-WGC\n实现对 HMIP-DLD 的实验性支持，以设置锁定状态，并在需要时提供选项 PIN（请参阅上面的注释）\n检测新的和未知的设备和通道并重新初始化结构以动态添加新对象\n实施 DOOR_LOCK_SENSOR_CHANNEL\n忽略 HEAT_DEMAND_CHANNEL、DEHUMIDIFIER_DEMAND_CHANNEL、FLOOR_TERMINAL_BLOCK_CHANNEL 和 CHANGE_OVER_CHANNEL 因为没有数据阻止日志\n优化卸载处理"
-      },
-      "1.14.0": {
-        "en": "Lower loglevel for state change logs to debug\nAdd verification when reading some data to prevent crashes\nRemoved some generic (error/info) states that only exists on chosen devices to re-add later in a generic way",
-        "de": "Niedrigeres Loglevel für Statusänderungsprotokolle zum Debuggen\nFügen Sie beim Lesen einiger Daten eine Überprüfung hinzu, um Abstürze zu vermeiden\nEinige generische (Fehler-/Info-)Zustände entfernt, die nur auf ausgewählten Geräten vorhanden sind, um sie später auf generische Weise wieder hinzuzufügen",
-        "ru": "Более низкий уровень журнала для журналов изменения состояния для отладки\nДобавьте проверку при чтении некоторых данных, чтобы предотвратить сбои\nУдалены некоторые общие (ошибка / информация) состояния, которые существуют только на выбранных устройствах, для повторного добавления позже обычным способом.",
-        "pt": "Nível de log inferior para logs de mudança de estado para depurar\nAdicionar verificação ao ler alguns dados para evitar travamentos\nRemovidos alguns estados genéricos (erro / informações) que só existem em dispositivos escolhidos para serem adicionados posteriormente de forma genérica",
-        "nl": "Lager logniveau voor statuswijzigingslogboeken om te debuggen\nVoeg verificatie toe bij het lezen van sommige gegevens om crashes te voorkomen\nEnkele generieke (fout/info)-statussen verwijderd die alleen op gekozen apparaten bestaan om later op een generieke manier opnieuw toe te voegen",
-        "fr": "Niveau de journalisation inférieur pour les journaux de changement d'état à déboguer\nAjouter une vérification lors de la lecture de certaines données pour éviter les plantages\nSuppression de certains états génériques (erreur/info) qui n'existent que sur les appareils choisis pour les rajouter plus tard de manière générique",
-        "it": "Livello di registro inferiore per i registri di modifica dello stato di cui eseguire il debug\nAggiungi la verifica durante la lettura di alcuni dati per evitare arresti anomali\nRimossi alcuni stati generici (errore/info) che esistono solo sui dispositivi scelti per riaggiungerli in seguito in modo generico",
-        "es": "Nivel de registro más bajo para los registros de cambios de estado para depurar\nAgregue verificación al leer algunos datos para evitar fallas\nSe eliminaron algunos estados genéricos (error / información) que solo existen en los dispositivos elegidos para volver a agregarlos más tarde de una manera genérica",
-        "pl": "Niższy poziom logowania dla dzienników zmian stanu do debugowania\nDodaj weryfikację podczas odczytywania niektórych danych, aby zapobiec awariom\nUsunięto niektóre ogólne (błąd/informacje) stany, które istnieją tylko na wybranych urządzeniach, aby móc je ponownie dodać później w ogólny sposób",
-        "zh-cn": "用于调试的状态更改日志的较低日志级别\n读取一些数据时添加验证以防止崩溃\n删除了一些仅存在于所选设备上的通用（错误/信息）状态，以便稍后以通用方式重新添加"
       }
     },
     "title": "HomeMaticIP Cloud AccessPoint",
