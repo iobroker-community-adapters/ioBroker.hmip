@@ -619,7 +619,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     async _updateDeviceStates(device) {
         this.log.silly(`updateDeviceStates - ${device.type} - ${JSON.stringify(device)}`);
         let unknownChannelDetected = false;
-        if (this.initializedChannels[`${device.id}`]) {
+        if (this.initializedChannels[`devices.${device.id}`]) {
             let promises = [];
             promises.push(this.secureSetStateAsync(`devices.${device.id}.info.type`, device.type, true));
             promises.push(this.secureSetStateAsync(`devices.${device.id}.info.modelType`, device.modelType, true));
@@ -642,7 +642,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 }
                 let fc = device.functionalChannels[i];
                 promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${i}.functionalChannelType`, fc.functionalChannelType, true));
-                if (!this.initializedChannels[`${device.id}.channels.${i}`]) {
+                if (!this.initializedChannels[`devices.${device.id}.channels.${i}`]) {
                     unknownChannelDetected = true;
                     continue;
                 }
@@ -849,24 +849,31 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             unknownChannelDetected = true;
         }
 
-        if (unknownChannelDetected && !this.reInitDataTimeout) {
-            this.log.info(`New devices or channels detected ... reinitialize in 5s... ${device.id}`);
-            this._api.dispose();
-            this.reInitDataTimeout = setTimeout(async () => {
-                this.reInitDataTimeout = null;
-                try {
-                    await this._initData();
-                } catch (err) {
-                    this.log.error(`error updating homematic ip for unknown states: ${err}`);
-                    this.log.error('Try reconnect in 30s');
-                    this.reInitTimeout && clearTimeout(this.reInitTimeout);
-                    this.reInitTimeout = setTimeout(() => {
-                        this.reInitTimeout = null;
-                        this._ready()
-                    }, 30000);
-                }
-            }, 5000);
+        if (unknownChannelDetected) {
+            this._reinitializeData(`Device ${device.id}`)
         }
+    }
+
+    _reinitializeData(id) {
+        if (this.reInitDataTimeout) {
+            return;
+        }
+        this.log.info(`New data structures detected ... reinitialize in 5s... ${id}`);
+        this._api.dispose();
+        this.reInitDataTimeout = setTimeout(async () => {
+            this.reInitDataTimeout = null;
+            try {
+                await this._initData();
+            } catch (err) {
+                this.log.error(`error updating homematic ip for unknown states: ${err}`);
+                this.log.error('Try reconnect in 30s');
+                this.reInitTimeout && clearTimeout(this.reInitTimeout);
+                this.reInitTimeout = setTimeout(() => {
+                    this.reInitTimeout = null;
+                    this._ready()
+                }, 30000);
+            }
+        }, 5000);
     }
 
     /* Start Channel Types */
@@ -1429,59 +1436,68 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _updateGroupStates(group) {
         this.log.silly(`_updateGroupStates - ${JSON.stringify(group)}`);
-        let promises = [];
-        promises.push(this.secureSetStateAsync(`groups.${group.id}.info.type`, group.type, true));
-        promises.push(this.secureSetStateAsync(`groups.${group.id}.info.label`, group.label, true));
 
-        switch (group.type) {
-            case 'HEATING': {
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.windowOpenTemperature`, group.windowOpenTemperature, true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.setPointTemperature`, group.setPointTemperature, true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.minTemperature`, group.minTemperature, true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.maxTemperature`, group.maxTemperature, true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.windowState`, group.windowState, true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.windowOpen`, group.windowState === 'OPEN', true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.cooling`, group.cooling, true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.partyMode`, group.partyMode, true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.controlMode`, group.controlMode, true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.activeProfile`, group.activeProfile, true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.boostMode`, group.boostMode, true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.boostDuration`, group.boostDuration, true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.actualTemperature`, group.actualTemperature, true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.humidity`, group.humidity, true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.coolingAllowed`, group.coolingAllowed, true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.coolingIgnored`, group.coolingIgnored, true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.ecoAllowed`, group.ecoAllowed, true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.ecoIgnored`, group.ecoIgnored, true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.controllable`, group.controllable, true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.floorHeatingMode`, group.floorHeatingMode, true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.humidityLimitEnabled`, group.humidityLimitEnabled, true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.humidityLimitValue`, group.humidityLimitValue, true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.externalClockEnabled`, group.externalClockEnabled, true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.externalClockHeatingTemperature`, group.externalClockHeatingTemperature, true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.externalClockCoolingTemperature`, group.externalClockCoolingTemperature, true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.valvePosition`, group.valvePosition, true));
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.sabotage`, group.sabotage, true));
-                break;
+        if (this.initializedChannels[`groups.${group.id}`]) {
+            let promises = [];
+            promises.push(this.secureSetStateAsync(`groups.${group.id}.info.type`, group.type, true));
+            promises.push(this.secureSetStateAsync(`groups.${group.id}.info.label`, group.label, true));
+
+            switch (group.type) {
+                case 'HEATING': {
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.windowOpenTemperature`, group.windowOpenTemperature, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.setPointTemperature`, group.setPointTemperature, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.minTemperature`, group.minTemperature, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.maxTemperature`, group.maxTemperature, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.windowState`, group.windowState, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.windowOpen`, group.windowState === 'OPEN', true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.cooling`, group.cooling, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.partyMode`, group.partyMode, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.controlMode`, group.controlMode, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.activeProfile`, group.activeProfile, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.boostMode`, group.boostMode, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.boostDuration`, group.boostDuration, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.actualTemperature`, group.actualTemperature, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.humidity`, group.humidity, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.coolingAllowed`, group.coolingAllowed, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.coolingIgnored`, group.coolingIgnored, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.ecoAllowed`, group.ecoAllowed, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.ecoIgnored`, group.ecoIgnored, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.controllable`, group.controllable, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.floorHeatingMode`, group.floorHeatingMode, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.humidityLimitEnabled`, group.humidityLimitEnabled, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.humidityLimitValue`, group.humidityLimitValue, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.externalClockEnabled`, group.externalClockEnabled, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.externalClockHeatingTemperature`, group.externalClockHeatingTemperature, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.externalClockCoolingTemperature`, group.externalClockCoolingTemperature, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.valvePosition`, group.valvePosition, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.sabotage`, group.sabotage, true));
+                    break;
+                }
+                case 'SWITCHING': {
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.on`, group.on, true));
+                    break;
+                }
+                case 'SECURITY_ZONE': {
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.active`, group.active, true));
+                    break;
+                }
             }
-            case 'SWITCHING': {
-                promises.push(this.secureSetStateAsync(`groups.${group.id}.on`, group.on, true));
-                break;
-            }
-	    case 'SECURITY_ZONE': {
-		promises.push(this.secureSetStateAsync(`groups.${group.id}.active`, group.active, true));
-                break;
-            }
+
+            return Promise.all(promises);
+        } else {
+            this._reinitializeData(`Group ${group.id}`)
         }
-
-        return Promise.all(promises);
     }
 
     _updateClientStates(client) {
         this.log.silly(`_updateClientStates - ${JSON.stringify(client)}`);
-        let promises = [];
-        promises.push(this.secureSetStateAsync(`clients.${client.id}.info.label`, client.label, true));
-        return Promise.all(promises);
+        if (this.initializedChannels[`clients.${client.id}`]) {
+            let promises = [];
+            promises.push(this.secureSetStateAsync(`clients.${client.id}.info.label`, client.label, true));
+            return Promise.all(promises);
+        } else {
+            this._reinitializeData(`Client ${client.id}`)
+        }
     }
 
     _updateHomeStates(home) {
@@ -1578,7 +1594,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.extendObjectAsync(`devices.${device.id}.info.label`, { type: 'state', common: { name: 'type', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.info.firmwareVersion`, { type: 'state', common: { name: 'type', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.info.updateState`, { type: 'state', common: { name: 'type', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        this.initializedChannels[`${device.id}`] = true;
+        this.initializedChannels[`devices.${device.id}`] = true;
         switch (device.type) {
             /*case 'PLUGABLE_SWITCH': {
                 promises.push(this.extendObjectAsync('devices.' + device.id + '.channels.1', { type: 'channel', common: {}, native: {} }));
@@ -1594,7 +1610,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             }
             let fc = device.functionalChannels[i];
             promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${i}`, { type: 'channel', common: {}, native: {} }));
-            this.initializedChannels[`${device.id}.channels.${i}`] = true;
+            this.initializedChannels[`devices.${device.id}.channels.${i}`] = true;
 
             promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${i}.functionalChannelType`, { type: 'state', common: { name: 'functionalChannelType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
             switch (fc.functionalChannelType) {
@@ -1939,7 +1955,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _createMultiModeInputDimmerChannel(device, channel) {
         let promises = [];
         promises.push(...this._createMultiModeInputSwitchChannel(device, channel));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.dimLevel`, { type: 'state', common: { name: 'dimLevel', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.dimLevel`, { type: 'state', common: { name: 'dimLevel', type: 'number', role: 'value', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'setDimLevel' } }));
         return promises;
     }
 
@@ -2358,6 +2374,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.extendObjectAsync(`groups.${group.id}`, { type: 'device', common: { name: group.label }, native: {} }));
         promises.push(this.extendObjectAsync(`groups.${group.id}.info.type`, { type: 'state', common: { name: 'type', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`groups.${group.id}.info.label`, { type: 'state', common: { name: 'label', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        this.initializedChannels[`groups.${group.id}`] = true;
 
         switch (group.type) {
             case 'HEATING': {
@@ -2416,6 +2433,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         let promises = [];
         promises.push(this.extendObjectAsync(`clients.${client.id}`, { type: 'device', common: { name: client.label }, native: {} }));
         promises.push(this.extendObjectAsync(`clients.${client.id}.info.label`, { type: 'state', common: { name: 'label', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        this.initializedChannels[`clients.${client.id}`] = true;
         return Promise.all(promises);
     }
 
