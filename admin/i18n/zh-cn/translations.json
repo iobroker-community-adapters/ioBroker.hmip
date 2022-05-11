@@ -1,5 +1,5 @@
 {
-    "on save adapter restarts with new config immediately": "保存适配器立即重新启动新配置",
+    "on save adapter restarts with new config immediately": "保存适配器后，将立即以新配置重新启动",
     "normaly filled by token creation": "通过令牌创建来填充",
     "token data": "令牌数据",
     "press 'start token creation'": "按“开始令牌创建”",
