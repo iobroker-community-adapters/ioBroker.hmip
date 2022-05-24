@@ -49,7 +49,7 @@
     "@vitalets/google-translate-api": "^8.0.0",
     "configstore": "^6.0.0",
     "axios": "^0.27.2",
-    "@iobroker/testing": "^2.6.0"
+    "@iobroker/testing": "^3.0.2"
   },
   "main": "main.js",
   "scripts": {
