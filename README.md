@@ -60,6 +60,11 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
+
+### __WORK IN PROGRESS__
+* (Apollon77) Added support for PARTICULATE_MATTER_SENSOR_CHANNEL
+* (Apollon77) Correctly ignore some channels without meaningful data
+
 ### 1.17.0 (2022-04-26)
 * (Apollon77) Also reinitialize objects when new groups or clients are detected
 * (Apollon77) Added experimental support to set dimLevel for Multi Mode Input Dimmer channels

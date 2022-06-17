@@ -827,6 +827,15 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     case 'CARBON_DIOXIDE_SENSOR_CHANNEL':
                         promises.push(...this._updateCarbonDioxideSensorStates(device, i));
                         break;
+                    case 'PARTICULATE_MATTER_SENSOR_CHANNEL':
+                        promises.push(...this._updateParticulateMatterSensorStates(device, i));
+                        break;
+                    case 'HEAT_DEMAND_CHANNEL':
+                    case 'DEHUMIDIFIER_DEMAND_CHANNEL':
+                    case 'CHANGE_OVER_CHANNEL':
+                    case 'FLOOR_TERMINAL_BLOCK_CHANNEL':
+                        this.log.silly(`Ignore channel type ${fc.functionalChannelType} - ${JSON.stringify(device)}`);
+                        break;
                     default:
                         if (Object.keys(fc).length <= 6) { // we only have the minimum fields, so nothing to display
                             break;
@@ -1326,6 +1335,25 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         return promises;
     }
 
+    _updateParticulateMatterSensorStates(device, channel) {
+        let promises = [];
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.actualTemperature`, device.functionalChannels[channel].actualTemperature, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.humidity`, device.functionalChannels[channel].humidity, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.particulateMassConcentrationTen`, device.functionalChannels[channel].particulateMassConcentrationTen, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.particulateMassConcentrationTenAverage`, device.functionalChannels[channel].particulateMassConcentrationTenAverage, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.stoparticulateNumberConcentrationTenrm`, device.functionalChannels[channel].particulateNumberConcentrationTen, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.particulateMassConcentrationTwoPointFive`, device.functionalChannels[channel].particulateMassConcentrationTwoPointFive, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.particulateMassConcentrationTwoPointFiveAverage`, device.functionalChannels[channel].particulateMassConcentrationTwoPointFiveAverage, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.particulateNumberConcentrationTwoPointFive`, device.functionalChannels[channel].particulateNumberConcentrationTwoPointFive, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.particulateMassConcentrationOne`, device.functionalChannels[channel].particulateMassConcentrationOne, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.particulateMassConcentrationOneAverage`, device.functionalChannels[channel].particulateMassConcentrationOneAverage, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.particulateNumberConcentrationOne`, device.functionalChannels[channel].particulateNumberConcentrationOne, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.particulateTypicalSize`, device.functionalChannels[channel].particulateTypicalSize, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.airQualityIndexTen`, device.functionalChannels[channel].airQualityIndexTen, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.airQualityIndexTwoPointFive`, device.functionalChannels[channel].airQualityIndexTwoPointFive, true));
+        return promises;
+    }
+
     _updateWeatherSensorPlusChannelStates(device, channel) {
         let promises = [];
         promises.push(...this._updateWeatherSensorChannelStates(device, channel));
@@ -1793,6 +1821,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'CARBON_DIOXIDE_SENSOR_CHANNEL':
                     promises.push(...this._createCarbonDioxideSensorChannel(device, i));
                     break;
+                case 'PARTICULATE_MATTER_SENSOR_CHANNEL':
+                    promises.push(...this._createParticulateMatterSensorChannel(device, i));
+                    break;
                 case 'HEAT_DEMAND_CHANNEL':
                 case 'DEHUMIDIFIER_DEMAND_CHANNEL':
                 case 'CHANGE_OVER_CHANNEL':
@@ -1800,7 +1831,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     this.log.silly(`Ignore channel type ${fc.functionalChannelType} - ${JSON.stringify(device)}`);
                     break;
                 default:
-                    this.log.info(`unknown channel type - ${fc.functionalChannelType} - ${JSON.stringify(device)}`);
+                    this.log.info(`Unknown channel type - ${fc.functionalChannelType} - ${JSON.stringify(device)}`);
                     break;
             }
         }
@@ -2250,6 +2281,25 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.windSpeed`, { type: 'state', common: { name: 'windSpeed', type: 'number', role: 'value.speed', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.windValueType`, { type: 'state', common: { name: 'windValueType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.yesterdaySunshineDuration`, { type: 'state', common: { name: 'yesterdaySunshineDuration', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
+    _createParticulateMatterSensorChannel(device, channel) {
+        let promises = [];
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.actualTemperature`, { type: 'state', common: { name: 'actualTemperature', type: 'number', role: 'value.temperature', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.humidity`, { type: 'state', common: { name: 'humidity', type: 'number', role: 'value.humidity', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.particulateMassConcentrationTen`, { type: 'state', common: { name: 'particulateMassConcentrationTen', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.particulateMassConcentrationTenAverage`, { type: 'state', common: { name: 'particulateMassConcentrationTenAverage', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.particulateNumberConcentrationTen`, { type: 'state', common: { name: 'particulateNumberConcentrationTen', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.particulateMassConcentrationTwoPointFive`, { type: 'state', common: { name: 'particulateMassConcentrationTwoPointFive', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.particulateMassConcentrationTwoPointFiveAverage`, { type: 'state', common: { name: 'particulateMassConcentrationTwoPointFiveAverage', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.particulateNumberConcentrationTwoPointFive`, { type: 'state', common: { name: 'particulateNumberConcentrationTwoPointFive', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.particulateMassConcentrationOne`, { type: 'state', common: { name: 'particulateMassConcentrationOne', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.particulateMassConcentrationOneAverage`, { type: 'state', common: { name: 'particulateMassConcentrationOneAverage', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.particulateNumberConcentrationOne`, { type: 'state', common: { name: 'particulateNumberConcentrationOne', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.particulateTypicalSize`, { type: 'state', common: { name: 'particulateTypicalSize', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.airQualityIndexTen`, { type: 'state', common: { name: 'airQualityIndexTen', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.airQualityIndexTwoPointFive`, { type: 'state', common: { name: 'airQualityIndexTwoPointFive', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         return promises;
     }
 
