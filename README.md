@@ -60,8 +60,7 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
-
-### __WORK IN PROGRESS__
+### 1.18.0 (2022-06-17)
 * (Apollon77) Added support for PARTICULATE_MATTER_SENSOR_CHANNEL
 * (Apollon77) Correctly ignore some channels without meaningful data
 

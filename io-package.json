@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.17.0",
+    "version": "1.18.0",
     "news": {
+      "1.18.0": {
+        "en": "Added support for PARTICULATE_MATTER_SENSOR_CHANNEL\nCorrectly ignore some channels without meaningful data",
+        "de": "Unterstützung für PARTICULATE_MATTER_SENSOR_CHANNEL\nEinige Kanäle ohne aussagekräftige Daten korrekt ignorieren",
+        "ru": "Добавлена поддержка PARTICULATE_MATTER_SENSOR_CHANNEL\nПравильно игнорировать некоторые каналы без значимых данных",
+        "pt": "Adicionado suporte para PARTICULATE_MATTER_SENSOR_CHANNEL\nIgnorar corretamente alguns canais sem dados significativos",
+        "nl": "Vervoegde ondersteuning voor PARTICULATEMATTERSORNEL\nNegeer wat kanalen zonder betekenisvolle gegevens",
+        "fr": "Ajout du support pour PARTICULATE_MATTER_SENSOR_CHANNEL\nIgnorer correctement certains canaux sans données significatives",
+        "it": "Aggiunto il supporto per PARTICULATE_MATTER_SENSOR_CHANNEL\nIgnorare correttamente alcuni canali senza dati significativi",
+        "es": "Apoyo añadido para PARTICULATE_MATTER_SENSOR_CHANNEL\nIgnorar correctamente algunos canales sin datos significativos",
+        "pl": "Oficjalna strona PARTICULATE_MATTER_SENSOR_CHANELEL\nNiezwłocznie zignorować niektórych kanałów bez większych danych",
+        "zh-cn": "加入《保护所有移徙工人及其家庭成员权利国际公约》\n正确地无视某些渠道而不提供有意义的数据"
+      },
       "1.17.0": {
         "en": "Also reinitialize objects when new groups or clients are detected\nAdded experimental support to set dimLevel for Multi Mode Input Dimmer channels",
         "de": "Initialisieren Sie Objekte auch neu, wenn neue Gruppen oder Clients erkannt werden\nExperimentelle Unterstützung hinzugefügt, um dimLevel für Multi-Modus-Eingangsdimmerkanäle festzulegen",
@@ -74,18 +86,6 @@
         "es": "Agregar indicador de ventanaAbrir en dos lugares más\nOptimizar el manejo de reconexión\nOptimice la inicialización automática de dispositivos y canales desconocidos",
         "pl": "Dodaj oknoOtwórz wskaźnik w dwóch kolejnych miejscach\nZoptymalizuj obsługę ponownego połączenia\nZoptymalizuj automatyczną inicjalizację nieznanych urządzeń i kanałów",
         "zh-cn": "将 windowOpen 指示器添加到另外两个地方\n优化重连处理\n优化未知设备和通道的自动初始化"
-      },
-      "1.15.2": {
-        "en": "Wait 10s until no new \"unknown state update\" was received before updating the whole system",
-        "de": "Warten Sie 10 Sekunden, bis kein neues \"Unbekanntes Statusupdate\" empfangen wurde, bevor Sie das gesamte System aktualisieren",
-        "ru": "Подождите 10 секунд, пока не будет получено новое «неизвестное обновление состояния», прежде чем обновлять всю систему.",
-        "pt": "Aguarde 10s até que nenhuma nova \"atualização de estado desconhecido\" seja recebida antes de atualizar todo o sistema",
-        "nl": "Wacht 10 seconden totdat er geen nieuwe \"onbekende statusupdate\" is ontvangen voordat u het hele systeem bijwerkt",
-        "fr": "Attendez 10 s jusqu'à ce qu'aucune nouvelle \"mise à jour d'état inconnu\" ne soit reçue avant de mettre à jour l'ensemble du système",
-        "it": "Attendi 10 secondi fino a quando non è stato ricevuto alcun nuovo \"aggiornamento dello stato sconosciuto\" prima di aggiornare l'intero sistema",
-        "es": "Espere 10 segundos hasta que no se reciba una nueva \"actualización de estado desconocido\" antes de actualizar todo el sistema",
-        "pl": "Poczekaj 10 sekund, aż nie zostanie odebrana nowa „aktualizacja nieznanego stanu”, zanim zaktualizujesz cały system",
-        "zh-cn": "等待 10 秒，直到没有收到新的“未知状态更新”，然后才更新整个系统"
       }
     },
     "title": "HomeMaticIP Cloud AccessPoint",
