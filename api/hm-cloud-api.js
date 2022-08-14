@@ -291,12 +291,24 @@ class HmCloudAPI {
 
     // =========== API for HM Devices ===========
 
+    // boolean
     async deviceControlSetSwitchState(deviceId, on, channelIndex = 1) {
         let data = { "deviceId": deviceId, "on": on, "channelIndex": channelIndex };
         await this.callRestApi('device/control/setSwitchState', data);
     }
 
-    //door commands as number: 1 = open; 2 = stop; 3 = close; 4 = ventilation position
+    // door commands as number: 1 = open; 2 = stop; 3 = close; 4 = ventilation position
+    // DoorState
+    //     CLOSED = auto()
+    //     OPEN = auto()
+    //     VENTILATION_POSITION = auto()
+    //     POSITION_UNKNOWN = auto()
+    //
+    // DoorCommand
+    //     OPEN = auto()
+    //     STOP = auto()
+    //     CLOSE = auto()
+    //     PARTIAL_OPEN = auto()
     async deviceControlSendDoorCommand(deviceId, doorCommand, channelIndex = 1) {
         let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'doorCommand': doorCommand };
         await this.callRestApi('device/control/sendDoorCommand', data);
@@ -317,26 +329,41 @@ class HmCloudAPI {
         await this.callRestApi('device/configuration/setOperationLock', data);
     }
 
+    // ClimateControlDisplay
+    //     ACTUAL = auto()
+    //     SETPOINT = auto()
+    //     ACTUAL_HUMIDITY = auto()
     async deviceConfigurationSetClimateControlDisplay(deviceId, display, channelIndex = 1) {
         let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'display': display };
         await this.callRestApi('device/configuration/setClimateControlDisplay', data);
     }
 
+    // float 0.0-1.0
     async deviceConfigurationSetMinimumFloorHeatingValvePosition(deviceId, minimumFloorHeatingValvePosition, channelIndex = 1) {
         let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'minimumFloorHeatingValvePosition': minimumFloorHeatingValvePosition };
         await this.callRestApi('device/configuration/setMinimumFloorHeatingValvePosition', data);
     }
 
+    // float 0.0-1.0??
     async deviceControlSetDimLevel(deviceId, dimLevel, channelIndex = 1) {
         let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'dimLevel': dimLevel };
         await this.callRestApi('device/control/setDimLevel', data);
     }
 
+    // float 0.0-1.0??
     async deviceControlSetRgbDimLevel(deviceId, rgb, dimLevel, channelIndex = 1) {
         let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'simpleRGBColorState': rgb, 'dimLevel': dimLevel };
         await this.callRestApi('device/control/setSimpleRGBColorDimLevel', data);
     }
 
+    // float 0.0-1.0??
+    // not used right now
+    async deviceControlSetRgbDimLevelWithTime(deviceId, rgb, dimLevel, onTime, rampTime, channelIndex = 1) {
+        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'simpleRGBColorState': rgb, 'dimLevel': dimLevel, 'onTime': onTime, 'rampTime': rampTime };
+        await this.callRestApi('device/control/setSimpleRGBColorDimLevelWithTime', data);
+    }
+
+    // float 0.0 = open - 1.0 = closed
     async deviceControlSetShutterLevel(deviceId, shutterLevel, channelIndex = 1) {
         let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'shutterLevel': shutterLevel };
         await this.callRestApi('device/control/setShutterLevel', data);
@@ -347,6 +374,7 @@ class HmCloudAPI {
         await this.callRestApi('device/control/startImpulse', data);
     }
 
+    // float 0.0 = open - 1.0 = closed
     async deviceControlSetSlatsLevel(deviceId, slatsLevel, shutterLevel, channelIndex = 1) {
         let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'slatsLevel': slatsLevel, 'shutterLevel': shutterLevel };
         await this.callRestApi('device/control/setSlatsLevel', data);
@@ -365,6 +393,120 @@ class HmCloudAPI {
     async deviceControlSetSecondaryShadingLevel(deviceId, primaryShadingLevel, secondaryShadingLevel, channelIndex = 1) {
         let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'primaryShadingLevel': primaryShadingLevel, 'secondaryShadingLevel': secondaryShadingLevel };
         await this.callRestApi('device/control/setSecondaryShadingLevel', data);
+    }
+
+    // AcousticAlarmSignal
+    //     DISABLE_ACOUSTIC_SIGNAL = auto()
+    //     FREQUENCY_RISING = auto()
+    //     FREQUENCY_FALLING = auto()
+    //     FREQUENCY_RISING_AND_FALLING = auto()
+    //     FREQUENCY_ALTERNATING_LOW_HIGH = auto()
+    //     FREQUENCY_ALTERNATING_LOW_MID_HIGH = auto()
+    //     FREQUENCY_HIGHON_OFF = auto()
+    //     FREQUENCY_HIGHON_LONGOFF = auto()
+    //     FREQUENCY_LOWON_OFF_HIGHON_OFF = auto()
+    //     FREQUENCY_LOWON_LONGOFF_HIGHON_LONGOFF = auto()
+    //     LOW_BATTERY = auto()
+    //     DISARMED = auto()
+    //     INTERNALLY_ARMED = auto()
+    //     EXTERNALLY_ARMED = auto()
+    //     DELAYED_INTERNALLY_ARMED = auto()
+    //     DELAYED_EXTERNALLY_ARMED = auto()
+    //     EVENT = auto()
+    //     ERROR = auto()
+    async deviceConfigurationSetAcousticAlarmSignal(deviceId, acousticAlarmSignal, channelIndex = 1) {
+        let data = { "deviceId": deviceId, "acousticAlarmSignal": acousticAlarmSignal, "channelIndex": channelIndex };
+        await this.callRestApi('device/configuration/setAcousticAlarmSignal', data);
+    }
+
+    // AcousticAlarmTiming
+    //     PERMANENT = auto()
+    //     THREE_MINUTES = auto()
+    //     SIX_MINUTES = auto()
+    //     ONCE_PER_MINUTE = auto()
+    async deviceConfigurationSetAcousticAlarmTiming(deviceId, acousticAlarmTiming, channelIndex = 1) {
+        let data = { "deviceId": deviceId, "acousticAlarmTiming": acousticAlarmTiming, "channelIndex": channelIndex };
+        await this.callRestApi('device/configuration/setAcousticAlarmTiming', data);
+    }
+
+    // WaterAlarmTrigger
+    //     NO_ALARM = auto()
+    //     MOISTURE_DETECTION = auto()
+    //     WATER_DETECTION = auto()
+    //     WATER_MOISTURE_DETECTION = auto()
+    async deviceConfigurationSetAcousticWaterAlarmTrigger(deviceId, acousticWaterAlarmTrigger, channelIndex = 1) {
+        let data = { "deviceId": deviceId, "acousticWaterAlarmTrigger": acousticWaterAlarmTrigger, "channelIndex": channelIndex };
+        await this.callRestApi('device/configuration/setAcousticWaterAlarmTrigger', data);
+    }
+
+    // WaterAlarmTrigger
+    //     NO_ALARM = auto()
+    //     MOISTURE_DETECTION = auto()
+    //     WATER_DETECTION = auto()
+    //     WATER_MOISTURE_DETECTION = auto()
+    async deviceConfigurationSetInAppWaterAlarmTrigger(deviceId, inAppWaterAlarmTrigger, channelIndex = 1) {
+        let data = { "deviceId": deviceId, "inAppWaterAlarmTrigger": inAppWaterAlarmTrigger, "channelIndex": channelIndex };
+        await this.callRestApi('device/configuration/setInAppWaterAlarmTrigger', data);
+    }
+
+    // WaterAlarmTrigger
+    //     NO_ALARM = auto()
+    //     MOISTURE_DETECTION = auto()
+    //     WATER_DETECTION = auto()
+    //     WATER_MOISTURE_DETECTION = auto()
+    async deviceConfigurationSetSirenWaterAlarmTrigger(deviceId, sirenWaterAlarmTrigger, channelIndex = 1) {
+        let data = { "deviceId": deviceId, "sirenWaterAlarmTrigger": sirenWaterAlarmTrigger, "channelIndex": channelIndex };
+        await this.callRestApi('device/configuration/setSirenWaterAlarmTrigger', data);
+    }
+
+    // AccelerationSensorMode
+    //     ANY_MOTION = auto()
+    //     FLAT_DECT = auto()
+    async deviceConfigurationSetAccelerationSensorMode(deviceId, accelerationSensorMode, channelIndex = 1) {
+        let data = { "deviceId": deviceId, "accelerationSensorMode": accelerationSensorMode, "channelIndex": channelIndex };
+        await this.callRestApi('device/configuration/setAccelerationSensorMode', data);
+    }
+
+    // AccelerationSensorNeutralPosition
+    //     HORIZONTAL = auto()
+    //     VERTICAL = auto()
+    async deviceConfigurationSetAccelerationSensorNeutralPosition(deviceId, accelerationSensorNeutralPosition, channelIndex = 1) {
+        let data = { "deviceId": deviceId, "accelerationSensorNeutralPosition": accelerationSensorNeutralPosition, "channelIndex": channelIndex };
+        await this.callRestApi('device/configuration/setAccelerationSensorNeutralPosition', data);
+    }
+
+    // accelerationSensorTriggerAngle = int
+    async deviceConfigurationSetAccelerationSensorTriggerAngle(deviceId, accelerationSensorTriggerAngle, channelIndex = 1) {
+        let data = { "deviceId": deviceId, "accelerationSensorTriggerAngle": accelerationSensorTriggerAngle, "channelIndex": channelIndex };
+        await this.callRestApi('device/configuration/setAccelerationSensorTriggerAngle', data);
+    }
+
+    // AccelerationSensorSensitivity
+    //     SENSOR_RANGE_16G = auto()
+    //     SENSOR_RANGE_8G = auto()
+    //     SENSOR_RANGE_4G = auto()
+    //     SENSOR_RANGE_2G = auto()
+    //     SENSOR_RANGE_2G_PLUS_SENS = auto()
+    //     SENSOR_RANGE_2G_2PLUS_SENSE = auto()
+    async deviceConfigurationSetAccelerationSensorSensitivity(deviceId, accelerationSensorSensitivity, channelIndex = 1) {
+        let data = { "deviceId": deviceId, "accelerationSensorSensitivity": accelerationSensorSensitivity, "channelIndex": channelIndex };
+        await this.callRestApi('device/configuration/setAccelerationSensorSensitivity', data);
+    }
+
+    // accelerationSensorEventFilterPeriod = float
+    async deviceConfigurationSetAccelerationSensorEventFilterPeriod(deviceId, accelerationSensorEventFilterPeriod, channelIndex = 1) {
+        let data = { "deviceId": deviceId, "accelerationSensorEventFilterPeriod": accelerationSensorEventFilterPeriod, "channelIndex": channelIndex };
+        await this.callRestApi('device/configuration/setAccelerationSensorEventFilterPeriod', data);
+    }
+
+    // NotificationSoundType
+    //     SOUND_NO_SOUND = auto()
+    //     SOUND_SHORT = auto()
+    //     SOUND_SHORT_SHORT = auto()
+    //     SOUND_LONG = auto()
+    async deviceConfigurationSetNotificationSoundTyp(deviceId, notificationSoundType, isHighToLow, channelIndex = 1) {
+        let data = { "deviceId": deviceId, "notificationSoundType": notificationSoundType, "isHighToLow": isHighToLow, "channelIndex": channelIndex };
+        await this.callRestApi('device/configuration/setNotificationSoundTyp', data);
     }
 
     async deviceConfigurationSetRouterModuleEnabled(deviceId, routerModuleEnabled, channelIndex = 1) {
