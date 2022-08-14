@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.18.0",
+    "version": "1.19.0",
     "news": {
+      "1.19.0": {
+        "en": "Add several more device settings that can be modified via adapter (see readme for list)",
+        "de": "Fügen Sie mehrere weitere Geräteeinstellungen hinzu, die über Adapter geändert werden können (siehe Readme für Liste)",
+        "ru": "Добавьте еще несколько настроек устройства, которые могут быть изменены через адаптер (см. readme для списка)",
+        "pt": "Adicione várias outras configurações de dispositivo que podem ser modificadas via adaptador (consulte readme for list)",
+        "nl": "Voeg nog een paar apparatuur toe dat kan worden aangepast via adapter (zee lees me voor)",
+        "fr": "Ajouter plusieurs réglages de périphériques qui peuvent être modifiés via l'adaptateur (voir readme pour liste)",
+        "it": "Aggiungere più impostazioni del dispositivo che possono essere modificate tramite adattatore (vedere readme per l'elenco)",
+        "es": "Agregue varios ajustes de dispositivo más que se pueden modificar mediante adaptador (ver readme para lista)",
+        "pl": "Dostarczając kilka ustawień urządzenie, które mogą być modyfikowane poprzez adapter (patrz czytelnik na listę)",
+        "zh-cn": "增加一些能够通过适应者加以修改的装置环境(见清单的读者)。"
+      },
       "1.18.0": {
         "en": "Added support for PARTICULATE_MATTER_SENSOR_CHANNEL\nCorrectly ignore some channels without meaningful data",
         "de": "Unterstützung für PARTICULATE_MATTER_SENSOR_CHANNEL\nEinige Kanäle ohne aussagekräftige Daten korrekt ignorieren",
@@ -74,18 +86,6 @@
         "es": "Arreglar sendDoorCommand para HmIP-MOD-HO",
         "pl": "Napraw sendDoorCommand dla HmIP-MOD-HO",
         "zh-cn": "修复 HmIP-MOD-HO 的 sendDoorCommand"
-      },
-      "1.15.3": {
-        "en": "Add windowOpen indicator to two more places\nOptimize reconnection handling\nOptimize automatic initialization of unknown devices and channels",
-        "de": "WindowOpen-Indikator an zwei weiteren Stellen hinzufügen\nOptimieren Sie die Handhabung der Wiederverbindung\nOptimieren Sie die automatische Initialisierung unbekannter Geräte und Kanäle",
-        "ru": "Добавить индикатор windowOpen еще в два места\nОптимизация обработки повторного подключения\nОптимизация автоматической инициализации неизвестных устройств и каналов",
-        "pt": "Adicione o indicador windowOpen a mais dois lugares\nOtimize o tratamento de reconexão\nOtimize a inicialização automática de dispositivos e canais desconhecidos",
-        "nl": "VensterOpen indicator toevoegen aan nog twee plaatsen\nOptimaliseer de afhandeling van herverbinding\nOptimaliseer automatische initialisatie van onbekende apparaten en kanalen",
-        "fr": "Ajouter un indicateur de fenêtre ouverte à deux autres endroits\nOptimiser la gestion des reconnexions\nOptimiser l'initialisation automatique des appareils et canaux inconnus",
-        "it": "Aggiungi finestraIndicatore di apertura in altre due posizioni\nOttimizza la gestione della riconnessione\nOttimizza l'inizializzazione automatica di dispositivi e canali sconosciuti",
-        "es": "Agregar indicador de ventanaAbrir en dos lugares más\nOptimizar el manejo de reconexión\nOptimice la inicialización automática de dispositivos y canales desconocidos",
-        "pl": "Dodaj oknoOtwórz wskaźnik w dwóch kolejnych miejscach\nZoptymalizuj obsługę ponownego połączenia\nZoptymalizuj automatyczną inicjalizację nieznanych urządzeń i kanałów",
-        "zh-cn": "将 windowOpen 指示器添加到另外两个地方\n优化重连处理\n优化未知设备和通道的自动初始化"
       }
     },
     "title": "HomeMaticIP Cloud AccessPoint",
