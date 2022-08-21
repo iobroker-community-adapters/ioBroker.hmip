@@ -64,8 +64,7 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
-
-### __WORK IN PROGRESS__
+### 1.19.1 (2022-08-21)
 * Fix datatype of selfCalibrationInProgress
 
 ### 1.19.0 (2022-08-14)

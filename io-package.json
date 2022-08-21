@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.19.0",
+    "version": "1.19.1",
     "news": {
+      "1.19.1": {
+        "en": "Fix datatype of selfCalibrationInProgress",
+        "de": "Datentyp von selfCalibration beheben Im Vorfeld",
+        "ru": "Исправление типа данных selfCalibration InProgress",
+        "pt": "Corrigir o tipo de dados de autoCalibração InProgresso",
+        "nl": "Vertaling: Vertaling:",
+        "fr": "Fix datatype of selfCalibration InProgress",
+        "it": "Fissare il tipo di dati di autoCalibrazione In arrivo",
+        "es": "Fijar el tipo de datos de autoCalibración InProgress",
+        "pl": "Fix datatype Inwestycja",
+        "zh-cn": "自我评估的固定数据类型 目 录"
+      },
       "1.19.0": {
         "en": "Add several more device settings that can be modified via adapter (see readme for list)",
         "de": "Fügen Sie mehrere weitere Geräteeinstellungen hinzu, die über Adapter geändert werden können (siehe Readme für Liste)",
@@ -74,18 +86,6 @@
         "es": "Optimizar el manejo de reconexión",
         "pl": "Zoptymalizuj obsługę ponownego połączenia",
         "zh-cn": "优化重连处理"
-      },
-      "1.15.4": {
-        "en": "Fix sendDoorCommand for HmIP-MOD-HO",
-        "de": "sendDoorCommand für HmIP-MOD-HO korrigiert",
-        "ru": "Исправление sendDoorCommand для HmIP-MOD-HO",
-        "pt": "Corrigir sendDoorCommand para HmIP-MOD-HO",
-        "nl": "Fix sendDoorCommand voor HmIP-MOD-HO",
-        "fr": "Correction de sendDoorCommand pour HmIP-MOD-HO",
-        "it": "Risolto il problema con sendDoorCommand per HmIP-MOD-HO",
-        "es": "Arreglar sendDoorCommand para HmIP-MOD-HO",
-        "pl": "Napraw sendDoorCommand dla HmIP-MOD-HO",
-        "zh-cn": "修复 HmIP-MOD-HO 的 sendDoorCommand"
       }
     },
     "title": "HomeMaticIP Cloud AccessPoint",
