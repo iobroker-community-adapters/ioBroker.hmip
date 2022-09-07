@@ -612,18 +612,20 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         this.wsConnectionStableTimeout && clearTimeout(this.wsConnectionStableTimeout);
         this.wsConnectionStableTimeout = setTimeout(() => {
             this.wsConnectionStableTimeout = null;
+            this.wsConnectionErrorCounter = 0;
         }, 5000); // set null when connection is stable
     }
 
     _closed(code, reason) {
-        if (this.wsConnectionStableTimeout) {
+        if (this.wsConnectionStableTimeout || !this.wsConnected) {
             this.wsConnectionErrorCounter++;
         } else {
             this.wsConnectionErrorCounter = 0;
         }
+        reason = reason ? reason.toString() : '';
         this.log.warn(`ws connection closed (${this.wsConnectionErrorCounter}) - code: ${code} - reason: ${reason}`);
         this.wsConnected = false;
-        if (this.wsConnectionErrorCounter > 6 && !this._unloaded) {
+        if ((this.wsConnectionErrorCounter > 6 || reason.includes('ECONNREFUSED')) && !this._unloaded) {
             this._api.dispose();
             this.log.error(`error updating homematic ip for unknown states: ${code} - ${reason}`);
             this.log.error('Try reconnect in 30s');
