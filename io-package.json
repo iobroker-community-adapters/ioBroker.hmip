@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.19.1",
+    "version": "1.19.2",
     "news": {
+      "1.19.2": {
+        "en": "Optimize Reconnect handling",
+        "de": "Optimieren Sie Reconnect Handling",
+        "ru": "Оптимизация обработки Reconnect",
+        "pt": "Otimizar o manuseio Reconnect",
+        "nl": "Optimize Reconnect",
+        "fr": "Optimiser la manipulation de reconnect",
+        "it": "Ottimizzare la gestione della connessione",
+        "es": "Optimize Reconnect handling",
+        "pl": "Optimize Reconnection",
+        "zh-cn": "恢复联系"
+      },
       "1.19.1": {
         "en": "Fix datatype of selfCalibrationInProgress",
         "de": "Datentyp von selfCalibration beheben Im Vorfeld",
@@ -74,18 +86,6 @@
         "es": "Optimizar el manejo de reconexión de websocket\nAgregar soporte para GENERIC_INPUT_CHANNEL",
         "pl": "Zoptymalizuj obsługę ponownego połączenia websocket\nDodaj obsługę GENERIC_INPUT_CHANNEL",
         "zh-cn": "优化 websocket 重连处理\n添加对 GENERIC_INPUT_CHANNEL 的支持"
-      },
-      "1.15.5": {
-        "en": "Optimize reconnection handling",
-        "de": "Optimieren Sie die Handhabung der Wiederverbindung",
-        "ru": "Оптимизация обработки повторного подключения",
-        "pt": "Otimize o tratamento de reconexão",
-        "nl": "Optimaliseer de afhandeling van herverbinding",
-        "fr": "Optimiser la gestion des reconnexions",
-        "it": "Ottimizza la gestione della riconnessione",
-        "es": "Optimizar el manejo de reconexión",
-        "pl": "Zoptymalizuj obsługę ponownego połączenia",
-        "zh-cn": "优化重连处理"
       }
     },
     "title": "HomeMaticIP Cloud AccessPoint",
