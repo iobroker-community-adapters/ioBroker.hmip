@@ -1104,6 +1104,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.multiModeInputMode`, device.functionalChannels[channel].multiModeInputMode, true));
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.windowState`, device.functionalChannels[channel].windowState, true));
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.windowOpen`, device.functionalChannels[channel].windowState === 'OPEN', true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.corrosionPreventionActive`, device.functionalChannels[channel].corrosionPreventionActive, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.doorBellSensorEventTimestamp`, device.functionalChannels[channel].doorBellSensorEventTimestamp, true));
         return promises;
     }
 
@@ -1217,6 +1219,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _updateFloorTerminalBlockMechanicChannelStates(device, channel) {
         let promises = [];
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.valveState`, device.functionalChannels[channel].valveState, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.valvePosition`, device.functionalChannels[channel].valvePosition * 100, true));
         return promises;
     }
 
@@ -2058,6 +2061,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.multiModeInputMode`, { type: 'state', common: { name: 'multiModeInputMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.windowState`, { type: 'state', common: { name: 'windowState', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.windowOpen`, { type: 'state', common: { name: 'windowOpen', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.corrosionPreventionActive`, { type: 'state', common: { name: 'corrosionPreventionActive', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.doorBellSensorEventTimestamp`, { type: 'state', common: { name: 'doorBellSensorEventTimestamp', type: 'number', role: 'date', read: true, write: false }, native: {} }));
         return promises;
     }
 
@@ -2196,6 +2201,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _createFloorTerminalBlockMechanicChannel(device, channel) {
         let promises = [];
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.valveState`, { type: 'state', common: { name: 'valveState', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.valvePosition`, { type: 'state', common: { name: 'valvePosition', type: 'number', role: 'valve', unit: '%', read: true, write: false }, native: {} }));
         return promises;
     }
 

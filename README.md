@@ -64,6 +64,11 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
+
+### __WORK IN PROGRESS__
+* Add additional fields for MULTI_MODE_INPUT_CHANNEL for Doorbell
+* Add valve position for FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL
+
 ### 1.19.2 (2022-09-07)
 * Optimize Reconnect handling
 
