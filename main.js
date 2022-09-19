@@ -1353,6 +1353,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.on`, device.functionalChannels[channel].on, true));
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.profileMode`, device.functionalChannels[channel].profileMode, true));
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.userDesiredProfileMode`, device.functionalChannels[channel].userDesiredProfileMode, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.powerUpSwitchState`, device.functionalChannels[channel].powerUpSwitchState, true));
         return promises;
     }
 
@@ -1376,6 +1377,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         let promises = [];
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.dimLevel`, device.functionalChannels[channel].dimLevel, true));
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.on`, device.functionalChannels[channel].on, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.profileMode`, device.functionalChannels[channel].profileMode, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.userDesiredProfileMode`, device.functionalChannels[channel].userDesiredProfileMode, true));
         return promises;
     }
 
@@ -1440,6 +1443,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.windSpeed`, device.functionalChannels[channel].windSpeed, true));
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.windValueType`, device.functionalChannels[channel].windValueType, true));
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.yesterdaySunshineDuration`, device.functionalChannels[channel].yesterdaySunshineDuration, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.vaporAmount`, device.functionalChannels[channel].vaporAmount, true));
         return promises;
     }
 
@@ -1478,7 +1482,6 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.weathervaneAlignmentNeeded`, device.functionalChannels[channel].weathervaneAlignmentNeeded, true));
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.windDirection`, device.functionalChannels[channel].windDirection, true));
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.windDirectionVariation`, device.functionalChannels[channel].windDirectionVariation, true));
-        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.vaporAmount`, device.functionalChannels[channel].vaporAmount, true));
         return promises;
     }
 
@@ -1498,6 +1501,12 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.bottomToTopReferenceTime`, device.functionalChannels[channel].bottomToTopReferenceTime, true));
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.changeOverDelay`, device.functionalChannels[channel].changeOverDelay, true));
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.endpositionAutoDetectionEnabled`, device.functionalChannels[channel].endpositionAutoDetectionEnabled, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.delayCompensationValue`, device.functionalChannels[channel].delayCompensationValue, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.profileMode`, device.functionalChannels[channel].profileMode, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.supportingDelayCompensation`, device.functionalChannels[channel].supportingDelayCompensation, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.supportingEndpositionAutoDetection`, device.functionalChannels[channel].supportingEndpositionAutoDetection, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.supportingSelfCalibration`, device.functionalChannels[channel].supportingSelfCalibration, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.userDesiredProfileMode`, device.functionalChannels[channel].userDesiredProfileMode, true));
         return promises;
     }
 
@@ -1745,7 +1754,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 continue;
             }
             let fc = device.functionalChannels[i];
-            promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${i}`, { type: 'channel', common: {}, native: {} }));
+            promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${i}`, { type: 'channel', common: { name: fc.label || `Channel ${i}`}, native: {} }));
             this.initializedChannels[`devices.${device.id}.channels.${i}`] = true;
 
             promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${i}.functionalChannelType`, { type: 'state', common: { name: 'functionalChannelType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
@@ -1950,7 +1959,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _createMainsFailureChannel(device, channel) {
         let promises = [];
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.powerMainsFailure`, { type: 'state', common: { name: 'powerMainsFailure', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.genericAlarmSignal`, { type: 'state', common: { name: 'genericAlarmSignal', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.genericAlarmSignal`, { type: 'state', common: { name: 'genericAlarmSignal', type: 'string', states: {'NO_ALARM': 'NO_ALARM', 'SILENT_ALARM': 'SILENT_ALARM', 'FULL_ALARM': 'FULL_ALARM'}, role: 'info', read: true, write: false }, native: {} }));
         return promises;
     }
 
@@ -1958,8 +1967,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         let promises = [];
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.volumeLevel`, { type: 'state', common: { name: 'volumeLevel', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.soundFile`, { type: 'state', common: { name: 'soundFile', type: 'string', role: 'text', read: true, write: true }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.profileMode`, { type: 'state', common: { name: 'profileMode', type: 'string', role: 'text', read: true, write: true }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.userDesiredProfileMode`, { type: 'state', common: { name: 'userDesiredProfileMode', type: 'string', role: 'text', read: true, write: true }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.profileMode`, { type: 'state', common: { name: 'profileMode', type: 'string', states: {'AUTOMATIC': 'AUTOMATIC', 'MANUAL': 'MANUAL'}, role: 'text', read: true, write: true }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.userDesiredProfileMode`, { type: 'state', common: { name: 'userDesiredProfileMode', type: 'string', states: {'AUTOMATIC': 'AUTOMATIC', 'MANUAL': 'MANUAL'}, role: 'text', read: true, write: true }, native: {} }));
         return promises;
     }
 
@@ -1983,14 +1992,14 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _createDoorLockChannel(device, channel) {
         let promises = [];
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.lockState`, { type: 'state', common: { name: 'lockState', type: 'string', role: 'info', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.motorState`, { type: 'state', common: { name: 'motorState', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.lockState`, { type: 'state', common: { name: 'lockState', type: 'string', states: {'OPEN': 'OPEN', 'UNLOCKED': 'UNLOCKED', 'LOCKED': 'LOCKED', 'NONE': 'NONE'}, role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.motorState`, { type: 'state', common: { name: 'motorState', type: 'string', states: {'STOPPED': 'STOPPED', 'CLOSING': 'CLOSING', 'OPENING': 'OPENING'}, role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.autoRelockEnabled`, { type: 'state', common: { name: 'autoRelockEnabled', type: 'boolean', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.doorLockDirection`, { type: 'state', common: { name: 'doorLockDirection', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.doorLockNeutralPosition`, { type: 'state', common: { name: 'doorLockNeutralPosition', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.doorLockTurns`, { type: 'state', common: { name: 'doorLockTurns', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.doorHandleType`, { type: 'state', common: { name: 'doorHandleType', type: 'string', role: 'info', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.autoRelockDelay`, { type: 'state', common: { name: 'autoRelockDelay', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.autoRelockDelay`, { type: 'state', common: { name: 'autoRelockDelay', type: 'number', role: 'value.interval', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.pin`, { type: 'state', common: { name: 'pin', type: 'string', role: 'state', read: true, write: true }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.setLockState`, { type: 'state', common: { name: 'setLockState', type: 'number', role: 'value', read: true, write: true, states: {1: 'OPEN', 2: 'LOCKED', 3:'UNLOCKED'} }, native: { id: device.id, channel: channel, parameter: 'setLockState' } }));
         return promises;
@@ -1998,7 +2007,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _createDoorLockSensorChannel(device, channel) {
         let promises = [];
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.lockState`, { type: 'state', common: { name: 'lockState', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.lockState`, { type: 'state', common: { name: 'lockState', type: 'string', states: {'OPEN': 'OPEN', 'UNLOCKED': 'UNLOCKED', 'LOCKED': 'LOCKED', 'NONE': 'NONE'}, role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.doorLockDirection`, { type: 'state', common: { name: 'doorLockDirection', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.doorLockNeutralPosition`, { type: 'state', common: { name: 'doorLockNeutralPosition', type: 'string', role: 'info', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.doorLockTurns`, { type: 'state', common: { name: 'doorLockTurns', type: 'number', role: 'value', read: true, write: false }, native: {} }));
@@ -2045,7 +2054,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _createSmokeDetectorChannel(device, channel) {
         let promises = [];
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.smokeDetectorAlarmType`, { type: 'state', common: { name: 'smokeDetectorAlarmType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.smokeDetectorAlarmType`, { type: 'state', common: { name: 'smokeDetectorAlarmType', states: {'IDLE_OFF': 'IDLE_OFF', 'PRIMARY_ALARM': 'PRIMARY_ALARM', 'INTRUSION_ALARM': 'INTRUSION_ALARM', 'SECONDARY_ALARM': 'SECONDARY_ALARM'}, type: 'string', role: 'text', read: true, write: false }, native: {} }));
         return promises;
     }
 
@@ -2057,8 +2066,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _createMultiModeInputChannel(device, channel) {
         let promises = [];
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.binaryBehaviorType`, { type: 'state', common: { name: 'binaryBehaviorType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.multiModeInputMode`, { type: 'state', common: { name: 'multiModeInputMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.binaryBehaviorType`, { type: 'state', common: { name: 'binaryBehaviorType', type: 'string', states: {'NORMALLY_CLOSE': 'NORMALLY_CLOSE', 'NORMALLY_OPEN': 'NORMALLY_OPEN'}, role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.multiModeInputMode`, { type: 'state', common: { name: 'multiModeInputMode', type: 'string', states: {'KEY_BEHAVIOR': 'KEY_BEHAVIOR', 'SWITCH_BEHAVIOR': 'SWITCH_BEHAVIOR', 'BINARY_BEHAVIOR': 'BINARY_BEHAVIOR'}, role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.windowState`, { type: 'state', common: { name: 'windowState', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.windowOpen`, { type: 'state', common: { name: 'windowOpen', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.corrosionPreventionActive`, { type: 'state', common: { name: 'corrosionPreventionActive', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
@@ -2069,8 +2078,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _createMultiModeInputSwitchChannel(device, channel) {
         let promises = [];
         promises.push(...this._createSwitchChannel(device, channel));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.binaryBehaviorType`, { type: 'state', common: { name: 'binaryBehaviorType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.multiModeInputMode`, { type: 'state', common: { name: 'multiModeInputMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.binaryBehaviorType`, { type: 'state', common: { name: 'binaryBehaviorType', type: 'string', states: {'NORMALLY_CLOSE': 'NORMALLY_CLOSE', 'NORMALLY_OPEN': 'NORMALLY_OPEN'}, role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.multiModeInputMode`, { type: 'state', common: { name: 'multiModeInputMode', type: 'string', states: {'KEY_BEHAVIOR': 'KEY_BEHAVIOR', 'SWITCH_BEHAVIOR': 'SWITCH_BEHAVIOR', 'BINARY_BEHAVIOR': 'BINARY_BEHAVIOR'}, role: 'text', read: true, write: false }, native: {} }));
         return promises;
     }
 
@@ -2157,7 +2166,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.illumination`, { type: 'state', common: { name: 'illumination', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.currentIllumination`, { type: 'state', common: { name: 'currentIllumination', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.numberOfBrightnessMeasurements`, { type: 'state', common: { name: 'numberOfBrightnessMeasurements', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.motionDetectionSendInterval`, { type: 'state', common: { name: 'motionDetectionSendInterval', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.motionDetectionSendInterval`, { type: 'state', common: { name: 'motionDetectionSendInterval', type: 'string', states: {'SECONDS_30': 'SECONDS_30', 'SECONDS_60': 'SECONDS_60', 'SECONDS_120': 'SECONDS_120', 'SECONDS_240': 'SECONDS_240', 'SECONDS_480': 'SECONDS_480'}, role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.motionBufferActive`, { type: 'state', common: { name: 'motionBufferActive', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         return promises;
     }
@@ -2168,7 +2177,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.leftCounter`, { type: 'state', common: { name: 'leftCounter', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.leftRightCounterDelta`, { type: 'state', common: { name: 'leftRightCounterDelta', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.passageBlindtime`, { type: 'state', common: { name: 'passageBlindtime', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.passageDirection`, { type: 'state', common: { name: 'passageDirection', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.passageDirection`, { type: 'state', common: { name: 'passageDirection', states: {'LEFT': 'LEFT', 'RIGHT': 'RIGHT'}, type: 'string', role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.passageSensorSensitivity`, { type: 'state', common: { name: 'passageSensorSensitivity', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.passageTimeout`, { type: 'state', common: { name: 'passageTimeout', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.rightCounter`, { type: 'state', common: { name: 'rightCounter', type: 'number', role: 'value', read: true, write: false }, native: {} }));
@@ -2184,8 +2193,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.coolingEmergencyValue`, { type: 'state', common: { name: 'coolingEmergencyValue', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.heatingEmergencyValue`, { type: 'state', common: { name: 'heatingEmergencyValue', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.globalPumpControl`, { type: 'state', common: { name: 'globalPumpControl', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.heatingValveType`, { type: 'state', common: { name: 'heatingValveType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.heatingLoadType`, { type: 'state', common: { name: 'heatingLoadType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.heatingValveType`, { type: 'state', common: { name: 'heatingValveType', states: {'NORMALLY_CLOSE': 'NORMALLY_CLOSE', 'NORMALLY_OPEN': 'NORMALLY_OPEN'}, type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.heatingLoadType`, { type: 'state', common: { name: 'heatingLoadType', states: {'LOAD_BALANCING': 'LOAD_BALANCING', 'LOAD_COLLECTION': 'LOAD_COLLECTION'}, type: 'string', role: 'text', read: true, write: false }, native: {} }));
         return promises;
     }
 
@@ -2278,18 +2287,18 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.previousShutterLevel`, { type: 'state', common: { name: 'previousShutterLevel', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.processing`, { type: 'state', common: { name: 'processing', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.selfCalibrationInProgress`, { type: 'state', common: { name: 'selfCalibrationInProgress', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.topToBottomReferenceTime`, { type: 'state', common: { name: 'topToBottomReferenceTime', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.bottomToTopReferenceTime`, { type: 'state', common: { name: 'bottomToTopReferenceTime', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.changeOverDelay`, { type: 'state', common: { name: 'changeOverDelay', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.topToBottomReferenceTime`, { type: 'state', common: { name: 'topToBottomReferenceTime', type: 'number', role: 'value.interval', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.bottomToTopReferenceTime`, { type: 'state', common: { name: 'bottomToTopReferenceTime', type: 'number', role: 'value.interval', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.changeOverDelay`, { type: 'state', common: { name: 'changeOverDelay', type: 'number', role: 'value.interval', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.supportingSelfCalibration`, { type: 'state', common: { name: 'supportingSelfCalibration', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.endpositionAutoDetectionEnabled`, { type: 'state', common: { name: 'endpositionAutoDetectionEnabled', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.supportingEndpositionAutoDetection`, { type: 'state', common: { name: 'supportingEndpositionAutoDetection', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.delayCompensationValue`, { type: 'state', common: { name: 'delayCompensationValue', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.delayCompensationValue`, { type: 'state', common: { name: 'delayCompensationValue', type: 'number', role: 'value.interval', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.supportingDelayCompensation`, { type: 'state', common: { name: 'supportingDelayCompensation', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.profileMode`, { type: 'state', common: { name: 'profileMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.userDesiredProfileMode`, { type: 'state', common: { name: 'userDesiredProfileMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.profileMode`, { type: 'state', common: { name: 'profileMode', states: {'AUTOMATIC': 'AUTOMATIC', 'MANUAL': 'MANUAL'}, type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.userDesiredProfileMode`, { type: 'state', common: { name: 'userDesiredProfileMode', type: 'string', states: {'AUTOMATIC': 'AUTOMATIC', 'MANUAL': 'MANUAL'}, role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.previousSlatsLevel`, { type: 'state', common: { name: 'previousSlatsLevel', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.slatsReferenceTime`, { type: 'state', common: { name: 'slatsReferenceTime', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.slatsReferenceTime`, { type: 'state', common: { name: 'slatsReferenceTime', type: 'number', role: 'value.interval', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.blindModeActive`, { type: 'state', common: { name: 'blindModeActive', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.slatsLevel`, { type: 'state', common: { name: 'slatsLevel', type: 'number', role: 'value', read: true, write: true, min: 0, max: 100 }, native: { id: device.id, channel: channel, parameter: 'slatsLevel' } }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.shutterLevel`, { type: 'state', common: { name: 'shutterLevel', type: 'number', role: 'value', read: true, write: true, min: 0, max: 100 }, native: { id: device.id, channel: channel, parameter: 'shutterlevel' } }));
@@ -2328,6 +2337,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         let promises = [];
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.dimLevel`, { type: 'state', common: { name: 'dimLevel', type: 'number', role: 'level.dimmer', read: true, write: true, min: 0, max: 100 }, native: { id: device.id, channel: channel, parameter: 'setDimLevel' } }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.on`, { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'switchState' } }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.profileMode`, { type: 'state', common: { name: 'profileMode', type: 'string', states: {'AUTOMATIC': 'AUTOMATIC', 'MANUAL': 'MANUAL'}, role: 'text', read: true, write: true }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.userDesiredProfileMode`, { type: 'state', common: { name: 'userDesiredProfileMode', type: 'string', states: {'AUTOMATIC': 'AUTOMATIC', 'MANUAL': 'MANUAL'}, role: 'text', read: true, write: true }, native: {} }));
         return promises;
     }
 
@@ -2335,14 +2346,14 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         let promises = [];
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.primaryShadingLevel`, { type: 'state', common: { name: 'primaryShadingLevel', type: 'number', role: 'value', unit: '%', min: 0, max: 100, read: true, write: true }, native: {id: device.id, channel: channel, parameter: 'setPrimaryShadingLevel'} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.previousPrimaryShadingLevel`, { type: 'state', common: { name: 'previousPrimaryShadingLevel', type: 'number', role: 'value', unit: '%', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.primaryShadingStateType`, { type: 'state', common: { name: 'primaryShadingStateType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.primaryShadingStateType`, { type: 'state', common: { name: 'primaryShadingStateType', states: {'NOT_POSSIBLE': 'NOT_POSSIBLE', 'NOT_EXISTENT': 'NOT_EXISTENT', 'POSITION_USED': 'POSITION_USED', 'TILT_USED': 'TILT_USED', 'NOT_USED': 'NOT_USED', 'MIXED': 'MIXED'}, type: 'string', role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.processing`, { type: 'state', common: { name: 'processing', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.secondaryShadingLevel`, { type: 'state', common: { name: 'secondaryShadingLevel', type: 'number', role: 'value', unit: '%', min: 0, max: 100, read: true, write: true }, native: {id: device.id, channel: channel, parameter: 'setSecondaryShadingLevel'} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.previousSecondaryShadingLevel`, { type: 'state', common: { name: 'previousSecondaryShadingLevel', type: 'number', role: 'value', unit: '%', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.secondaryShadingStateType`, { type: 'state', common: { name: 'secondaryShadingStateType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.profileMode`, { type: 'state', common: { name: 'profileMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.userDesiredProfileMode`, { type: 'state', common: { name: 'userDesiredProfileMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.shadingPackagePosition`, { type: 'state', common: { name: 'shadingPackagePosition', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.secondaryShadingStateType`, { type: 'state', common: { name: 'secondaryShadingStateType', type: 'string', states: {'NOT_POSSIBLE': 'NOT_POSSIBLE', 'NOT_EXISTENT': 'NOT_EXISTENT', 'POSITION_USED': 'POSITION_USED', 'TILT_USED': 'TILT_USED', 'NOT_USED': 'NOT_USED', 'MIXED': 'MIXED'}, role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.profileMode`, { type: 'state', common: { name: 'profileMode', type: 'string', states: {'AUTOMATIC': 'AUTOMATIC', 'MANUAL': 'MANUAL'}, role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.userDesiredProfileMode`, { type: 'state', common: { name: 'userDesiredProfileMode', type: 'string', states: {'AUTOMATIC': 'AUTOMATIC', 'MANUAL': 'MANUAL'}, role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.shadingPackagePosition`, { type: 'state', common: { name: 'shadingPackagePosition', states: {'LEFT': 'LEFT', 'RIGHT': 'RIGHT', 'CENTER': 'CENTER', 'SPLIT': 'SPLIT', 'TOP': 'TOP', 'BOTTOM': 'BOTTOM', 'TDBU': 'TDBU', 'NOT_USED': 'NOT_USED'}, type: 'string', role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.primaryOpenAdjustable`, { type: 'state', common: { name: 'primaryOpenAdjustable', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.primaryCloseAdjustable`, { type: 'state', common: { name: 'primaryCloseAdjustable', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.secondaryOpenAdjustable`, { type: 'state', common: { name: 'secondaryOpenAdjustable', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
@@ -2354,8 +2365,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.productId`, { type: 'state', common: { name: 'productId', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.identifyOemSupported`, { type: 'state', common: { name: 'identifyOemSupported', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.shadingDriveVersion`, { type: 'state', common: { name: 'shadingDriveVersion', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.manualDriveSpeed`, { type: 'state', common: { name: 'manualDriveSpeed', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.automationDriveSpeed`, { type: 'state', common: { name: 'automationDriveSpeed', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.manualDriveSpeed`, { type: 'state', common: { name: 'manualDriveSpeed', states: {'CREEP_SPEED': 'CREEP_SPEED', 'SLOW_SPEED': 'SLOW_SPEED', 'NOMINAL_SPEED': 'NOMINAL_SPEED', 'OPTIONAL_SPEED': 'OPTIONAL_SPEED'}, type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.automationDriveSpeed`, { type: 'state', common: { name: 'automationDriveSpeed', states: {'CREEP_SPEED': 'CREEP_SPEED', 'SLOW_SPEED': 'SLOW_SPEED', 'NOMINAL_SPEED': 'NOMINAL_SPEED', 'OPTIONAL_SPEED': 'OPTIONAL_SPEED'}, type: 'string', role: 'text', read: true, write: false }, native: {} }));
         return promises;
     }
 
@@ -2390,8 +2401,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.todaySunshineDuration`, { type: 'state', common: { name: 'todaySunshineDuration', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.totalSunshineDuration`, { type: 'state', common: { name: 'totalSunshineDuration', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.windSpeed`, { type: 'state', common: { name: 'windSpeed', type: 'number', role: 'value.speed', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.windValueType`, { type: 'state', common: { name: 'windValueType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.windValueType`, { type: 'state', common: { name: 'windValueType', type: 'string', states: {'CURRENT_VALUE': 'CURRENT_VALUE', 'MIN_VALUE': 'MIN_VALUE', 'MAX_VALUE': 'MAX_VALUE', 'AVERAGE_VALUE': 'AVERAGE_VALUE'}, role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.yesterdaySunshineDuration`, { type: 'state', common: { name: 'yesterdaySunshineDuration', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.vaporAmount`, { type: 'state', common: { name: 'vaporAmount', type: 'number', role: 'level', read: true, write: false }, native: {} }));
         return promises;
     }
 
@@ -2430,7 +2442,6 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.weathervaneAlignmentNeeded`, { type: 'state', common: { name: 'weathervaneAlignmentNeeded', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.windDirection`, { type: 'state', common: { name: 'windDirection', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.windDirectionVariation`, { type: 'state', common: { name: 'windDirectionVariation', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.vaporAmount`, { type: 'state', common: { name: 'vaporAmount', type: 'number', role: 'level', read: true, write: false }, native: {} }));
 	  return promises;
     }
 
@@ -2441,10 +2452,17 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.previousShutterLevel`, { type: 'state', common: { name: 'previousShutterLevel', type: 'string', role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.processing`, { type: 'state', common: { name: 'processing', type: 'boolean', role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.selfCalibrationInProgress`, { type: 'state', common: { name: 'selfCalibrationInProgress', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.topToBottomReferenceTime`, { type: 'state', common: { name: 'topToBottomReferenceTime', type: 'number', role: 'seconds', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.bottomToTopReferenceTime`, { type: 'state', common: { name: 'bottomToTopReferenceTime', type: 'number', role: 'seconds', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.changeOverDelay`, { type: 'state', common: { name: 'changeOverDelay', type: 'number', role: 'seconds', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'changeOverDelay' } }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.topToBottomReferenceTime`, { type: 'state', common: { name: 'topToBottomReferenceTime', type: 'number', role: 'value.interval', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.bottomToTopReferenceTime`, { type: 'state', common: { name: 'bottomToTopReferenceTime', type: 'number', role: 'value.interval', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.changeOverDelay`, { type: 'state', common: { name: 'changeOverDelay', type: 'number', role: 'value.interval', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'changeOverDelay' } }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.endpositionAutoDetectionEnabled`, { type: 'state', common: { name: 'endpositionAutoDetectionEnabled', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'switchState' } }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.delayCompensationValue`, { type: 'state', common: { name: 'delayCompensationValue', type: 'number', role: 'value.interval', read: true, write: false }, native: {}}));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.profileMode`, { type: 'state', common: { name: 'profileMode', type: 'string', states: {'AUTOMATIC': 'AUTOMATIC', 'MANUAL': 'MANUAL'}, role: 'text', read: true, write: false }, native: {}}));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.delayCompensationValue`, { type: 'state', common: { name: 'delayCompensationValue', type: 'number', role: 'value.interval', read: true, write: false }, native: {}}));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.supportingDelayCompensation`, { type: 'state', common: { name: 'supportingDelayCompensation', type: 'boolean', role: 'indicator', read: true, write: false }, native: {}}));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.supportingEndpositionAutoDetection`, { type: 'state', common: { name: 'supportingEndpositionAutoDetection', type: 'boolean', role: 'indicator', read: true, write: false }, native: {}}));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.supportingSelfCalibration`, { type: 'state', common: { name: 'supportingSelfCalibration', type: 'boolean', role: 'indicator', read: true, write: false }, native: {}}));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.userDesiredProfileMode`, { type: 'state', common: { name: 'userDesiredProfileMode', type: 'string', states: {'AUTOMATIC': 'AUTOMATIC', 'MANUAL': 'MANUAL'}, role: 'text', read: true, write: false }, native: {}}));
         return promises;
     }
 
@@ -2457,8 +2475,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _createSwitchChannel(device, channel) {
         let promises = [];
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.on`, { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'switchState' } }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.profileMode`, { type: 'state', common: { name: 'profileMode', type: 'string', role: 'text', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.userDesiredProfileMode`, { type: 'state', common: { name: 'userDesiredProfileMode', type: 'string', role: 'button', read: false, write: true }, native: { id: device.id, channel: channel, parameter: 'resetEnergyCounter' } }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.profileMode`, { type: 'state', common: { name: 'profileMode', type: 'string', states: {'AUTOMATIC': 'AUTOMATIC', 'MANUAL': 'MANUAL'}, role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.userDesiredProfileMode`, { type: 'state', common: { name: 'userDesiredProfileMode', type: 'string', states: {'AUTOMATIC': 'AUTOMATIC', 'MANUAL': 'MANUAL'}, role: 'state', read: false, write: true }, native: { } }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.powerUpSwitchState`, { type: 'state', common: { name: 'powerUpSwitchState', type: 'string', role: 'state', read: false, write: true }, native: { } }));
         return promises;
     }
 
@@ -2466,7 +2485,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         let promises = [];
         promises.push(...this._createSwitchChannel(device, channel));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.energyCounter`, { type: 'state', common: { name: 'energyCounter', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.currentPowerConsumption`, { type: 'state', common: { name: 'currentPowerConsumption', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.currentPowerConsumption`, { type: 'state', common: { name: 'currentPowerConsumption', type: 'number', role: 'value', read: true, write: false, unit: 'W' }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.resetEnergyCounter`, { type: 'state', common: { name: 'on', type: 'boolean', role: 'button', read: false, write: true }, native: { id: device.id, channel: channel, parameter: 'resetEnergyCounter' } }));
         return promises;
     }
@@ -2521,7 +2540,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.motionDetected`, { type: 'state', common: { name: 'motionDetected', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.illumination`, { type: 'state', common: { name: 'illumination', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.currentIllumination`, { type: 'state', common: { name: 'currentIllumination', type: 'number', role: 'value', read: true, write: false }, native: {} }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.motionDetectionSendInterval`, { type: 'state', common: { name: 'motionDetectionSendInterval', type: 'string', role: 'text', read: false, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.motionDetectionSendInterval`, { type: 'state', common: { name: 'motionDetectionSendInterval', type: 'string', states:{'SECONDS_30': 'SECONDS_30','SECONDS_60': 'SECONDS_60','SECONDS_120': 'SECONDS_120','SECONDS_240': 'SECONDS_240','SECONDS_480': 'SECONDS_480'}, role: 'text', read: false, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.motionBufferActive`, { type: 'state', common: { name: 'motionBufferActive', type: 'boolean', role: 'switch', read: false, write: true }, native: { id: device.id, channel: channel, parameter: 'switchState' } }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.numberOfBrightnessMeasurements`, { type: 'state', common: { name: 'numberOfBrightnessMeasurements', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         return promises;

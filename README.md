@@ -68,6 +68,8 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 ### __WORK IN PROGRESS__
 * Add additional fields for MULTI_MODE_INPUT_CHANNEL for Doorbell
 * Add valve position for FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL
+* Add several more states for SWITCH_CHANNEL, DIMMER_CHANNEL, WEATHER_SENSOR_CHANNEL, SHUTTER_CHANNEL 
+* Add channel label
 
 ### 1.19.2 (2022-09-07)
 * Optimize Reconnect handling
