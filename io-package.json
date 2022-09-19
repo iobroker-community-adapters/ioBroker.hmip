@@ -1,8 +1,20 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.19.2",
+    "version": "1.20.0",
     "news": {
+      "1.20.0": {
+        "en": "IMPORTANT: Node.js 12.x is now required at minimum\nAdd additional fields for MULTI_MODE_INPUT_CHANNEL for Doorbell\nAdd valve position for FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL\nAdd several more states for SWITCH_CHANNEL, DIMMER_CHANNEL, WEATHER_SENSOR_CHANNEL, SHUTTER_CHANNEL \nAdd channel label",
+        "de": "WICHTIG: Node.js 12.x ist jetzt mindestens erforderlich\nFügen Sie weitere Felder für MULTI_MODE_INPUT_CHANNEL für Doorbell hinzu\nVentilstellung für FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL hinzufügen\nFügen Sie mehrere Zustände für SWITCH_CHANNEL, DIMMER_CHANNEL, WEATHER_SENSOR_CHANNEL, SHUTTER_CHANNEL hinzu\nHinzufügen von Channel Label",
+        "ru": "ВАЖНО: Node.js 12.x теперь требуется минимум\nДобавить дополнительные поля для MULTI_MODE_INPUT_CHANNEL для Doorbell\nДобавить позицию клапана для FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL\nДобавить еще несколько штатов для SWITCH_CHANNEL, DIMMER_CHANNEL, WEATHER_SENSOR_CHANNEL, SHUTTER_CHANNEL\nДобавить ярлык канала",
+        "pt": "IMPORTANTE: Node.js 12.x é agora exigido no mínimo\nAdicionar campos adicionais para MULTI_MODE_INPUT_CHANNEL para campainha\nAdicionar posição da válvula para FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL\nAdicione mais alguns estados para SWITCH_CHANNEL, DIMMER_CHANNEL, WEATHER_SENSOR_CHANNEL, SHUTTER_CHANNEL\nAdicionar etiqueta de canal",
+        "nl": "Node is nu nodig op minimum\nVoeg extra velden toe voor MULTIMODEINPUTCHANNEL voor de deurbel\nVoeg klep positie toe voor FLOORMINAL\nVertaling:\nVertaling:",
+        "fr": "IMPORTANT: Node.js 12.x est maintenant nécessaire au minimum\nAjouter des champs additionnels pour MULTI_MODE_INPUT_CHANNEL pour Doorbell\nAjouter la position de la valve pour FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL\nAjouter plusieurs autres états pour SWITCH_CHANNEL, DIMMER_CHANNEL, WEATHER_SENSOR_CHANNEL, SHUTTER_CHANNEL\nAjouter le label de canal",
+        "it": "IMPORTANTE: Node.js 12.x è ora richiesto al minimo\nAggiungi ulteriori campi per MULTI_MODE_INPUT_CHANNEL per Doorbell\nAggiungi la posizione della valvola per FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL\nAggiungi più stati per SWITCH_CHANNEL, DIMMER_CHANNEL, WEATHER_SENSOR_CHANNEL, SHUTTER_CHANNEL\nAggiungi etichetta canale",
+        "es": "IMPORTANTE: Node.js 12.x se requiere ahora al mínimo\nAgregar campos adicionales para MULTI_MODE_INPUT_CHANNEL para Doorbell\nAñadir la posición de la válvula para FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL\nAñadir varios estados más para SWITCH_CHANNEL, DIMMER_CHANNEL, WEATHER_SENSOR_CHANNEL, SHUTTER_CHANNEL\nAñadir etiqueta de canal",
+        "pl": "IMPORTANT: Nodejs 12.x jest obecnie wymagany przy minimalnej liczbie\nWspomnienia dla MULTI_MODE_INPUT_CHANNEL dla Doorbelly\nPozycja zaworu dla FLOOR_TERMINAL_BLOCK_MECHANNEL\nWspierał kilka kolejnych stanów: SWITCH_CHANNEL, DIMMER_CHANNEL, WEATHER_SENSOR_CHANNEL, SHUTTER_CHANNEL\nKanał",
+        "zh-cn": "IMPORTANT:Nodejs 12x现在至少需要。\n增加MULTI_MODE_INPUT_CHANNEL for Doorbell\n增加民解力量(联尼特派团)的作用\n增加更多国家,以东南非投资中心,CHANNEL, DIMBA_CHANNEL, WEATHER_SEANNEL, SHUTTER_CHANNEL\n增加标签"
+      },
       "1.19.2": {
         "en": "Optimize Reconnect handling",
         "de": "Optimieren Sie Reconnect Handling",
@@ -74,18 +86,6 @@
         "es": "Arreglar el caso de bloqueo introducido por la última versión",
         "pl": "Napraw przypadek awarii wprowadzony przez ostatnią wersję",
         "zh-cn": "修复上一版本引入的崩溃案例"
-      },
-      "1.16.0": {
-        "en": "Optimize websocket reconnection handling\nAdd support for GENERIC_INPUT_CHANNEL",
-        "de": "Optimieren Sie die Handhabung der Websocket-Wiederverbindung\nUnterstützung für GENERIC_INPUT_CHANNEL hinzufügen",
-        "ru": "Оптимизация обработки повторного подключения через веб-сокет\nДобавить поддержку GENERIC_INPUT_CHANNEL",
-        "pt": "Otimize o manuseio de reconexão do websocket\nAdicionar suporte para GENERIC_INPUT_CHANNEL",
-        "nl": "Optimaliseer de afhandeling van het opnieuw verbinden van de websocket\nOndersteuning toevoegen voor GENERIC_INPUT_CHANNEL",
-        "fr": "Optimiser la gestion de la reconnexion des websockets\nAjouter la prise en charge de GENERIC_INPUT_CHANNEL",
-        "it": "Ottimizza la gestione della riconnessione del websocket\nAggiungi il supporto per GENERIC_INPUT_CHANNEL",
-        "es": "Optimizar el manejo de reconexión de websocket\nAgregar soporte para GENERIC_INPUT_CHANNEL",
-        "pl": "Zoptymalizuj obsługę ponownego połączenia websocket\nDodaj obsługę GENERIC_INPUT_CHANNEL",
-        "zh-cn": "优化 websocket 重连处理\n添加对 GENERIC_INPUT_CHANNEL 的支持"
       }
     },
     "title": "HomeMaticIP Cloud AccessPoint",

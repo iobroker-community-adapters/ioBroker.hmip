@@ -64,8 +64,7 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 https://github.com/ioBroker/AdapterRequests/issues/62
 
 ## Changelog
-
-### __WORK IN PROGRESS__
+### 1.20.0 (2022-09-19)
 * IMPORTANT: Node.js 12.x is now required at minimum
 * Add additional fields for MULTI_MODE_INPUT_CHANNEL for Doorbell
 * Add valve position for FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL
