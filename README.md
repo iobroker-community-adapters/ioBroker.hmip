@@ -66,6 +66,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 ## Changelog
 
 ### __WORK IN PROGRESS__
+* IMPORTANT: Node.js 12.x is now required at minimum
 * Add additional fields for MULTI_MODE_INPUT_CHANNEL for Doorbell
 * Add valve position for FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL
 * Add several more states for SWITCH_CHANNEL, DIMMER_CHANNEL, WEATHER_SENSOR_CHANNEL, SHUTTER_CHANNEL 
