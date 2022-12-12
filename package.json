@@ -46,7 +46,7 @@
     "chai": "^4.3.7",
     "gulp": "^4.0.2",
     "mocha": "^10.2.0",
-    "@vitalets/google-translate-api": "^8.0.0",
+    "@vitalets/google-translate-api": "^9.0.0",
     "configstore": "^6.0.0",
     "axios": "^0.27.2",
     "@iobroker/testing": "^4.1.0"
