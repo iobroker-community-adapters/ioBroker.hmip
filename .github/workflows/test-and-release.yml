@@ -39,9 +39,11 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-
       - name: Install Dependencies
         run: npm ci
+
+      - name: Build
+        run: npm run build
 
 #      - name: Perform a type check
 #        run: npm run check:ts
@@ -74,7 +76,10 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-#      - name: Run local tests
+      - name: Build
+        run: npm run build
+
+      #      - name: Run local tests
 #        run: npm test
       - name: Run unit tests
         run: npm run test:unit
@@ -125,8 +130,9 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-#      - name: Create a clean build
-#        run: npm run build
+      - name: Create a clean build
+        run: npm run build
+
       - name: Publish package to npm
         run: |
           npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
@@ -141,7 +147,7 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release v${{ steps.extract_release.outputs.VERSION }}
           draft: false
-          # Prerelease versions create prereleases on Github
+          # Prerelease versions create prereleases on GitHub
           prerelease: ${{ contains(steps.extract_release.outputs.VERSION, '-') }}
           body: ${{ steps.extract_release.outputs.BODY }}
 
