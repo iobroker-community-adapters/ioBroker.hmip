@@ -68,6 +68,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 ### **WORK IN PROGRESS**
 * (bluefox) IMPORTANT: Node.js 16.x is now required at a minimum
 * (bluefox) replaced module `require` with `axios`
+* (bluefox) Added JSON config
 * (ChristianFue) Added support for Hmip-RGBW 
 
 ### 1.20.0 (2022-09-19)
@@ -111,7 +112,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 * (Apollon77) Added experimental support to set dimLevel for Multi Mode Input Dimmer channels
 
 ### 1.16.1 (2022-04-19)
-* (Apollon77) Fix crash case introduced by last version
+* (Apollon77) Fixed a crash case introduced by last version
 
 ### 1.16.0 (2022-04-16)
 * (Apollon77) Optimize websocket reconnection handling
@@ -132,11 +133,11 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 * (Apollon77) Wait 10s until no new "unknown state update" was received before updating the whole system
 
 ### 1.15.0 (2022-01-02)
-* Node.js 10.x is now minimum required version for this adapter
+* Node.js 10.x is now the minimum required version for this adapter
 * (Apollon77) Optimize WebSocket reconnection Logic
 * (Apollon77) Optimize current value handling and re-set value if a state change is not processed because of an unchanged value
-* (Apollon77) Implement startImpulse call for ImpulseOutputChannels for e.g. HM-WGC
-* (Apollon77) Implement support for HMIP-DLD to set the lock state and also an option PIN if needed (see notes above)
+* (Apollon77) Implemented startImpulse call for ImpulseOutputChannels for e.g., HM-WGC
+* (Apollon77) Implemented support for HMIP-DLD to set the lock state and also an option PIN if needed (see notes above)
 * (Apollon77) Detect new and unknown devices and channels and reinitialize the structure to add the new objects on the fly
 * (Apollon77) Implement DOOR_LOCK_SENSOR_CHANNEL
 * (Apollon77) Ignore HEAT_DEMAND_CHANNEL, DEHUMIDIFIER_DEMAND_CHANNEL, FLOOR_TERMINAL_BLOCK_CHANNEL and CHANGE_OVER_CHANNEL because no data to prevent logs
@@ -145,7 +146,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 ### 1.14.0 (2021-11-07)
 * (Apollon77) Lower loglevel for state change logs to debug
 * (Apollon77) Add verification when reading some data to prevent crashes
-* (Apollon77) Removed some generic (error/info) states that only exists on chosen devices to re-add later in a generic way
+* (Apollon77) Removed some generic (error/info) states that only exist on chosen devices to re-add later in a generic way
 
 ### 1.13.2 (2021-08-25)
 * (Apollon77) Fix warning on js-controller 3.3 with two datapoints
@@ -204,10 +205,10 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 * (Apollon77) ignore DEVICE_CHANNEL_EVENT for now and also log as debug to not flood log
 
 ### 1.5.0 (2020-11-09)
-* (Apollon77) Add control options for primary/secondaryShadingLevel datapoints
+* (Apollon77) Add control options for primary/secondaryShadingLevel data points
 
 ### 1.4.1 (2020-11-03)
-* (Apollon77) fix potential crash case (Sentry IOBROKER-HMIP-1N)
+* (Apollon77) fixed a potential crash case (Sentry IOBROKER-HMIP-1N)
 
 ### 1.4.0 (2020-10-29)
 * (Apollon77) Add ROTARY_WHEEL_CHANNEL and RAIN_DETECTION_CHANNEL, ACCESS_CONTROLLER_WIRED_CHANNEL
@@ -227,7 +228,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 * (Apollon77) Prevent Crash case (Sentry IOBROKER-HMIP-1B)
 
 ### 1.2.1 (2020-08-10)
-* (Apollon77) Fix pairing process
+* (Apollon77) Fixed a pairing process
 
 ### 1.2.0 (2020-07-26)
 * (saschaabraham) Added an active property INTERNAL and EXTERNAL groups for alarm zones
@@ -237,9 +238,9 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 * (Apollon77) Crash prevented if object is deleted by state changed (Sentry IOBROKER-HMIP-Y)
 
 ### 1.1.0 (2020-07-14)
-* (Apollon77) Remember already sent unknown channel infos to not spam Sentry
+* (Apollon77) Remember already sent unknown channel info to not spam Sentry
 * (Apollon77) Handle reconnects better (Sentry IOBROKER-HMIP-G)
-* (Apollon77) Try to prevent crashes on i valid server reponses, warning is logged
+* (Apollon77) Try to prevent crashes on invalid server responses, warning is logged
 * (SliX185) Add HMIP-SPDR (PASSAGE_DETECTOR_CHANNEL)
 
 ### 1.0.1 (2020-05-16)
@@ -255,7 +256,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 * (ApolloSK) add vaporAmount for WeatherSensorPro
 * (ApolloSK) fix HmIP-SWO-PR wrong DataType actualTemperature
 * (marcus0303) Added DEVICE_GLOBAL_PUMP_CONTROL, FLOOR_TERMINAL_BLOCK_LOCAL_PUMP_CHANNEL and DEVICE_INCORRECT_POSITIONED, Fixed role in _createWaterSensorChannel and function call in _createWeatherSensorPlusChannel
-* (marcus0303) Added CONTACT_INTERFACE_CHANNEL for HmIP-SCI (see Issue #70 ), Added FLOOR_TERMINAL_BLOCK_CHANNEL, HEAT_DEMAND_CHANNEL, DEHUMIDIFIER_DEMAND_CHANNEL, CHANGE_OVER_CHANNEL, but without functionality, because it's not implemented in REST-API. Only to supress Warnings in Log.
+* (marcus0303) Added CONTACT_INTERFACE_CHANNEL for HmIP-SCI (see Issue #70), Added FLOOR_TERMINAL_BLOCK_CHANNEL, HEAT_DEMAND_CHANNEL, DEHUMIDIFIER_DEMAND_CHANNEL, CHANGE_OVER_CHANNEL, but without functionality, because it's not implemented in REST-API. Only to supress Warnings in Log.
 
 ### 0.0.12
 * (jogibear9988) multiple fixes

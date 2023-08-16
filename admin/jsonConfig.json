@@ -1,0 +1,99 @@
+{
+  "i18n": true,
+  "type": "panel",
+  "items": {
+    "_info1": {
+      "type": "staticText",
+      "text": "caution - this adapter is only for communication with a homematic ip cloudaccesspoint",
+      "style": {
+        "fontSize": 20
+      },
+      "sm": 12
+    },
+    "_info2": {
+      "type": "staticText",
+      "text": "Enter Access point Sgtin & pin here and press 'Create token' button",
+      "sm": 12,
+      "hidden": "!!data.authToken"
+    },
+    "accessPointSgtin": {
+      "label": "accesspoint sgtin",
+      "newLine": true,
+      "type": "text",
+      "sm": 12,
+      "lg": 8
+    },
+    "deviceName": {
+      "newLine": true,
+      "label": "device name",
+      "help": "name for the device shown in the app",
+      "type": "text",
+      "sm": 12,
+      "md": 6,
+      "lg": 4
+    },
+    "deviceId": {
+      "label": "device id",
+      "type": "text",
+      "help": "id for your homematic device, leave empty or reuse already created one (if you remove adapter and install again)",
+      "sm": 12,
+      "md": 6,
+      "lg": 4
+    },
+    "pin": {
+      "newLine": true,
+      "label": "pin",
+      "type": "text",
+      "sm": 12,
+      "md": 4,
+      "lg": 2
+    },
+    "_custom": {
+      "newLine": true,
+      "type": "custom",
+      "sm": 12,
+      "md": 6,
+      "lg": 6,
+      "i18n": true,
+      "url": "custom/customComponents.js",
+      "name": "ConfigCustomHmipSet/Components/HmipComponent"
+    },
+    "_header": {
+      "newLine": true,
+      "type": "header",
+      "size": 4,
+      "text": "token data",
+      "sm": 12
+    },
+    "_info": {
+      "newLine": true,
+      "style": {
+        "fontSize": 14
+      },
+      "type": "staticText",
+      "text": "normally filled by token creation",
+      "sm": 12
+    },
+    "authToken": {
+      "newLine": true,
+      "label": "authToken",
+      "type": "text",
+      "sm": 12,
+      "md": 4
+    },
+    "clientAuthToken": {
+      "newLine": true,
+      "label": "clientAuthToken",
+      "type": "text",
+      "sm": 12,
+      "md": 4
+    },
+    "clientId": {
+      "newLine": true,
+      "label": "clientId",
+      "type": "text",
+      "sm": 12,
+      "md": 4
+    }
+  }
+}

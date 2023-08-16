@@ -64,11 +64,12 @@
     "test:package": "mocha test/package --exit",
     "test:unit": "mocha test/unit --exit",
     "test:integration": "mocha test/integration --exit",
+    "build": "gulp",
     "release": "release-script",
     "release-patch": "release-script patch --yes --no-update-lockfile",
     "release-minor": "release-script minor --yes --no-update-lockfile",
     "release-major": "release-script major --yes --no-update-lockfile",
-    "update-packages": "ncu --upgrade"
+    "update-packages": "ncu --upgrade && cd src-admin && ncu --upgrade"
   },
   "bugs": {
     "url": "https://github.com/iobroker-community-adapters/ioBroker.hmip/issues"

@@ -103,7 +103,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     async _ready() {
         // set UUID if not set
         if (!this.config.deviceId) {
-            const config = this.getForeignObjectAsync(`system.adapter.${this.namespace}`);
+            const config = await this.getForeignObjectAsync(`system.adapter.${this.namespace}`);
             config.native.deviceId = uuidv4();
             await this.setForeignObjectAsync(config._id, config);
             return;

@@ -1,0 +1,47 @@
+{
+    "name": "iobroker-admin-component-hmip",
+    "private": true,
+    "version": "1.20.0",
+    "scripts": {
+        "start": "set PORT=4173 && craco start",
+        "build": "craco build"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+        "@emotion/react": "^11.11.1",
+        "@emotion/styled": "^11.11.0",
+        "@iobroker/adapter-react-v5": "^4.4.7",
+        "@mui/material": "^5.14.5",
+        "@mui/styles": "^5.14.5",
+        "@mui/icons-material": "^5.14.3",
+        "prop-types": "^15.8.1",
+        "react": "^18.2.0",
+        "react-ace": "^10.1.0",
+        "react-dom": "^18.2.0",
+        "react-scripts": "^5.0.1",
+        "react-refresh": "^0.14.0",
+        "@originjs/vite-plugin-federation": "^1.2.3",
+        "@rollup/plugin-babel": "^6.0.3",
+        "@rollup/plugin-commonjs": "^25.0.4",
+        "@rollup/plugin-node-resolve": "^15.1.0",
+        "@rollup/plugin-replace": "^5.0.2",
+        "@types/react": "^18.2.20",
+        "@types/react-dom": "^18.2.7",
+        "@craco/craco": "^7.1.0",
+        "craco-esbuild": "^0.5.2",
+        "craco-module-federation": "^1.1.0"
+    },
+    "browserslist": {
+        "production": [
+            ">0.2%",
+            "not dead",
+            "not op_mini all"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ]
+    }
+}
