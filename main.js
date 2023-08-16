@@ -941,6 +941,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     case 'FLOOR_TERMINAL_BLOCK_CHANNEL':
                         this.log.silly(`Ignore channel type ${fc.functionalChannelType} - ${JSON.stringify(device)}`);
                         break;
+                    case 'UNIVERSAL_LIGHT_CHANNEL':
+                        promises.push(...this._updateUniversalLightChannelStates(device, i));
+                        break;
                     default:
                         if (Object.keys(fc).length <= 6) { // we only have the minimum fields, so nothing to display
                             break;
@@ -1374,6 +1377,15 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     _updateDimmerChannelStates(device, channel) {
+        let promises = [];
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.dimLevel`, device.functionalChannels[channel].dimLevel, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.on`, device.functionalChannels[channel].on, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.profileMode`, device.functionalChannels[channel].profileMode, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.userDesiredProfileMode`, device.functionalChannels[channel].userDesiredProfileMode, true));
+        return promises;
+    }
+
+    _updateUniversalLightChannelStates(device, channel) {
         let promises = [];
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.dimLevel`, device.functionalChannels[channel].dimLevel, true));
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.on`, device.functionalChannels[channel].on, true));
@@ -1830,7 +1842,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     promises.push(...this._createWeatherSensorProChannel(device, i));
                     break;
                 case 'SHUTTER_CHANNEL':
-                    promises.push(...this._createShutterChannel(device, i));
+                    promises.push(...this._createShutterChannel(device, i)); 
                     break;
                 case 'MOTION_DETECTION_CHANNEL':
                     promises.push(...this._createMotionDetectionChannel(device, i));
@@ -1946,6 +1958,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 case 'CHANGE_OVER_CHANNEL':
                 case 'FLOOR_TERMINAL_BLOCK_CHANNEL':
                     this.log.silly(`Ignore channel type ${fc.functionalChannelType} - ${JSON.stringify(device)}`);
+                    break;
+                case 'UNIVERSAL_LIGHT_CHANNEL':
+                    promises.push(...this._createUniversalLightChannel(device, i));
                     break;
                 default:
                     this.log.info(`Unknown channel type - ${fc.functionalChannelType} - ${JSON.stringify(device)}`);
@@ -2334,6 +2349,15 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     _createDimmerChannel(device, channel) {
+        let promises = [];
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.dimLevel`, { type: 'state', common: { name: 'dimLevel', type: 'number', role: 'level.dimmer', read: true, write: true, min: 0, max: 100 }, native: { id: device.id, channel: channel, parameter: 'setDimLevel' } }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.on`, { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'switchState' } }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.profileMode`, { type: 'state', common: { name: 'profileMode', type: 'string', states: {'AUTOMATIC': 'AUTOMATIC', 'MANUAL': 'MANUAL'}, role: 'text', read: true, write: true }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.userDesiredProfileMode`, { type: 'state', common: { name: 'userDesiredProfileMode', type: 'string', states: {'AUTOMATIC': 'AUTOMATIC', 'MANUAL': 'MANUAL'}, role: 'text', read: true, write: true }, native: {} }));
+        return promises;
+    }
+
+    _createUniversalLightChannel(device, channel) {
         let promises = [];
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.dimLevel`, { type: 'state', common: { name: 'dimLevel', type: 'number', role: 'level.dimmer', read: true, write: true, min: 0, max: 100 }, native: { id: device.id, channel: channel, parameter: 'setDimLevel' } }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.on`, { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'switchState' } }));
