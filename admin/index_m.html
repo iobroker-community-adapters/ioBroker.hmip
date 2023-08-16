@@ -12,18 +12,21 @@
     <script type="text/javascript" src="../../js/adapter-settings.js"></script>
 
     <script type="text/javascript" src="words.js"></script>
-
-    <script type="text/javascript" src="uuid.js"></script>
     <style>
-        .m .col .select-wrapper+label {
-   top: -26px;  
-  }
-     .m span{
-         font-size: 0.9em;
-     }
- </style>
-    <script type="text/javascript">
+        .m .col .select-wrapper + label {
+            top: -26px;
+        }
 
+        .m span {
+            font-size: 0.9em;
+        }
+        .sub-title {
+            padding: 0.5rem;
+            background: #2196f3;
+            color: white;
+        }
+    </style>
+    <script type="text/javascript">
         var theOnChange;
         function handleResponse(response) {
             switch (response.state) {
@@ -36,13 +39,13 @@
                 case 'confirmToken':
                     $('#deviceInfo').text('confirming token');
                     return true;
-                case 'errorOccured':
-                    $('#deviceInfo').text('error occured during token generation, look at the logs');
-                    $('#table-button-create').prop("disabled", false);
+                case 'errorOccurred':
+                    $('#deviceInfo').text('error occurred during token generation, look at the logs');
+                    $('#table-button-create').prop('disabled', false);
                     break;
                 case 'idle':
                     $('#deviceInfo').text("press 'start token creation'");
-                    $('#table-button-create').prop("disabled", false);
+                    $('#table-button-create').prop('disabled', false);
                     break;
                 case 'tokenCreated': {
                     $('#authToken').val(response.authToken);
@@ -51,14 +54,14 @@
                     $('#deviceInfo').text('token created, save settings to use your accesspoint');
                     theOnChange();
                     M.updateTextFields();
-                    $('#table-button-create').prop("disabled", false);
+                    $('#table-button-create').prop('disabled', false);
                     break;
                 }
             }
             return false;
         }
         function requestToken() {
-            $('#table-button-create').prop("disabled", true);
+            $('#table-button-create').prop('disabled', true);
             let accessPointSgtin = $('#accessPointSgtin').val();
             let clientId = $('#clientId').val();
             let pin = $('#pin').val();
@@ -71,23 +74,28 @@
             }
             $('#deviceInfo').text('started token creation');
             sendTo(null, 'requestToken', config, function (response) {
-                if (handleResponse(response))
+                if (handleResponse(response)) {
                     sendrequestTokenState();
+                }
             });
         }
 
         function sendrequestTokenState() {
             sendTo(null, 'requestTokenState', null, function (response) {
-                if (handleResponse(response))
-                    sendrequestTokenState();
+                if (handleResponse(response)) {
+                    setTimeout(function () {
+                        sendrequestTokenState();
+                    }, 300);
+                }
             });
         }
 
         // the function loadSettings has to exist ...
         function load(settings, onChange) {
             // example: select elements with id=key and class=value and insert value
-            if (!settings) return;
-            if (settings.deviceId === undefined) settings.deviceId = UUID.genV4();
+            if (!settings) {
+                return;
+            }
             $('.value').each(function () {
                 var $key = $(this);
                 var id = $key.attr('id');
@@ -128,15 +136,6 @@
 
         setTimeout(() => sendrequestTokenState(), 100);
     </script>
-
-    <style>
-        .sub-title {
-            padding: 0.5rem;
-            background: #2196f3;
-            color: white;
-        }
-    </style>
-
 </head>
 
 <body>
@@ -148,12 +147,10 @@
                     <img src="homematic.png" class="logo">
                 </div>
                 <div class="col s12">
-                    <p class="translate">caution - this adapter is only for communication with a homatic ip
+                    <p class="translate">caution - this adapter is only for communication with a homematic ip
                         cloudaccesspoint</p>
                 </div>
             </div>
-
-
 
             <div class="row">
                 <div class="col s12">
@@ -168,8 +165,8 @@
             </div>
             <div class="row">
                 <div class="col s12">
-                    <input class="value" id="accessPointSgtin" /><label for="accessPointSgtin" class="translate">accesspoint
-                        sgtin</label>
+                    <input class="value" id="accessPointSgtin" />
+                    <label for="accessPointSgtin" class="translate">accesspoint sgtin</label>
                 </div>
             </div>
             <div class="row">
@@ -178,21 +175,24 @@
                     <input class="value" id="deviceName" /><label for="deviceName" class="translate">device name</label>
                 </div>
                 <div class="col s12 m6 l6">
-                    <p class="translate">id for your homatic device, leave empty or reuse already created one (if you
+                    <p class="translate">id for your homematic device, leave empty or reuse already created one (if you
                         remove adapter and install again)</p>
-                    <input class="value" id="deviceId" /><label for="deviceId" class="translate">device id</label>
+                    <input class="value" id="deviceId" />
+                    <label for="deviceId" class="translate">device id</label>
                 </div>
             </div>
             <div class="row">
                 <div class="col s12">
-                    <input class="value" id="pin" /><label for="pin" class="translate">pin</label>
+                    <input class="value" id="pin" />
+                    <label for="pin" class="translate">pin</label>
                 </div>
                 <div class="col s12 m6 l4">
                     <button disabled id="table-button-create" class="waves-effect waves-light btn" style="margin-top: 20px;"
-                        onclick="requestToken()"><span class="translate">start token creation</span></button>
+                        onclick="requestToken()">
+                        <span class="translate">start token creation</span>
+                    </button>
                 </div>
-                <div id="deviceInfo" class="col s12 m6 l4" style="background: lightgrey; height: 60px; color:black; display: flex; justify-content: center; align-items: center;"
-                    class="translate">
+                <div id="deviceInfo" class="col s12 m6 l4 translate" style="background: lightgrey; height: 60px; color:black; display: flex; justify-content: center; align-items: center;">
                     please start adapter so token could be created
                 </div>
             </div>

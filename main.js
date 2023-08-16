@@ -4,7 +4,7 @@
 
 const utils = require('@iobroker/adapter-core'); // Get common adapter utils
 const apiClass = require('./api/hm-cloud-api.js');
-const delay = require('delay');
+const { v4: uuidv4 } = require('uuid');
 
 const adapterName = require('./package.json').name.split('.').pop();
 
@@ -60,7 +60,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     async _message(msg) {
-        this.log.debug(`message recieved - ${JSON.stringify(msg)}`);
+        this.log.debug(`message received - ${JSON.stringify(msg)}`);
         switch (msg.command) {
             case 'requestToken':
                 this._requestTokenState = { state: 'startedTokenCreation' };
@@ -84,7 +84,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             this.log.info('auth step 2');
             while (!await this._api.auth2isRequestAcknowledged() && !this._unloaded) {
                 this._requestTokenState = { state: 'waitForBlueButton' };
-                await delay(2000);
+                await new Promise(resolve => setTimeout(resolve, 2000));
             }
             if (!this._unloaded) {
                 this._requestTokenState = { state: 'confirmToken' };
@@ -94,14 +94,21 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 saveData.state = 'tokenCreated';
                 this._requestTokenState = saveData;
             }
-        }
-        catch (err) {
-            this._requestTokenState = { state: 'errorOccured' };
+        } catch (err) {
+            this._requestTokenState = { state: 'errorOccurred' };
             this.log.error(`error requesting token: ${err}`);
         }
     }
 
     async _ready() {
+        // set UUID if not set
+        if (!this.config.deviceId) {
+            const config = this.getForeignObjectAsync(`system.adapter.${this.namespace}`);
+            config.native.deviceId = uuidv4();
+            await this.setForeignObjectAsync(config._id, config);
+            return;
+        }
+
         this.reInitTimeout && clearTimeout(this.reInitTimeout);
         this.log.debug('ready');
         this.setState('info.connection', false, true);
@@ -126,7 +133,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
                 await this._initData();
             } catch (err) {
-                this.log.error(`error starting homematic: ${err}`);
+                this.log.error(`error starting Homematic: ${err}`);
                 this.log.error('Try reconnect in 30s');
                 this.reInitTimeout && clearTimeout(this.reInitTimeout);
                 this.reInitTimeout = setTimeout(() => {
@@ -607,7 +614,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     _opened() {
-        this.log.info("ws connection opened");
+        this.log.info('ws connection opened');
         this.wsConnected = true;
         this.wsConnectionStableTimeout && clearTimeout(this.wsConnectionStableTimeout);
         this.wsConnectionStableTimeout = setTimeout(() => {
@@ -627,7 +634,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         this.wsConnected = false;
         if ((this.wsConnectionErrorCounter > 6 || reason.includes('ECONNREFUSED')) && !this._unloaded) {
             this._api.dispose();
-            this.log.error(`error updating homematic ip for unknown states: ${code} - ${reason}`);
+            this.log.error(`error updating Homematic ip for unknown states: ${code} - ${reason}`);
             this.log.error('Try reconnect in 30s');
             this.reInitTimeout && clearTimeout(this.reInitTimeout);
             this.reInitTimeout = setTimeout(() => {
@@ -696,7 +703,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     await this._updateHomeStates(ev.home);
                 } else {
                     this.log.debug(`Read Home for SECURITY_JOURNAL_CHANGED: ${JSON.stringify(ev)}`);
-                    let state = await this._api.callRestApi('home/getCurrentState', this._api._clientCharacteristics);
+                    const state = await this._api.callRestApi('home/getCurrentState', this._api._clientCharacteristics);
                     state && state.home && await this._updateHomeStates(state.home);
                 }
                 break;
@@ -753,7 +760,6 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 }
 
                 switch (fc.functionalChannelType) {
-
                     case 'DEVICE_OPERATIONLOCK':
                         promises.push(...this._updateDeviceOperationLockChannelStates(device, i));
                         break;
@@ -982,7 +988,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             try {
                 await this._initData();
             } catch (err) {
-                this.log.error(`error updating homematic ip for unknown states: ${err}`);
+                this.log.error(`error updating Homematic ip for unknown states: ${err}`);
                 this.log.error('Try reconnect in 30s');
                 this.reInitTimeout && clearTimeout(this.reInitTimeout);
                 this.reInitTimeout = setTimeout(() => {
@@ -1842,7 +1848,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     promises.push(...this._createWeatherSensorProChannel(device, i));
                     break;
                 case 'SHUTTER_CHANNEL':
-                    promises.push(...this._createShutterChannel(device, i)); 
+                    promises.push(...this._createShutterChannel(device, i));
                     break;
                 case 'MOTION_DETECTION_CHANNEL':
                     promises.push(...this._createMotionDetectionChannel(device, i));

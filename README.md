@@ -16,34 +16,32 @@
 **HomeMatic is a trademark of ELV Elektronik AG**
 
 ## Description
-This adapter allows the communication with a HomematicIP CloudAccessPoint via the Rest API of the Homematic IP Cloud
+This adapter allows communication with a HomematicIP CloudAccessPoint via the Rest API of the Homematic IP Cloud
 
 **Important note:** Please limit control requests to the bare minimum because EQ-3 started to block IPs when you do too much!
 
 ## Installation
 This Adapter needs node-js in version >= 10.0
 
-Here a Step-by-Step Installation Video on YouTube 
+Here is a Step-by-Step Installation Video on YouTube 
 https://youtu.be/kXWfJRUYJIA
 
 ## Info
-
 Most Homematic IP devices are already working with the latest adapter version. 
 
-I will improve it constantly, but it will take time. Any help from the community thru e.g. Pull Request would be highly appreciated.
+I will improve it constantly, but it will take time. Any help from the community through e.g. Pull Request would be highly appreciated.
 
-For not working HmIP devices, please create an issue with this info (please one per device and if possible the technical name in the subject).
-Switch adapter logging in ioBroker to silly mode and add the json of the device which is printed to the log in the issue.
+For not working HmIP devices, please create an issue with this info (please one per device and if possible, the technical name in the subject).
+Switch adapter logging in ioBroker to silly mode and add the json of the device, which is printed to the log in the issue.
 I may also need a json of a state change.
 
-Thank you
+Thank you!
 
-If you are looking for the information, if the alarm settings are active you have to check the active status of the group INTERNAL and EXTERNAL, they represent in combination the three alarm states. INTERNAL and EXTERNAL actives means Away, only EXTERNAL active means only Perimeter active.
+If you are looking for the information, if the alarm settings are active, you have to check the active status of the group INTERNAL and EXTERNAL, they represent in combination the three alarm states. INTERNAL and EXTERNAL actives means Away, only EXTERNAL active means only Perimeter active.
 
 ## Important Info what can be done with this adapter
-
 !!! You can only trigger events with this adapter that can be triggered through the original Homematic IP app. 
-For example direct connections between devices have no events in the app and can also not be triggert through this adapter!!! 
+For example, direct connections between devices have no events in the app and can also not be triggert through this adapter!!! 
 
 ## Settings
 * enter your SGTIN (back of the Access Point) and the PIN (if set before), and validate the data via press of the blue LED Button. This will create an Authentication token.
@@ -51,21 +49,29 @@ For example direct connections between devices have no events in the app and can
 ## Special settings
 
 ### HMIP-DLD (Door Lock Drive)
-If you have assigned a PIN to the lock in HmIP app (Settings / Access authorizations - German: "Zutrittsberechtigungen") then the PIN needs to be set in the pin state of the devices objects. It is NOT your system PIN!! if you have not set a PIN in settings you can also leave empty in the pin state.
-Additionally please add "iobroker" client to the list of access control clients in HmIP app settings!
+If you have assigned a PIN to the lock in HmIP app (Settings / Access authorizations - German: "Zutrittsberechtigungen") then the PIN needs to be set in the pin state of the device's objects. It is NOT your system PIN!! if you have not set a PIN in settings, you can also leave empty in the pin state.
+Additionally, please add "iobroker" client to the list of access control clients in HmIP app settings!
 
 ## Thanks
 * to @coreGreenberet for his python lib (https://github.com/coreGreenberet/homematicip-rest-api)
-* 
+
 ## Diskussion in ioBroker Forum
 https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 
 ## Adapter Request auf GitHub
 https://github.com/ioBroker/AdapterRequests/issues/62
 
+<!--
+    ### **WORK IN PROGRESS**
+-->
 ## Changelog
+### **WORK IN PROGRESS**
+* (bluefox) IMPORTANT: Node.js 16.x is now required at a minimum
+* (bluefox) replaced module `require` with `axios`
+* (ChristianFue) Added support for Hmip-RGBW 
+
 ### 1.20.0 (2022-09-19)
-* IMPORTANT: Node.js 12.x is now required at minimum
+* IMPORTANT: Node.js 12.x is now required at a minimum
 * Add additional fields for MULTI_MODE_INPUT_CHANNEL for Doorbell
 * Add valve position for FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL
 * Add several more states for SWITCH_CHANNEL, DIMMER_CHANNEL, WEATHER_SENSOR_CHANNEL, SHUTTER_CHANNEL 
@@ -290,7 +296,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 ## License
 The MIT License (MIT)
 
-Copyright (c) 2018-2022 jogibear9988 <jochen.kuehner@gmx.de>, Apollon77
+Copyright (c) 2018-2023 jogibear9988 <jochen.kuehner@gmx.de>, Apollon77
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
