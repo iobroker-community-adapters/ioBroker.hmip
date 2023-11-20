@@ -48,7 +48,7 @@
     "mocha": "^10.2.0",
     "@vitalets/google-translate-api": "^9.1.0",
     "configstore": "^6.0.0",
-    "axios": "^1.6.1",
+    "axios": "^1.6.2",
     "@iobroker/testing": "^4.1.0"
   },
   "main": "main.js",
