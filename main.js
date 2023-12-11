@@ -999,7 +999,6 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     /* Start Channel Types */
     _updateDeviceEnergySensorChannelStates(device, channel) {
         let promises = [];
-        promises.push(...this._updateWeatherSensorPlusChannelStates(device, channel));
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.gasVolumePerImpulse`, device.functionalChannels[channel].gasVolumePerImpulse, true));
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.impulsesPerKWH`, device.functionalChannels[channel].impulsesPerKWH, true));
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.connectedEnergySensorType`, device.functionalChannels[channel].connectedEnergySensorType, true));
