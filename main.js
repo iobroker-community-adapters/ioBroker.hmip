@@ -944,6 +944,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     case 'UNIVERSAL_LIGHT_CHANNEL':
                         promises.push(...this._updateUniversalLightChannelStates(device, i));
                         break;
+		    case 'ENERGY_SENSORS_INTERFACE_CHANNEL':
+			promises.push(...this._updateEnergySensorsInterfaceChannelStates(device, i));
+                        break;
                     default:
                         if (Object.keys(fc).length <= 6) { // we only have the minimum fields, so nothing to display
                             break;
@@ -1589,6 +1592,17 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         return promises;
     }
 
+    _updateupdateEnergySensorsInterfaceChannelStates(device, channel) {
+        let promises = [];
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.currentPowerConsumption`, device.functionalChannels[channel].currentPowerConsumption, true));
+	promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.gasFlow`, device.functionalChannels[channel].gasFlow, true));
+	promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.gasVolume`, device.functionalChannels[channel].gasVolume, true));
+	promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.energyCounterOne`, device.functionalChannels[channel].energyCounterOne, true));
+	promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.energyCounterTwo`, device.functionalChannels[channel].energyCounterTwo, true));
+	promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.energyCounterThree`, device.functionalChannels[channel].energyCounterThree, true));
+        return promises;
+    }
+
     /* End Channel Types */
 
     _updateGroupStates(group) {
@@ -1961,6 +1975,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     break;
                 case 'UNIVERSAL_LIGHT_CHANNEL':
                     promises.push(...this._createUniversalLightChannel(device, i));
+                    break;
+		case 'ENERGY_SENSORS_INTERFACE_CHANNEL':
+                    promises.push(...this._createEnergySensorsInterfaceChannel(device, i));
                     break;
                 default:
                     this.log.info(`Unknown channel type - ${fc.functionalChannelType} - ${JSON.stringify(device)}`);
@@ -2567,6 +2584,17 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.motionDetectionSendInterval`, { type: 'state', common: { name: 'motionDetectionSendInterval', type: 'string', states:{'SECONDS_30': 'SECONDS_30','SECONDS_60': 'SECONDS_60','SECONDS_120': 'SECONDS_120','SECONDS_240': 'SECONDS_240','SECONDS_480': 'SECONDS_480'}, role: 'text', read: false, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.motionBufferActive`, { type: 'state', common: { name: 'motionBufferActive', type: 'boolean', role: 'switch', read: false, write: true }, native: { id: device.id, channel: channel, parameter: 'switchState' } }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.numberOfBrightnessMeasurements`, { type: 'state', common: { name: 'numberOfBrightnessMeasurements', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
+    _createEnergySensorsInterfaceChannel(device, channel) {
+        let promises = [];
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.currentPowerConsumption`, { type: 'state', common: { name: 'currentPowerConsumption', type: 'number', role: 'value', read: true, write: true, min: 0, max: 100 }, native: { id: device.id, channel: channel, parameter: 'currentPowerConsumption' } }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.gasFlow`, { type: 'state', common: { name: 'gasFlow', type: 'number', role: 'value', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'gasFlow' } }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.gasVolume`, { type: 'state', common: { name: 'gasVolume', type: 'number', role: 'value', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'gasVolume' } }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.energyCounterOne`, { type: 'state', common: { name: 'energyCounterOne', type: 'number', role: 'value', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'energyCounterOne' } }));
+	promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.energyCounterTwo`, { type: 'state', common: { name: 'energyCounterTwo', type: 'number', role: 'value', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'energyCounterTwo' } }));
+	promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.energyCounterThree`, { type: 'state', common: { name: 'energyCounterThree', type: 'number', role: 'value', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'energyCounterThree' } }));
         return promises;
     }
 
