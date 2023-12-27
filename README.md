@@ -68,10 +68,9 @@ https://github.com/ioBroker/AdapterRequests/issues/62
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### 1.21.0-alpha.1 (2023-12-27)
+### **WORK IN PROGRESS**
+- (ApolloSK) Implement ENERGY_SENSORS_INTERFACE_CHANNEL
 - (mcm1957) Standard workflows and testing have been updated.
-
-### 1.21.0-alpha.0 (2023-12-27)
 - (mcm1957) Adapter requires nodejs 16 or newer now.
 - (mcm1957) Dependencies have been updated.
 
