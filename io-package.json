@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.20.0",
+    "version": "1.21.0-alpha.0",
     "news": {
+      "1.21.0-alpha.0": {
+        "en": "Adapter requires nodejs 16 or newer now.\nDependencies have been updated.",
+        "de": "Adapter benötigt jetzt Node-js 16 oder neuer.\nAbhängigkeiten wurden aktualisiert.",
+        "ru": "Адаптер требует nodejs 16 или новее теперь.\nОбновлены зависимости.",
+        "pt": "Adaptador requer nodejs 16 ou mais recente agora.\nAs dependências foram atualizadas.",
+        "nl": "Adapter vereist nodejs 16 of Newer nu.\nAfhankelijkheid is geüpdateerd.",
+        "fr": "Adaptateur nécessite nodejs 16 ou plus maintenant.\nLes dépendances ont été mises à jour.",
+        "it": "Adattatore richiede nodejs 16 o più nuovo ora.\nLe dipendenze sono state aggiornate.",
+        "es": "Adaptador requiere nodejs 16 o más nuevo ahora.\nSe han actualizado las dependencias.",
+        "pl": "Adapter wymaga węzła 16 lub nowszych.\nW zależności zostały zaktualizowane.",
+        "uk": "Адаптер вимагає nodejs 16 або новіший зараз.\nОновлено залежність.",
+        "zh-cn": "现在需要16个或新人员。.\n情况已经更新。."
+      },
       "1.20.0": {
         "en": "IMPORTANT: Node.js 12.x is now required at minimum\nAdd additional fields for MULTI_MODE_INPUT_CHANNEL for Doorbell\nAdd valve position for FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL\nAdd several more states for SWITCH_CHANNEL, DIMMER_CHANNEL, WEATHER_SENSOR_CHANNEL, SHUTTER_CHANNEL \nAdd channel label",
         "de": "WICHTIG: Node.js 12.x ist jetzt mindestens erforderlich\nFügen Sie weitere Felder für MULTI_MODE_INPUT_CHANNEL für Doorbell hinzu\nVentilstellung für FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL hinzufügen\nFügen Sie mehrere Zustände für SWITCH_CHANNEL, DIMMER_CHANNEL, WEATHER_SENSOR_CHANNEL, SHUTTER_CHANNEL hinzu\nHinzufügen von Channel Label",
@@ -74,18 +87,6 @@
         "es": "También reinicializar objetos cuando se detectan nuevos grupos o clientes\nSe agregó soporte experimental para configurar dimLevel para canales de atenuación de entrada multimodo",
         "pl": "Ponowna inicjalizacja obiektów również po wykryciu nowych grup lub klientów\nDodano eksperymentalne wsparcie dla ustawienia poziomu dimLevel dla kanałów ściemniacza wejścia Multi Mode",
         "zh-cn": "当检测到新组或客户端时也重新初始化对象\n添加了为多模式输入调光器通道设置 dimLevel 的实验性支持"
-      },
-      "1.16.1": {
-        "en": "Fix crash case introduced by last version",
-        "de": "Absturzfall behoben, der in der letzten Version eingeführt wurde",
-        "ru": "Исправить случай сбоя, появившийся в последней версии",
-        "pt": "Corrigir caso de falha introduzido pela última versão",
-        "nl": "Fix crash case geïntroduceerd door de laatste versie",
-        "fr": "Correction du cas de crash introduit par la dernière version",
-        "it": "Risolto il caso di crash introdotto dall'ultima versione",
-        "es": "Arreglar el caso de bloqueo introducido por la última versión",
-        "pl": "Napraw przypadek awarii wprowadzony przez ostatnią wersję",
-        "zh-cn": "修复上一版本引入的崩溃案例"
       }
     },
     "title": "HomeMaticIP Cloud AccessPoint",
