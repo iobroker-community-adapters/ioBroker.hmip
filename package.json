@@ -34,8 +34,8 @@
     "@iobroker/adapter-core": "^3.0.4",
     "delay": "^5.0.0",
     "js-sha512": "^0.8.0",
-    "request-promise-native": "^1.0.9",
     "request": "^2.88.2",
+    "request-promise-native": "^1.0.9",
     "uuid": "^9.0.1",
     "ws": "^8.16.0"
   },
@@ -43,13 +43,14 @@
     "@alcalzone/release-script": "^3.7.0",
     "@alcalzone/release-script-plugin-iobroker": "^3.7.0",
     "@alcalzone/release-script-plugin-license": "^3.7.0",
-    "chai": "^4.3.10",
-    "gulp": "^4.0.2",
-    "mocha": "^10.2.0",
+    "@alcalzone/release-script-plugin-manual-review": "^3.7.0",
+    "@iobroker/testing": "^4.1.0",
     "@vitalets/google-translate-api": "^9.2.0",
-    "configstore": "^6.0.0",
     "axios": "^1.6.3",
-    "@iobroker/testing": "^4.1.0"
+    "chai": "^4.3.10",
+    "configstore": "^6.0.0",
+    "gulp": "^4.0.2",
+    "mocha": "^10.2.0"
   },
   "main": "main.js",
   "scripts": {
