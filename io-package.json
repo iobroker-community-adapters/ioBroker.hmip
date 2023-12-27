@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.21.0-alpha.0",
+    "version": "1.21.0-alpha.1",
     "news": {
+      "1.21.0-alpha.1": {
+        "en": "Standard workflows and testing have been updated.",
+        "de": "Standard-Workflows und Tests wurden aktualisiert.",
+        "ru": "Обновлены стандартные рабочие процессы и тестирование.",
+        "pt": "Fluxos de trabalho e testes padrão foram atualizados.",
+        "nl": "Standaardwerk en testen zijn geüpdateerd.",
+        "fr": "Des workflows et des tests standard ont été mis à jour.",
+        "it": "Sono stati aggiornati flussi di lavoro e test standard.",
+        "es": "Se han actualizado los flujos de trabajo y las pruebas estándar.",
+        "pl": "Standardowe przepływy pracy i testowania zostały zaktualizowane.",
+        "uk": "Оновлено стандартні робочі процеси та тестування.",
+        "zh-cn": "已更新了标准工作流程和试验。."
+      },
       "1.21.0-alpha.0": {
         "en": "Adapter requires nodejs 16 or newer now.\nDependencies have been updated.",
         "de": "Adapter benötigt jetzt Node-js 16 oder neuer.\nAbhängigkeiten wurden aktualisiert.",
@@ -75,18 +88,6 @@
         "es": "Apoyo añadido para PARTICULATE_MATTER_SENSOR_CHANNEL\nIgnorar correctamente algunos canales sin datos significativos",
         "pl": "Oficjalna strona PARTICULATE_MATTER_SENSOR_CHANELEL\nNiezwłocznie zignorować niektórych kanałów bez większych danych",
         "zh-cn": "加入《保护所有移徙工人及其家庭成员权利国际公约》\n正确地无视某些渠道而不提供有意义的数据"
-      },
-      "1.17.0": {
-        "en": "Also reinitialize objects when new groups or clients are detected\nAdded experimental support to set dimLevel for Multi Mode Input Dimmer channels",
-        "de": "Initialisieren Sie Objekte auch neu, wenn neue Gruppen oder Clients erkannt werden\nExperimentelle Unterstützung hinzugefügt, um dimLevel für Multi-Modus-Eingangsdimmerkanäle festzulegen",
-        "ru": "Также повторно инициализируйте объекты при обнаружении новых групп или клиентов.\nДобавлена экспериментальная поддержка установки dimLevel для каналов многорежимного входного диммера.",
-        "pt": "Também reinicialize objetos quando novos grupos ou clientes forem detectados\nAdicionado suporte experimental para definir dimLevel para canais Multi Mode Input Dimmer",
-        "nl": "Ook objecten opnieuw initialiseren wanneer nieuwe groepen of clients worden gedetecteerd\nExperimentele ondersteuning toegevoegd om dimLevel in te stellen voor Multi Mode Input Dimmer-kanalen",
-        "fr": "Réinitialise également les objets lorsque de nouveaux groupes ou clients sont détectés\nAjout d'un support expérimental pour définir dimLevel pour les canaux de gradateur d'entrée multimode",
-        "it": "Reinizializzare anche gli oggetti quando vengono rilevati nuovi gruppi o client\nAggiunto supporto sperimentale per impostare dimLevel per i canali Multi Mode Input Dimmer",
-        "es": "También reinicializar objetos cuando se detectan nuevos grupos o clientes\nSe agregó soporte experimental para configurar dimLevel para canales de atenuación de entrada multimodo",
-        "pl": "Ponowna inicjalizacja obiektów również po wykryciu nowych grup lub klientów\nDodano eksperymentalne wsparcie dla ustawienia poziomu dimLevel dla kanałów ściemniacza wejścia Multi Mode",
-        "zh-cn": "当检测到新组或客户端时也重新初始化对象\n添加了为多模式输入调光器通道设置 dimLevel 的实验性支持"
       }
     },
     "title": "HomeMaticIP Cloud AccessPoint",
