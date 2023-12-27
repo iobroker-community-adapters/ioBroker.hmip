@@ -754,6 +754,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
                 switch (fc.functionalChannelType) {
 
+                    case 'ENERGY_SENSORS_INTERFACE_CHANNEL':
+                        promises.push(...this._updateDeviceEnergySensorChannelStates(device, i));
+                        break;
                     case 'DEVICE_OPERATIONLOCK':
                         promises.push(...this._updateDeviceOperationLockChannelStates(device, i));
                         break;
@@ -994,6 +997,23 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     /* Start Channel Types */
+    _updateDeviceEnergySensorChannelStates(device, channel) {
+        let promises = [];
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.gasVolumePerImpulse`, device.functionalChannels[channel].gasVolumePerImpulse, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.impulsesPerKWH`, device.functionalChannels[channel].impulsesPerKWH, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.connectedEnergySensorType`, device.functionalChannels[channel].connectedEnergySensorType, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.currentPowerConsumption`, device.functionalChannels[channel].currentPowerConsumption, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.currentGasFlow`, device.functionalChannels[channel].currentGasFlow, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.gasVolume`, device.functionalChannels[channel].gasVolume, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.energyCounterOne`, device.functionalChannels[channel].energyCounterOne, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.energyCounterTwo`, device.functionalChannels[channel].energyCounterTwo, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.energyCounterThree`, device.functionalChannels[channel].energyCounterThree, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.energyCounterOneType`, device.functionalChannels[channel].energyCounterOneType, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.energyCounterTwoType`, device.functionalChannels[channel].energyCounterTwoType, true));
+        promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.energyCounterThreeType`, device.functionalChannels[channel].energyCounterThreeType, true));
+        return promises;
+    }
+
     _updateMainsFailureChannelStates(device, channel) {
         let promises = [];
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.powerMainsFailure`, device.functionalChannels[channel].powerMainsFailure, true));
@@ -1772,6 +1792,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${i}.functionalChannelType`, { type: 'state', common: { name: 'functionalChannelType', type: 'string', role: 'text', read: true, write: false }, native: {} }));
             switch (fc.functionalChannelType) {
 
+                case 'ENERGY_SENSORS_INTERFACE_CHANNEL':
+                    promises.push(...this._createEnergySensorChannel(device, i));
+                    break;
                 case 'DEVICE_OPERATIONLOCK':
                     promises.push(...this._createDeviceOperationLockChannel(device, i));
                     break;
@@ -1971,6 +1994,23 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     /* Start Channel Types */
+    _createEnergySensorChannel(device, channel) {
+        let promises = [];
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.gasVolumePerImpulse`, { type: 'state', common: { name: 'gasVolumePerImpulse', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.impulsesPerKWH`, { type: 'state', common: { name: 'impulsesPerKWH', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.currentPowerConsumption`, { type: 'state', common: { name: 'currentPowerConsumption', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.currentGasFlow`, { type: 'state', common: { name: 'currentGasFlow', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.gasVolume`, { type: 'state', common: { name: 'gasVolume', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.energyCounterOne`, { type: 'state', common: { name: 'energyCounterOne', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.energyCounterTwo`, { type: 'state', common: { name: 'energyCounterTwo', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.energyCounterThree`, { type: 'state', common: { name: 'energyCounterThree', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.connectedEnergySensorType`, { type: 'state', common: { name: 'connectedEnergySensorType', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.energyCounterOneType`, { type: 'state', common: { name: 'energyCounterOneType', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.energyCounterTwoType`, { type: 'state', common: { name: 'energyCounterTwoType', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.energyCounterThreeType`, { type: 'state', common: { name: 'energyCounterThreeType', type: 'string', role: 'info', read: true, write: false }, native: {} }));
+        return promises;
+    }
+
     _createMainsFailureChannel(device, channel) {
         let promises = [];
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.powerMainsFailure`, { type: 'state', common: { name: 'powerMainsFailure', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
