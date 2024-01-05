@@ -755,7 +755,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                 switch (fc.functionalChannelType) {
 
                     case 'ENERGY_SENSORS_INTERFACE_CHANNEL':
-                        promises.push(...this._updateDeviceEnergySensorChannelStates(device, i));
+                        promises.push(...this._updateEnergySensorsInterfaceChannelStates(device, i));
                         break;
                     case 'DEVICE_OPERATIONLOCK':
                         promises.push(...this._updateDeviceOperationLockChannelStates(device, i));
@@ -997,7 +997,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     /* Start Channel Types */
-    _updateDeviceEnergySensorChannelStates(device, channel) {
+    _updateEnergySensorsInterfaceChannelStates(device, channel) {
         let promises = [];
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.gasVolumePerImpulse`, device.functionalChannels[channel].gasVolumePerImpulse, true));
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.impulsesPerKWH`, device.functionalChannels[channel].impulsesPerKWH, true));
@@ -1793,7 +1793,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             switch (fc.functionalChannelType) {
 
                 case 'ENERGY_SENSORS_INTERFACE_CHANNEL':
-                    promises.push(...this._createEnergySensorChannel(device, i));
+                    promises.push(...this._createEnergySensorsInterfaceChannel(device, i));
                     break;
                 case 'DEVICE_OPERATIONLOCK':
                     promises.push(...this._createDeviceOperationLockChannel(device, i));
@@ -1994,7 +1994,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     }
 
     /* Start Channel Types */
-    _createEnergySensorChannel(device, channel) {
+    _createEnergySensorsInterfaceChannel(device, channel) {
         let promises = [];
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.gasVolumePerImpulse`, { type: 'state', common: { name: 'gasVolumePerImpulse', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.impulsesPerKWH`, { type: 'state', common: { name: 'impulsesPerKWH', type: 'number', role: 'value', read: true, write: false }, native: {} }));
