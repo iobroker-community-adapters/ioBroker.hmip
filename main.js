@@ -1411,6 +1411,21 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.on`, device.functionalChannels[channel].on, true));
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.profileMode`, device.functionalChannels[channel].profileMode, true));
         promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.userDesiredProfileMode`, device.functionalChannels[channel].userDesiredProfileMode, true));
+	promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.colorTemperature`, device.functionalChannels[channel].colorTemperature, true));
+	promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.hue`, device.functionalChannels[channel].hue, true));
+	promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.saturationLevel`, device.functionalChannels[channel].saturationLevel, true));
+	promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.hardwareColorTemperatureColdWhite`, device.functionalChannels[channel].hardwareColorTemperatureColdWhite, true));
+	promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.hardwareColorTemperatureWarmWhite`, device.functionalChannels[channel].hardwareColorTemperatureWarmWhite, true));
+	promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.dim2WarmActive`, device.functionalChannels[channel].dim2WarmActive, true));
+	promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.humanCentricLightActive`, device.functionalChannels[channel].humanCentricLightActive, true));
+	promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.lightSceneId`, device.functionalChannels[channel].lightSceneId, true));
+	promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.channelActive`, device.functionalChannels[channel].channelActive, true));
+	promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.connectedDeviceUnreach`, device.functionalChannels[channel].connectedDeviceUnreach, true));
+	promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.controlGearFailure`, device.functionalChannels[channel].controlGearFailure, true));
+	promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.lampFailure`, device.functionalChannels[channel].lampFailure, true));
+	promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.limitFailure`, device.functionalChannels[channel].limitFailure, true));
+	promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.minimalColorTemperature`, device.functionalChannels[channel].minimalColorTemperature, true));
+	promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.maximumColorTemperature`, device.functionalChannels[channel].maximumColorTemperature, true));
         return promises;
     }
 
@@ -2403,6 +2418,21 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.on`, { type: 'state', common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'switchState' } }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.profileMode`, { type: 'state', common: { name: 'profileMode', type: 'string', states: {'AUTOMATIC': 'AUTOMATIC', 'MANUAL': 'MANUAL'}, role: 'text', read: true, write: true }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.userDesiredProfileMode`, { type: 'state', common: { name: 'userDesiredProfileMode', type: 'string', states: {'AUTOMATIC': 'AUTOMATIC', 'MANUAL': 'MANUAL'}, role: 'text', read: true, write: true }, native: {} }));
+	promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.colorTemperature`, { type: 'state', common: { name: 'colorTemperature', type: 'number', role: 'level.color.temperature', read: true, write: true, min: 2000, max: 6500  }, native: { id: device.id, channel: channel, parameter: 'colorTemperature' } }));
+	promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.hue`, { type: 'state', common: { name: 'hue', type: 'number', role: 'level.color.hue', read: true, write: true, min: 0, max: 360 }, native: { id: device.id, channel: channel, parameter: 'hue' } }));
+	promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.saturationLevel`, { type: 'state', common: { name: 'saturationLevel', type: 'number', role: 'level.color.saturation', read: true, write: true, min: 0, max: 255 }, native: { id: device.id, channel: channel, parameter: 'saturationLevel' } }));
+	promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.hardwareColorTemperatureColdWhite`, { type: 'state', common: { name: 'hardwareColorTemperatureColdWhite', type: 'numbern', role: 'level.color.temperature', read: true, write: false }, native: {} }));
+	promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.hardwareColorTemperatureWarmWhite`, { type: 'state', common: { name: 'hardwareColorTemperatureWarmWhite', type: 'number', role: 'level.color.temperature', read: true, write: false }, native: {} }));
+	promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.dim2WarmActive`, { type: 'state', common: { name: 'dim2WarmActive', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'switchState' } }));
+	promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.humanCentricLightActive`, { type: 'state', common: { name: 'humanCentricLightActive', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'switchState' } })); 
+	promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.lightSceneId`, { type: 'state', common: { name: 'lightSceneId', type: 'number', role: 'value', read: true, write: true }, native: {} }));
+	promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.channelActive`, { type: 'state', common: { name: 'channelActive', type: 'boolean', role: 'switch', read: true, write: false }, native: {} }));
+	promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.connectedDeviceUnreach`, { type: 'state', common: { name: 'connectedDeviceUnreach', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+	promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.controlGearFailure`, { type: 'state', common: { name: 'controlGearFailure', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+	promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.lampFailure`, { type: 'state', common: { name: 'lampFailure', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+	promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.limitFailure`, { type: 'state', common: { name: 'limitFailure', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+	promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.minimalColorTemperature`, { type: 'state', common: { name: 'minimalColorTemperature', type: 'number', role: 'value', read: true, write: false }, native: {} }));
+	promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.maximumColorTemperature`, { type: 'state', common: { name: 'maximumColorTemperature', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         return promises;
     }
 
