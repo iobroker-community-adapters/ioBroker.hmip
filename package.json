@@ -55,7 +55,7 @@
     "@types/sinon": "^17.0.2",
     "@types/sinon-chai": "^3.2.12",
     "@vitalets/google-translate-api": "^9.2.0",
-    "axios": "^1.6.3",
+    "axios": "^1.6.5",
     "chai": "^4.3.10",
     "chai-as-promised": "^7.1.1",
     "configstore": "^6.0.0",
