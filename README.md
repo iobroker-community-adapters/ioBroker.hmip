@@ -68,7 +68,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 1.21.1 (2024-01-15)
 - (ApolloSK) Some issuses for energySensor have been fixed.
 - (mcm1957) Dependencies have been updated.
 

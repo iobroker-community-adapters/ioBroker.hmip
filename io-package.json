@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.21.0",
+    "version": "1.21.1",
     "news": {
+      "1.21.1": {
+        "en": "Some issuses for energySensor have been fixed.\nDependencies have been updated.",
+        "de": "Einige Issuses für energySensor wurden behoben.\nAbhängigkeiten wurden aktualisiert.",
+        "ru": "Некоторые иззусы для EnergySensor были исправлены.\nЗависимость была обновлена.",
+        "pt": "Alguns issuses para energiaSensor foram corrigidos.\nAs dependências foram atualizadas.",
+        "nl": "Sommige issues voor energieSensor zijn vastgesteld.\nAfhankelijkheden zijn bijgewerkt.",
+        "fr": "Certaines isotopes pour l'énergieLe capteur a été fixé.\nLes dépendances ont été actualisées.",
+        "it": "Alcuni issuses for energySensor sono stati fissati.\nLe dipendenze sono state aggiornate.",
+        "es": "Algunos issuses for energySensor han sido fijos.\nSe han actualizado las dependencias.",
+        "pl": "Niektóre wyspy dla EnergySensor zostały naprawione.\nZaktualizowano zależność.",
+        "uk": "Зафіксовано деякі запобіжники для енергоносіїв.\nОновлено залежність.",
+        "zh-cn": "一些能量感应器被修好了.\n附属关系已经更新."
+      },
       "1.21.0": {
         "en": "Implement ENERGY_SENSORS_INTERFACE_CHANNEL\nStandard workflows and testing have been updated.\nAdapter requires nodejs 16 or newer now.\nDependencies have been updated.",
         "de": "Umsetzung ENERGY_SENSORS_INTERFACE_CHANNEL\nStandard-Workflows und Tests wurden aktualisiert.\nAdapter benötigt jetzt Node-js 16 oder neuer.\nAbhängigkeiten wurden aktualisiert.",
