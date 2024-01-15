@@ -68,6 +68,10 @@ https://github.com/ioBroker/AdapterRequests/issues/62
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+- (ApolloSK) Some issuses for energySensor have been fixed.
+- (mcm1957) Dependencies have been updated.
+
 ### 1.21.0 (2023-12-27)
 - (ApolloSK) Implement ENERGY_SENSORS_INTERFACE_CHANNEL
 - (mcm1957) Standard workflows and testing have been updated.
