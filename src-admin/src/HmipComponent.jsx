@@ -12,7 +12,7 @@ import {
 // invalid
 // import ConfigGeneric from '@iobroker/adapter-react-v5/ConfigGeneric';
 // valid
-import { ConfigGeneric, Confirm, I18n } from '@iobroker/adapter-react-v5';
+import { ConfigGeneric, I18n } from '@iobroker/adapter-react-v5';
 
 const styles = () => ({
 });
@@ -53,7 +53,7 @@ class HmipComponent extends ConfigGeneric {
         if (this.handleResponse(response)) {
             this.askTimeout = this.askTimeout || setTimeout(() => {
                 this.askTimeout = null;
-                this.askState()
+                this.askState();
             }, 300);
         }
     }
@@ -94,7 +94,7 @@ class HmipComponent extends ConfigGeneric {
             clientId: ConfigGeneric.getValue(this.props.data, 'clientId'),
             pin: ConfigGeneric.getValue(this.props.data, 'pin'),
             deviceName: ConfigGeneric.getValue(this.props.data, 'deviceName'),
-        }
+        };
         this.setState({ response: 'started token creation', running: true, error: false });
         const response = await this.props.socket.sendTo(`hmip.${this.props.instance}`, 'requestToken', config);
         if (this.handleResponse(response)) {
@@ -126,7 +126,7 @@ class HmipComponent extends ConfigGeneric {
             const config = {
                 accessPointSgtin: ConfigGeneric.getValue(this.props.data, 'accessPointSgtin'),
                 pin: ConfigGeneric.getValue(this.props.data, 'pin'),
-            }
+            };
 
             return <div style={{ width: '100%'}}>
                 <div

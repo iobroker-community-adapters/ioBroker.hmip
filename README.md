@@ -65,11 +65,25 @@ https://github.com/ioBroker/AdapterRequests/issues/62
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
+<!--
+    Placeholder for the next version (at the beginning of the line):
+    ### **WORK IN PROGRESS**
+-->
 ### **WORK IN PROGRESS**
 * (bluefox) IMPORTANT: Node.js 16.x is now required at a minimum
 * (bluefox) replaced module `require` with `axios`
 * (bluefox) Added JSON config
 * (ChristianFue) Added support for Hmip-RGBW 
+
+### 1.21.1 (2024-01-15)
+- (ApolloSK) Some issuses for energySensor have been fixed.
+- (mcm1957) Dependencies have been updated.
+
+### 1.21.0 (2023-12-27)
+- (ApolloSK) Implement ENERGY_SENSORS_INTERFACE_CHANNEL
+- (mcm1957) Standard workflows and testing have been updated.
+- (mcm1957) Adapter requires nodejs 16 or newer now.
+- (mcm1957) Dependencies have been updated.
 
 ### 1.20.0 (2022-09-19)
 * IMPORTANT: Node.js 12.x is now required at a minimum
@@ -297,7 +311,8 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 ## License
 The MIT License (MIT)
 
-Copyright (c) 2018-2023 jogibear9988 <jochen.kuehner@gmx.de>, Apollon77
+Copyright (c) 2023-2024 iobroker-community-adapters <mcm57@gmx.at>  
+Copyright (c) 2018-2022 jogibear9988 <jochen.kuehner@gmx.de>, Apollon77
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

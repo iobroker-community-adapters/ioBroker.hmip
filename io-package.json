@@ -1,8 +1,34 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.20.0",
+    "version": "1.21.1",
     "news": {
+      "1.21.1": {
+        "en": "Some issuses for energySensor have been fixed.\nDependencies have been updated.",
+        "de": "Einige Issuses für energySensor wurden behoben.\nAbhängigkeiten wurden aktualisiert.",
+        "ru": "Некоторые иззусы для EnergySensor были исправлены.\nЗависимость была обновлена.",
+        "pt": "Alguns issuses para energiaSensor foram corrigidos.\nAs dependências foram atualizadas.",
+        "nl": "Sommige issues voor energieSensor zijn vastgesteld.\nAfhankelijkheden zijn bijgewerkt.",
+        "fr": "Certaines isotopes pour l'énergieLe capteur a été fixé.\nLes dépendances ont été actualisées.",
+        "it": "Alcuni issuses for energySensor sono stati fissati.\nLe dipendenze sono state aggiornate.",
+        "es": "Algunos issuses for energySensor han sido fijos.\nSe han actualizado las dependencias.",
+        "pl": "Niektóre wyspy dla EnergySensor zostały naprawione.\nZaktualizowano zależność.",
+        "uk": "Зафіксовано деякі запобіжники для енергоносіїв.\nОновлено залежність.",
+        "zh-cn": "一些能量感应器被修好了.\n附属关系已经更新."
+      },
+      "1.21.0": {
+        "en": "Implement ENERGY_SENSORS_INTERFACE_CHANNEL\nStandard workflows and testing have been updated.\nAdapter requires nodejs 16 or newer now.\nDependencies have been updated.",
+        "de": "Umsetzung ENERGY_SENSORS_INTERFACE_CHANNEL\nStandard-Workflows und Tests wurden aktualisiert.\nAdapter benötigt jetzt Node-js 16 oder neuer.\nAbhängigkeiten wurden aktualisiert.",
+        "ru": "Внедрение ENERGY_SENSORS_INTERFACE_CHANNEL\nОбновлены стандартные рабочие процессы и тестирование.\nАдаптер требует nodejs 16 или новее теперь.\nОбновлены зависимости.",
+        "pt": "Implementar ENERGY_SENSORS_INTERFACE_CHANNEL\nFluxos de trabalho e testes padrão foram atualizados.\nAdaptador requer nodejs 16 ou mais recente agora.\nAs dependências foram atualizadas.",
+        "nl": "Vertaling:\nStandaardwerk en testen zijn geüpdateerd.\nAdapter vereist nodejs 16 of Newer nu.\nAfhankelijkheid is geüpdateerd.",
+        "fr": "Mettre en œuvre ENERGY_SENSORS_INTERFACE_CHANNEL\nDes workflows et des tests standard ont été mis à jour.\nAdaptateur nécessite nodejs 16 ou plus maintenant.\nLes dépendances ont été mises à jour.",
+        "it": "ENERGIA_SENSORS_INTERFACE_CHANNEL\nSono stati aggiornati flussi di lavoro e test standard.\nAdattatore richiede nodejs 16 o più nuovo ora.\nLe dipendenze sono state aggiornate.",
+        "es": "Implementar ENERGY_SENSORS_INTERFACE_CHANNEL\nSe han actualizado los flujos de trabajo y las pruebas estándar.\nAdaptador requiere nodejs 16 o más nuevo ahora.\nSe han actualizado las dependencias.",
+        "pl": "Współczynnik ENERGY_SENSORS_INTERFNEL\nStandardowe przepływy pracy i testowania zostały zaktualizowane.\nAdapter wymaga węzła 16 lub nowszych.\nW zależności zostały zaktualizowane.",
+        "uk": "Реалізація ENERGY_SENSORS_INTERFACE_CHANNEL\nОновлено стандартні робочі процеси та тестування.\nАдаптер вимагає nodejs 16 або новіший зараз.\nОновлено залежність.",
+        "zh-cn": "执行ENERGY_SENSORS_INTERCE_CHANNEL\n已更新了标准工作流程和试验。.\n现在需要16个或新人员。.\n情况已经更新。."
+      },
       "1.20.0": {
         "en": "IMPORTANT: Node.js 12.x is now required at minimum\nAdd additional fields for MULTI_MODE_INPUT_CHANNEL for Doorbell\nAdd valve position for FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL\nAdd several more states for SWITCH_CHANNEL, DIMMER_CHANNEL, WEATHER_SENSOR_CHANNEL, SHUTTER_CHANNEL \nAdd channel label",
         "de": "WICHTIG: Node.js 12.x ist jetzt mindestens erforderlich\nFügen Sie weitere Felder für MULTI_MODE_INPUT_CHANNEL für Doorbell hinzu\nVentilstellung für FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL hinzufügen\nFügen Sie mehrere Zustände für SWITCH_CHANNEL, DIMMER_CHANNEL, WEATHER_SENSOR_CHANNEL, SHUTTER_CHANNEL hinzu\nHinzufügen von Channel Label",
@@ -50,42 +76,6 @@
         "es": "Agregue varios ajustes de dispositivo más que se pueden modificar mediante adaptador (ver readme para lista)",
         "pl": "Dostarczając kilka ustawień urządzenie, które mogą być modyfikowane poprzez adapter (patrz czytelnik na listę)",
         "zh-cn": "增加一些能够通过适应者加以修改的装置环境(见清单的读者)。"
-      },
-      "1.18.0": {
-        "en": "Added support for PARTICULATE_MATTER_SENSOR_CHANNEL\nCorrectly ignore some channels without meaningful data",
-        "de": "Unterstützung für PARTICULATE_MATTER_SENSOR_CHANNEL\nEinige Kanäle ohne aussagekräftige Daten korrekt ignorieren",
-        "ru": "Добавлена поддержка PARTICULATE_MATTER_SENSOR_CHANNEL\nПравильно игнорировать некоторые каналы без значимых данных",
-        "pt": "Adicionado suporte para PARTICULATE_MATTER_SENSOR_CHANNEL\nIgnorar corretamente alguns canais sem dados significativos",
-        "nl": "Vervoegde ondersteuning voor PARTICULATEMATTERSORNEL\nNegeer wat kanalen zonder betekenisvolle gegevens",
-        "fr": "Ajout du support pour PARTICULATE_MATTER_SENSOR_CHANNEL\nIgnorer correctement certains canaux sans données significatives",
-        "it": "Aggiunto il supporto per PARTICULATE_MATTER_SENSOR_CHANNEL\nIgnorare correttamente alcuni canali senza dati significativi",
-        "es": "Apoyo añadido para PARTICULATE_MATTER_SENSOR_CHANNEL\nIgnorar correctamente algunos canales sin datos significativos",
-        "pl": "Oficjalna strona PARTICULATE_MATTER_SENSOR_CHANELEL\nNiezwłocznie zignorować niektórych kanałów bez większych danych",
-        "zh-cn": "加入《保护所有移徙工人及其家庭成员权利国际公约》\n正确地无视某些渠道而不提供有意义的数据"
-      },
-      "1.17.0": {
-        "en": "Also reinitialize objects when new groups or clients are detected\nAdded experimental support to set dimLevel for Multi Mode Input Dimmer channels",
-        "de": "Initialisieren Sie Objekte auch neu, wenn neue Gruppen oder Clients erkannt werden\nExperimentelle Unterstützung hinzugefügt, um dimLevel für Multi-Modus-Eingangsdimmerkanäle festzulegen",
-        "ru": "Также повторно инициализируйте объекты при обнаружении новых групп или клиентов.\nДобавлена экспериментальная поддержка установки dimLevel для каналов многорежимного входного диммера.",
-        "pt": "Também reinicialize objetos quando novos grupos ou clientes forem detectados\nAdicionado suporte experimental para definir dimLevel para canais Multi Mode Input Dimmer",
-        "nl": "Ook objecten opnieuw initialiseren wanneer nieuwe groepen of clients worden gedetecteerd\nExperimentele ondersteuning toegevoegd om dimLevel in te stellen voor Multi Mode Input Dimmer-kanalen",
-        "fr": "Réinitialise également les objets lorsque de nouveaux groupes ou clients sont détectés\nAjout d'un support expérimental pour définir dimLevel pour les canaux de gradateur d'entrée multimode",
-        "it": "Reinizializzare anche gli oggetti quando vengono rilevati nuovi gruppi o client\nAggiunto supporto sperimentale per impostare dimLevel per i canali Multi Mode Input Dimmer",
-        "es": "También reinicializar objetos cuando se detectan nuevos grupos o clientes\nSe agregó soporte experimental para configurar dimLevel para canales de atenuación de entrada multimodo",
-        "pl": "Ponowna inicjalizacja obiektów również po wykryciu nowych grup lub klientów\nDodano eksperymentalne wsparcie dla ustawienia poziomu dimLevel dla kanałów ściemniacza wejścia Multi Mode",
-        "zh-cn": "当检测到新组或客户端时也重新初始化对象\n添加了为多模式输入调光器通道设置 dimLevel 的实验性支持"
-      },
-      "1.16.1": {
-        "en": "Fix crash case introduced by last version",
-        "de": "Absturzfall behoben, der in der letzten Version eingeführt wurde",
-        "ru": "Исправить случай сбоя, появившийся в последней версии",
-        "pt": "Corrigir caso de falha introduzido pela última versão",
-        "nl": "Fix crash case geïntroduceerd door de laatste versie",
-        "fr": "Correction du cas de crash introduit par la dernière version",
-        "it": "Risolto il caso di crash introdotto dall'ultima versione",
-        "es": "Arreglar el caso de bloqueo introducido por la última versión",
-        "pl": "Napraw przypadek awarii wprowadzony przez ostatnią wersję",
-        "zh-cn": "修复上一版本引入的崩溃案例"
       }
     },
     "title": "HomeMaticIP Cloud AccessPoint",
