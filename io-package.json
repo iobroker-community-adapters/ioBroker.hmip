@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.21.1",
+    "version": "1.22.0-alpha.0",
     "news": {
+      "1.22.0-alpha.0": {
+        "en": "IMPORTANT: Node.js 16.x is now required at a minimum\nreplaced module `require` with `axios`\nAdded JSON config\nAdded support for Hmip-RGBW \nDependencies have been updated.",
+        "de": "WICHTIG: Node.js 16.x ist numehr minimal erforderlich\nModul `require` wurde durch `axios` ersetzt.\nJSON config\nUnterstützung für Hmip-RGBW hinzugefügt\nAbhängigkeiten wurden aktualisiert.",
+        "ru": "ВАЖНО: Node.js 16.x теперь требуется минимум\nзамененный модуль `require' на `axios \"\nДобавить конфигурацию JSON\nДобавлена поддержка Hmip-RGBW\nЗависимость была обновлена.",
+        "pt": "IMPORTANTE: Node.js 16.x é agora exigido no mínimo\nmódulo substituído `require` com `axios \"\nAdicionado JSON config\nAdicionado suporte para Hmip-RGBW\nAs dependências foram atualizadas.",
+        "nl": "BELANGRIJK: Node.js 16.x is nu minimaal vereist\nvervangen module  wat\nJSON-configuratie toegevoegd\nOndersteuning toegevoegd voor Hmip-RGBW\nAfhankelijkheden zijn bijgewerkt.",
+        "fr": "IMPORTANT: Node.js 16.x est maintenant requis au minimum\nremplacer le module `require` par `axios \"\nAjout de la configuration JSON\nAjout du support pour Hmip-RGBW\nLes dépendances ont été actualisées.",
+        "it": "IMPORTANTE: Node.js 16.x è ora richiesto al minimo\nmodulo sostituito `require` con `assios #\nAggiunto JSON config\nAggiunto il supporto per Hmip-RGBW\nLe dipendenze sono state aggiornate.",
+        "es": "IMPORTANTE: Node.js 16.x se requiere ahora al mínimo\nsustituido módulo `require ' por `axios `\nConfiguración JSON\nApoyo añadido para Hmip-RGBW\nSe han actualizado las dependencias.",
+        "pl": "WAŻNE: Node.js 16.x jest teraz wymagane co najmniej\nzastąpiony moduł \"require\" z 'axios'\nDodano plik konfiguracyjny JSON\nDodano wsparcie dla HEIT- RGBW\nZaktualizowano zależność.",
+        "uk": "ВАЖЛИВО: Node.js 16.x тепер потрібен мінімум\nзаміщаний модуль ````axios й\nДодано налаштування JSON\nДодано підтримку Hmip-RGBW\nОновлено залежність.",
+        "zh-cn": "重要:现在至少需要16x节点\n将 \" 要求 \" 模块改为 \" 轴 \" `\n添加 JSON 配置\n添加对 Hmip-RGBW 的支持\n附属关系已经更新."
+      },
       "1.21.1": {
         "en": "Some issuses for energySensor have been fixed.\nDependencies have been updated.",
         "de": "Einige Issuses für energySensor wurden behoben.\nAbhängigkeiten wurden aktualisiert.",
