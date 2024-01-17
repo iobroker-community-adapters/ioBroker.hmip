@@ -1,0 +1,10 @@
+{
+  "custom_hmip_not_alive": "A instância do HMIP não está ativa",
+  "custom_hmip_request_token": "Solicitar token",
+  "custom_hmip_started token creation": "Criação de token iniciada...",
+  "custom_hmip_press blue button on accesspoint": "Pressione o botão azul no ponto de acesso",
+  "custom_hmip_confirming token": "símbolo de confirmação...",
+  "custom_hmip_error occurred during token generation, look at the logs": "ocorreu um erro durante a geração do token, veja os logs",
+  "custom_hmip_press \"request token\"": "pressione \"solicitar token\"",
+  "custom_hmip_token created, save settings to use your accesspoint": "token criado, salve as configurações para usar seu ponto de acesso"
+}

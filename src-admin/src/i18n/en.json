@@ -1,0 +1,10 @@
+{
+  "custom_hmip_not_alive": "HMIP instance is not alive",
+  "custom_hmip_request_token": "Create token",
+  "custom_hmip_started token creation": "Started token creation...",
+  "custom_hmip_press blue button on accesspoint": "Press blue button on accesspoint",
+  "custom_hmip_confirming token": "confirming token...",
+  "custom_hmip_error occurred during token generation, look at the logs": "error occurred during token generation, look at the logs",
+  "custom_hmip_press \"request token\"": "press \"Create token\"",
+  "custom_hmip_token created, save settings to use your accesspoint": "token created, save settings to use your accesspoint"
+}

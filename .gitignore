@@ -4,3 +4,6 @@ node_modules
 nbproject
 admin/i18n/flat.txt
 admin/i18n/*/flat.txt
+src-admin/package-lock.json
+src-admin/node_modules
+src-admin/build

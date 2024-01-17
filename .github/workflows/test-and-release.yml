@@ -67,7 +67,7 @@ jobs:
 
         runs-on: ubuntu-latest
 
-        # Write permissions are required to create Github releases
+        # Write permissions are required to create GitHub releases
         permissions:
             contents: write
 

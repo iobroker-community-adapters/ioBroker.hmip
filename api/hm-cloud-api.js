@@ -2,10 +2,10 @@
 /*jslint node: true */
 'use strict';
 
-const rq = require('request-promise-native');
 const sha512 = require('js-sha512');
-const {v4: uuidv4} = require('uuid');
+const { v4: uuidv4 } = require('uuid');
 const webSocket = require('ws');
+const axios = require('axios');
 
 class HmCloudAPI {
     constructor(configDataOrApId, pin) {
@@ -19,7 +19,7 @@ class HmCloudAPI {
     parseConfigData(configDataOrApId, pin, deviceId) {
         if (typeof configDataOrApId === 'string') {
             this._accessPointSgtin = configDataOrApId.replace(/[^a-fA-F0-9 ]/g, '');
-            this._clientAuthToken = sha512(this._accessPointSgtin + "jiLpVitHvWnIGD1yo7MA").toUpperCase();
+            this._clientAuthToken = sha512(`${this._accessPointSgtin}jiLpVitHvWnIGD1yo7MA`).toUpperCase();
             this._authToken = '';
             this._clientId = '';
 
@@ -37,40 +37,36 @@ class HmCloudAPI {
         }
 
         this._clientCharacteristics = {
-            "clientCharacteristics":
-            {
-                "apiVersion": "12",
-                "applicationIdentifier": "iobroker",
-                "applicationVersion": "1.0",
-                "deviceManufacturer": "none",
-                "deviceType": "Computer",
-                "language": 'en_US',
-                "osType": 'Linux',
-                "osVersion": 'NT',
+            clientCharacteristics: {
+                apiVersion: '12',
+                applicationIdentifier: 'iobroker',
+                applicationVersion: '1.0',
+                deviceManufacturer: 'none',
+                deviceType: 'Computer',
+                language: 'en_US',
+                osType: 'Linux',
+                osVersion: 'NT',
             },
-            "id": this._accessPointSgtin
+            id: this._accessPointSgtin
         };
     }
 
     getSaveData() {
         return {
-            'authToken': this._authToken,
-            'clientAuthToken': this._clientAuthToken,
-            'clientId': this._clientId,
-            'accessPointSgtin': this._accessPointSgtin,
-            'pin': this._pin,
-            'deviceId': this._deviceId
-        }
+            authToken: this._authToken,
+            clientAuthToken: this._clientAuthToken,
+            clientId: this._clientId,
+            accessPointSgtin: this._accessPointSgtin,
+            pin: this._pin,
+            deviceId: this._deviceId,
+        };
     }
 
     async getHomematicHosts() {
         let res;
         try {
-            res = await rq("https://lookup.homematic.com:48335/getHost", {
-                method: 'POST',
-                json: true,
-                body: this._clientCharacteristics
-            });
+            const response = await axios.post('https://lookup.homematic.com:48335/getHost', this._clientCharacteristics);
+            res = response.data;
         } catch (err) {
             this.requestError && this.requestError(err);
         }
@@ -78,37 +74,50 @@ class HmCloudAPI {
             this._urlREST = res.urlREST;
             this._urlWebSocket = res.urlWebSocket;
             if (this._urlWebSocket.startsWith('http')) {
-                this._urlWebSocket = 'ws' + this._urlWebSocket.substring(4); // make sure it is ws:// or wss://
+                this._urlWebSocket = `ws${this._urlWebSocket.substring(4)}`; // make sure it is ws:// or wss://
             }
         }
         if (!this._urlREST || !this._urlWebSocket) {
-            throw "Could not get host details. Please check the SGTIN.";
+            throw new Error('Could not get host details. Please check the SGTIN.');
         }
     }
 
     // =========== API for Token generation ===========
 
     async auth1connectionRequest(devicename = 'hmipnodejs') {
-        const headers = { 'content-type': 'application/json', 'accept': 'application/json', 'VERSION': '12', 'CLIENTAUTH': this._clientAuthToken };
-        if (this._pin)
+        const headers = {
+            'content-type': 'application/json',
+            'accept': 'application/json',
+            'VERSION': '12',
+            'CLIENTAUTH': this._clientAuthToken,
+        };
+        if (this._pin) {
             headers['PIN'] = this._pin;
-        const body = { "deviceId": this._deviceId, "deviceName": devicename, "sgtin": this._accessPointSgtin };
+        }
+        const body = {
+            deviceId: this._deviceId,
+            deviceName: devicename,
+            sgtin: this._accessPointSgtinб
+        };
         let res;
         try {
-            res = await rq(this._urlREST + "/hmip/auth/connectionRequest", { method: 'POST', json: true, body: body, headers: headers, simple: false, resolveWithFullResponse: true });
+            const response = await axios.post(`${this._urlREST}/hmip/auth/connectionRequest`, body);
+            res = response.data;
         } catch (err) {
             this.requestError && this.requestError(err);
         }
-        if (!res || res.statusCode !== 200)
-            throw "error";
+        if (!res || res.statusCode !== 200) {
+            throw new Error('error');
+        }
     }
 
     async auth2isRequestAcknowledged() {
         const headers = { 'content-type': 'application/json', 'accept': 'application/json', 'VERSION': '12', 'CLIENTAUTH': this._clientAuthToken };
-        const body = { "deviceId": this._deviceId };
+        const body = { deviceId: this._deviceId };
         let res;
         try {
-            res = await rq(this._urlREST + "/hmip/auth/isRequestAcknowledged", { method: 'POST', json: true, body: body, headers: headers, simple: false, resolveWithFullResponse: true });
+            const response = await axios.post(`${this._urlREST}/hmip/auth/isRequestAcknowledged`, body, { headers });
+            res = response.data;
         } catch (err) {
             this.requestError && this.requestError(err);
         }
@@ -117,13 +126,15 @@ class HmCloudAPI {
 
     async auth3requestAuthToken() {
         let headers = { 'content-type': 'application/json', 'accept': 'application/json', 'VERSION': '12', 'CLIENTAUTH': this._clientAuthToken };
-        let body = { "deviceId": this._deviceId };
+        let body = { deviceId: this._deviceId };
         let res;
         try {
-            res = await rq(this._urlREST + "/hmip/auth/requestAuthToken", { method: 'POST', json: true, body: body, headers: headers });
+            let response = await axios.post(`${this._urlREST}/hmip/auth/requestAuthToken`, body, { headers });
+            res = response.data;
             this._authToken = res.authToken;
-            body = { "deviceId": this._deviceId, "authToken": this._authToken };
-            res = await rq(this._urlREST + "/hmip/auth/confirmAuthToken", { method: 'POST', json: true, body: body, headers: headers });
+            body = { deviceId: this._deviceId, authToken: this._authToken };
+            response = await axios.post(`${this._urlREST}/hmip/auth/confirmAuthToken`, body, { headers });
+            res = response.data;
             this._clientId = res.clientId;
         } catch (err) {
             this.requestError && this.requestError(err);
@@ -132,21 +143,18 @@ class HmCloudAPI {
 
     async callRestApi(path, data) {
         let headers = { 'content-type': 'application/json', 'accept': 'application/json', 'VERSION': '12', 'AUTHTOKEN': this._authToken, 'CLIENTAUTH': this._clientAuthToken};
-        let res;
         try {
-            res = await rq(this._urlREST + "/hmip/" + path, { method: 'POST', json: true, body: data, headers: headers });
-            return res;
+            const response = await axios.post(`${this._urlREST}/hmip/${path}`, data, { headers });
+            return response.data;
         } catch (err) {
             this.requestError && this.requestError(err);
         }
     }
 
     // =========== API for HM ===========
-
     async loadCurrentConfig() {
         let state = await this.callRestApi('home/getCurrentState', this._clientCharacteristics);
-        if (state)
-        {
+        if (state) {
             this.home = state.home;
             this.groups = state.groups;
             this.clients = state.clients;
@@ -163,10 +171,12 @@ class HmCloudAPI {
         if (this._ws) {
             this._ws.close();
         }
-        if (this._connectTimeout)
+        if (this._connectTimeout) {
             clearTimeout(this._connectTimeout);
-        if (this._pingInterval)
+        }
+        if (this._pingInterval) {
             clearInterval(this._pingInterval);
+        }
     }
 
     connectWebsocket() {
@@ -176,77 +186,75 @@ class HmCloudAPI {
         }
         this._ws = new webSocket(this._urlWebSocket, {
             headers: {
-                'AUTHTOKEN': this._authToken, 'CLIENTAUTH': this._clientAuthToken
+                'AUTHTOKEN': this._authToken,
+                'CLIENTAUTH': this._clientAuthToken,
             },
-            perMessageDeflate: false
+            perMessageDeflate: false,
         });
 
         this._ws.on('open', () => {
-            if (this.opened)
-                this.opened();
+            this.opened && this.opened();
 
             this._pingInterval && clearInterval(this._pingInterval);
-            this._pingInterval = setInterval(() => {
-                this._ws.ping(() => { });
-            }, 5000);
+            this._pingInterval = setInterval(() =>
+                this._ws.ping(() => { }), 5000);
         });
 
         this._ws.on('close', (code, reason) => {
-            if (this.closed)
-                this.closed(code, reason.toString('utf8'));
+            this.closed && this.closed(code, reason.toString('utf8'));
             if (this._pingInterval) {
                 clearInterval(this._pingInterval);
                 this._pingInterval = null;
             }
             if (!this.isClosed) {
                 this._connectTimeout && clearTimeout(this._connectTimeout);
-                this._connectTimeout = setTimeout(() => this.connectWebsocket(), 10000);
+                this._connectTimeout = setTimeout(() => {
+                    this._connectTimeout = null;
+                    this.connectWebsocket()
+                }, 10000);
             }
         });
 
         this._ws.on('error', (error) => {
-            if (this.errored)
-                this.errored(error);
+            this.errored && this.errored(error);
             if (this._pingInterval) {
                 clearInterval(this._pingInterval);
                 this._pingInterval = null;
             }
             if (!this.isClosed) {
                 this._connectTimeout && clearTimeout(this._connectTimeout);
-                this._connectTimeout = setTimeout(() => this.connectWebsocket(), 10000);
+                this._connectTimeout = setTimeout(() => {
+                    this._connectTimeout = null;
+                    this.connectWebsocket()
+                }, 10000);
             }
         });
 
         this._ws.on('unexpected-response', (request, response) => {
-            if (this.unexpectedResponse)
-                this.unexpectedResponse(request, response);
+            this.unexpectedResponse && this.unexpectedResponse(request, response);
             if (this._pingInterval) {
                 clearInterval(this._pingInterval);
                 this._pingInterval = null;
             }
             if (!this.isClosed) {
                 this._connectTimeout && clearTimeout(this._connectTimeout);
-                this._connectTimeout = setTimeout(() => this.connectWebsocket(), 10000);
+                this._connectTimeout = setTimeout(() => {
+                    this._connectTimeout = null;
+                    this.connectWebsocket();
+                }, 10000);
             }
         });
 
         this._ws.on('message', (d) => {
-            let dString = d.toString('utf8');
-            if (this.dataReceived)
-                this.dataReceived(dString);
-            let data = JSON.parse(dString);
+            const dString = d.toString('utf8');
+            this.dataReceived && this.dataReceived(dString);
+            const data = JSON.parse(dString);
             this._parseEventdata(data);
         });
 
-        this._ws.on('ping', () => {
-            if (this.dataReceived)
-                this.dataReceived("ping");
-        });
+        this._ws.on('ping', () => this.dataReceived && this.dataReceived('ping'));
 
-        this._ws.on('pong', () => {
-            if (this.dataReceived)
-                this.dataReceived("pong");
-        });
+        this._ws.on('pong', () => this.dataReceived && this.dataReceived('pong'));
     }
 
     _parseEventdata(data) {
@@ -284,8 +292,7 @@ class HmCloudAPI {
                     this.home = ev.home;
                     break;
             }
-            if (this.eventRaised)
-                this.eventRaised(ev);
+            this.eventRaised && this.eventRaised(ev);
         }
     }
 
@@ -293,7 +300,11 @@ class HmCloudAPI {
 
     // boolean
     async deviceControlSetSwitchState(deviceId, on, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "on": on, "channelIndex": channelIndex };
+        const data = {
+            deviceId,
+            on,
+            channelIndex,
+        };
         await this.callRestApi('device/control/setSwitchState', data);
     }
 
@@ -310,22 +321,22 @@ class HmCloudAPI {
     //     CLOSE = auto()
     //     PARTIAL_OPEN = auto()
     async deviceControlSendDoorCommand(deviceId, doorCommand, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'doorCommand': doorCommand };
+        let data = { deviceId, channelIndex, doorCommand };
         await this.callRestApi('device/control/sendDoorCommand', data);
     }
 
     async deviceControlSetLockState(deviceId, lockState, pin, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'authorizationPin': pin.toString(), 'targetLockState': lockState };
+        let data = { deviceId, channelIndex, authorizationPin: pin.toString(), targetLockState: lockState };
         await this.callRestApi('device/control/setLockState', data);
     }
 
     async deviceControlResetEnergyCounter(deviceId, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "channelIndex": channelIndex };
+        let data = { deviceId, channelIndex };
         await this.callRestApi('device/control/resetEnergyCounter', data);
     }
 
     async deviceConfigurationSetOperationLock(deviceId, operationLock, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'operationLock': operationLock };
+        let data = { deviceId, channelIndex, 'operationLock': operationLock };
         await this.callRestApi('device/configuration/setOperationLock', data);
     }
 
@@ -334,64 +345,64 @@ class HmCloudAPI {
     //     SETPOINT = auto()
     //     ACTUAL_HUMIDITY = auto()
     async deviceConfigurationSetClimateControlDisplay(deviceId, display, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'display': display };
+        let data = { deviceId, channelIndex, display };
         await this.callRestApi('device/configuration/setClimateControlDisplay', data);
     }
 
     // float 0.0-1.0
     async deviceConfigurationSetMinimumFloorHeatingValvePosition(deviceId, minimumFloorHeatingValvePosition, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'minimumFloorHeatingValvePosition': minimumFloorHeatingValvePosition };
+        let data = { deviceId, channelIndex, minimumFloorHeatingValvePosition };
         await this.callRestApi('device/configuration/setMinimumFloorHeatingValvePosition', data);
     }
 
     // float 0.0-1.0??
     async deviceControlSetDimLevel(deviceId, dimLevel, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'dimLevel': dimLevel };
+        let data = { deviceId, channelIndex, dimLevel };
         await this.callRestApi('device/control/setDimLevel', data);
     }
 
     // float 0.0-1.0??
     async deviceControlSetRgbDimLevel(deviceId, rgb, dimLevel, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'simpleRGBColorState': rgb, 'dimLevel': dimLevel };
+        let data = { deviceId, channelIndex, 'simpleRGBColorState': rgb, dimLevel };
         await this.callRestApi('device/control/setSimpleRGBColorDimLevel', data);
     }
 
     // float 0.0-1.0??
     // not used right now
     async deviceControlSetRgbDimLevelWithTime(deviceId, rgb, dimLevel, onTime, rampTime, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'simpleRGBColorState': rgb, 'dimLevel': dimLevel, 'onTime': onTime, 'rampTime': rampTime };
+        let data = { deviceId, channelIndex, simpleRGBColorState: rgb, dimLevel, onTime, rampTime };
         await this.callRestApi('device/control/setSimpleRGBColorDimLevelWithTime', data);
     }
 
     // float 0.0 = open - 1.0 = closed
     async deviceControlSetShutterLevel(deviceId, shutterLevel, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'shutterLevel': shutterLevel };
+        let data = { deviceId, channelIndex, shutterLevel };
         await this.callRestApi('device/control/setShutterLevel', data);
     }
 
     async deviceControlStartImpulse(deviceId, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "channelIndex": channelIndex };
+        let data = { deviceId, channelIndex };
         await this.callRestApi('device/control/startImpulse', data);
     }
 
     // float 0.0 = open - 1.0 = closed
     async deviceControlSetSlatsLevel(deviceId, slatsLevel, shutterLevel, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'slatsLevel': slatsLevel, 'shutterLevel': shutterLevel };
+        let data = { deviceId, channelIndex, slatsLevel, shutterLevel };
         await this.callRestApi('device/control/setSlatsLevel', data);
     }
 
     async deviceControlStop(deviceId, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "channelIndex": channelIndex };
+        let data = { deviceId, channelIndex };
         await this.callRestApi('device/control/stop', data);
     }
 
     async deviceControlSetPrimaryShadingLevel(deviceId, primaryShadingLevel, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'primaryShadingLevel': primaryShadingLevel };
+        let data = { deviceId, channelIndex, 'primaryShadingLevel': primaryShadingLevel };
         await this.callRestApi('device/control/setPrimaryShadingLevel', data);
     }
 
     async deviceControlSetSecondaryShadingLevel(deviceId, primaryShadingLevel, secondaryShadingLevel, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "channelIndex": channelIndex, 'primaryShadingLevel': primaryShadingLevel, 'secondaryShadingLevel': secondaryShadingLevel };
+        let data = { deviceId, channelIndex, primaryShadingLevel, secondaryShadingLevel };
         await this.callRestApi('device/control/setSecondaryShadingLevel', data);
     }
 
@@ -415,7 +426,7 @@ class HmCloudAPI {
     //     EVENT = auto()
     //     ERROR = auto()
     async deviceConfigurationSetAcousticAlarmSignal(deviceId, acousticAlarmSignal, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "acousticAlarmSignal": acousticAlarmSignal, "channelIndex": channelIndex };
+        let data = { deviceId, acousticAlarmSignal, channelIndex };
         await this.callRestApi('device/configuration/setAcousticAlarmSignal', data);
     }
 
@@ -425,7 +436,7 @@ class HmCloudAPI {
     //     SIX_MINUTES = auto()
     //     ONCE_PER_MINUTE = auto()
     async deviceConfigurationSetAcousticAlarmTiming(deviceId, acousticAlarmTiming, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "acousticAlarmTiming": acousticAlarmTiming, "channelIndex": channelIndex };
+        let data = { deviceId, acousticAlarmTiming, channelIndex };
         await this.callRestApi('device/configuration/setAcousticAlarmTiming', data);
     }
 
@@ -435,7 +446,7 @@ class HmCloudAPI {
     //     WATER_DETECTION = auto()
     //     WATER_MOISTURE_DETECTION = auto()
     async deviceConfigurationSetAcousticWaterAlarmTrigger(deviceId, acousticWaterAlarmTrigger, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "acousticWaterAlarmTrigger": acousticWaterAlarmTrigger, "channelIndex": channelIndex };
+        let data = { deviceId, acousticWaterAlarmTrigger, channelIndex };
         await this.callRestApi('device/configuration/setAcousticWaterAlarmTrigger', data);
     }
 
@@ -445,7 +456,7 @@ class HmCloudAPI {
     //     WATER_DETECTION = auto()
     //     WATER_MOISTURE_DETECTION = auto()
     async deviceConfigurationSetInAppWaterAlarmTrigger(deviceId, inAppWaterAlarmTrigger, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "inAppWaterAlarmTrigger": inAppWaterAlarmTrigger, "channelIndex": channelIndex };
+        let data = { deviceId, inAppWaterAlarmTrigger, channelIndex };
         await this.callRestApi('device/configuration/setInAppWaterAlarmTrigger', data);
     }
 
@@ -455,7 +466,7 @@ class HmCloudAPI {
     //     WATER_DETECTION = auto()
     //     WATER_MOISTURE_DETECTION = auto()
     async deviceConfigurationSetSirenWaterAlarmTrigger(deviceId, sirenWaterAlarmTrigger, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "sirenWaterAlarmTrigger": sirenWaterAlarmTrigger, "channelIndex": channelIndex };
+        let data = { deviceId, sirenWaterAlarmTrigger, channelIndex };
         await this.callRestApi('device/configuration/setSirenWaterAlarmTrigger', data);
     }
 
@@ -463,7 +474,7 @@ class HmCloudAPI {
     //     ANY_MOTION = auto()
     //     FLAT_DECT = auto()
     async deviceConfigurationSetAccelerationSensorMode(deviceId, accelerationSensorMode, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "accelerationSensorMode": accelerationSensorMode, "channelIndex": channelIndex };
+        let data = { deviceId, accelerationSensorMode, channelIndex };
         await this.callRestApi('device/configuration/setAccelerationSensorMode', data);
     }
 
@@ -471,13 +482,13 @@ class HmCloudAPI {
     //     HORIZONTAL = auto()
     //     VERTICAL = auto()
     async deviceConfigurationSetAccelerationSensorNeutralPosition(deviceId, accelerationSensorNeutralPosition, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "accelerationSensorNeutralPosition": accelerationSensorNeutralPosition, "channelIndex": channelIndex };
+        let data = { deviceId, accelerationSensorNeutralPosition, channelIndex };
         await this.callRestApi('device/configuration/setAccelerationSensorNeutralPosition', data);
     }
 
     // accelerationSensorTriggerAngle = int
     async deviceConfigurationSetAccelerationSensorTriggerAngle(deviceId, accelerationSensorTriggerAngle, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "accelerationSensorTriggerAngle": accelerationSensorTriggerAngle, "channelIndex": channelIndex };
+        let data = { deviceId, accelerationSensorTriggerAngle, channelIndex };
         await this.callRestApi('device/configuration/setAccelerationSensorTriggerAngle', data);
     }
 
@@ -489,13 +500,13 @@ class HmCloudAPI {
     //     SENSOR_RANGE_2G_PLUS_SENS = auto()
     //     SENSOR_RANGE_2G_2PLUS_SENSE = auto()
     async deviceConfigurationSetAccelerationSensorSensitivity(deviceId, accelerationSensorSensitivity, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "accelerationSensorSensitivity": accelerationSensorSensitivity, "channelIndex": channelIndex };
+        let data = { deviceId, accelerationSensorSensitivity, channelIndex };
         await this.callRestApi('device/configuration/setAccelerationSensorSensitivity', data);
     }
 
     // accelerationSensorEventFilterPeriod = float
     async deviceConfigurationSetAccelerationSensorEventFilterPeriod(deviceId, accelerationSensorEventFilterPeriod, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "accelerationSensorEventFilterPeriod": accelerationSensorEventFilterPeriod, "channelIndex": channelIndex };
+        let data = { deviceId, accelerationSensorEventFilterPeriod, channelIndex };
         await this.callRestApi('device/configuration/setAccelerationSensorEventFilterPeriod', data);
     }
 
@@ -505,104 +516,104 @@ class HmCloudAPI {
     //     SOUND_SHORT_SHORT = auto()
     //     SOUND_LONG = auto()
     async deviceConfigurationSetNotificationSoundTyp(deviceId, notificationSoundType, isHighToLow, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "notificationSoundType": notificationSoundType, "isHighToLow": isHighToLow, "channelIndex": channelIndex };
+        let data = { deviceId, notificationSoundType, isHighToLow, channelIndex };
         await this.callRestApi('device/configuration/setNotificationSoundTyp', data);
     }
 
     async deviceConfigurationSetRouterModuleEnabled(deviceId, routerModuleEnabled, channelIndex = 1) {
-        let data = { "deviceId": deviceId, "routerModuleEnabled": routerModuleEnabled, "channelIndex": channelIndex };
+        let data = { deviceId, routerModuleEnabled, channelIndex };
         await this.callRestApi('device/configuration/setRouterModuleEnabled', data);
     }
 
     async deviceDeleteDevice(deviceId) {
-        let data = { "deviceId": deviceId };
+        let data = { deviceId };
         await this.callRestApi('device/deleteDevice', data);
     }
 
     async deviceSetDeviceLabel(deviceId, label) {
-        let data = { "deviceId": deviceId, "label": label };
+        let data = { deviceId, label };
         await this.callRestApi('device/setDeviceLabel', data);
     }
 
     async deviceIsUpdateApplicable(deviceId) {
-        let data = { "deviceId": deviceId };
+        let data = { deviceId };
         await this.callRestApi('device/isUpdateApplicable', data);
     }
 
     async deviceAuthorizeUpdate(deviceId) {
-        let data = { "deviceId": deviceId };
+        let data = { deviceId };
         await this.callRestApi('device/authorizeUpdate', data);
     }
 
     // =========== API for HM Groups ===========
 
     async groupHeatingSetPointTemperature(groupId, setPointTemperature) {
-        let data = { "groupId": groupId, "setPointTemperature": setPointTemperature };
+        let data = { groupId, setPointTemperature };
         await this.callRestApi('group/heating/setSetPointTemperature', data);
     }
 
     async groupHeatingSetBoostDuration(groupId, boostDuration) {
-        let data = { "groupId": groupId, "boostDuration": boostDuration };
+        let data = { groupId, boostDuration };
         await this.callRestApi('group/heating/setBoostDuration', data);
     }
 
     async groupHeatingSetBoost(groupId, boost) {
-        let data = { "groupId": groupId, "boost": boost };
+        let data = { groupId, boost };
         await this.callRestApi('group/heating/setBoost', data);
     }
 
     async groupHeatingSetControlMode(groupId, controlMode) {
-        let data = { "groupId": groupId, "controlMode": controlMode };
+        let data = { groupId, controlMode };
         //AUTOMATIC,MANUAL
         await this.callRestApi('group/heating/setControlMode', data);
     }
 
     async groupHeatingSetActiveProfile(groupId, profileIndex) {
-        let data = { "groupId": groupId, "profileIndex": profileIndex };
+        let data = { groupId, profileIndex };
         await this.callRestApi('group/heating/setActiveProfile', data);
     }
 
     async groupSwitchingAlarmSetOnTime(groupId, onTime) {
-        let data ={"groupId": groupId, "onTime": onTime};
+        let data ={groupId, onTime};
         await this.callRestApi('group/switching/alarm/setOnTime', data);
     }
 
     async groupSwitchingAlarmTestSignalOptical(groupId, signalOptical) {
-        let data = { "groupId": groupId, "signalOptical": signalOptical };
+        let data = { groupId, signalOptical };
         await this.callRestApi('group/switching/alarm/testSignalOptical', data);
     }
 
     async groupSwitchingAlarmSetSignalOptical(groupId, signalOptical) {
-        let data = { "groupId": groupId, "signalOptical": signalOptical };
+        let data = { groupId, signalOptical };
         await this.callRestApi('group/switching/alarm/setSignalOptical', data);
     }
 
     async groupSwitchingAlarmTestSignalAcoustic(groupId, signalAcoustic) {
-        let data = { "groupId": groupId, "signalAcoustic": signalAcoustic };
+        let data = { groupId, signalAcoustic };
         await this.callRestApi('group/switching/alarm/testSignalAcoustic', data);
     }
 
     async groupSwitchingAlarmSetSignalAcoustic(groupId, signalAcoustic) {
-        let data = { "groupId": groupId, "signalAcoustic": signalAcoustic };
+        let data = { groupId, signalAcoustic };
         await this.callRestApi('group/switching/alarm/setSignalAcoustic', data);
     }
 
     // =========== API for HM Clients ===========
 
     async clientDeleteClient(clientId) {
-        let data = { "clientId": clientId };
+        let data = { clientId };
         await this.callRestApi('client/deleteClient', data);
     }
 
     // =========== API for HM Home ===========
 
     async homeHeatingActivateAbsenceWithPeriod(endTime) {
-        let data = { "endTime": endTime };
+        let data = { endTime };
         await this.callRestApi('home/heating/activateAbsenceWithPeriod', data);
     }
 
     async homeHeatingActivateAbsenceWithDuration(duration) {
-        let data = { "duration": duration };
+        let data = { duration };
         await this.callRestApi('home/heating/activateAbsenceWithDuration', data);
     }
 
@@ -615,7 +626,7 @@ class HmCloudAPI {
     }
 
     async homeHeatingActivateVacation(temperature, endtime) {
-        let data = { "temperature": temperature, "endtime": endtime };
+        let data = { temperature, endtime };
         await this.callRestApi('home/heating/activateVacation', data);
     }
 
@@ -624,12 +635,12 @@ class HmCloudAPI {
     }
 
     async homeSetIntrusionAlertThroughSmokeDetectors(intrusionAlertThroughSmokeDetectors) {
-        let data = { "intrusionAlertThroughSmokeDetectors": intrusionAlertThroughSmokeDetectors};
+        let data = { intrusionAlertThroughSmokeDetectors };
         await this.callRestApi('home/security/setIntrusionAlertThroughSmokeDetectors', data);
     }
 
     async homeSetZonesActivation(internal, external) {
-        let data = { "zonesActivation": { "INTERNAL": internal, "EXTERNAL": external } };
+        let data = { zonesActivation: { INTERNAL: internal, EXTERNAL: external } };
         await this.callRestApi('home/security/setZonesActivation', data);
     }
 }

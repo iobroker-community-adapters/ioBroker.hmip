@@ -110,7 +110,9 @@
     "mode": "daemon",
     "compact": true,
     "icon": "homematic.png",
-    "materialize": true,
+    "adminUI": {
+      "config": "json"
+    },
     "enabled": true,
     "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.hmip/master/admin/homematic.png",
     "keywords": [
@@ -139,6 +141,7 @@
   },
   "native": {
     "deviceName": "iobroker",
+    "deviceId": "",
     "authToken": "",
     "clientAuthToken": "",
     "clientId": "",
