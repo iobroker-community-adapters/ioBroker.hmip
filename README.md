@@ -74,6 +74,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 * (bluefox) replaced module `require` with `axios`
 * (bluefox) Added JSON config
 * (ChristianFue) Added support for Hmip-RGBW 
+- (bluefox) Dependencies have been updated.
 
 ### 1.21.1 (2024-01-15)
 - (ApolloSK) Some issuses for energySensor have been fixed.
