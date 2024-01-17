@@ -1,20 +1,20 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.22.0-alpha.0",
+    "version": "1.22.0",
     "news": {
-      "1.22.0-alpha.0": {
-        "en": "IMPORTANT: Node.js 16.x is now required at a minimum\nreplaced module `require` with `axios`\nAdded JSON config\nAdded support for Hmip-RGBW \nDependencies have been updated.",
-        "de": "WICHTIG: Node.js 16.x ist numehr minimal erforderlich\nModul `require` wurde durch `axios` ersetzt.\nJSON config\nUnterstützung für Hmip-RGBW hinzugefügt\nAbhängigkeiten wurden aktualisiert.",
-        "ru": "ВАЖНО: Node.js 16.x теперь требуется минимум\nзамененный модуль `require' на `axios \"\nДобавить конфигурацию JSON\nДобавлена поддержка Hmip-RGBW\nЗависимость была обновлена.",
-        "pt": "IMPORTANTE: Node.js 16.x é agora exigido no mínimo\nmódulo substituído `require` com `axios \"\nAdicionado JSON config\nAdicionado suporte para Hmip-RGBW\nAs dependências foram atualizadas.",
-        "nl": "BELANGRIJK: Node.js 16.x is nu minimaal vereist\nvervangen module  wat\nJSON-configuratie toegevoegd\nOndersteuning toegevoegd voor Hmip-RGBW\nAfhankelijkheden zijn bijgewerkt.",
-        "fr": "IMPORTANT: Node.js 16.x est maintenant requis au minimum\nremplacer le module `require` par `axios \"\nAjout de la configuration JSON\nAjout du support pour Hmip-RGBW\nLes dépendances ont été actualisées.",
-        "it": "IMPORTANTE: Node.js 16.x è ora richiesto al minimo\nmodulo sostituito `require` con `assios #\nAggiunto JSON config\nAggiunto il supporto per Hmip-RGBW\nLe dipendenze sono state aggiornate.",
-        "es": "IMPORTANTE: Node.js 16.x se requiere ahora al mínimo\nsustituido módulo `require ' por `axios `\nConfiguración JSON\nApoyo añadido para Hmip-RGBW\nSe han actualizado las dependencias.",
-        "pl": "WAŻNE: Node.js 16.x jest teraz wymagane co najmniej\nzastąpiony moduł \"require\" z 'axios'\nDodano plik konfiguracyjny JSON\nDodano wsparcie dla HEIT- RGBW\nZaktualizowano zależność.",
-        "uk": "ВАЖЛИВО: Node.js 16.x тепер потрібен мінімум\nзаміщаний модуль ````axios й\nДодано налаштування JSON\nДодано підтримку Hmip-RGBW\nОновлено залежність.",
-        "zh-cn": "重要:现在至少需要16x节点\n将 \" 要求 \" 模块改为 \" 轴 \" `\n添加 JSON 配置\n添加对 Hmip-RGBW 的支持\n附属关系已经更新."
+      "1.22.0": {
+        "en": "IMPORTANT: Node.js 16.x or newer is now required\nModule `require` has been replaced by `axios`\nAdded JSON config\nAdded support for Hmip-RGBW \nDependencies have been updated.",
+        "de": "WICHTIG: Node.js 16.x oder neuer ist jetzt erforderlich\nModul `require` wurde durch `axios` ersetzt\nJSON config\nUnterstützung für Hmip-RGBW hinzugefügt\nAbhängigkeiten wurden aktualisiert.",
+        "ru": "ВАЖНО: Node.js 16.x или новый теперь требуется\nМодуль `require' был заменен на `axios'\nДобавить конфигурацию JSON\nДобавлена поддержка Hmip-RGBW\nЗависимость была обновлена.",
+        "pt": "IMPORTANTE: Node.js 16.x ou mais recente é agora necessário\nMódulo `require` foi substituído por `axios`\nAdicionado JSON config\nAdicionado suporte para Hmip-RGBW\nAs dependências foram atualizadas.",
+        "nl": "BELANGRIJK: Node.js 16.x of nieuwer is nu vereist\nModule \"require\" is vervangen door \"axios\"\nJSON-configuratie toegevoegd\nOndersteuning toegevoegd voor Hmip-RGBW\nAfhankelijkheden zijn bijgewerkt.",
+        "fr": "IMPORTANT: Node.js 16.x ou plus récent est maintenant nécessaire\nLe module `require` a été remplacé par `axios`\nAjout de la configuration JSON\nAjout du support pour Hmip-RGBW\nLes dépendances ont été actualisées.",
+        "it": "IMPORTANTE: Node.js 16.x o più recente è ora richiesto\nModulo `require` è stato sostituito da `axios`\nAggiunto JSON config\nAggiunto il supporto per Hmip-RGBW\nLe dipendenze sono state aggiornate.",
+        "es": "IMPORTANTE: Node.js 16.x o nuevo se requiere ahora\nEl módulo `require ' ha sido reemplazado por `axios &apos\nConfiguración JSON\nApoyo añadido para Hmip-RGBW\nSe han actualizado las dependencias.",
+        "pl": "WAŻNE: Node.js 16.x lub nowsze jest teraz wymagane\nModuł \"require\" został zastąpiony przez \"axios\"\nDodano plik konfiguracyjny JSON\nDodano wsparcie dla HEIT- RGBW\nZaktualizowano zależność.",
+        "uk": "ВАЖЛИВО: Node.js 16.x або новачок тепер потрібно\nМодуль `Потрібний` замінено на `axios`\nДодано налаштування JSON\nДодано підтримку Hmip-RGBW\nОновлено залежність.",
+        "zh-cn": "重要:现在需要16x节点或更新\n`要求 ' 模块已替换为`轴 '\n添加 JSON 配置\n添加对 Hmip-RGBW 的支持\n附属关系已经更新."
       },
       "1.21.1": {
         "en": "Some issuses for energySensor have been fixed.\nDependencies have been updated.",
@@ -77,18 +77,6 @@
         "es": "Fijar el tipo de datos de autoCalibración InProgress",
         "pl": "Fix datatype Inwestycja",
         "zh-cn": "自我评估的固定数据类型 目 录"
-      },
-      "1.19.0": {
-        "en": "Add several more device settings that can be modified via adapter (see readme for list)",
-        "de": "Fügen Sie mehrere weitere Geräteeinstellungen hinzu, die über Adapter geändert werden können (siehe Readme für Liste)",
-        "ru": "Добавьте еще несколько настроек устройства, которые могут быть изменены через адаптер (см. readme для списка)",
-        "pt": "Adicione várias outras configurações de dispositivo que podem ser modificadas via adaptador (consulte readme for list)",
-        "nl": "Voeg nog een paar apparatuur toe dat kan worden aangepast via adapter (zee lees me voor)",
-        "fr": "Ajouter plusieurs réglages de périphériques qui peuvent être modifiés via l'adaptateur (voir readme pour liste)",
-        "it": "Aggiungere più impostazioni del dispositivo che possono essere modificate tramite adattatore (vedere readme per l'elenco)",
-        "es": "Agregue varios ajustes de dispositivo más que se pueden modificar mediante adaptador (ver readme para lista)",
-        "pl": "Dostarczając kilka ustawień urządzenie, które mogą być modyfikowane poprzez adapter (patrz czytelnik na listę)",
-        "zh-cn": "增加一些能够通过适应者加以修改的装置环境(见清单的读者)。"
       }
     },
     "title": "HomeMaticIP Cloud AccessPoint",
