@@ -21,7 +21,7 @@ This adapter allows communication with a HomematicIP CloudAccessPoint via the Re
 **Important note:** Please limit control requests to the bare minimum because EQ-3 started to block IPs when you do too much!
 
 ## Installation
-This Adapter needs node-js in version >= 10.0
+This Adapter needs node-js in version >= 16.0
 
 Here is a Step-by-Step Installation Video on YouTube 
 https://youtu.be/kXWfJRUYJIA
