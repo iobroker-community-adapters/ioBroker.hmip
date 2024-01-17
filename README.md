@@ -69,9 +69,9 @@ https://github.com/ioBroker/AdapterRequests/issues/62
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### 1.22.0-alpha.0 (2024-01-17)
-* (bluefox) IMPORTANT: Node.js 16.x is now required at a minimum
-* (bluefox) replaced module `require` with `axios`
+### **WORK IN PROGRESS**
+* (bluefox) IMPORTANT: Node.js 16.x or newer is now required
+* (bluefox) Module `require` has been replaced by `axios`
 * (bluefox) Added JSON config
 * (ChristianFue) Added support for Hmip-RGBW 
 - (bluefox) Dependencies have been updated.
