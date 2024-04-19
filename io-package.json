@@ -79,7 +79,6 @@
         "zh-cn": "自我评估的固定数据类型 目 录"
       }
     },
-    "title": "HomeMaticIP Cloud AccessPoint",
     "titleLang": {
       "en": "HomeMaticIP Cloud AccessPoint",
       "de": "HomeMatic IP Cloud-Zugriffspunkt",
@@ -123,8 +122,12 @@
     ],
     "readme": "https://github.com/iobroker-community-adapters/ioBroker.hmip/blob/master/README.md",
     "loglevel": "info",
+    "tier": 2,
     "type": "hardware",
-    "license": "MIT",
+    "licenseInformation": {
+      "license": "MIT",
+      "type": "free"
+    },
     "messagebox": true,
     "plugins": {
       "sentry": {
@@ -133,10 +136,14 @@
     },
     "dependencies": [
       {
-        "js-controller": ">=3.1.0"
+        "js-controller": ">=5.0.19"
       }
     ],
-    "tier": 2,
+    "globalDependencies": [
+      {
+        "admin": ">=6.13.16"
+      }
+    ],
     "connectionType": "cloud",
     "dataSource": "push"
   },

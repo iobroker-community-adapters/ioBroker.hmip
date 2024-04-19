@@ -28,10 +28,10 @@
     "url": "https://github.com/iobroker-community-adapters/ioBroker.hmip"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=18"
   },
   "dependencies": {
-    "@iobroker/adapter-core": "^3.0.4",
+    "@iobroker/adapter-core": "^3.1.1",
     "js-sha512": "^0.8.0",
     "axios": "^1.6.7",
     "uuid": "^9.0.1",
