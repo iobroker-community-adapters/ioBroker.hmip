@@ -33,7 +33,7 @@
   "dependencies": {
     "@iobroker/adapter-core": "^3.1.1",
     "js-sha512": "^0.9.0",
-    "axios": "^1.6.7",
+    "axios": "^1.6.8",
     "uuid": "^9.0.1",
     "ws": "^8.16.0"
   },
@@ -53,7 +53,7 @@
     "@types/sinon": "^17.0.3",
     "@types/sinon-chai": "^3.2.12",
     "@vitalets/google-translate-api": "^9.2.0",
-    "axios": "^1.6.7",
+    "axios": "^1.6.8",
     "chai": "^4.4.1",
     "chai-as-promised": "^7.1.1",
     "configstore": "^6.0.0",
