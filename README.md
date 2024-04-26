@@ -73,7 +73,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 * (bluefox) IMPORTANT: Node.js 16.x is now required at a minimum
 * (bluefox) replaced module `require` with `axios`
 * (bluefox) Added JSON config
-* (ChristianFue) Added support for Hmip-RGBW 
+* (ChristianFue) Added support for Hmip-RGBW
 
 ### 1.21.1 (2024-01-15)
 - (ApolloSK) Some issuses for energySensor have been fixed.
