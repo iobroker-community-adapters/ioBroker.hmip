@@ -32,7 +32,7 @@ class HmipComponent extends ConfigGeneric {
     componentDidMount() {
         super.componentDidMount();
         const state = this.props.socket.getState(`hmip.${this.props.instance}.alive`);
-        if (state && state.val) {
+        if (state?.val) {
             this.setState({ alive: true, initialized: true }, () => this.askState());
         }
         this.props.socket.subscribeState(`system.adapter.hmip.${this.props.instance}.alive`, this.onAliveChanged);
@@ -92,7 +92,7 @@ class HmipComponent extends ConfigGeneric {
         const config = {
             accessPointSgtin: ConfigGeneric.getValue(this.props.data, 'accessPointSgtin'),
             clientId: ConfigGeneric.getValue(this.props.data, 'clientId'),
-            pin: ConfigGeneric.getValue(this.props.data, 'pin'),
+            pin: ConfigGeneric.getValue(this.props.data, 'pin') || '',
             deviceName: ConfigGeneric.getValue(this.props.data, 'deviceName'),
         };
         this.setState({ response: 'started token creation', running: true, error: false });
@@ -120,32 +120,30 @@ class HmipComponent extends ConfigGeneric {
     renderItem() {
         if (!this.state.alive && !this.state.initialized) {
             return <div>{I18n.t('custom_hmip_not_alive')}</div>;
-        } else if (!this.state.initialized) {
-            return <LinearProgress />;
-        } else {
-            const config = {
-                accessPointSgtin: ConfigGeneric.getValue(this.props.data, 'accessPointSgtin'),
-                pin: ConfigGeneric.getValue(this.props.data, 'pin'),
-            };
-
-            return <div style={{ width: '100%'}}>
-                <div
-                    style={{
-                        color: this.state.error ? (this.props.themeType === 'dark' ? '#c20000' : '#800000') : undefined,
-                    }}
-                >
-                    {I18n.t(`custom_hmip_${this.state.response}`).replace('custom_hmip_', '')}
-                </div>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    disabled={this.state.running || !config.accessPointSgtin || !config.pin}
-                    onClick={() => this.requestToken()}
-                >
-                    {this.state.running ? <CircularProgress size={24} /> : I18n.t('custom_hmip_request_token')}
-                </Button>
-            </div>;
         }
+        if (!this.state.initialized) {
+            return <LinearProgress />;
+        }
+
+        const accessPointSgtin = ConfigGeneric.getValue(this.props.data, 'accessPointSgtin');
+
+        return <div style={{ width: '100%'}}>
+            <div
+                style={{
+                    color: this.state.error ? (this.props.themeType === 'dark' ? '#c20000' : '#800000') : undefined,
+                }}
+            >
+                {I18n.t(`custom_hmip_${this.state.response}`).replace('custom_hmip_', '')}
+            </div>
+            <Button
+                variant="contained"
+                color="primary"
+                disabled={this.state.running || !accessPointSgtin}
+                onClick={() => this.requestToken()}
+            >
+                {this.state.running ? <CircularProgress size={24} /> : I18n.t('custom_hmip_request_token')}
+            </Button>
+        </div>;
     }
 }
 
