@@ -97,7 +97,7 @@ class HmCloudAPI {
         const body = {
             deviceId: this._deviceId,
             deviceName: devicename,
-            sgtin: this._accessPointSgtinб
+            sgtin: this._accessPointSgtin,
         };
         let res;
         try {
