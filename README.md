@@ -69,7 +69,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 1.23.1 (2024-04-30)
 * (bluefox) Allowed calling token request without PIN
 
 ### 1.23.0 (2024-04-19)
