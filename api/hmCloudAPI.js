@@ -100,7 +100,7 @@ class HmCloudAPI {
         try {
             const response = await axios.post(`${this._urlREST}/hmip/auth/connectionRequest`, body, {
                 headers,
-                validateStatus: status => status => status < 400,
+                validateStatus: status => status < 400,
             });
             return response.data;
         } catch (err) {
@@ -120,7 +120,7 @@ class HmCloudAPI {
         try {
             const response = await axios.post(`${this._urlREST}/hmip/auth/isRequestAcknowledged`, body, {
                 headers,
-                validateStatus: status => status => status < 400,
+                validateStatus: status => status < 400,
             });
             return response.data && typeof response.data === 'object';
         } catch (err) {
@@ -141,7 +141,7 @@ class HmCloudAPI {
         try {
             let response = await axios.post(`${this._urlREST}/hmip/auth/requestAuthToken`, body, {
                 headers,
-                validateStatus: status => status => status < 400,
+                validateStatus: status => status < 400,
             });
             res = response.data;
             this._authToken = res.authToken;

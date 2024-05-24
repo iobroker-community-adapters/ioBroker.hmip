@@ -3,7 +3,7 @@
 'use strict';
 
 const utils = require('@iobroker/adapter-core'); // Get common adapter utils
-const apiClass = require('./api/hmCloudAPI.js');
+const apiClass = require('./api/hmCloudAPI');
 const { v4: uuidv4 } = require('uuid');
 
 const adapterName = require('./package.json').name.split('.').pop();
