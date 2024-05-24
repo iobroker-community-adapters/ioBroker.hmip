@@ -69,8 +69,9 @@ https://github.com/ioBroker/AdapterRequests/issues/62
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### 1.23.1 (2024-04-30)
+### **WORK IN PROGRESS**
 * (bluefox) Allowed calling token request without PIN
+* (bluefox) Corrected the token request
 
 ### 1.23.0 (2024-04-19)
 - (mcm1957) Adapter requires node.js >= 18 and js-controller >= 5 now

@@ -4,7 +4,7 @@ if (!process.argv || !process.argv[2]) {
     console.log('run like this "node test_getAuthToken.js ACCESSPOINTGTIN [PIN]"');
 }
 
-const apiClass = require('./hm-cloud-api.js');
+const apiClass = require('./hmCloudAPI.js');
 const api = new apiClass(process.argv[2], process.argv[3]);
 
 console.log('------ test start --------');

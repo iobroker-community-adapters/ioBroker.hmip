@@ -1,6 +1,6 @@
 // node --inspect-brk testterminal.js
 
-const apiClass = require('./hm-cloud-api.js');
+const apiClass = require('./hmCloudAPI.js');
 const api = new apiClass({
     authToken: 'xxxxxxxxxx',
     clientAuthToken: 'xxxxxxxxxxxxxxxxxxxxxxxx',

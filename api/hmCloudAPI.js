@@ -1,5 +1,3 @@
-/* jshint -W097 */// jshint strict:false
-/*jslint node: true */
 'use strict';
 
 const sha512 = require('js-sha512');
@@ -87,9 +85,9 @@ class HmCloudAPI {
     async auth1connectionRequest(devicename = 'hmipnodejs') {
         const headers = {
             'content-type': 'application/json',
-            'accept': 'application/json',
-            'VERSION': '12',
-            'CLIENTAUTH': this._clientAuthToken,
+            accept: 'application/json',
+            VERSION: '12',
+            CLIENTAUTH: this._clientAuthToken,
         };
         if (this._pin) {
             headers['PIN'] = this._pin;
@@ -99,41 +97,62 @@ class HmCloudAPI {
             deviceName: devicename,
             sgtin: this._accessPointSgtin,
         };
-        let res;
         try {
-            const response = await axios.post(`${this._urlREST}/hmip/auth/connectionRequest`, body);
-            res = response.data;
+            const response = await axios.post(`${this._urlREST}/hmip/auth/connectionRequest`, body, {
+                headers,
+                validateStatus: status => status => status < 400,
+            });
+            return response.data;
         } catch (err) {
             this.requestError && this.requestError(err);
-        }
-        if (!res || res.statusCode !== 200) {
-            throw new Error('error');
+            return null;
         }
     }
 
     async auth2isRequestAcknowledged() {
-        const headers = { 'content-type': 'application/json', 'accept': 'application/json', 'VERSION': '12', 'CLIENTAUTH': this._clientAuthToken };
+        const headers = {
+            'content-type': 'application/json',
+            accept: 'application/json',
+            VERSION: '12',
+            CLIENTAUTH: this._clientAuthToken,
+        };
         const body = { deviceId: this._deviceId };
-        let res;
         try {
-            const response = await axios.post(`${this._urlREST}/hmip/auth/isRequestAcknowledged`, body, { headers });
-            res = response.data;
+            const response = await axios.post(`${this._urlREST}/hmip/auth/isRequestAcknowledged`, body, {
+                headers,
+                validateStatus: status => status => status < 400,
+            });
+            return response.data && typeof response.data === 'object';
         } catch (err) {
             this.requestError && this.requestError(err);
+            return false;
         }
-        return res && typeof res === 'object' && res.statusCode === 200;
     }
 
     async auth3requestAuthToken() {
-        let headers = { 'content-type': 'application/json', 'accept': 'application/json', 'VERSION': '12', 'CLIENTAUTH': this._clientAuthToken };
+        let headers = {
+            'content-type': 'application/json',
+            accept: 'application/json',
+            VERSION: '12',
+            CLIENTAUTH: this._clientAuthToken,
+        };
         let body = { deviceId: this._deviceId };
         let res;
         try {
-            let response = await axios.post(`${this._urlREST}/hmip/auth/requestAuthToken`, body, { headers });
+            let response = await axios.post(`${this._urlREST}/hmip/auth/requestAuthToken`, body, {
+                headers,
+                validateStatus: status => status => status < 400,
+            });
             res = response.data;
             this._authToken = res.authToken;
-            body = { deviceId: this._deviceId, authToken: this._authToken };
-            response = await axios.post(`${this._urlREST}/hmip/auth/confirmAuthToken`, body, { headers });
+            body = {
+                deviceId: this._deviceId,
+                authToken: this._authToken,
+            };
+            response = await axios.post(`${this._urlREST}/hmip/auth/confirmAuthToken`, body, {
+                headers,
+                validateStatus: status => status => status < 400,
+            });
             res = response.data;
             this._clientId = res.clientId;
         } catch (err) {
@@ -142,7 +161,13 @@ class HmCloudAPI {
     }
 
     async callRestApi(path, data) {
-        let headers = { 'content-type': 'application/json', 'accept': 'application/json', 'VERSION': '12', 'AUTHTOKEN': this._authToken, 'CLIENTAUTH': this._clientAuthToken};
+        let headers = {
+            'content-type': 'application/json',
+            accept: 'application/json',
+            VERSION: '12',
+            AUTHTOKEN: this._authToken,
+            CLIENTAUTH: this._clientAuthToken,
+        };
         try {
             const response = await axios.post(`${this._urlREST}/hmip/${path}`, data, { headers });
             return response.data;

@@ -3,19 +3,6 @@
     "name": "hmip",
     "version": "1.23.1",
     "news": {
-      "1.23.1": {
-        "en": "Allowed calling token request without PIN",
-        "de": "Token Request ist nun ohne PIN möglich.",
-        "ru": "Разрешенный вызов токен запрос без PIN",
-        "pt": "Pedido de token de chamada permitido sem PIN",
-        "nl": "Toegestaan aanroepen token verzoek zonder PIN",
-        "fr": "Demande de jeton d'appel autorisée sans NIP",
-        "it": "Ammessi chiamare richiesta di token senza PIN",
-        "es": "Permiso de llamada sin PIN",
-        "pl": "Dopuszczalny sygnał wywoławczy bez PIN",
-        "uk": "Дозволений запит Token без PIN",
-        "zh-cn": "允许不使用 PIN 调用令牌请求"
-      },
       "1.23.0": {
         "en": "Adapter requires node.js >= 18 and js-controller >= 5 now\nDependencies have been updated",
         "de": "Adapter benötigt node.js >= 18 und js-controller >= 5 jetzt\nAbhängigkeiten wurden aktualisiert",

@@ -3,7 +3,7 @@
 'use strict';
 
 const utils = require('@iobroker/adapter-core'); // Get common adapter utils
-const apiClass = require('./api/hm-cloud-api.js');
+const apiClass = require('./api/hmCloudAPI.js');
 const { v4: uuidv4 } = require('uuid');
 
 const adapterName = require('./package.json').name.split('.').pop();
@@ -655,7 +655,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         if (error.response) {
             // The request was made and the server responded with a status code
             // that falls out of the range of 2xx
-            this.log.warn(`Request error data: ${error.response.data}`);
+            this.log.warn(`Request error data: ${error.response.data}, (${JSON.stringify(error.response.data)})`);
             this.log.warn(`Request error status: ${error.response.status}`);
         } else if (error.request) {
             // The request was made but no response was received
