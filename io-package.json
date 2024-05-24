@@ -161,6 +161,7 @@
     "connectionType": "cloud",
     "dataSource": "push"
   },
+  "protectedNative" : ["authToken", "clientAuthToken", "clientId"],
   "native": {
     "deviceName": "iobroker",
     "deviceId": "",
