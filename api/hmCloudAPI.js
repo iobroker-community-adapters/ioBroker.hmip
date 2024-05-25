@@ -82,7 +82,7 @@ class HmCloudAPI {
 
     // =========== API for Token generation ===========
 
-    async auth1connectionRequest(devicename = 'hmipnodejs') {
+    async auth1connectionRequest(deviceName = 'hmipnodejs') {
         const headers = {
             'content-type': 'application/json',
             accept: 'application/json',
@@ -94,7 +94,7 @@ class HmCloudAPI {
         }
         const body = {
             deviceId: this._deviceId,
-            deviceName: devicename,
+            deviceName,
             sgtin: this._accessPointSgtin,
         };
         try {
@@ -118,11 +118,11 @@ class HmCloudAPI {
         };
         const body = { deviceId: this._deviceId };
         try {
-            const response = await axios.post(`${this._urlREST}/hmip/auth/isRequestAcknowledged`, body, {
+            await axios.post(`${this._urlREST}/hmip/auth/isRequestAcknowledged`, body, {
                 headers,
-                validateStatus: status => status < 400,
+                validateStatus: status => status === 200,
             });
-            return response.data && typeof response.data === 'object';
+            return true;
         } catch (err) {
             this.requestError && this.requestError(err);
             return false;
