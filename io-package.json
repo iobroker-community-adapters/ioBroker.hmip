@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.23.2",
+    "version": "1.23.3",
     "news": {
+      "1.23.3": {
+        "en": "Ignored status 400 by token request",
+        "de": "Ignorieren des Status 400 durch Token-Anfrage",
+        "ru": "Игнорированный статус 400 по токену запроса",
+        "pt": "Status ignorado 400 por pedido de token",
+        "nl": "Status vergeten 400 op token verzoek",
+        "fr": "Statut ignoré 400 sur demande de jeton",
+        "it": "Stato ignorato 400 da richiesta token",
+        "es": "Estado ignorado 400 por solicitud de token",
+        "pl": "Ignorowany status 400 na żądanie tokena",
+        "uk": "Ignored статус 400 за запитом",
+        "zh-cn": "通过符号请求忽略状态 400"
+      },
       "1.23.2": {
         "en": "Allowed calling token request without PIN\nCorrected the token request",
         "de": "Erlaubte Anrufbeantwortung ohne PIN\nKorrektur der Tokenanfrage",
@@ -79,18 +92,6 @@
         "es": "IMPORTANTE: Node.js 12.x se requiere ahora al mínimo\nAgregar campos adicionales para MULTI_MODE_INPUT_CHANNEL para Doorbell\nAñadir la posición de la válvula para FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL\nAñadir varios estados más para SWITCH_CHANNEL, DIMMER_CHANNEL, WEATHER_SENSOR_CHANNEL, SHUTTER_CHANNEL\nAñadir etiqueta de canal",
         "pl": "IMPORTANT: Nodejs 12.x jest obecnie wymagany przy minimalnej liczbie\nWspomnienia dla MULTI_MODE_INPUT_CHANNEL dla Doorbelly\nPozycja zaworu dla FLOOR_TERMINAL_BLOCK_MECHANNEL\nWspierał kilka kolejnych stanów: SWITCH_CHANNEL, DIMMER_CHANNEL, WEATHER_SENSOR_CHANNEL, SHUTTER_CHANNEL\nKanał",
         "zh-cn": "IMPORTANT:Nodejs 12x现在至少需要。\n增加MULTI_MODE_INPUT_CHANNEL for Doorbell\n增加民解力量(联尼特派团)的作用\n增加更多国家,以东南非投资中心,CHANNEL, DIMBA_CHANNEL, WEATHER_SEANNEL, SHUTTER_CHANNEL\n增加标签"
-      },
-      "1.19.2": {
-        "en": "Optimize Reconnect handling",
-        "de": "Optimieren Sie Reconnect Handling",
-        "ru": "Оптимизация обработки Reconnect",
-        "pt": "Otimizar o manuseio Reconnect",
-        "nl": "Optimize Reconnect",
-        "fr": "Optimiser la manipulation de reconnect",
-        "it": "Ottimizzare la gestione della connessione",
-        "es": "Optimize Reconnect handling",
-        "pl": "Optimize Reconnection",
-        "zh-cn": "恢复联系"
       }
     },
     "titleLang": {
@@ -161,7 +162,12 @@
     "connectionType": "cloud",
     "dataSource": "push"
   },
-  "protectedNative" : ["authToken", "clientAuthToken", "clientId", "pin"],
+  "protectedNative": [
+    "authToken",
+    "clientAuthToken",
+    "clientId",
+    "pin"
+  ],
   "native": {
     "deviceName": "iobroker",
     "deviceId": "",

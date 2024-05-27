@@ -69,7 +69,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 1.23.3 (2024-05-27)
 * (bluefox) Ignored status 400 by token request
 
 ### 1.23.2 (2024-05-24)
