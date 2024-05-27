@@ -124,7 +124,9 @@ class HmCloudAPI {
             });
             return true;
         } catch (err) {
-            this.requestError && this.requestError(err);
+            if (err.response && err.response.status !== 400) {
+                this.requestError && this.requestError(err);
+            }
             return false;
         }
     }
