@@ -55,7 +55,7 @@
     "@vitalets/google-translate-api": "^9.2.0",
     "axios": "^1.7.2",
     "chai": "^4.4.1",
-    "chai-as-promised": "^7.1.2",
+    "chai-as-promised": "^8.0.0",
     "configstore": "^6.0.0",
     "eslint": "^9.3.0",
     "eslint-config-prettier": "^9.1.0",
