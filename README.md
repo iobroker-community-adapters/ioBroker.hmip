@@ -62,6 +62,7 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 https://github.com/ioBroker/AdapterRequests/issues/62
 
 <!--
+    Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
@@ -69,6 +70,11 @@ https://github.com/ioBroker/AdapterRequests/issues/62
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+
+* ### __WORK IN PROGRESS__
+* (Apollon77) previousShutterLevel and hardwareColorTemperatureColdWhite datatype corrected
+* (Apollon77) Optimize websocket reconnection handling
+
 ### 1.23.3 (2024-05-27)
 * (bluefox) Ignored status 400 by token request
 

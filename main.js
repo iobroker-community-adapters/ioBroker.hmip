@@ -634,9 +634,9 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         reason = reason ? reason.toString() : '';
         this.log.warn(`ws connection closed (${this.wsConnectionErrorCounter}) - code: ${code} - reason: ${reason}`);
         this.wsConnected = false;
-        if ((this.wsConnectionErrorCounter > 6 || reason.includes('ECONNREFUSED')) && !this._unloaded) {
+        if (this.wsConnectionErrorCounter > 6 && !this._unloaded) {
             this._api.dispose();
-            this.log.error(`error updating Homematic ip for unknown states: ${code} - ${reason}`);
+            this.log.error(`error updating Homematic ip: ${code} - ${reason}`);
             this.log.error('Try reconnect in 30s');
             this.reInitTimeout && clearTimeout(this.reInitTimeout);
             this.reInitTimeout = setTimeout(() => {
@@ -648,8 +648,19 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _errored(error) {
         this.log.warn(`ws connection error (${this.wsConnectionErrorCounter}): ${error}`);
+        const reason = error ? error.toString() : '';
         if (!this.wsConnected) {
             this.wsConnectionErrorCounter++;
+        }
+        if (reason.includes('ECONNREFUSED') && !this._unloaded) {
+            this._api.dispose();
+            this.log.error(`error updating homematic ip: ${reason}`);
+            this.log.error('Try reconnect in 30s');
+            this.reInitTimeout && clearTimeout(this.reInitTimeout);
+            this.reInitTimeout = setTimeout(() => {
+                this.reInitTimeout = null;
+                this._ready()
+            }, 30000);
         }
     }
 
@@ -2375,7 +2386,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _createBlindChannel(device, channel) {
         let promises = [];
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.stop`, { type: 'state', common: { name: 'on', type: 'boolean', role: 'button', read: false, write: true }, native: { id: device.id, channel: channel, parameter: 'stop' } }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.previousShutterLevel`, { type: 'state', common: { name: 'previousShutterLevel', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.previousShutterLevel`, { type: 'state', common: { name: 'previousShutterLevel', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.processing`, { type: 'state', common: { name: 'processing', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.selfCalibrationInProgress`, { type: 'state', common: { name: 'selfCalibrationInProgress', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.topToBottomReferenceTime`, { type: 'state', common: { name: 'topToBottomReferenceTime', type: 'number', role: 'value.interval', read: true, write: false }, native: {} }));
@@ -2442,7 +2453,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 	    promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.colorTemperature`, { type: 'state', common: { name: 'colorTemperature', type: 'number', role: 'level.color.temperature', read: true, write: true, min: 2000, max: 6500  }, native: { id: device.id, channel: channel, parameter: 'colorTemperature' } }));
 	    promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.hue`, { type: 'state', common: { name: 'hue', type: 'number', role: 'level.color.hue', read: true, write: true, min: 0, max: 360 }, native: { id: device.id, channel: channel, parameter: 'hue' } }));
 	    promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.saturationLevel`, { type: 'state', common: { name: 'saturationLevel', type: 'number', role: 'level.color.saturation', read: true, write: true, min: 0, max: 255 }, native: { id: device.id, channel: channel, parameter: 'saturationLevel' } }));
-	    promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.hardwareColorTemperatureColdWhite`, { type: 'state', common: { name: 'hardwareColorTemperatureColdWhite', type: 'numbern', role: 'level.color.temperature', read: true, write: false }, native: {} }));
+	    promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.hardwareColorTemperatureColdWhite`, { type: 'state', common: { name: 'hardwareColorTemperatureColdWhite', type: 'number', role: 'level.color.temperature', read: true, write: false }, native: {} }));
 	    promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.hardwareColorTemperatureWarmWhite`, { type: 'state', common: { name: 'hardwareColorTemperatureWarmWhite', type: 'number', role: 'level.color.temperature', read: true, write: false }, native: {} }));
 	    promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.dim2WarmActive`, { type: 'state', common: { name: 'dim2WarmActive', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'switchState' } }));
 	    promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.humanCentricLightActive`, { type: 'state', common: { name: 'humanCentricLightActive', type: 'boolean', role: 'switch', read: true, write: true }, native: { id: device.id, channel: channel, parameter: 'switchState' } }));
@@ -2564,7 +2575,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         let promises = [];
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.stop`, { type: 'state', common: { name: 'on', type: 'boolean', role: 'button', read: false, write: true }, native: { id: device.id, channel: channel, parameter: 'stop' } }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.shutterLevel`, { type: 'state', common: { name: 'shutterLevel', type: 'number', role: 'level', read: true, write: true, min: 0, max: 100 }, native: { id: device.id, channel: channel, parameter: 'shutterlevel' } }));
-        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.previousShutterLevel`, { type: 'state', common: { name: 'previousShutterLevel', type: 'string', role: 'text', read: true, write: false }, native: {} }));
+        promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.previousShutterLevel`, { type: 'state', common: { name: 'previousShutterLevel', type: 'number', role: 'value', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.processing`, { type: 'state', common: { name: 'processing', type: 'boolean', role: 'text', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.selfCalibrationInProgress`, { type: 'state', common: { name: 'selfCalibrationInProgress', type: 'boolean', role: 'indicator', read: true, write: false }, native: {} }));
         promises.push(this.extendObjectAsync(`devices.${device.id}.channels.${channel}.topToBottomReferenceTime`, { type: 'state', common: { name: 'topToBottomReferenceTime', type: 'number', role: 'value.interval', read: true, write: false }, native: {} }));
