@@ -67,7 +67,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 -->
 ## Changelog
 
-* ### __WORK IN PROGRESS__
+### __WORK IN PROGRESS__
 * (Apollon77) previousShutterLevel and hardwareColorTemperatureColdWhite datatype corrected
 * (Apollon77) Optimize websocket reconnection handling
 
