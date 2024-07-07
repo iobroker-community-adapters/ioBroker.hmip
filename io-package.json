@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.23.3",
+    "version": "1.23.4",
     "news": {
+      "1.23.4": {
+        "en": "previousShutterLevel and hardwareColorTemperatureColdWhite datatype corrected\nOptimize websocket reconnection handling",
+        "de": "vorherigeShutterLevel und HardwareColorTemperature kalt Weißer Datentyp korrigiert\nOptimieren Sie Websocket-Reconnecting-Handling",
+        "ru": "предыдущееУровень и аппаратная температура Холодный Белый тип данных исправлен\nОптимизация обработки веб-сокета",
+        "pt": "anteriorShutterLevel e hardwareColorTemperature Frio Tipo de dados branco corrigido\nOtimizar o manuseio de reconexão websocket",
+        "nl": "vorigeShutterLevel en hardwareColorTemperatuur Koud Wit gegevenstype gecorrigeerd\nOptimaliseren van websocket-reconnectie",
+        "fr": "précédentShutterLevel et hardwareColorTemperature Froid Type de données blanc corrigé\nOptimiser la gestion de la reconnection de la poche web",
+        "it": "precedenteShutterLevel e hardwareColorTemperature Freddo freddo Datatipo bianco corretto\nOttimizzare la gestione della connessione websocket",
+        "es": "anteriorShutterNivel y hardwareColorTemperatura Cold Tipo de datos blanco corregido\nOptimize websocket reconnection handling",
+        "pl": "previousShutterLevel and hardwareColorTemperatura Zimne Białe typy danych skorygowane\nOptymalizacja obsługi ponownego połączenia websocket",
+        "uk": "попереднійShutterLevel і обладнанняColorTemperature Холодний Білий тип даних виправлений\nОптимізуйте переключення websocket",
+        "zh-cn": "前一个 Shutter 级别和硬件颜色 凉 更正的白色数据类型\n优化 Websocket 重新连接处理"
+      },
       "1.23.3": {
         "en": "Ignored status 400 by token request",
         "de": "Ignorieren des Status 400 durch Token-Anfrage",
@@ -80,18 +93,6 @@
         "pl": "Współczynnik ENERGY_SENSORS_INTERFNEL\nStandardowe przepływy pracy i testowania zostały zaktualizowane.\nAdapter wymaga węzła 16 lub nowszych.\nW zależności zostały zaktualizowane.",
         "uk": "Реалізація ENERGY_SENSORS_INTERFACE_CHANNEL\nОновлено стандартні робочі процеси та тестування.\nАдаптер вимагає nodejs 16 або новіший зараз.\nОновлено залежність.",
         "zh-cn": "执行ENERGY_SENSORS_INTERCE_CHANNEL\n已更新了标准工作流程和试验。.\n现在需要16个或新人员。.\n情况已经更新。."
-      },
-      "1.20.0": {
-        "en": "IMPORTANT: Node.js 12.x is now required at minimum\nAdd additional fields for MULTI_MODE_INPUT_CHANNEL for Doorbell\nAdd valve position for FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL\nAdd several more states for SWITCH_CHANNEL, DIMMER_CHANNEL, WEATHER_SENSOR_CHANNEL, SHUTTER_CHANNEL \nAdd channel label",
-        "de": "WICHTIG: Node.js 12.x ist jetzt mindestens erforderlich\nFügen Sie weitere Felder für MULTI_MODE_INPUT_CHANNEL für Doorbell hinzu\nVentilstellung für FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL hinzufügen\nFügen Sie mehrere Zustände für SWITCH_CHANNEL, DIMMER_CHANNEL, WEATHER_SENSOR_CHANNEL, SHUTTER_CHANNEL hinzu\nHinzufügen von Channel Label",
-        "ru": "ВАЖНО: Node.js 12.x теперь требуется минимум\nДобавить дополнительные поля для MULTI_MODE_INPUT_CHANNEL для Doorbell\nДобавить позицию клапана для FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL\nДобавить еще несколько штатов для SWITCH_CHANNEL, DIMMER_CHANNEL, WEATHER_SENSOR_CHANNEL, SHUTTER_CHANNEL\nДобавить ярлык канала",
-        "pt": "IMPORTANTE: Node.js 12.x é agora exigido no mínimo\nAdicionar campos adicionais para MULTI_MODE_INPUT_CHANNEL para campainha\nAdicionar posição da válvula para FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL\nAdicione mais alguns estados para SWITCH_CHANNEL, DIMMER_CHANNEL, WEATHER_SENSOR_CHANNEL, SHUTTER_CHANNEL\nAdicionar etiqueta de canal",
-        "nl": "Node is nu nodig op minimum\nVoeg extra velden toe voor MULTIMODEINPUTCHANNEL voor de deurbel\nVoeg klep positie toe voor FLOORMINAL\nVertaling:\nVertaling:",
-        "fr": "IMPORTANT: Node.js 12.x est maintenant nécessaire au minimum\nAjouter des champs additionnels pour MULTI_MODE_INPUT_CHANNEL pour Doorbell\nAjouter la position de la valve pour FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL\nAjouter plusieurs autres états pour SWITCH_CHANNEL, DIMMER_CHANNEL, WEATHER_SENSOR_CHANNEL, SHUTTER_CHANNEL\nAjouter le label de canal",
-        "it": "IMPORTANTE: Node.js 12.x è ora richiesto al minimo\nAggiungi ulteriori campi per MULTI_MODE_INPUT_CHANNEL per Doorbell\nAggiungi la posizione della valvola per FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL\nAggiungi più stati per SWITCH_CHANNEL, DIMMER_CHANNEL, WEATHER_SENSOR_CHANNEL, SHUTTER_CHANNEL\nAggiungi etichetta canale",
-        "es": "IMPORTANTE: Node.js 12.x se requiere ahora al mínimo\nAgregar campos adicionales para MULTI_MODE_INPUT_CHANNEL para Doorbell\nAñadir la posición de la válvula para FLOOR_TERMINAL_BLOCK_MECHANIC_CHANNEL\nAñadir varios estados más para SWITCH_CHANNEL, DIMMER_CHANNEL, WEATHER_SENSOR_CHANNEL, SHUTTER_CHANNEL\nAñadir etiqueta de canal",
-        "pl": "IMPORTANT: Nodejs 12.x jest obecnie wymagany przy minimalnej liczbie\nWspomnienia dla MULTI_MODE_INPUT_CHANNEL dla Doorbelly\nPozycja zaworu dla FLOOR_TERMINAL_BLOCK_MECHANNEL\nWspierał kilka kolejnych stanów: SWITCH_CHANNEL, DIMMER_CHANNEL, WEATHER_SENSOR_CHANNEL, SHUTTER_CHANNEL\nKanał",
-        "zh-cn": "IMPORTANT:Nodejs 12x现在至少需要。\n增加MULTI_MODE_INPUT_CHANNEL for Doorbell\n增加民解力量(联尼特派团)的作用\n增加更多国家,以东南非投资中心,CHANNEL, DIMBA_CHANNEL, WEATHER_SEANNEL, SHUTTER_CHANNEL\n增加标签"
       }
     },
     "titleLang": {
