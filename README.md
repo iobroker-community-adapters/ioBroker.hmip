@@ -66,10 +66,6 @@ https://github.com/ioBroker/AdapterRequests/issues/62
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
-<!--
-    Placeholder for the next version (at the beginning of the line):
-    ### **WORK IN PROGRESS**
--->
 
 * ### __WORK IN PROGRESS__
 * (Apollon77) previousShutterLevel and hardwareColorTemperatureColdWhite datatype corrected
