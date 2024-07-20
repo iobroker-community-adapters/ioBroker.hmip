@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@mui/styles';
 
 import {
     LinearProgress,
@@ -13,9 +12,6 @@ import {
 // import ConfigGeneric from '@iobroker/adapter-react-v5/ConfigGeneric';
 // valid
 import { ConfigGeneric, I18n } from '@iobroker/adapter-react-v5';
-
-const styles = () => ({
-});
 
 class HmipComponent extends ConfigGeneric {
     constructor(props) {
@@ -160,4 +156,4 @@ HmipComponent.propTypes = {
     onChange: PropTypes.func,
 };
 
-export default withStyles(styles)(HmipComponent);
+export default HmipComponent;
