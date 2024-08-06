@@ -66,7 +66,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 1.24.1 (2024-08-06)
 * (bluefox) GUI was migrated for Admin 7
 
 ### 1.23.4 (2024-07-07)
