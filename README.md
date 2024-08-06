@@ -66,8 +66,8 @@ https://github.com/ioBroker/AdapterRequests/issues/62
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
-### 1.24.0 (2024-07-20)
-* (bluefox) GUI was migrated to Admin 7
+### **WORK IN PROGRESS**
+* (bluefox) GUI was migrated for Admin 7
 
 ### 1.23.4 (2024-07-07)
 * (Apollon77) previousShutterLevel and hardwareColorTemperatureColdWhite datatype corrected

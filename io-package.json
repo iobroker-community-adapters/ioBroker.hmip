@@ -3,19 +3,6 @@
     "name": "hmip",
     "version": "1.24.0",
     "news": {
-      "1.24.0": {
-        "en": "GUI was migrated to Admin 7",
-        "de": "GUI wurde zu Admin 7 migriert",
-        "ru": "GUI был перенесен в Админ 7",
-        "pt": "GUI foi migrado para Admin 7",
-        "nl": "GUI is gemigreerd naar Admin 7",
-        "fr": "L'interface graphique a été transférée à l'Admin 7",
-        "it": "GUI è stata migrata ad Admin 7",
-        "es": "GUI was migrated to Admin 7",
-        "pl": "GUI został przeniesiony do Admin 7",
-        "uk": "GUI був мігрований до Admin 7",
-        "zh-cn": "GUI 已迁移到管理员 7"
-      },
       "1.23.4": {
         "en": "previousShutterLevel and hardwareColorTemperatureColdWhite datatype corrected\nOptimize websocket reconnection handling",
         "de": "vorherigeShutterLevel und HardwareColorTemperature kalt Weißer Datentyp korrigiert\nOptimieren Sie Websocket-Reconnecting-Handling",
