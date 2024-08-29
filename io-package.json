@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.24.1",
+    "version": "1.24.2",
     "news": {
+      "1.24.2": {
+        "en": "GUI was migrated for Admin 7\nRemoved gulp",
+        "de": "GUI wurde für Admin 7 migriert\nEntfernter Gulp",
+        "ru": "GUI был перенесен на Админ 7\nУдаленный gulp",
+        "pt": "GUI foi migrado para Admin 7\nGulp removido",
+        "nl": "GUI is gemigreerd voor Admin 7\nGulp verwijderd",
+        "fr": "GUI a été migré pour l'Admin 7\nSupprimé le goupille",
+        "it": "GUI è stata migrata per Admin 7\nGolp rimosso",
+        "es": "GUI was migrated for Admin 7\nGolpes eliminados",
+        "pl": "Interfejs GUI został wyemigrowany do Admin 7\nUsunięty przełyk",
+        "uk": "GUI був мігрований для адміністратора 7\nВиданий гель",
+        "zh-cn": "管理员 7 的图形用户界面已迁移\n删除的 gulp"
+      },
       "1.24.1": {
         "en": "GUI was migrated for Admin 7",
         "de": "GUI wurde für Admin 7 migriert",
@@ -80,19 +93,6 @@
         "pl": "WAŻNE: Node.js 16.x lub nowsze jest teraz wymagane\nModuł \"require\" został zastąpiony przez \"axios\"\nDodano plik konfiguracyjny JSON\nDodano wsparcie dla HEIT- RGBW\nZaktualizowano zależność.",
         "uk": "ВАЖЛИВО: Node.js 16.x або новачок тепер потрібно\nМодуль `Потрібний` замінено на `axios`\nДодано налаштування JSON\nДодано підтримку Hmip-RGBW\nОновлено залежність.",
         "zh-cn": "重要:现在需要16x节点或更新\n`要求 ' 模块已替换为`轴 '\n添加 JSON 配置\n添加对 Hmip-RGBW 的支持\n附属关系已经更新."
-      },
-      "1.21.1": {
-        "en": "Some issuses for energySensor have been fixed.\nDependencies have been updated.",
-        "de": "Einige Issuses für energySensor wurden behoben.\nAbhängigkeiten wurden aktualisiert.",
-        "ru": "Некоторые иззусы для EnergySensor были исправлены.\nЗависимость была обновлена.",
-        "pt": "Alguns issuses para energiaSensor foram corrigidos.\nAs dependências foram atualizadas.",
-        "nl": "Sommige issues voor energieSensor zijn vastgesteld.\nAfhankelijkheden zijn bijgewerkt.",
-        "fr": "Certaines isotopes pour l'énergieLe capteur a été fixé.\nLes dépendances ont été actualisées.",
-        "it": "Alcuni issuses for energySensor sono stati fissati.\nLe dipendenze sono state aggiornate.",
-        "es": "Algunos issuses for energySensor han sido fijos.\nSe han actualizado las dependencias.",
-        "pl": "Niektóre wyspy dla EnergySensor zostały naprawione.\nZaktualizowano zależność.",
-        "uk": "Зафіксовано деякі запобіжники для енергоносіїв.\nОновлено залежність.",
-        "zh-cn": "一些能量感应器被修好了.\n附属关系已经更新."
       }
     },
     "titleLang": {
