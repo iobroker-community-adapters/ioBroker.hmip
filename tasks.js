@@ -29,7 +29,7 @@ if (process.argv.find(arg => arg.replace(/^--/, '') === '0-clean')) {
     npmInstall(srcAdmin)
         .catch(e => console.error(`Cannot install: ${e}`));
 } else if (process.argv.find(arg => arg.replace(/^--/, '') === '2-compile')) {
-    buildCraco(__dirname, srcAdmin)
+    buildCraco(srcAdmin, { rootDir: __dirname })
         .catch(e => console.error(`Cannot compile: ${e}`));
 } else if (process.argv.find(arg => arg.replace(/^--/, '') === '3-copy')) {
     copyAllFiles();
@@ -38,7 +38,7 @@ if (process.argv.find(arg => arg.replace(/^--/, '') === '0-clean')) {
 
     npmInstall(srcAdmin)
         .then(async () => {
-            await buildCraco(__dirname, srcAdmin);
+            await buildCraco(srcAdmin, { rootDir: __dirname });
             copyAllFiles();
         });
 }
