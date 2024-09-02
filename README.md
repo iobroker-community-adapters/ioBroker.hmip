@@ -66,7 +66,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 1.24.3 (2024-09-02)
 * (bluefox) GUI was migrated for Admin 7
 * (bluefox) Removed gulp
 
