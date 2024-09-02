@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { ThemeProvider } from '@mui/material/styles';
 
 import {
     LinearProgress,
@@ -11,19 +12,20 @@ import {
 // invalid
 // import ConfigGeneric from '@iobroker/adapter-react-v5/ConfigGeneric';
 // valid
-import { I18n } from '@iobroker/adapter-react-v5';
+import { I18n, Theme } from '@iobroker/adapter-react-v5';
 import { ConfigGeneric } from '@iobroker/json-config';
 
 class HmipComponent extends ConfigGeneric {
     constructor(props) {
         super(props);
-        this.state = {
+        Object.assign(this.state, {
             response: false,
             running: false,
             initialized: false,
             alive: false,
             error: false,
-        };
+            theme: Theme(this.props.themeName || 'light'),
+        });
     }
 
     componentDidMount() {
@@ -116,31 +118,37 @@ class HmipComponent extends ConfigGeneric {
 
     renderItem() {
         if (!this.state.alive && !this.state.initialized) {
-            return <div>{I18n.t('custom_hmip_not_alive')}</div>;
+            return <ThemeProvider theme={this.state.theme}>
+                <div>{I18n.t('custom_hmip_not_alive')}</div>
+            </ThemeProvider>;
         }
         if (!this.state.initialized) {
-            return <LinearProgress />;
+            return <ThemeProvider theme={this.state.theme}>
+                <LinearProgress />
+            </ThemeProvider>;
         }
 
         const accessPointSgtin = ConfigGeneric.getValue(this.props.data, 'accessPointSgtin');
 
-        return <div style={{ width: '100%'}}>
-            <div
-                style={{
-                    color: this.state.error ? (this.props.themeType === 'dark' ? '#c20000' : '#800000') : undefined,
-                }}
-            >
-                {I18n.t(`custom_hmip_${this.state.response}`).replace('custom_hmip_', '')}
+        return <ThemeProvider theme={this.state.theme}>
+            <div style={{ width: '100%'}}>
+                <div
+                    style={{
+                        color: this.state.error ? (this.props.themeType === 'dark' ? '#c20000' : '#800000') : undefined,
+                    }}
+                >
+                    {I18n.t(`custom_hmip_${this.state.response}`).replace('custom_hmip_', '')}
+                </div>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    disabled={this.state.running || !accessPointSgtin}
+                    onClick={() => this.requestToken()}
+                >
+                    {this.state.running ? <CircularProgress size={24} /> : I18n.t('custom_hmip_request_token')}
+                </Button>
             </div>
-            <Button
-                variant="contained"
-                color="primary"
-                disabled={this.state.running || !accessPointSgtin}
-                onClick={() => this.requestToken()}
-            >
-                {this.state.running ? <CircularProgress size={24} /> : I18n.t('custom_hmip_request_token')}
-            </Button>
-        </div>;
+        </ThemeProvider>;
     }
 }
 

@@ -3,19 +3,6 @@
     "name": "hmip",
     "version": "1.24.2",
     "news": {
-      "1.24.2": {
-        "en": "GUI was migrated for Admin 7\nRemoved gulp",
-        "de": "GUI wurde für Admin 7 migriert\nEntfernter Gulp",
-        "ru": "GUI был перенесен на Админ 7\nУдаленный gulp",
-        "pt": "GUI foi migrado para Admin 7\nGulp removido",
-        "nl": "GUI is gemigreerd voor Admin 7\nGulp verwijderd",
-        "fr": "GUI a été migré pour l'Admin 7\nSupprimé le goupille",
-        "it": "GUI è stata migrata per Admin 7\nGolp rimosso",
-        "es": "GUI was migrated for Admin 7\nGolpes eliminados",
-        "pl": "Interfejs GUI został wyemigrowany do Admin 7\nUsunięty przełyk",
-        "uk": "GUI був мігрований для адміністратора 7\nВиданий гель",
-        "zh-cn": "管理员 7 的图形用户界面已迁移\n删除的 gulp"
-      },
       "1.24.1": {
         "en": "GUI was migrated for Admin 7",
         "de": "GUI wurde für Admin 7 migriert",
