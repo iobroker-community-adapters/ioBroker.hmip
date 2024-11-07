@@ -9,6 +9,8 @@
     "dependencies": {},
     "devDependencies": {
         "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+        "@emotion/react": "^11.13.3",
+        "@emotion/styled": "^11.13.0",
         "@iobroker/adapter-react-v5": "^7.2.6",
         "@iobroker/json-config": "^7.2.6",
         "@mui/material": "^6.1.6",

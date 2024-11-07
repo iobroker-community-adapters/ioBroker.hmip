@@ -1,4 +1,4 @@
-const { deleteFoldersRecursive, copyFiles, npmInstall, buildCraco } = require('@iobroker/build-tools');
+const { deleteFoldersRecursive, copyFiles, npmInstall, buildCraco, buildReact} = require('@iobroker/build-tools');
 
 const srcAdmin = `${__dirname}/src-admin/`;
 
@@ -11,14 +11,14 @@ function copyAllFiles() {
     copyFiles(
         [
             'src-admin/build/static/js/*.js',
-            '!src-admin/build/static/js/vendors*.js',
-            '!src-admin/build/static/js/src_bootstrap_*.js',
+            //'!src-admin/build/static/js/vendors*.js',
+            //'!src-admin/build/static/js/src_bootstrap_*.js',
         ],
         'admin/custom/static/js',
     );
-    copyFiles(['src-admin/build/static/js/*_emotion_react_dist_*.js'], 'admin/custom/static/js');
-    copyFiles(['src-admin/build/static/js/*_material_styles_createTheme_*.js'], 'admin/custom/static/js');
-    copyFiles(['src-admin/build/static/js/*_material_styles_ThemeProvider_*.js'], 'admin/custom/static/js');
+    // copyFiles(['src-admin/build/static/js/*_emotion_react_dist_*.js'], 'admin/custom/static/js');
+    // copyFiles(['src-admin/build/static/js/*_material_styles_createTheme_*.js'], 'admin/custom/static/js');
+    // copyFiles(['src-admin/build/static/js/*_material_styles_ThemeProvider_*.js'], 'admin/custom/static/js');
     copyFiles(
         [
             'src-admin/build/static/js/*.map',
@@ -37,14 +37,14 @@ if (process.argv.find(arg => arg.replace(/^--/, '') === '0-clean')) {
 } else if (process.argv.find(arg => arg.replace(/^--/, '') === '1-npm')) {
     npmInstall(srcAdmin).catch(e => console.error(`Cannot install: ${e}`));
 } else if (process.argv.find(arg => arg.replace(/^--/, '') === '2-compile')) {
-    buildCraco(srcAdmin, { rootDir: __dirname }).catch(e => console.error(`Cannot compile: ${e}`));
+    buildReact(srcAdmin, { rootDir: __dirname, craco: true, exec: true }).catch(e => console.error(`Cannot compile: ${e}`));
 } else if (process.argv.find(arg => arg.replace(/^--/, '') === '3-copy')) {
     copyAllFiles();
 } else {
     admin0Clean();
 
     npmInstall(srcAdmin).then(async () => {
-        await buildCraco(srcAdmin, { rootDir: __dirname });
+        await buildReact(srcAdmin, { rootDir: __dirname, craco: true, exec: true });
         copyAllFiles();
     });
 }

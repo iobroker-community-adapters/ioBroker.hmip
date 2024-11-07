@@ -107,7 +107,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
 
         this.reInitTimeout && clearTimeout(this.reInitTimeout);
         this.log.debug('ready');
-        this.setState('info.connection', false, true);
+        await this.setState('info.connection', false, true);
 
         if (!this.Sentry && this.supportsFeature && this.supportsFeature('PLUGINS')) {
             const sentryInstance = this.getPluginInstance('sentry');
@@ -146,7 +146,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             this.log.debug('subscribeStates');
             this.subscribeStates('*');
 
-            this.setState('info.connection', true, true);
+            await this.setState('info.connection', true, true);
             this.log.info('hmip adapter connected and ready');
         } else {
             this.log.info('token not yet created');

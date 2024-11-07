@@ -45,7 +45,7 @@
         "@iobroker/adapter-dev": "^1.3.0",
         "@iobroker/build-tools": "^2.0.6",
         "@iobroker/eslint-config": "^0.1.6",
-        "@iobroker/legacy-testing": "^2.0.0",
+        "@iobroker/legacy-testing": "^2.0.1",
         "@iobroker/testing": "^5.0.0",
         "@tsconfig/node14": "^14.1.2",
         "@types/chai": "^4.3.19",

@@ -21,10 +21,18 @@ describe('test-admin-gui', () => {
     });
 
     it('Check admin server', async function () {
-        this.timeout(15_000);
+        this.timeout(240_000);
         return new Promise(resolve =>
             setTimeout(async () => {
-                await gPage.waitForSelector('.hmip-admin-component', { timeout: 15_000 });
+                try {
+                    await gPage.waitForSelector('.slow-connection-cancel', { timeout: 55_000 });
+                    await gPage.click('.slow-connection-cancel');
+                } catch {
+                    // ignore
+                }
+
+
+                await gPage.waitForSelector('.hmip-admin-component', { timeout: 55_000 });
                 await guiHelper.screenshot(rootDir, null, '01_started');
                 resolve();
             }, 1000),

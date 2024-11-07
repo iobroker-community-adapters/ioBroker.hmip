@@ -119,11 +119,11 @@ class HmipComponent extends ConfigGeneric {
     renderItem() {
         if (!this.state.alive && !this.state.initialized) {
             return <ThemeProvider theme={this.state.theme}>
-                <div>{I18n.t('custom_hmip_not_alive')}</div>
+                <div className="hmip-admin-component">{I18n.t('custom_hmip_not_alive')}</div>
             </ThemeProvider>;
         }
         if (!this.state.initialized) {
-            return <ThemeProvider theme={this.state.theme}>
+            return <ThemeProvider theme={this.state.theme} className="hmip-admin-component">
                 <LinearProgress />
             </ThemeProvider>;
         }
