@@ -12,9 +12,10 @@ describe('test-admin-gui', () => {
         await engineHelper.startIoBrokerAdapters({ adapters: ['admin', adapterName] });
         await engineHelper;
         const { page } = await guiHelper.startBrowser(
-            `/#tab-instances/config/system.adapter.${adapterName}.0`,
+            adapterName,
             rootDir,
             process.env.CI === 'true',
+            `/#tab-instances/config/system.adapter.${adapterName}.0`,
         );
         gPage = page;
     });
