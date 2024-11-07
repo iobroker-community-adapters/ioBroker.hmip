@@ -7,3 +7,5 @@ admin/i18n/*/flat.txt
 src-admin/package-lock.json
 src-admin/node_modules
 src-admin/build
+*.tgz
+/tmp/

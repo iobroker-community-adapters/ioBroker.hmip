@@ -44,12 +44,22 @@ jobs:
                 os: [ubuntu-latest, windows-latest, macos-latest]
 
         steps:
-            - uses: ioBroker/testing-action-adapter@v1
+            - name: Tests
+              uses: ioBroker/testing-action-adapter@v1
               with:
                   node-version: ${{ matrix.node-version }}
                   os: ${{ matrix.os }}
+                  extra-tests: npm run test:gui
                   # Uncomment the following line if your adapter cannot be installed using 'npm ci'
                   # install-command: 'npm install'
+            - name: Archive screenshots
+              if: always()
+                # if: failure()
+              uses: actions/upload-artifact@v4
+              with:
+                  path: tmp/screenshots/**/*.png
+                  retention-days: 3
+                  name: artifacts-${{ matrix.os }}-${{ matrix.node-version }}
 
     # TODO: To enable automatic npm releases, create a token on npmjs.org
     # Enter this token as a GitHub secret (with name NPM_TOKEN) in the repository options
