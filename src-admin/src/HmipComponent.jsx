@@ -131,7 +131,7 @@ class HmipComponent extends ConfigGeneric {
         const accessPointSgtin = ConfigGeneric.getValue(this.props.data, 'accessPointSgtin');
 
         return <ThemeProvider theme={this.state.theme}>
-            <div style={{ width: '100%'}}>
+            <div style={{ width: '100%'}} className="hmip-admin-component">
                 <div
                     style={{
                         color: this.state.error ? (this.props.themeType === 'dark' ? '#c20000' : '#800000') : undefined,

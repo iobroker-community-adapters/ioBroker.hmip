@@ -16,17 +16,16 @@ console.log('------ test start --------');
         console.log('1st:');
         await api.auth1connectionRequest();
         console.log('2nd:');
-        while (!await api.auth2isRequestAcknowledged()) {
+        while (!(await api.auth2isRequestAcknowledged())) {
             console.log('press blue button...');
             await new Promise(resolve => setTimeout(resolve, 2000));
         }
         console.log('3rd:');
         await api.auth3requestAuthToken();
 
-        console.log('config :')
+        console.log('config :');
         console.log(api.getSaveData());
     } catch (e) {
         console.error(e);
     }
 })();
-

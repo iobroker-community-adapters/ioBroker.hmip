@@ -5,11 +5,7 @@ import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
 
 import { Box } from '@mui/material';
 
-import {
-    GenericApp,
-    I18n,
-    Loader,
-} from '@iobroker/adapter-react-v5';
+import { GenericApp, I18n, Loader } from '@iobroker/adapter-react-v5';
 
 import HmipComponent from './HmipComponent';
 
@@ -54,35 +50,39 @@ class App extends GenericApp {
 
     render() {
         if (!this.state.loaded) {
-            return <StyledEngineProvider injectFirst>
-                <ThemeProvider theme={this.state.theme}>
-                    <Loader themeType={this.state.themeType} />
-                </ThemeProvider>
-            </StyledEngineProvider>;
+            return (
+                <StyledEngineProvider injectFirst>
+                    <ThemeProvider theme={this.state.theme}>
+                        <Loader themeType={this.state.themeType} />
+                    </ThemeProvider>
+                </StyledEngineProvider>
+            );
         }
 
-        return <StyledEngineProvider injectFirst>
-            <ThemeProvider theme={this.state.theme}>
-                <Box sx={styles.app}>
-                    <div style={styles.item}>
-                        <HmipComponent
-                            socket={this.socket}
-                            themeType={this.state.themeType}
-                            themeName={this.state.themeName}
-                            attr='myCustomAttribute'
-                            data={this.state.data}
-                            onError={() => {}}
-                            instance={0}
-                            schema={{
-                                name: 'ConfigCustomHmipSet/Components/HmipComponent',
-                                type: 'custom',
-                            }}
-                            onChange={data => this.setState({ data })}
-                        />
-                    </div>
-                </Box>
-            </ThemeProvider>
-        </StyledEngineProvider>;
+        return (
+            <StyledEngineProvider injectFirst>
+                <ThemeProvider theme={this.state.theme}>
+                    <Box sx={styles.app}>
+                        <div style={styles.item}>
+                            <HmipComponent
+                                socket={this.socket}
+                                themeType={this.state.themeType}
+                                themeName={this.state.themeName}
+                                attr="myCustomAttribute"
+                                data={this.state.data}
+                                onError={() => {}}
+                                instance={0}
+                                schema={{
+                                    name: 'ConfigCustomHmipSet/Components/HmipComponent',
+                                    type: 'custom',
+                                }}
+                                onChange={data => this.setState({ data })}
+                            />
+                        </div>
+                    </Box>
+                </ThemeProvider>
+            </StyledEngineProvider>
+        );
     }
 }
 

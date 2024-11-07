@@ -45,7 +45,7 @@ class HmCloudAPI {
                 osType: 'Linux',
                 osVersion: 'NT',
             },
-            id: this._accessPointSgtin
+            id: this._accessPointSgtin,
         };
     }
 
@@ -63,7 +63,10 @@ class HmCloudAPI {
     async getHomematicHosts() {
         let res;
         try {
-            const response = await axios.post('https://lookup.homematic.com:48335/getHost', this._clientCharacteristics);
+            const response = await axios.post(
+                'https://lookup.homematic.com:48335/getHost',
+                this._clientCharacteristics,
+            );
             res = response.data;
         } catch (err) {
             this.requestError && this.requestError(err);
@@ -153,7 +156,7 @@ class HmCloudAPI {
             };
             response = await axios.post(`${this._urlREST}/hmip/auth/confirmAuthToken`, body, {
                 headers,
-                validateStatus: status => status => status < 400,
+                validateStatus: status => status < 400,
             });
             res = response.data;
             this._clientId = res.clientId;
@@ -213,8 +216,8 @@ class HmCloudAPI {
         }
         this._ws = new webSocket(this._urlWebSocket, {
             headers: {
-                'AUTHTOKEN': this._authToken,
-                'CLIENTAUTH': this._clientAuthToken,
+                AUTHTOKEN: this._authToken,
+                CLIENTAUTH: this._clientAuthToken,
             },
             perMessageDeflate: false,
         });
@@ -223,8 +226,7 @@ class HmCloudAPI {
             this.opened && this.opened();
 
             this._pingInterval && clearInterval(this._pingInterval);
-            this._pingInterval = setInterval(() =>
-                this._ws.ping(() => { }), 5000);
+            this._pingInterval = setInterval(() => this._ws.ping(() => {}), 5000);
         });
 
         this._ws.on('close', (code, reason) => {
@@ -237,12 +239,12 @@ class HmCloudAPI {
                 this._connectTimeout && clearTimeout(this._connectTimeout);
                 this._connectTimeout = setTimeout(() => {
                     this._connectTimeout = null;
-                    this.connectWebsocket()
+                    this.connectWebsocket();
                 }, 10000);
             }
         });
 
-        this._ws.on('error', (error) => {
+        this._ws.on('error', error => {
             this.errored && this.errored(error);
             if (this._pingInterval) {
                 clearInterval(this._pingInterval);
@@ -252,7 +254,7 @@ class HmCloudAPI {
                 this._connectTimeout && clearTimeout(this._connectTimeout);
                 this._connectTimeout = setTimeout(() => {
                     this._connectTimeout = null;
-                    this.connectWebsocket()
+                    this.connectWebsocket();
                 }, 10000);
             }
         });
@@ -272,7 +274,7 @@ class HmCloudAPI {
             }
         });
 
-        this._ws.on('message', (d) => {
+        this._ws.on('message', d => {
             const dString = d.toString('utf8');
             this.dataReceived && this.dataReceived(dString);
             const data = JSON.parse(dString);
@@ -363,7 +365,7 @@ class HmCloudAPI {
     }
 
     async deviceConfigurationSetOperationLock(deviceId, operationLock, channelIndex = 1) {
-        let data = { deviceId, channelIndex, 'operationLock': operationLock };
+        let data = { deviceId, channelIndex, operationLock: operationLock };
         await this.callRestApi('device/configuration/setOperationLock', data);
     }
 
@@ -377,7 +379,11 @@ class HmCloudAPI {
     }
 
     // float 0.0-1.0
-    async deviceConfigurationSetMinimumFloorHeatingValvePosition(deviceId, minimumFloorHeatingValvePosition, channelIndex = 1) {
+    async deviceConfigurationSetMinimumFloorHeatingValvePosition(
+        deviceId,
+        minimumFloorHeatingValvePosition,
+        channelIndex = 1,
+    ) {
         let data = { deviceId, channelIndex, minimumFloorHeatingValvePosition };
         await this.callRestApi('device/configuration/setMinimumFloorHeatingValvePosition', data);
     }
@@ -390,7 +396,7 @@ class HmCloudAPI {
 
     // float 0.0-1.0??
     async deviceControlSetRgbDimLevel(deviceId, rgb, dimLevel, channelIndex = 1) {
-        let data = { deviceId, channelIndex, 'simpleRGBColorState': rgb, dimLevel };
+        let data = { deviceId, channelIndex, simpleRGBColorState: rgb, dimLevel };
         await this.callRestApi('device/control/setSimpleRGBColorDimLevel', data);
     }
 
@@ -424,11 +430,16 @@ class HmCloudAPI {
     }
 
     async deviceControlSetPrimaryShadingLevel(deviceId, primaryShadingLevel, channelIndex = 1) {
-        let data = { deviceId, channelIndex, 'primaryShadingLevel': primaryShadingLevel };
+        let data = { deviceId, channelIndex, primaryShadingLevel: primaryShadingLevel };
         await this.callRestApi('device/control/setPrimaryShadingLevel', data);
     }
 
-    async deviceControlSetSecondaryShadingLevel(deviceId, primaryShadingLevel, secondaryShadingLevel, channelIndex = 1) {
+    async deviceControlSetSecondaryShadingLevel(
+        deviceId,
+        primaryShadingLevel,
+        secondaryShadingLevel,
+        channelIndex = 1,
+    ) {
         let data = { deviceId, channelIndex, primaryShadingLevel, secondaryShadingLevel };
         await this.callRestApi('device/control/setSecondaryShadingLevel', data);
     }
@@ -508,13 +519,21 @@ class HmCloudAPI {
     // AccelerationSensorNeutralPosition
     //     HORIZONTAL = auto()
     //     VERTICAL = auto()
-    async deviceConfigurationSetAccelerationSensorNeutralPosition(deviceId, accelerationSensorNeutralPosition, channelIndex = 1) {
+    async deviceConfigurationSetAccelerationSensorNeutralPosition(
+        deviceId,
+        accelerationSensorNeutralPosition,
+        channelIndex = 1,
+    ) {
         let data = { deviceId, accelerationSensorNeutralPosition, channelIndex };
         await this.callRestApi('device/configuration/setAccelerationSensorNeutralPosition', data);
     }
 
     // accelerationSensorTriggerAngle = int
-    async deviceConfigurationSetAccelerationSensorTriggerAngle(deviceId, accelerationSensorTriggerAngle, channelIndex = 1) {
+    async deviceConfigurationSetAccelerationSensorTriggerAngle(
+        deviceId,
+        accelerationSensorTriggerAngle,
+        channelIndex = 1,
+    ) {
         let data = { deviceId, accelerationSensorTriggerAngle, channelIndex };
         await this.callRestApi('device/configuration/setAccelerationSensorTriggerAngle', data);
     }
@@ -526,13 +545,21 @@ class HmCloudAPI {
     //     SENSOR_RANGE_2G = auto()
     //     SENSOR_RANGE_2G_PLUS_SENS = auto()
     //     SENSOR_RANGE_2G_2PLUS_SENSE = auto()
-    async deviceConfigurationSetAccelerationSensorSensitivity(deviceId, accelerationSensorSensitivity, channelIndex = 1) {
+    async deviceConfigurationSetAccelerationSensorSensitivity(
+        deviceId,
+        accelerationSensorSensitivity,
+        channelIndex = 1,
+    ) {
         let data = { deviceId, accelerationSensorSensitivity, channelIndex };
         await this.callRestApi('device/configuration/setAccelerationSensorSensitivity', data);
     }
 
     // accelerationSensorEventFilterPeriod = float
-    async deviceConfigurationSetAccelerationSensorEventFilterPeriod(deviceId, accelerationSensorEventFilterPeriod, channelIndex = 1) {
+    async deviceConfigurationSetAccelerationSensorEventFilterPeriod(
+        deviceId,
+        accelerationSensorEventFilterPeriod,
+        channelIndex = 1,
+    ) {
         let data = { deviceId, accelerationSensorEventFilterPeriod, channelIndex };
         await this.callRestApi('device/configuration/setAccelerationSensorEventFilterPeriod', data);
     }
@@ -601,7 +628,7 @@ class HmCloudAPI {
     }
 
     async groupSwitchingAlarmSetOnTime(groupId, onTime) {
-        let data ={groupId, onTime};
+        let data = { groupId, onTime };
         await this.callRestApi('group/switching/alarm/setOnTime', data);
     }
 
