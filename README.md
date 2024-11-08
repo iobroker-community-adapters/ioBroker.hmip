@@ -66,7 +66,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 1.25.0 (2024-11-08)
 * (bluefox) Updated packages
 * (bluefox) User prettier for code
 * (bluefox) Added GUI test for the admin component

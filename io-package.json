@@ -1,194 +1,205 @@
 {
-    "common": {
-        "name": "hmip",
-        "version": "1.24.3",
-        "news": {
-            "1.24.3": {
-                "en": "GUI was migrated for Admin 7\nRemoved gulp",
-                "de": "GUI wurde für Admin 7 migriert\nEntfernter Gulp",
-                "ru": "GUI был перенесен на Админ 7\nУдаленный gulp",
-                "pt": "GUI foi migrado para Admin 7\nGulp removido",
-                "nl": "GUI is gemigreerd voor Admin 7\nGulp verwijderd",
-                "fr": "GUI a été migré pour l'Admin 7\nSupprimé le goupille",
-                "it": "GUI è stata migrata per Admin 7\nGolp rimosso",
-                "es": "GUI was migrated for Admin 7\nGolpes eliminados",
-                "pl": "Interfejs GUI został wyemigrowany do Admin 7\nUsunięty przełyk",
-                "uk": "GUI був мігрований для адміністратора 7\nВиданий гель",
-                "zh-cn": "管理员 7 的图形用户界面已迁移\n删除的 gulp"
-            },
-            "1.24.1": {
-                "en": "GUI was migrated for Admin 7",
-                "de": "GUI wurde für Admin 7 migriert",
-                "ru": "GUI был перенесен на Админ 7",
-                "pt": "GUI foi migrado para Admin 7",
-                "nl": "GUI is gemigreerd voor Admin 7",
-                "fr": "GUI a été migré pour l'Admin 7",
-                "it": "GUI è stata migrata per Admin 7",
-                "es": "GUI was migrated for Admin 7",
-                "pl": "Interfejs GUI został wyemigrowany do Admin 7",
-                "uk": "GUI був мігрований для адміністратора 7",
-                "zh-cn": "管理员 7 的图形用户界面已迁移"
-            },
-            "1.23.4": {
-                "en": "previousShutterLevel and hardwareColorTemperatureColdWhite datatype corrected\nOptimize websocket reconnection handling",
-                "de": "vorherigeShutterLevel und HardwareColorTemperature kalt Weißer Datentyp korrigiert\nOptimieren Sie Websocket-Reconnecting-Handling",
-                "ru": "предыдущееУровень и аппаратная температура Холодный Белый тип данных исправлен\nОптимизация обработки веб-сокета",
-                "pt": "anteriorShutterLevel e hardwareColorTemperature Frio Tipo de dados branco corrigido\nOtimizar o manuseio de reconexão websocket",
-                "nl": "vorigeShutterLevel en hardwareColorTemperatuur Koud Wit gegevenstype gecorrigeerd\nOptimaliseren van websocket-reconnectie",
-                "fr": "précédentShutterLevel et hardwareColorTemperature Froid Type de données blanc corrigé\nOptimiser la gestion de la reconnection de la poche web",
-                "it": "precedenteShutterLevel e hardwareColorTemperature Freddo freddo Datatipo bianco corretto\nOttimizzare la gestione della connessione websocket",
-                "es": "anteriorShutterNivel y hardwareColorTemperatura Cold Tipo de datos blanco corregido\nOptimize websocket reconnection handling",
-                "pl": "previousShutterLevel and hardwareColorTemperatura Zimne Białe typy danych skorygowane\nOptymalizacja obsługi ponownego połączenia websocket",
-                "uk": "попереднійShutterLevel і обладнанняColorTemperature Холодний Білий тип даних виправлений\nОптимізуйте переключення websocket",
-                "zh-cn": "前一个 Shutter 级别和硬件颜色 凉 更正的白色数据类型\n优化 Websocket 重新连接处理"
-            },
-            "1.23.3": {
-                "en": "Ignored status 400 by token request",
-                "de": "Ignorieren des Status 400 durch Token-Anfrage",
-                "ru": "Игнорированный статус 400 по токену запроса",
-                "pt": "Status ignorado 400 por pedido de token",
-                "nl": "Status vergeten 400 op token verzoek",
-                "fr": "Statut ignoré 400 sur demande de jeton",
-                "it": "Stato ignorato 400 da richiesta token",
-                "es": "Estado ignorado 400 por solicitud de token",
-                "pl": "Ignorowany status 400 na żądanie tokena",
-                "uk": "Ignored статус 400 за запитом",
-                "zh-cn": "通过符号请求忽略状态 400"
-            },
-            "1.23.2": {
-                "en": "Allowed calling token request without PIN\nCorrected the token request",
-                "de": "Erlaubte Anrufbeantwortung ohne PIN\nKorrektur der Tokenanfrage",
-                "ru": "Разрешенный вызов токен запрос без PIN\nИсправлена просьба к токену",
-                "pt": "Pedido de token de chamada permitido sem PIN\nCorrigido o pedido de token",
-                "nl": "Toegestaan aanroepen token verzoek zonder PIN\nHet tokenverzoek gecorrigeerd",
-                "fr": "Demande de jeton d'appel autorisée sans NIP\nCorrection de la demande de jeton",
-                "it": "Ammessi chiamare richiesta di token senza PIN\nCorretto la richiesta di token",
-                "es": "Permiso de llamada sin PIN\nCorregido la solicitud de ficha",
-                "pl": "Dopuszczalny sygnał wywoławczy bez PIN\nPoprawiono żądanie symbolu",
-                "uk": "Дозволений запит Token без PIN\nВиправлено запит Token",
-                "zh-cn": "允许不使用 PIN 调用令牌请求\n更正了令牌请求"
-            },
-            "1.23.0": {
-                "en": "Adapter requires node.js >= 18 and js-controller >= 5 now\nDependencies have been updated",
-                "de": "Adapter benötigt node.js >= 18 und js-controller >= 5 jetzt\nAbhängigkeiten wurden aktualisiert",
-                "ru": "Адаптер требует node.js >= 18 и js-контроллер >= 5 сейчас\nЗависимость обновлена",
-                "pt": "Adapter requer node.js >= 18 e js-controller >= 5 agora\nAs dependências foram atualizadas",
-                "nl": "Voor adaptor zijn node.js < 18 en js-controller > Nu 5\nAfhankelijkheden zijn bijgewerkt",
-                "fr": "L'adaptateur nécessite node.js >= 18 et js-controller >= 5 maintenant\nLes dépendances ont été actualisées",
-                "it": "Adattatore richiede node.js >= 18 e js-controller >= 5 ora\nLe dipendenze sono state aggiornate",
-                "es": "Adaptador requiere node.js √≥= 18 y js-controller 5 ahora\nSe han actualizado las dependencias",
-                "pl": "Adapter wymaga node.js > = 18 i kontroler js- > = 5 teraz\nZaktualizowano zależności",
-                "uk": "Адаптер вимагає node.js >= 18 і js-controller >= 5 тепер\nЗалежність було оновлено",
-                "zh-cn": "适配器需要节点.js QQ18和js控制器 QQ 现在5号\n依赖关系已更新"
-            },
-            "1.22.0": {
-                "en": "IMPORTANT: Node.js 16.x or newer is now required\nModule `require` has been replaced by `axios`\nAdded JSON config\nAdded support for Hmip-RGBW \nDependencies have been updated.",
-                "de": "WICHTIG: Node.js 16.x oder neuer ist jetzt erforderlich\nModul `require` wurde durch `axios` ersetzt\nJSON config\nUnterstützung für Hmip-RGBW hinzugefügt\nAbhängigkeiten wurden aktualisiert.",
-                "ru": "ВАЖНО: Node.js 16.x или новый теперь требуется\nМодуль `require' был заменен на `axios'\nДобавить конфигурацию JSON\nДобавлена поддержка Hmip-RGBW\nЗависимость была обновлена.",
-                "pt": "IMPORTANTE: Node.js 16.x ou mais recente é agora necessário\nMódulo `require` foi substituído por `axios`\nAdicionado JSON config\nAdicionado suporte para Hmip-RGBW\nAs dependências foram atualizadas.",
-                "nl": "BELANGRIJK: Node.js 16.x of nieuwer is nu vereist\nModule \"require\" is vervangen door \"axios\"\nJSON-configuratie toegevoegd\nOndersteuning toegevoegd voor Hmip-RGBW\nAfhankelijkheden zijn bijgewerkt.",
-                "fr": "IMPORTANT: Node.js 16.x ou plus récent est maintenant nécessaire\nLe module `require` a été remplacé par `axios`\nAjout de la configuration JSON\nAjout du support pour Hmip-RGBW\nLes dépendances ont été actualisées.",
-                "it": "IMPORTANTE: Node.js 16.x o più recente è ora richiesto\nModulo `require` è stato sostituito da `axios`\nAggiunto JSON config\nAggiunto il supporto per Hmip-RGBW\nLe dipendenze sono state aggiornate.",
-                "es": "IMPORTANTE: Node.js 16.x o nuevo se requiere ahora\nEl módulo `require ' ha sido reemplazado por `axios &apos\nConfiguración JSON\nApoyo añadido para Hmip-RGBW\nSe han actualizado las dependencias.",
-                "pl": "WAŻNE: Node.js 16.x lub nowsze jest teraz wymagane\nModuł \"require\" został zastąpiony przez \"axios\"\nDodano plik konfiguracyjny JSON\nDodano wsparcie dla HEIT- RGBW\nZaktualizowano zależność.",
-                "uk": "ВАЖЛИВО: Node.js 16.x або новачок тепер потрібно\nМодуль `Потрібний` замінено на `axios`\nДодано налаштування JSON\nДодано підтримку Hmip-RGBW\nОновлено залежність.",
-                "zh-cn": "重要:现在需要16x节点或更新\n`要求 ' 模块已替换为`轴 '\n添加 JSON 配置\n添加对 Hmip-RGBW 的支持\n附属关系已经更新."
-            }
-        },
-        "titleLang": {
-            "en": "HomeMaticIP Cloud AccessPoint",
-            "de": "HomeMatic IP Cloud-Zugriffspunkt",
-            "ru": "Точка доступа HomeMatic IP Cloud",
-            "pt": "Ponto de acesso da nuvem IP da HomeMatic",
-            "nl": "HomeMatic IP Cloud Access Point",
-            "fr": "Point d'accès IP HomeMatic Cloud",
-            "it": "HomeMatic IP Cloud Access Point",
-            "es": "Punto de acceso HomeMatic IP Cloud",
-            "pl": "Punkt dostępu do chmury internetowej HomeMatic",
-            "zh-cn": "HomeMatic IP云接入点"
-        },
-        "desc": {
-            "en": "HomeMaticIP Cloud AccessPoint",
-            "de": "HomeMatic IP Cloud-Zugriffspunkt",
-            "ru": "Точка доступа HomeMatic IP Cloud",
-            "pt": "Ponto de acesso da nuvem IP da HomeMatic",
-            "nl": "HomeMatic IP Cloud Access Point",
-            "fr": "Point d'accès IP HomeMatic Cloud",
-            "it": "HomeMatic IP Cloud Access Point",
-            "es": "Punto de acceso HomeMatic IP Cloud",
-            "pl": "Punkt dostępu do chmury internetowej HomeMatic",
-            "zh-cn": "HomeMatic IP云接入点"
-        },
-        "authors": ["jogibear9988 <jochen.kuehner@gmx.de>"],
-        "platform": "Javascript/Node.js",
-        "mode": "daemon",
-        "compact": true,
-        "icon": "homematic.png",
-        "adminUI": {
-            "config": "json"
-        },
-        "enabled": true,
-        "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.hmip/master/admin/homematic.png",
-        "keywords": ["hardware", "homematic", "hm"],
-        "readme": "https://github.com/iobroker-community-adapters/ioBroker.hmip/blob/master/README.md",
-        "loglevel": "info",
-        "tier": 2,
-        "type": "hardware",
-        "licenseInformation": {
-            "license": "MIT",
-            "type": "free"
-        },
-        "messagebox": true,
-        "plugins": {
-            "sentry": {
-                "dsn": "https://1716d7389af84920bddc96d2f1e8e421@sentry.iobroker.net/73"
-            }
-        },
-        "dependencies": [
-            {
-                "js-controller": ">=5.0.19"
-            }
-        ],
-        "globalDependencies": [
-            {
-                "admin": ">=6.13.16"
-            }
-        ],
-        "connectionType": "cloud",
-        "dataSource": "push"
+  "common": {
+    "name": "hmip",
+    "version": "1.25.0",
+    "news": {
+      "1.25.0": {
+        "en": "Updated packages\nUser prettier for code\nAdded GUI test for the admin component",
+        "de": "Aktualisierte Pakete\nBenutzeroberfläche für Code\nGUI Test für die Admin-Komponente hinzugefügt",
+        "ru": "Обновленные пакеты\nПользовательский красивее для кода\nДобавить тест GUI для компонента администратора",
+        "pt": "Pacotes atualizados\nMais bonito do usuário para o código\nAdicionado teste GUI para o componente admin",
+        "nl": "Bijgewerkte pakketten\nGebruiker mooier voor code\nGUI-test toegevoegd voor het admin-component",
+        "fr": "Paquets mis à jour\nUtilisateur meilleur pour le code\nAjout du test GUI pour le composant admin",
+        "it": "Pacchetti aggiornati\nPrettier utente per codice\nAggiunto test GUI per il componente admin",
+        "es": "Paquetes actualizados\nMás alto usuario para código\nPrueba GUI agregada para el componente admin",
+        "pl": "Aktualizacja pakietów\nUser pretier for code\nDodano test GUI dla komponentu admin",
+        "uk": "Оновлені пакети\nКористувач предтетер за код\nДодано графічний тест для компонента адміністратора",
+        "zh-cn": "更新软件包\n代码用户更美\n为管理员组件添加的图形用户界面测试"
+      },
+      "1.24.3": {
+        "en": "GUI was migrated for Admin 7\nRemoved gulp",
+        "de": "GUI wurde für Admin 7 migriert\nEntfernter Gulp",
+        "ru": "GUI был перенесен на Админ 7\nУдаленный gulp",
+        "pt": "GUI foi migrado para Admin 7\nGulp removido",
+        "nl": "GUI is gemigreerd voor Admin 7\nGulp verwijderd",
+        "fr": "GUI a été migré pour l'Admin 7\nSupprimé le goupille",
+        "it": "GUI è stata migrata per Admin 7\nGolp rimosso",
+        "es": "GUI was migrated for Admin 7\nGolpes eliminados",
+        "pl": "Interfejs GUI został wyemigrowany do Admin 7\nUsunięty przełyk",
+        "uk": "GUI був мігрований для адміністратора 7\nВиданий гель",
+        "zh-cn": "管理员 7 的图形用户界面已迁移\n删除的 gulp"
+      },
+      "1.24.1": {
+        "en": "GUI was migrated for Admin 7",
+        "de": "GUI wurde für Admin 7 migriert",
+        "ru": "GUI был перенесен на Админ 7",
+        "pt": "GUI foi migrado para Admin 7",
+        "nl": "GUI is gemigreerd voor Admin 7",
+        "fr": "GUI a été migré pour l'Admin 7",
+        "it": "GUI è stata migrata per Admin 7",
+        "es": "GUI was migrated for Admin 7",
+        "pl": "Interfejs GUI został wyemigrowany do Admin 7",
+        "uk": "GUI був мігрований для адміністратора 7",
+        "zh-cn": "管理员 7 的图形用户界面已迁移"
+      },
+      "1.23.4": {
+        "en": "previousShutterLevel and hardwareColorTemperatureColdWhite datatype corrected\nOptimize websocket reconnection handling",
+        "de": "vorherigeShutterLevel und HardwareColorTemperature kalt Weißer Datentyp korrigiert\nOptimieren Sie Websocket-Reconnecting-Handling",
+        "ru": "предыдущееУровень и аппаратная температура Холодный Белый тип данных исправлен\nОптимизация обработки веб-сокета",
+        "pt": "anteriorShutterLevel e hardwareColorTemperature Frio Tipo de dados branco corrigido\nOtimizar o manuseio de reconexão websocket",
+        "nl": "vorigeShutterLevel en hardwareColorTemperatuur Koud Wit gegevenstype gecorrigeerd\nOptimaliseren van websocket-reconnectie",
+        "fr": "précédentShutterLevel et hardwareColorTemperature Froid Type de données blanc corrigé\nOptimiser la gestion de la reconnection de la poche web",
+        "it": "precedenteShutterLevel e hardwareColorTemperature Freddo freddo Datatipo bianco corretto\nOttimizzare la gestione della connessione websocket",
+        "es": "anteriorShutterNivel y hardwareColorTemperatura Cold Tipo de datos blanco corregido\nOptimize websocket reconnection handling",
+        "pl": "previousShutterLevel and hardwareColorTemperatura Zimne Białe typy danych skorygowane\nOptymalizacja obsługi ponownego połączenia websocket",
+        "uk": "попереднійShutterLevel і обладнанняColorTemperature Холодний Білий тип даних виправлений\nОптимізуйте переключення websocket",
+        "zh-cn": "前一个 Shutter 级别和硬件颜色 凉 更正的白色数据类型\n优化 Websocket 重新连接处理"
+      },
+      "1.23.3": {
+        "en": "Ignored status 400 by token request",
+        "de": "Ignorieren des Status 400 durch Token-Anfrage",
+        "ru": "Игнорированный статус 400 по токену запроса",
+        "pt": "Status ignorado 400 por pedido de token",
+        "nl": "Status vergeten 400 op token verzoek",
+        "fr": "Statut ignoré 400 sur demande de jeton",
+        "it": "Stato ignorato 400 da richiesta token",
+        "es": "Estado ignorado 400 por solicitud de token",
+        "pl": "Ignorowany status 400 na żądanie tokena",
+        "uk": "Ignored статус 400 за запитом",
+        "zh-cn": "通过符号请求忽略状态 400"
+      },
+      "1.23.2": {
+        "en": "Allowed calling token request without PIN\nCorrected the token request",
+        "de": "Erlaubte Anrufbeantwortung ohne PIN\nKorrektur der Tokenanfrage",
+        "ru": "Разрешенный вызов токен запрос без PIN\nИсправлена просьба к токену",
+        "pt": "Pedido de token de chamada permitido sem PIN\nCorrigido o pedido de token",
+        "nl": "Toegestaan aanroepen token verzoek zonder PIN\nHet tokenverzoek gecorrigeerd",
+        "fr": "Demande de jeton d'appel autorisée sans NIP\nCorrection de la demande de jeton",
+        "it": "Ammessi chiamare richiesta di token senza PIN\nCorretto la richiesta di token",
+        "es": "Permiso de llamada sin PIN\nCorregido la solicitud de ficha",
+        "pl": "Dopuszczalny sygnał wywoławczy bez PIN\nPoprawiono żądanie symbolu",
+        "uk": "Дозволений запит Token без PIN\nВиправлено запит Token",
+        "zh-cn": "允许不使用 PIN 调用令牌请求\n更正了令牌请求"
+      },
+      "1.23.0": {
+        "en": "Adapter requires node.js >= 18 and js-controller >= 5 now\nDependencies have been updated",
+        "de": "Adapter benötigt node.js >= 18 und js-controller >= 5 jetzt\nAbhängigkeiten wurden aktualisiert",
+        "ru": "Адаптер требует node.js >= 18 и js-контроллер >= 5 сейчас\nЗависимость обновлена",
+        "pt": "Adapter requer node.js >= 18 e js-controller >= 5 agora\nAs dependências foram atualizadas",
+        "nl": "Voor adaptor zijn node.js < 18 en js-controller > Nu 5\nAfhankelijkheden zijn bijgewerkt",
+        "fr": "L'adaptateur nécessite node.js >= 18 et js-controller >= 5 maintenant\nLes dépendances ont été actualisées",
+        "it": "Adattatore richiede node.js >= 18 e js-controller >= 5 ora\nLe dipendenze sono state aggiornate",
+        "es": "Adaptador requiere node.js √≥= 18 y js-controller 5 ahora\nSe han actualizado las dependencias",
+        "pl": "Adapter wymaga node.js > = 18 i kontroler js- > = 5 teraz\nZaktualizowano zależności",
+        "uk": "Адаптер вимагає node.js >= 18 і js-controller >= 5 тепер\nЗалежність було оновлено",
+        "zh-cn": "适配器需要节点.js QQ18和js控制器 QQ 现在5号\n依赖关系已更新"
+      }
     },
-    "protectedNative": ["authToken", "clientAuthToken", "clientId", "pin"],
-    "native": {
-        "deviceName": "iobroker",
-        "deviceId": "",
-        "authToken": "",
-        "clientAuthToken": "",
-        "clientId": "",
-        "accessPointSgtin": "",
-        "pin": ""
+    "titleLang": {
+      "en": "HomeMaticIP Cloud AccessPoint",
+      "de": "HomeMatic IP Cloud-Zugriffspunkt",
+      "ru": "Точка доступа HomeMatic IP Cloud",
+      "pt": "Ponto de acesso da nuvem IP da HomeMatic",
+      "nl": "HomeMatic IP Cloud Access Point",
+      "fr": "Point d'accès IP HomeMatic Cloud",
+      "it": "HomeMatic IP Cloud Access Point",
+      "es": "Punto de acceso HomeMatic IP Cloud",
+      "pl": "Punkt dostępu do chmury internetowej HomeMatic",
+      "zh-cn": "HomeMatic IP云接入点"
     },
-    "objects": [],
-    "instanceObjects": [
-        {
-            "_id": "info",
-            "type": "channel",
-            "common": {
-                "name": "Information"
-            },
-            "native": {}
-        },
-        {
-            "_id": "info.connection",
-            "type": "state",
-            "common": {
-                "role": "indicator.connected",
-                "name": "If connected to Cloud",
-                "type": "boolean",
-                "read": true,
-                "write": false,
-                "def": false
-            },
-            "native": {}
-        }
-    ]
+    "desc": {
+      "en": "HomeMaticIP Cloud AccessPoint",
+      "de": "HomeMatic IP Cloud-Zugriffspunkt",
+      "ru": "Точка доступа HomeMatic IP Cloud",
+      "pt": "Ponto de acesso da nuvem IP da HomeMatic",
+      "nl": "HomeMatic IP Cloud Access Point",
+      "fr": "Point d'accès IP HomeMatic Cloud",
+      "it": "HomeMatic IP Cloud Access Point",
+      "es": "Punto de acceso HomeMatic IP Cloud",
+      "pl": "Punkt dostępu do chmury internetowej HomeMatic",
+      "zh-cn": "HomeMatic IP云接入点"
+    },
+    "authors": [
+      "jogibear9988 <jochen.kuehner@gmx.de>"
+    ],
+    "platform": "Javascript/Node.js",
+    "mode": "daemon",
+    "compact": true,
+    "icon": "homematic.png",
+    "adminUI": {
+      "config": "json"
+    },
+    "enabled": true,
+    "extIcon": "https://raw.githubusercontent.com/iobroker-community-adapters/ioBroker.hmip/master/admin/homematic.png",
+    "keywords": [
+      "hardware",
+      "homematic",
+      "hm"
+    ],
+    "readme": "https://github.com/iobroker-community-adapters/ioBroker.hmip/blob/master/README.md",
+    "loglevel": "info",
+    "tier": 2,
+    "type": "hardware",
+    "licenseInformation": {
+      "license": "MIT",
+      "type": "free"
+    },
+    "messagebox": true,
+    "plugins": {
+      "sentry": {
+        "dsn": "https://1716d7389af84920bddc96d2f1e8e421@sentry.iobroker.net/73"
+      }
+    },
+    "dependencies": [
+      {
+        "js-controller": ">=5.0.19"
+      }
+    ],
+    "globalDependencies": [
+      {
+        "admin": ">=6.13.16"
+      }
+    ],
+    "connectionType": "cloud",
+    "dataSource": "push"
+  },
+  "protectedNative": [
+    "authToken",
+    "clientAuthToken",
+    "clientId",
+    "pin"
+  ],
+  "native": {
+    "deviceName": "iobroker",
+    "deviceId": "",
+    "authToken": "",
+    "clientAuthToken": "",
+    "clientId": "",
+    "accessPointSgtin": "",
+    "pin": ""
+  },
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "role": "indicator.connected",
+        "name": "If connected to Cloud",
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    }
+  ]
 }
