@@ -166,7 +166,7 @@ https://github.com/ioBroker/AdapterRequests/issues/62
 * (Apollon77) Optimize automatic initialization of unknown devices and channels
 
 ### 1.15.2 (2022-01-04)
-* (Apollon77) Wait 10s until no new "unknown state update" was received before updating the whole system
+* (Apollon77) Wait 10 seconds until no new "unknown state update" was received before updating the whole system
 
 ### 1.15.0 (2022-01-02)
 * Node.js 10.x is now the minimum required version for this adapter

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material';
 
 import {
     LinearProgress,
