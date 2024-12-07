@@ -175,6 +175,7 @@ class HmCloudAPI {
             VERSION: '12',
             AUTHTOKEN: this._authToken,
             CLIENTAUTH: this._clientAuthToken,
+            "ACCESSPOINT-ID": this._accessPointSgtin,
         };
         try {
             const response = await axios.post(`${this._urlREST}/hmip/${path}`, data, { headers });
