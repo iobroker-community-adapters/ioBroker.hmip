@@ -222,6 +222,7 @@ class HmCloudAPI {
             headers: {
                 AUTHTOKEN: this._authToken,
                 CLIENTAUTH: this._clientAuthToken,
+                "ACCESSPOINT-ID": this._accessPointSgtin,
             },
             perMessageDeflate: false,
         });
