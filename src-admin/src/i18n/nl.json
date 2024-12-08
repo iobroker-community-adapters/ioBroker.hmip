@@ -1,10 +1,11 @@
 {
-  "custom_hmip_not_alive": "HMIP-instantie leeft niet",
-  "custom_hmip_request_token": "Token aanvragen",
-  "custom_hmip_started token creation": "Token maken gestart...",
-  "custom_hmip_press blue button on accesspoint": "Druk op de blauwe knop op het toegangspunt",
-  "custom_hmip_confirming token": "bevestigend token...",
-  "custom_hmip_error occurred during token generation, look at the logs": "er is een fout opgetreden tijdens het genereren van tokens, kijk naar de logboeken",
-  "custom_hmip_press \"request token\"": "druk op \"token aanvragen\"",
-  "custom_hmip_token created, save settings to use your accesspoint": "token gemaakt, instellingen opslaan om uw toegangspunt te gebruiken"
+    "custom_hmip_confirming token": "bevestigend token...",
+    "custom_hmip_error occurred during token generation, look at the logs": "er is een fout opgetreden tijdens het genereren van tokens, kijk naar de logboeken",
+    "custom_hmip_not_alive": "HMIP-instantie leeft niet",
+    "custom_hmip_press \"request token\"": "Druk op de volgende knop om een token aan te maken.",
+    "custom_hmip_press blue button on accesspoint": "Druk op de blauwe knop op het toegangspunt",
+    "custom_hmip_press_hcu_button": "Als je een \"Home Control Unit\" gebruikt, druk dan eerst één keer op de knop op de HCU om de verbinding op afstand in te schakelen.",
+    "custom_hmip_request_token": "Token aanvragen",
+    "custom_hmip_started token creation": "Token maken gestart...",
+    "custom_hmip_token created, save settings to use your accesspoint": "token gemaakt, instellingen opslaan om uw toegangspunt te gebruiken"
 }

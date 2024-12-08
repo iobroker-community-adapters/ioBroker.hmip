@@ -1,10 +1,11 @@
 {
-  "custom_hmip_not_alive": "HMIP-Instanz ist nicht gestartet",
-  "custom_hmip_request_token": "Token erstellen",
-  "custom_hmip_started token creation": "Token-Erstellung gestartet...",
-  "custom_hmip_press blue button on accesspoint": "Drücken Sie die blaue Taste am Access point",
-  "custom_hmip_confirming token": "Bestätigungstoken...",
-  "custom_hmip_error occurred during token generation, look at the logs": "Während der Token-Generierung ist ein Fehler aufgetreten. Sehen Sie sich die Protokolle an",
-  "custom_hmip_press \"request token\"": "Drücken Sie „Token erstellen“",
-  "custom_hmip_token created, save settings to use your accesspoint": "Token erstellt, Einstellungen speichern, um Ihren Zugangspunkt zu verwenden"
+    "custom_hmip_confirming token": "Bestätigungstoken...",
+    "custom_hmip_error occurred during token generation, look at the logs": "Während der Token-Generierung ist ein Fehler aufgetreten. Sehen Sie sich die Protokolle an",
+    "custom_hmip_not_alive": "HMIP-Instanz ist nicht gestartet",
+    "custom_hmip_press \"request token\"": "Zur Token-Erstellung bitte den folgenden Knopf drücken",
+    "custom_hmip_press blue button on accesspoint": "Drücken Sie die blaue Taste am Access point",
+    "custom_hmip_press_hcu_button": "Wenn Sie eine \"Home Control Unit\" nutzen, drücken Sie bitte zunächst einmal die Taste an der HCU, um die Fernverbindung zu aktivieren.",
+    "custom_hmip_request_token": "Token erstellen",
+    "custom_hmip_started token creation": "Token-Erstellung gestartet...",
+    "custom_hmip_token created, save settings to use your accesspoint": "Token erstellt, Einstellungen speichern, um Ihren Zugangspunkt zu verwenden"
 }

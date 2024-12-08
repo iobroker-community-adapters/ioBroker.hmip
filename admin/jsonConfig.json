@@ -52,8 +52,8 @@
       "newLine": true,
       "type": "custom",
       "sm": 12,
-      "md": 6,
-      "lg": 6,
+      "md": 12,
+      "lg": 12,
       "i18n": true,
       "url": "custom/customComponents.js",
       "name": "ConfigCustomHmipSet/Components/HmipComponent"

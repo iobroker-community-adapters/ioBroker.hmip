@@ -1,10 +1,11 @@
 {
-  "custom_hmip_not_alive": "Екземпляр HMIP не працює",
-  "custom_hmip_request_token": "Маркер запиту",
-  "custom_hmip_started token creation": "Розпочато створення маркера...",
-  "custom_hmip_press blue button on accesspoint": "Натисніть синю кнопку на точці доступу",
-  "custom_hmip_confirming token": "підтвердження маркера...",
-  "custom_hmip_error occurred during token generation, look at the logs": "сталася помилка під час генерації маркера, перегляньте журнали",
-  "custom_hmip_press \"request token\"": "натисніть \"запит маркера\"",
-  "custom_hmip_token created, save settings to use your accesspoint": "маркер створено, збережіть налаштування для використання вашої точки доступу"
+    "custom_hmip_confirming token": "підтвердження маркера...",
+    "custom_hmip_error occurred during token generation, look at the logs": "сталася помилка під час генерації маркера, перегляньте журнали",
+    "custom_hmip_not_alive": "Екземпляр HMIP не працює",
+    "custom_hmip_press \"request token\"": "Щоб створити токен, будь ласка, натисніть наступну кнопку.",
+    "custom_hmip_press blue button on accesspoint": "Натисніть синю кнопку на точці доступу",
+    "custom_hmip_press_hcu_button": "Якщо ви використовуєте \"Домашній блок управління\", будь ласка, спочатку натисніть кнопку на блоці один раз, щоб увімкнути дистанційне з'єднання.",
+    "custom_hmip_request_token": "Маркер запиту",
+    "custom_hmip_started token creation": "Розпочато створення маркера...",
+    "custom_hmip_token created, save settings to use your accesspoint": "маркер створено, збережіть налаштування для використання вашої точки доступу"
 }

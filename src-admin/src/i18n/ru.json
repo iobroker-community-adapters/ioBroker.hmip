@@ -1,10 +1,11 @@
 {
-  "custom_hmip_not_alive": "Экземпляр HMIP не работает",
-  "custom_hmip_request_token": "Создать токен",
-  "custom_hmip_started token creation": "Начато создание токена...",
-  "custom_hmip_press blue button on accesspoint": "Нажмите синюю кнопку на точке доступа",
-  "custom_hmip_confirming token": "подтверждающий токен...",
-  "custom_hmip_error occurred during token generation, look at the logs": "при генерации токена произошла ошибка, посмотрите логи",
-  "custom_hmip_press \"request token\"": "нажмите \"Создать токен\"",
-  "custom_hmip_token created, save settings to use your accesspoint": "токен создан, сохраните настройки для использования точки доступа"
+    "custom_hmip_confirming token": "подтверждающий токен...",
+    "custom_hmip_error occurred during token generation, look at the logs": "при генерации токена произошла ошибка, посмотрите логи",
+    "custom_hmip_not_alive": "Экземпляр HMIP не работает",
+    "custom_hmip_press \"request token\"": "Чтобы создать токен, нажмите следующую кнопку.",
+    "custom_hmip_press blue button on accesspoint": "Нажмите синюю кнопку на точке доступа",
+    "custom_hmip_press_hcu_button": "Если вы используете \"Блок управления домом\", пожалуйста, нажмите кнопку на HCU один раз, чтобы включить дистанционное соединение.",
+    "custom_hmip_request_token": "Создать токен",
+    "custom_hmip_started token creation": "Начато создание токена...",
+    "custom_hmip_token created, save settings to use your accesspoint": "токен создан, сохраните настройки для использования точки доступа"
 }

@@ -1,10 +1,11 @@
 {
-  "custom_hmip_not_alive": "Instancja HMIPu nie żyje",
-  "custom_hmip_request_token": "Poproś o token",
-  "custom_hmip_started token creation": "Rozpoczęto tworzenie tokena...",
-  "custom_hmip_press blue button on accesspoint": "Naciśnij niebieski przycisk na punkcie dostępowym",
-  "custom_hmip_confirming token": "potwierdzanie tokena...",
-  "custom_hmip_error occurred during token generation, look at the logs": "wystąpił błąd podczas generowania tokena, spójrz na logi",
-  "custom_hmip_press \"request token\"": "naciśnij „poproś o token”",
-  "custom_hmip_token created, save settings to use your accesspoint": "utworzony token, zapisz ustawienia, aby korzystać z punktu dostępu"
+    "custom_hmip_confirming token": "potwierdzanie tokena...",
+    "custom_hmip_error occurred during token generation, look at the logs": "wystąpił błąd podczas generowania tokena, spójrz na logi",
+    "custom_hmip_not_alive": "Instancja HMIPu nie żyje",
+    "custom_hmip_press \"request token\"": "Aby utworzyć token, naciśnij poniższy przycisk.",
+    "custom_hmip_press blue button on accesspoint": "Naciśnij niebieski przycisk na punkcie dostępowym",
+    "custom_hmip_press_hcu_button": "Jeśli używasz \"Home Control Unit\", naciśnij raz przycisk na HCU, aby włączyć zdalne połączenie.",
+    "custom_hmip_request_token": "Poproś o token",
+    "custom_hmip_started token creation": "Rozpoczęto tworzenie tokena...",
+    "custom_hmip_token created, save settings to use your accesspoint": "utworzony token, zapisz ustawienia, aby korzystać z punktu dostępu"
 }

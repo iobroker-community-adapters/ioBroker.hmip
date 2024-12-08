@@ -1,0 +1,14 @@
+{
+    "Enter Access point Sgtin & pin here and press 'Create token' button": "Enter Access Point Sgtin and PIN below and press 'Create token' button",
+    "accesspoint sgtin": "Access point Sgtin",
+    "authToken": "Authentication token",
+    "caution - this adapter is only for communication with a homematic ip cloudaccesspoint": "Caution - this adapter is only for communication with a Homematic IP Cloud-Access-Point or HCU!",
+    "clientAuthToken": "Client authentication token",
+    "clientId": "Client ID",
+    "device name": "Device name",
+    "id for your homematic device, leave empty or reuse already created one (if you remove adapter and install again)": "ID of your HMIP device, leave empty or reuse already created one (from an earlier adapter installation)",
+    "name for the device shown in the app": "Name for the device shown in the app",
+    "normally filled by token creation": "These data are normally filled automatically when creating the token.",
+    "pin": "PIN",
+    "token data": "HMIP Token data"
+}

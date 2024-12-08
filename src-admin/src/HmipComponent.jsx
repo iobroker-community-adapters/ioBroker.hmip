@@ -12,7 +12,7 @@ import {
 // invalid
 // import ConfigGeneric from '@iobroker/adapter-react-v5/ConfigGeneric';
 // valid
-import { I18n } from '@iobroker/adapter-react-v5';
+import {I18n, Theme} from '@iobroker/adapter-react-v5';
 import { ConfigGeneric } from '@iobroker/json-config';
 
 class HmipComponent extends ConfigGeneric {
@@ -31,6 +31,10 @@ class HmipComponent extends ConfigGeneric {
 
         this.socket = this.props.oContext?.socket || this.props.socket;
         this.instance = this.props.oContext ? this.props.oContext.instance : this.props.instance;
+        this.themeType = this.props.oContext ? this.props.oContext.themeType : this.props.themeType;
+
+        this.theme = Theme(this.props.themeName);
+
     }
 
     componentDidMount() {
@@ -128,23 +132,39 @@ class HmipComponent extends ConfigGeneric {
         }
 
         if (!this.props.alive && !this.state.initialized) {
-            return <ThemeProvider theme={this.props.oContext?.theme || this.props.theme}>
+            return <ThemeProvider theme={this.theme}>
                 <div className="hmip-admin-component">{I18n.t('custom_hmip_not_alive')}</div>
             </ThemeProvider>;
         }
         if (!this.state.initialized) {
-            return <ThemeProvider theme={this.props.oContext?.theme || this.props.theme} className="hmip-admin-component">
+            return <ThemeProvider theme={this.theme} className="hmip-admin-component">
                 <LinearProgress />
             </ThemeProvider>;
         }
 
         const accessPointSgtin = ConfigGeneric.getValue(this.props.data, 'accessPointSgtin');
 
-        return <ThemeProvider theme={this.props.oContext?.theme || this.props.theme}>
-            <div style={{ width: '100%'}} className="hmip-admin-component">
+        let instruction = null;
+        if (this.state.response === 'press "request token"') {
+            instruction = I18n.t('custom_hmip_press_hcu_button').split('"Home Control Unit"');
+            if (instruction.length === 2) {
+                instruction = <div style={{ width: '100%' }}>
+                    <span>{instruction[0]}</span>
+                    <span style={{ marginLeft: 1, marginRight: 1, fontWeight: 600, color: this.themeType === 'dark' ? '#0091c5' : '#004b61' }}>"Home Control Unit"</span>
+                    <span>{instruction[1]}</span>
+                </div>;
+            } else {
+                instruction = <div style={{ width: '100%' }}>{I18n.t('custom_hmip_press_hcu_button')}</div>;
+            }
+        }
+
+        return <ThemeProvider theme={this.theme}>
+            <div style={{ width: '100%' }} className="hmip-admin-component">
+                {instruction}
                 <div
                     style={{
-                        color: this.state.error ? ((this.props.oContext?.themeType || this.props.themeType) === 'dark' ? '#c20000' : '#800000') : undefined,
+                        color: this.state.error ? (this.themeType === 'dark' ? '#c20000' : '#800000') : undefined,
+                        marginBottom: 8,
                     }}
                 >
                     {I18n.t(`custom_hmip_${this.state.response}`).replace('custom_hmip_', '')}
@@ -155,7 +175,7 @@ class HmipComponent extends ConfigGeneric {
                     disabled={this.state.running || !accessPointSgtin}
                     onClick={() => this.requestToken()}
                 >
-                    {this.state.running ? <CircularProgress size={24} /> : I18n.t('custom_hmip_request_token')}
+                    {this.state.running ? <CircularProgress size={24}/> : I18n.t('custom_hmip_request_token')}
                 </Button>
             </div>
         </ThemeProvider>;
