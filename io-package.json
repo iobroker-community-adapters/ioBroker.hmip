@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.25.0",
+    "version": "1.26.0",
     "news": {
+      "1.26.0": {
+        "en": "Added support for Home Control Unit\nCorrected the admin GUI",
+        "de": "Unterstützung für Home Control Unit\nKorrektur der admin GUI",
+        "ru": "Добавлена поддержка для подразделения внутреннего контроля\nИсправлен admin GUI",
+        "pt": "Adicionado suporte para unidade de controle de casa\nCorrigido o GUI de admin",
+        "nl": "Ondersteuning toegevoegd voor Home Control Unit\nDe admin GUI gecorrigeerd",
+        "fr": "Ajout du soutien à l'unité de contrôle à domicile\nCorrection de l'interface graphique administrative",
+        "it": "Aggiunto supporto per Home Control Unit\nCorretto la GUI dell'amministratore",
+        "es": "Apoyo adicional para la unidad de control de casa\nCorregido el GUI del administrador",
+        "pl": "Dodano wsparcie dla Home Control Unit\nPoprawiono interfejs administratora",
+        "uk": "Додано підтримку для домашнього управління\nВиправлено графічний інтерфейс адміністратора",
+        "zh-cn": "增加了对家庭控制股的支助\n纠正了管理界面"
+      },
       "1.25.0": {
         "en": "Updated packages\nUser prettier for code\nAdded GUI test for the admin component",
         "de": "Aktualisierte Pakete\nBenutzeroberfläche für Code\nGUI Test für die Admin-Komponente hinzugefügt",
@@ -80,19 +93,6 @@
         "pl": "Dopuszczalny sygnał wywoławczy bez PIN\nPoprawiono żądanie symbolu",
         "uk": "Дозволений запит Token без PIN\nВиправлено запит Token",
         "zh-cn": "允许不使用 PIN 调用令牌请求\n更正了令牌请求"
-      },
-      "1.23.0": {
-        "en": "Adapter requires node.js >= 18 and js-controller >= 5 now\nDependencies have been updated",
-        "de": "Adapter benötigt node.js >= 18 und js-controller >= 5 jetzt\nAbhängigkeiten wurden aktualisiert",
-        "ru": "Адаптер требует node.js >= 18 и js-контроллер >= 5 сейчас\nЗависимость обновлена",
-        "pt": "Adapter requer node.js >= 18 e js-controller >= 5 agora\nAs dependências foram atualizadas",
-        "nl": "Voor adaptor zijn node.js < 18 en js-controller > Nu 5\nAfhankelijkheden zijn bijgewerkt",
-        "fr": "L'adaptateur nécessite node.js >= 18 et js-controller >= 5 maintenant\nLes dépendances ont été actualisées",
-        "it": "Adattatore richiede node.js >= 18 e js-controller >= 5 ora\nLe dipendenze sono state aggiornate",
-        "es": "Adaptador requiere node.js √≥= 18 y js-controller 5 ahora\nSe han actualizado las dependencias",
-        "pl": "Adapter wymaga node.js > = 18 i kontroler js- > = 5 teraz\nZaktualizowano zależności",
-        "uk": "Адаптер вимагає node.js >= 18 і js-controller >= 5 тепер\nЗалежність було оновлено",
-        "zh-cn": "适配器需要节点.js QQ18和js控制器 QQ 现在5号\n依赖关系已更新"
       }
     },
     "titleLang": {

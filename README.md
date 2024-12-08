@@ -69,7 +69,7 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 1.26.0 (2024-12-08)
 * (@dietzm) Added support for Home Control Unit
 * (@GermanBluefox) Corrected the admin GUI
 
