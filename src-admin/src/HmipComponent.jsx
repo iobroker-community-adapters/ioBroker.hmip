@@ -18,28 +18,21 @@ import { ConfigGeneric } from '@iobroker/json-config';
 class HmipComponent extends ConfigGeneric {
     constructor(props) {
         super(props);
+
+        this.alive = false;
+
         Object.assign(this.state, {
             response: false,
             running: false,
             initialized: false,
-            alive: false,
             error: false,
-            theme: Theme(this.props.themeName || 'light'),
         });
-    }
 
-    componentDidMount() {
-        super.componentDidMount();
-        const state = this.props.socket.getState(`hmip.${this.props.instance}.alive`);
-        if (state?.val) {
-            this.setState({ alive: true, initialized: true }, () => this.askState());
-        }
-        this.props.socket.subscribeState(`system.adapter.hmip.${this.props.instance}.alive`, this.onAliveChanged);
+        this.socket = this.props.oContext?.socket || this.props.socket;
     }
 
     componentWillUnmount() {
         super.componentWillUnmount();
-        this.props.socket.unsubscribeState(`system.adapter.hmip.${this.props.instance}.alive`, this.onAliveChanged);
         if (this.askTimeout) {
             clearTimeout(this.askTimeout);
             this.askTimeout = null;
@@ -47,7 +40,7 @@ class HmipComponent extends ConfigGeneric {
     }
 
     async askState() {
-        const response = await this.props.socket.sendTo(`hmip.${this.props.instance}`, 'requestTokenState', null);
+        const response = await this.socket.sendTo(`hmip.${this.props.instance}`, 'requestTokenState', null);
 
         if (this.handleResponse(response)) {
             this.askTimeout = this.askTimeout || setTimeout(() => {
@@ -95,7 +88,7 @@ class HmipComponent extends ConfigGeneric {
             deviceName: ConfigGeneric.getValue(this.props.data, 'deviceName'),
         };
         this.setState({ response: 'started token creation', running: true, error: false });
-        const response = await this.props.socket.sendTo(`hmip.${this.props.instance}`, 'requestToken', config);
+        const response = await this.socket.sendTo(`hmip.${this.props.instance}`, 'requestToken', config);
         if (this.handleResponse(response)) {
             this.askTimeout = this.askTimeout || setTimeout(() => {
                 this.askTimeout = null;
@@ -104,37 +97,34 @@ class HmipComponent extends ConfigGeneric {
         }
     }
 
-    onAliveChanged = (id, state) => {
-        const alive = state ? state.val : false;
-        if (alive !== this.state.alive) {
-            this.setState({ alive }, () => {
-                if (alive && !this.state.initialized) {
-                    setTimeout(() =>
-                        this.setState({ initialized: true }, () => this.askState(), 100));
-                }
-            });
-        }
-    };
-
     renderItem() {
-        if (!this.state.alive && !this.state.initialized) {
-            return <ThemeProvider theme={this.state.theme}>
+        if (this.alive !== this.props.alive) {
+            this.alive = this.props.alive;
+            if (this.alive && !this.state.initialized) {
+                // Ask hmip instance
+                setTimeout(() =>
+                    this.setState({ initialized: true }, () => this.askState(), 100));
+            }
+        }
+
+        if (!this.props.alive && !this.state.initialized) {
+            return <ThemeProvider theme={this.props.oContext?.theme || this.props.theme}>
                 <div className="hmip-admin-component">{I18n.t('custom_hmip_not_alive')}</div>
             </ThemeProvider>;
         }
         if (!this.state.initialized) {
-            return <ThemeProvider theme={this.state.theme} className="hmip-admin-component">
+            return <ThemeProvider theme={this.props.oContext?.theme || this.props.theme} className="hmip-admin-component">
                 <LinearProgress />
             </ThemeProvider>;
         }
 
         const accessPointSgtin = ConfigGeneric.getValue(this.props.data, 'accessPointSgtin');
 
-        return <ThemeProvider theme={this.state.theme}>
+        return <ThemeProvider theme={this.props.oContext?.theme || this.props.theme}>
             <div style={{ width: '100%'}} className="hmip-admin-component">
                 <div
                     style={{
-                        color: this.state.error ? (this.props.themeType === 'dark' ? '#c20000' : '#800000') : undefined,
+                        color: this.state.error ? ((this.props.oContext?.themeType || this.props.themeType) === 'dark' ? '#c20000' : '#800000') : undefined,
                     }}
                 >
                     {I18n.t(`custom_hmip_${this.state.response}`).replace('custom_hmip_', '')}
@@ -153,9 +143,15 @@ class HmipComponent extends ConfigGeneric {
 }
 
 HmipComponent.propTypes = {
+    // @deprecated
     socket: PropTypes.object.isRequired,
+    // @deprecated
     themeType: PropTypes.string,
+    // @deprecated
     themeName: PropTypes.string,
+
+    oContext: PropTypes.object,
+
     style: PropTypes.object,
     className: PropTypes.string,
     data: PropTypes.object.isRequired,
