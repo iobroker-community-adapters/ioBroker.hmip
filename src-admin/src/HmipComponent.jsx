@@ -12,7 +12,7 @@ import {
 // invalid
 // import ConfigGeneric from '@iobroker/adapter-react-v5/ConfigGeneric';
 // valid
-import { I18n, Theme } from '@iobroker/adapter-react-v5';
+import { I18n } from '@iobroker/adapter-react-v5';
 import { ConfigGeneric } from '@iobroker/json-config';
 
 class HmipComponent extends ConfigGeneric {
@@ -22,13 +22,23 @@ class HmipComponent extends ConfigGeneric {
         this.alive = false;
 
         Object.assign(this.state, {
-            response: false,
+            response: '',
             running: false,
             initialized: false,
             error: false,
+            delayLoading: true,
         });
 
         this.socket = this.props.oContext?.socket || this.props.socket;
+        this.instance = this.props.oContext ? this.props.oContext.instance : this.props.instance;
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
+        // I have unexplainable problem with theme is null
+        setTimeout(() => {
+            this.setState( { delayLoading: false });
+        }, 1000)
     }
 
     componentWillUnmount() {
@@ -40,7 +50,7 @@ class HmipComponent extends ConfigGeneric {
     }
 
     async askState() {
-        const response = await this.socket.sendTo(`hmip.${this.props.instance}`, 'requestTokenState', null);
+        const response = await this.socket.sendTo(`hmip.${this.instance}`, 'requestTokenState', null);
 
         if (this.handleResponse(response)) {
             this.askTimeout = this.askTimeout || setTimeout(() => {
@@ -69,9 +79,11 @@ class HmipComponent extends ConfigGeneric {
                 break;
             case 'tokenCreated': {
                 this.setState({ response: 'token created, save settings to use your accesspoint', running: false });
+
                 ConfigGeneric.setValue(this.props.data, 'authToken', response.authToken);
                 ConfigGeneric.setValue(this.props.data, 'clientAuthToken', response.clientAuthToken);
                 ConfigGeneric.setValue(this.props.data, 'clientId', response.clientId);
+
                 this.props.onChange(this.props.data, undefined, () =>
                     this.props.forceUpdate(['authToken', 'clientAuthToken', 'clientId'], this.props.data));
                 break;
@@ -80,21 +92,25 @@ class HmipComponent extends ConfigGeneric {
         return false;
     }
 
-    async requestToken() {
-        const config = {
-            accessPointSgtin: ConfigGeneric.getValue(this.props.data, 'accessPointSgtin'),
-            clientId: ConfigGeneric.getValue(this.props.data, 'clientId'),
-            pin: ConfigGeneric.getValue(this.props.data, 'pin') || '',
-            deviceName: ConfigGeneric.getValue(this.props.data, 'deviceName'),
-        };
-        this.setState({ response: 'started token creation', running: true, error: false });
-        const response = await this.socket.sendTo(`hmip.${this.props.instance}`, 'requestToken', config);
-        if (this.handleResponse(response)) {
-            this.askTimeout = this.askTimeout || setTimeout(() => {
-                this.askTimeout = null;
-                this.askState();
-            }, 300);
-        }
+    requestToken() {
+        this.setState({ response: 'started token creation', running: true, error: false }, async () => {
+            const config = {
+                accessPointSgtin: ConfigGeneric.getValue(this.props.data, 'accessPointSgtin'),
+                clientId: ConfigGeneric.getValue(this.props.data, 'clientId'),
+                pin: ConfigGeneric.getValue(this.props.data, 'pin') || '',
+                deviceName: ConfigGeneric.getValue(this.props.data, 'deviceName'),
+            };
+
+            const response = await this.socket.sendTo(`hmip.${this.instance}`, 'requestToken', config);
+
+            if (this.handleResponse(response)) {
+                this.askTimeout = this.askTimeout || setTimeout(() => {
+                    this.askTimeout = null;
+                    this.askState();
+                }, 300);
+            }
+
+        });
     }
 
     renderItem() {
@@ -105,6 +121,10 @@ class HmipComponent extends ConfigGeneric {
                 setTimeout(() =>
                     this.setState({ initialized: true }, () => this.askState(), 100));
             }
+        }
+
+        if (this.state.delayLoading || (!this.props.oContext?.theme && !this.props.theme)) {
+            return <div>...</div>;
         }
 
         if (!this.props.alive && !this.state.initialized) {
