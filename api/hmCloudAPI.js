@@ -91,6 +91,7 @@ class HmCloudAPI {
             accept: 'application/json',
             VERSION: '12',
             CLIENTAUTH: this._clientAuthToken,
+            "ACCESSPOINT-ID": this._accessPointSgtin,
         };
         if (this._pin) {
             headers['PIN'] = this._pin;
@@ -118,8 +119,9 @@ class HmCloudAPI {
             accept: 'application/json',
             VERSION: '12',
             CLIENTAUTH: this._clientAuthToken,
+            "ACCESSPOINT-ID": this._accessPointSgtin,
         };
-        const body = { deviceId: this._deviceId };
+        const body = { deviceId: this._deviceId, accessPointId: this._accessPointSgtin };
         try {
             await axios.post(`${this._urlREST}/hmip/auth/isRequestAcknowledged`, body, {
                 headers,
@@ -140,6 +142,7 @@ class HmCloudAPI {
             accept: 'application/json',
             VERSION: '12',
             CLIENTAUTH: this._clientAuthToken,
+            "ACCESSPOINT-ID": this._accessPointSgtin,
         };
         let body = { deviceId: this._deviceId };
         let res;
@@ -172,6 +175,7 @@ class HmCloudAPI {
             VERSION: '12',
             AUTHTOKEN: this._authToken,
             CLIENTAUTH: this._clientAuthToken,
+            "ACCESSPOINT-ID": this._accessPointSgtin,
         };
         try {
             const response = await axios.post(`${this._urlREST}/hmip/${path}`, data, { headers });
@@ -218,6 +222,7 @@ class HmCloudAPI {
             headers: {
                 AUTHTOKEN: this._authToken,
                 CLIENTAUTH: this._clientAuthToken,
+                "ACCESSPOINT-ID": this._accessPointSgtin,
             },
             perMessageDeflate: false,
         });
