@@ -64,9 +64,6 @@ Many thanks to @dietzm for adding support of HCU to this adapter.
 ## Diskussion in ioBroker Forum
 https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 
-## Adapter Request auf GitHub
-https://github.com/ioBroker/AdapterRequests/issues/62
-
 <!--
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
