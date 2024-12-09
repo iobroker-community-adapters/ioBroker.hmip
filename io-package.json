@@ -105,7 +105,8 @@
       "it": "HomeMatic IP Cloud Access Point",
       "es": "Punto de acceso HomeMatic IP Cloud",
       "pl": "Punkt dostępu do chmury internetowej HomeMatic",
-      "zh-cn": "HomeMatic IP云接入点"
+      "zh-cn": "HomeMatic IP云接入点",
+      "uk": "Хмарна точка доступу HomeMaticIP"
     },
     "desc": {
       "en": "HomeMaticIP Cloud AccessPoint",
@@ -117,7 +118,8 @@
       "it": "HomeMatic IP Cloud Access Point",
       "es": "Punto de acceso HomeMatic IP Cloud",
       "pl": "Punkt dostępu do chmury internetowej HomeMatic",
-      "zh-cn": "HomeMatic IP云接入点"
+      "zh-cn": "HomeMatic IP云接入点",
+      "uk": "Хмарна точка доступу HomeMaticIP"
     },
     "authors": [
       "jogibear9988 <jochen.kuehner@gmx.de>"
