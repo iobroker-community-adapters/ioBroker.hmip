@@ -1,4 +1,4 @@
-const { deleteFoldersRecursive, copyFiles, npmInstall, buildCraco, buildReact} = require('@iobroker/build-tools');
+const { deleteFoldersRecursive, copyFiles, npmInstall, buildReact } = require('@iobroker/build-tools');
 
 const srcAdmin = `${__dirname}/src-admin/`;
 
@@ -37,7 +37,9 @@ if (process.argv.find(arg => arg.replace(/^--/, '') === '0-clean')) {
 } else if (process.argv.find(arg => arg.replace(/^--/, '') === '1-npm')) {
     npmInstall(srcAdmin).catch(e => console.error(`Cannot install: ${e}`));
 } else if (process.argv.find(arg => arg.replace(/^--/, '') === '2-compile')) {
-    buildReact(srcAdmin, { rootDir: __dirname, craco: true, exec: true }).catch(e => console.error(`Cannot compile: ${e}`));
+    buildReact(srcAdmin, { rootDir: __dirname, craco: true, exec: true }).catch(e =>
+        console.error(`Cannot compile: ${e}`),
+    );
 } else if (process.argv.find(arg => arg.replace(/^--/, '') === '3-copy')) {
     copyAllFiles();
 } else {
