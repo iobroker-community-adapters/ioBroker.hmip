@@ -1,9 +1,9 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.26.1-alpha.0",
+    "version": "1.26.1-alpha.1",
     "news": {
-      "1.26.1-alpha.0": {
+      "1.26.1-alpha.1": {
         "en": "Adapter requires node.js 20 now\nAdded support for Home Control Unit\nCorrected the admin GUI",
         "de": "Adapter benötigt node.js 20 jetzt\nUnterstützung für Home Control Unit\nKorrektur der admin GUI",
         "ru": "Адаптер требует node.js 20\nДобавлена поддержка для подразделения внутреннего контроля\nИсправлен admin GUI",
@@ -15,19 +15,6 @@
         "pl": "Adapter wymaga node.js 20 teraz\nDodano wsparcie dla Home Control Unit\nPoprawiono interfejs administratora",
         "uk": "Адаптер вимагає node.js 20 тепер\nДодано підтримку для домашнього управління\nВиправлено графічний інтерфейс адміністратора",
         "zh-cn": "适配器现在需要节点20\n增加了对家庭控制股的支助\n纠正了管理界面"
-      },
-      "1.26.0": {
-        "en": "Added support for Home Control Unit\nCorrected the admin GUI",
-        "de": "Unterstützung für Home Control Unit\nKorrektur der admin GUI",
-        "ru": "Добавлена поддержка для подразделения внутреннего контроля\nИсправлен admin GUI",
-        "pt": "Adicionado suporte para unidade de controle de casa\nCorrigido o GUI de admin",
-        "nl": "Ondersteuning toegevoegd voor Home Control Unit\nDe admin GUI gecorrigeerd",
-        "fr": "Ajout du soutien à l'unité de contrôle à domicile\nCorrection de l'interface graphique administrative",
-        "it": "Aggiunto supporto per Home Control Unit\nCorretto la GUI dell'amministratore",
-        "es": "Apoyo adicional para la unidad de control de casa\nCorregido el GUI del administrador",
-        "pl": "Dodano wsparcie dla Home Control Unit\nPoprawiono interfejs administratora",
-        "uk": "Додано підтримку для домашнього управління\nВиправлено графічний інтерфейс адміністратора",
-        "zh-cn": "增加了对家庭控制股的支助\n纠正了管理界面"
       },
       "1.25.0": {
         "en": "Updated packages\nUser prettier for code\nAdded GUI test for the admin component",
@@ -80,19 +67,6 @@
         "pl": "previousShutterLevel and hardwareColorTemperatura Zimne Białe typy danych skorygowane\nOptymalizacja obsługi ponownego połączenia websocket",
         "uk": "попереднійShutterLevel і обладнанняColorTemperature Холодний Білий тип даних виправлений\nОптимізуйте переключення websocket",
         "zh-cn": "前一个 Shutter 级别和硬件颜色 凉 更正的白色数据类型\n优化 Websocket 重新连接处理"
-      },
-      "1.23.3": {
-        "en": "Ignored status 400 by token request",
-        "de": "Ignorieren des Status 400 durch Token-Anfrage",
-        "ru": "Игнорированный статус 400 по токену запроса",
-        "pt": "Status ignorado 400 por pedido de token",
-        "nl": "Status vergeten 400 op token verzoek",
-        "fr": "Statut ignoré 400 sur demande de jeton",
-        "it": "Stato ignorato 400 da richiesta token",
-        "es": "Estado ignorado 400 por solicitud de token",
-        "pl": "Ignorowany status 400 na żądanie tokena",
-        "uk": "Ignored статус 400 за запитом",
-        "zh-cn": "通过符号请求忽略状态 400"
       }
     },
     "titleLang": {
