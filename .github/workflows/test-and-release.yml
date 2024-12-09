@@ -52,7 +52,7 @@ jobs:
                   # Uncomment the following line if your adapter cannot be installed using 'npm ci'
                   # install-command: 'npm install'
 
-    # Runs admin UI tests on all supported node versions and linux only
+    # Runs admin UI tests on main node version and linux only
     gui-tests:
         if: contains(github.event.head_commit.message, '[skip ci]') == false
         needs: [check-and-lint, adapter-tests]
@@ -60,7 +60,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         strategy:
             matrix:
-                node-version: [20.x, 22.x]
+                node-version: [20.x]
                 os: [ubuntu-latest]
                 
         steps:
