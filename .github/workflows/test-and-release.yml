@@ -40,8 +40,8 @@ jobs:
         runs-on: ${{ matrix.os }}
         strategy:
             matrix:
-                node-version: [20.x, 22.x]
-                os: [ubuntu-latest, macos-latest]
+                node-version: [18.x, 20.x, 22.x]
+                os: [ubuntu-latest, macos-latest, windows-latest]
 
         steps:
             - name: Tests
