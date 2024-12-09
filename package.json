@@ -82,7 +82,7 @@
     "test:package": "mocha test/package --exit",
     "test:integration": "mocha test/integration --exit",
     "test": "npm run test:js && npm run test:package && npm run test:gui",
-    "lint": "eslint .",
+    "lint": "eslint -c eslint.config.mjs .",
     "build": "node tasks",
     "npm": "npm i && cd src-admin && npm i -f",
     "translate": "translate-adapter",
