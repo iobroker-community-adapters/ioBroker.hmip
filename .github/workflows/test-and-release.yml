@@ -36,16 +36,34 @@ jobs:
     # Runs adapter tests on all supported node versions and OSes
     adapter-tests:
         if: contains(github.event.head_commit.message, '[skip ci]') == false
-
+ 
         runs-on: ${{ matrix.os }}
         strategy:
             matrix:
                 node-version: [20.x, 22.x]
-                # os: [ubuntu-latest, macos-latest, windows-latest]
-                os: [ubuntu-latest]
-
+                os: [ubuntu-latest, macos-latest, windows-latest]
+                
         steps:
-            - name: Tests
+              uses: ioBroker/testing-action-adapter@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  os: ${{ matrix.os }}
+                  # Uncomment the following line if your adapter cannot be installed using 'npm ci'
+                  # install-command: 'npm install'
+
+    # Runs admin UI tests on all supported node versions and linux only
+    gui-tests:
+        if: contains(github.event.head_commit.message, '[skip ci]') == false
+        needs: [check-and-lint, adapter-tests]
+        
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                node-version: [20.x, 22.x]
+                os: [ubuntu-latest]
+                
+        steps:
+            - name: gui tests
               uses: ioBroker/testing-action-adapter@v1
               with:
                   node-version: ${{ matrix.node-version }}
@@ -68,7 +86,7 @@ jobs:
 
     # Deploys the final package to NPM
     deploy:
-        needs: [check-and-lint, adapter-tests]
+        needs: [check-and-lint, adapter-tests, gui-tests]
 
         # Trigger this step only when a commit on any branch is tagged with a version number
         if: |
