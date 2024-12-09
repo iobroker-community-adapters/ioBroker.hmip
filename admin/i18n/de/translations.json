@@ -9,6 +9,6 @@
     "id for your homematic device, leave empty or reuse already created one (if you remove adapter and install again)": "ID Ihres HMIP-Geräts, leer lassen oder bereits erstellte wiederverwenden (aus einer früheren Adapterinstallation)",
     "name for the device shown in the app": "Name für das in der App angezeigte Gerät",
     "normally filled by token creation": "Diese Daten werden normalerweise beim Erstellen des Tokens automatisch ausgefüllt.",
-    "pin": "STIFT",
+    "pin": "PIN",
     "token data": "HMIP-Token-Daten"
 }
