@@ -69,7 +69,7 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 1.26.1-alpha.0 (2024-12-09)
 * (mcm1957) Adapter requires node.js 20 now
 * (dietzm) Added support for Home Control Unit
 * (GermanBluefox) Corrected the admin GUI
