@@ -8,52 +8,71 @@
       "style": {
         "fontSize": 20
       },
-      "sm": 12
+      "xs": 12,
+      "sm": 12,
+      "md": 12,
+      "lg": 12,
+      "xl": 12
     },
     "_info2": {
       "type": "staticText",
       "text": "Enter Access point Sgtin & pin here and press 'Create token' button",
+      "hidden": "!!data.authToken",
+      "xs": 12,
       "sm": 12,
-      "hidden": "!!data.authToken"
+      "md": 12,
+      "lg": 12,
+      "xl": 12
     },
     "accessPointSgtin": {
       "label": "accesspoint sgtin",
       "newLine": true,
       "type": "text",
+      "xs": 12,
       "sm": 12,
-      "lg": 8
+      "md": 12,
+      "lg": 8,
+      "xl": 8
     },
     "deviceName": {
       "newLine": true,
       "label": "device name",
       "help": "name for the device shown in the app",
       "type": "text",
+      "xs": 12,
       "sm": 12,
       "md": 6,
-      "lg": 4
+      "lg": 4,
+      "xl": 4
     },
     "deviceId": {
       "label": "device id",
       "type": "text",
       "help": "id for your homematic device, leave empty or reuse already created one (if you remove adapter and install again)",
+      "xs": 12,
       "sm": 12,
       "md": 6,
-      "lg": 4
+      "lg": 4,
+      "xl": 4
     },
     "pin": {
       "newLine": true,
       "label": "pin",
       "type": "text",
+      "xs": 12,
       "sm": 12,
       "md": 4,
-      "lg": 2
+      "lg": 2,
+      "xl": 2
     },
     "_custom": {
       "newLine": true,
       "type": "custom",
+      "xs": 12,
       "sm": 12,
       "md": 12,
       "lg": 12,
+      "xl": 12,
       "i18n": true,
       "url": "custom/customComponents.js",
       "name": "ConfigCustomHmipSet/Components/HmipComponent"
@@ -63,7 +82,11 @@
       "type": "header",
       "size": 4,
       "text": "token data",
-      "sm": 12
+      "xs": 12,
+      "sm": 12,
+      "md": 12,
+      "lg": 12,
+      "xl": 12
     },
     "_info": {
       "newLine": true,
@@ -72,28 +95,41 @@
       },
       "type": "staticText",
       "text": "normally filled by token creation",
-      "sm": 12
+      "xs": 12,
+      "sm": 12,
+      "md": 12,
+      "lg": 12,
+      "xl": 12
     },
     "authToken": {
       "newLine": true,
       "label": "authToken",
       "type": "text",
+      "xs": 12,
       "sm": 12,
-      "md": 4
+      "md": 4,
+      "lg": 2,
+      "xl": 2
     },
     "clientAuthToken": {
       "newLine": true,
       "label": "clientAuthToken",
       "type": "text",
+      "xs": 12,
       "sm": 12,
-      "md": 4
+      "md": 4,
+      "lg": 2,
+      "xl": 2
     },
     "clientId": {
       "newLine": true,
       "label": "clientId",
       "type": "text",
+      "xs": 12,
       "sm": 12,
-      "md": 4
+      "md": 4,
+      "lg": 2,
+      "xl": 2
     }
   }
 }
