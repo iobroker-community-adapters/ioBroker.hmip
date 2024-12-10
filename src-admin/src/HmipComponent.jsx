@@ -88,8 +88,12 @@ class HmipComponent extends ConfigGeneric {
                 ConfigGeneric.setValue(this.props.data, 'clientAuthToken', response.clientAuthToken);
                 ConfigGeneric.setValue(this.props.data, 'clientId', response.clientId);
 
-                this.props.onChange(this.props.data, undefined, () =>
-                    this.props.forceUpdate(['authToken', 'clientAuthToken', 'clientId'], this.props.data));
+                this.props.onChange(this.props.data, undefined, () => {
+                    const forceUpdate = this.props.oContext?.forceUpdate || this.props.forceUpdate;
+                    if (forceUpdate) {
+                        forceUpdate(['authToken', 'clientAuthToken', 'clientId'], this.props.data)
+                    }
+                });
                 break;
             }
         }
