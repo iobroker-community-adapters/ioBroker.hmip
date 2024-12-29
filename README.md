@@ -69,7 +69,7 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 1.26.3 (2024-12-29)
 * (@GermanBluefox) Updated packages
 
 ### 1.26.2 (2024-12-10)

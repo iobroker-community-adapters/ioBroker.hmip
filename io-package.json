@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.26.2",
+    "version": "1.26.3",
     "news": {
+      "1.26.3": {
+        "en": "Updated packages",
+        "de": "Aktualisierte Pakete",
+        "ru": "Обновленные пакеты",
+        "pt": "Pacotes atualizados",
+        "nl": "Bijgewerkte pakketten",
+        "fr": "Paquets mis à jour",
+        "it": "Pacchetti aggiornati",
+        "es": "Paquetes actualizados",
+        "pl": "Aktualizacja pakietów",
+        "uk": "Оновлені пакети",
+        "zh-cn": "更新软件包"
+      },
       "1.26.2": {
         "en": "Adapter requires node.js 20 now\nAdded support for Home Control Unit\nCorrected the admin GUI",
         "de": "Adapter benötigt node.js 20 jetzt\nUnterstützung für Home Control Unit\nKorrektur der admin GUI",
