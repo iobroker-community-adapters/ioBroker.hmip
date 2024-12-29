@@ -1,18 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { ThemeProvider } from '@mui/material/styles';
 
-import {
-    LinearProgress,
-    Button,
-    CircularProgress,
-} from '@mui/material';
+import { LinearProgress, Button, CircularProgress } from '@mui/material';
 
 // important to make from package and not from some children.
 // invalid
 // import ConfigGeneric from '@iobroker/adapter-react-v5/ConfigGeneric';
 // valid
-import {I18n, Theme} from '@iobroker/adapter-react-v5';
+import { I18n } from '@iobroker/adapter-react-v5';
 import { ConfigGeneric } from '@iobroker/json-config';
 
 class HmipComponent extends ConfigGeneric {
@@ -26,23 +21,11 @@ class HmipComponent extends ConfigGeneric {
             running: false,
             initialized: false,
             error: false,
-            delayLoading: true,
         });
 
         this.socket = this.props.oContext?.socket || this.props.socket;
         this.instance = this.props.oContext ? this.props.oContext.instance : this.props.instance;
         this.themeType = this.props.oContext ? this.props.oContext.themeType : this.props.themeType;
-
-        this.theme = Theme(this.props.themeName);
-
-    }
-
-    componentDidMount() {
-        super.componentDidMount();
-        // I have unexplainable problem with theme is null
-        setTimeout(() => {
-            this.setState( { delayLoading: false });
-        }, 1000)
     }
 
     componentWillUnmount() {
@@ -57,10 +40,12 @@ class HmipComponent extends ConfigGeneric {
         const response = await this.socket.sendTo(`hmip.${this.instance}`, 'requestTokenState', null);
 
         if (this.handleResponse(response)) {
-            this.askTimeout = this.askTimeout || setTimeout(() => {
-                this.askTimeout = null;
-                this.askState();
-            }, 300);
+            this.askTimeout =
+                this.askTimeout ||
+                setTimeout(() => {
+                    this.askTimeout = null;
+                    this.askState();
+                }, 300);
         }
     }
 
@@ -76,7 +61,11 @@ class HmipComponent extends ConfigGeneric {
                 this.setState({ response: 'confirming token', running: true });
                 return true;
             case 'errorOccurred':
-                this.setState({ response: 'error occurred during token generation, look at the logs', running: false, error: true });
+                this.setState({
+                    response: 'error occurred during token generation, look at the logs',
+                    running: false,
+                    error: true,
+                });
                 break;
             case 'idle':
                 this.setState({ response: 'press "request token"', running: false });
@@ -91,7 +80,7 @@ class HmipComponent extends ConfigGeneric {
                 this.props.onChange(this.props.data, undefined, () => {
                     const forceUpdate = this.props.oContext?.forceUpdate || this.props.forceUpdate;
                     if (forceUpdate) {
-                        forceUpdate(['authToken', 'clientAuthToken', 'clientId'], this.props.data)
+                        forceUpdate(['authToken', 'clientAuthToken', 'clientId'], this.props.data);
                     }
                 });
                 break;
@@ -112,12 +101,13 @@ class HmipComponent extends ConfigGeneric {
             const response = await this.socket.sendTo(`hmip.${this.instance}`, 'requestToken', config);
 
             if (this.handleResponse(response)) {
-                this.askTimeout = this.askTimeout || setTimeout(() => {
-                    this.askTimeout = null;
-                    this.askState();
-                }, 300);
+                this.askTimeout =
+                    this.askTimeout ||
+                    setTimeout(() => {
+                        this.askTimeout = null;
+                        this.askState();
+                    }, 300);
             }
-
         });
     }
 
@@ -126,24 +116,19 @@ class HmipComponent extends ConfigGeneric {
             this.alive = this.props.alive;
             if (this.alive && !this.state.initialized) {
                 // Ask hmip instance
-                setTimeout(() =>
-                    this.setState({ initialized: true }, () => this.askState(), 100));
+                setTimeout(() => this.setState({ initialized: true }, () => this.askState(), 100));
             }
         }
 
-        if (this.state.delayLoading || (!this.props.oContext?.theme && !this.props.theme)) {
+        if (!this.props.oContext?.theme && !this.props.theme) {
             return <div>...</div>;
         }
 
         if (!this.props.alive && !this.state.initialized) {
-            return <ThemeProvider theme={this.theme}>
-                <div className="hmip-admin-component">{I18n.t('custom_hmip_not_alive')}</div>
-            </ThemeProvider>;
+            return <div className="hmip-admin-component">{I18n.t('custom_hmip_not_alive')}</div>;
         }
         if (!this.state.initialized) {
-            return <ThemeProvider theme={this.theme} className="hmip-admin-component">
-                <LinearProgress />
-            </ThemeProvider>;
+            return <LinearProgress />;
         }
 
         const accessPointSgtin = ConfigGeneric.getValue(this.props.data, 'accessPointSgtin');
@@ -152,18 +137,32 @@ class HmipComponent extends ConfigGeneric {
         if (this.state.response === 'press "request token"') {
             instruction = I18n.t('custom_hmip_press_hcu_button').split('"Home Control Unit"');
             if (instruction.length === 2) {
-                instruction = <div style={{ width: '100%' }}>
-                    <span>{instruction[0]}</span>
-                    <span style={{ marginLeft: 1, marginRight: 1, fontWeight: 600, color: this.themeType === 'dark' ? '#0091c5' : '#004b61' }}>"Home Control Unit"</span>
-                    <span>{instruction[1]}</span>
-                </div>;
+                instruction = (
+                    <div style={{ width: '100%' }}>
+                        <span>{instruction[0]}</span>
+                        <span
+                            style={{
+                                marginLeft: 1,
+                                marginRight: 1,
+                                fontWeight: 600,
+                                color: this.themeType === 'dark' ? '#0091c5' : '#004b61',
+                            }}
+                        >
+                            "Home Control Unit"
+                        </span>
+                        <span>{instruction[1]}</span>
+                    </div>
+                );
             } else {
                 instruction = <div style={{ width: '100%' }}>{I18n.t('custom_hmip_press_hcu_button')}</div>;
             }
         }
 
-        return <ThemeProvider theme={this.theme}>
-            <div style={{ width: '100%' }} className="hmip-admin-component">
+        return (
+            <div
+                style={{ width: '100%' }}
+                className="hmip-admin-component"
+            >
                 {instruction}
                 <div
                     style={{
@@ -179,10 +178,10 @@ class HmipComponent extends ConfigGeneric {
                     disabled={this.state.running || !accessPointSgtin}
                     onClick={() => this.requestToken()}
                 >
-                    {this.state.running ? <CircularProgress size={24}/> : I18n.t('custom_hmip_request_token')}
+                    {this.state.running ? <CircularProgress size={24} /> : I18n.t('custom_hmip_request_token')}
                 </Button>
             </div>
-        </ThemeProvider>;
+        );
     }
 }
 
