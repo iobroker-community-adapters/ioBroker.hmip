@@ -4,8 +4,8 @@
     "version": "1.26.4",
     "news": {
       "1.26.4": {
-        "en": "Optimize Websocket disconnect cases",
-        "de": "Websocket Trennfälle optimieren",
+        "en": "Optimized Websocket disconnect cases",
+        "de": "Websocket Trennfälle optimiert",
         "ru": "Оптимизация случаев отключения Websocket",
         "pt": "Otimizar casos de desconexão Websocket",
         "nl": "Websocket verwijderen",
