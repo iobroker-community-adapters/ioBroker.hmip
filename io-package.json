@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.26.3",
+    "version": "1.26.4",
     "news": {
+      "1.26.4": {
+        "en": "Optimize Websocket disconnect cases",
+        "de": "Websocket Trennfälle optimieren",
+        "ru": "Оптимизация случаев отключения Websocket",
+        "pt": "Otimizar casos de desconexão Websocket",
+        "nl": "Websocket verwijderen",
+        "fr": "Optimiser les cas de déconnexion Websocket",
+        "it": "Ottimizzare i casi di disconnessione di Websocket",
+        "es": "Optimize Websocket casos de desconexión",
+        "pl": "Optymalizacja przypadków rozłączenia gniazda internetowego",
+        "uk": "Оптимізуйте випадки відключення Websocket",
+        "zh-cn": "优化 Websocket 断开大小写"
+      },
       "1.26.3": {
         "en": "Updated packages",
         "de": "Aktualisierte Pakete",
