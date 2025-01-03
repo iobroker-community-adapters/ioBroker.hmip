@@ -779,7 +779,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }
         reason = reason ? reason.toString() : '';
         if (!forced) {
-            this.log.warn(`ws connection closed (${this.wsConnectionErrorCounter}) - code: ${code} - reason: ${reason}`);
+            this.log.warn(
+                `ws connection closed (${this.wsConnectionErrorCounter}) - code: ${code} - reason: ${reason}`,
+            );
         }
         this.wsConnected = false;
         this.expectWsError && clearTimeout(this.expectWsError);
