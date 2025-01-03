@@ -40,6 +40,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
 
     _unload(callback) {
         this._unloaded = true;
+        this.expectWsError && clearTimeout(this.expectWsError);
         this.reInitTimeout && clearTimeout(this.reInitTimeout);
         this.reInitDataTimeout && clearTimeout(this.reInitDataTimeout);
         this._api.dispose();
@@ -770,18 +771,23 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }, 5000); // set null when connection is stable
     }
 
-    _closed(code, reason) {
+    _closed(code, reason, forced = false) {
         if (this.wsConnectionStableTimeout || !this.wsConnected) {
             this.wsConnectionErrorCounter++;
         } else {
             this.wsConnectionErrorCounter = 0;
         }
         reason = reason ? reason.toString() : '';
-        this.log.warn(`ws connection closed (${this.wsConnectionErrorCounter}) - code: ${code} - reason: ${reason}`);
+        if (!forced) {
+            this.log.warn(`ws connection closed (${this.wsConnectionErrorCounter}) - code: ${code} - reason: ${reason}`);
+        }
         this.wsConnected = false;
-        if (this.wsConnectionErrorCounter > 6 && !this._unloaded) {
+        this.expectWsError && clearTimeout(this.expectWsError);
+        // When no error happens within 5 seconds, we refresh our self
+        this.expectWsError = setTimeout(() => this._closed(code, reason, true), 5000);
+        if ((forced || this.wsConnectionErrorCounter > 6) && !this._unloaded) {
             this._api.dispose();
-            this.log.error(`error updating Homematic ip: ${code} - ${reason}`);
+            this.log.error(`close on websocket connection: ${code} - ${reason}`);
             this.log.error('Try reconnect in 30s');
             this.reInitTimeout && clearTimeout(this.reInitTimeout);
             this.reInitTimeout = setTimeout(async () => {
@@ -799,7 +805,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }
         if (reason.includes('ECONNREFUSED') && !this._unloaded) {
             this._api.dispose();
-            this.log.error(`error updating homematic ip: ${reason}`);
+            this.log.error(`error on websocket connection: ${reason}`);
             this.log.error('Try reconnect in 30s');
             this.reInitTimeout && clearTimeout(this.reInitTimeout);
             this.reInitTimeout = setTimeout(() => {

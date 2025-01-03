@@ -69,6 +69,9 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
+### __WORK IN PROGRESS__
+* (@Apollon77) Optimize Websocket disconnect cases
+
 ### 1.26.3 (2024-12-29)
 * (@GermanBluefox) Updated packages
 
