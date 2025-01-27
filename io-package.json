@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.26.4",
+    "version": "1.26.5",
     "news": {
+      "1.26.5": {
+        "en": "Fixed Websocket disconnect cases",
+        "de": "Feste Websocket Trennfälle",
+        "ru": "Фиксированные случаи отключения Websocket",
+        "pt": "Casos fixos de desconexão Websocket",
+        "nl": "Vaste Websocket loskoppelen gevallen",
+        "fr": "Cas de déconnexion de la poche Web corrigés",
+        "it": "Risolto Websocket casi di disconnessione",
+        "es": "Casos de desconexión Websocket fijos",
+        "pl": "Stałe obudowy rozłączenia websocket",
+        "uk": "Виправлені випадки відключення Websocket",
+        "zh-cn": "固定 Websocket 断开大小写"
+      },
       "1.26.4": {
         "en": "Optimized Websocket disconnect cases",
         "de": "Websocket Trennfälle optimiert",
@@ -80,19 +93,6 @@
         "pl": "Interfejs GUI został wyemigrowany do Admin 7",
         "uk": "GUI був мігрований для адміністратора 7",
         "zh-cn": "管理员 7 的图形用户界面已迁移"
-      },
-      "1.23.4": {
-        "en": "previousShutterLevel and hardwareColorTemperatureColdWhite datatype corrected\nOptimize websocket reconnection handling",
-        "de": "vorherigeShutterLevel und HardwareColorTemperature kalt Weißer Datentyp korrigiert\nOptimieren Sie Websocket-Reconnecting-Handling",
-        "ru": "предыдущееУровень и аппаратная температура Холодный Белый тип данных исправлен\nОптимизация обработки веб-сокета",
-        "pt": "anteriorShutterLevel e hardwareColorTemperature Frio Tipo de dados branco corrigido\nOtimizar o manuseio de reconexão websocket",
-        "nl": "vorigeShutterLevel en hardwareColorTemperatuur Koud Wit gegevenstype gecorrigeerd\nOptimaliseren van websocket-reconnectie",
-        "fr": "précédentShutterLevel et hardwareColorTemperature Froid Type de données blanc corrigé\nOptimiser la gestion de la reconnection de la poche web",
-        "it": "precedenteShutterLevel e hardwareColorTemperature Freddo freddo Datatipo bianco corretto\nOttimizzare la gestione della connessione websocket",
-        "es": "anteriorShutterNivel y hardwareColorTemperatura Cold Tipo de datos blanco corregido\nOptimize websocket reconnection handling",
-        "pl": "previousShutterLevel and hardwareColorTemperatura Zimne Białe typy danych skorygowane\nOptymalizacja obsługi ponownego połączenia websocket",
-        "uk": "попереднійShutterLevel і обладнанняColorTemperature Холодний Білий тип даних виправлений\nОптимізуйте переключення websocket",
-        "zh-cn": "前一个 Shutter 级别和硬件颜色 凉 更正的白色数据类型\n优化 Websocket 重新连接处理"
       }
     },
     "titleLang": {
