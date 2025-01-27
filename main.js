@@ -785,8 +785,10 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }
         this.wsConnected = false;
         this.expectWsError && clearTimeout(this.expectWsError);
-        // When no error happens within 5 seconds, we refresh our self
-        this.expectWsError = setTimeout(() => this._closed(code, reason, true), 5000);
+        if (!forced && !this.reInitTimeout) {
+            // When no error happens within 5 seconds, we refresh our self
+            this.expectWsError = setTimeout(() => this._closed(code, reason, true), 5000);
+        }
         if ((forced || this.wsConnectionErrorCounter > 6) && !this._unloaded) {
             this._api.dispose();
             this.log.error(`close on websocket connection: ${code} - ${reason}`);
