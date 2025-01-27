@@ -772,6 +772,8 @@ class HmIpCloudAccesspointAdapter extends Adapter {
     }
 
     _closed(code, reason, forced = false) {
+        this.log.debug(`_onclose( ${code}, ${reason}, ${forced})`);
+
         if (this.wsConnectionStableTimeout || !this.wsConnected) {
             this.wsConnectionErrorCounter++;
         } else {
