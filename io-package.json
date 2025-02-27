@@ -159,7 +159,7 @@
     ],
     "globalDependencies": [
       {
-        "admin": ">=6.13.16"
+        "admin": ">=6.17.14"
       }
     ],
     "connectionType": "cloud",
