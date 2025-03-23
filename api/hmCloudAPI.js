@@ -412,12 +412,12 @@ class HmCloudAPI {
         await this.callRestApi('device/control/setSimpleRGBColorDimLevelWithTime', data);
     }
 
-     // float 0.0-1.0??
+    // float 0.0-1.0??
     async deviceControlOpticalSignalBehaviour(deviceId, rgb, dimLevel, channelIndex = 2, opticalSignalBehaviour) {
         let data = { deviceId, channelIndex, dimLevel, simpleRGBColorState: rgb, opticalSignalBehaviour };
         await this.callRestApi('device/control/setOpticalSignal', data);
     }
-    
+
     // float 0.0 = open - 1.0 = closed
     async deviceControlSetShutterLevel(deviceId, shutterLevel, channelIndex = 1) {
         let data = { deviceId, channelIndex, shutterLevel };
