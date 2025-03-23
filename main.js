@@ -479,7 +479,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         );
                     }
                     break;
-                    case 'setOpticalSignalBehaviour':
+                case 'setOpticalSignalBehaviour':
                     {
                         let rgb = await this.getStateAsync(
                             `devices.${o.native.id}.channels.${o.native.channel}.simpleRGBColorState`,
@@ -4472,7 +4472,19 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         promises.push(
             this.extendObject(`devices.${device.id}.channels.${channel}.opticalSignalBehaviour`, {
                 type: 'state',
-                common: { name: 'opticalSignalBehaviour', type: 'string', "states": {"ON": "ON", "BLINKING_MIDDLE": "BLINKING_MIDDLE", "FLASH_MIDDLE": "FLASH_MIDDLE", "BILLOW_MIDDLE": "BILLOW_MIDDLE"}, role: 'state', read: true, write: true },
+                common: {
+                    name: 'opticalSignalBehaviour',
+                    type: 'string',
+                    states: {
+                        ON: 'ON',
+                        BLINKING_MIDDLE: 'BLINKING_MIDDLE',
+                        FLASH_MIDDLE: 'FLASH_MIDDLE',
+                        BILLOW_MIDDLE: 'BILLOW_MIDDLE',
+                    },
+                    role: 'state',
+                    read: true,
+                    write: true,
+                },
                 native: { id: device.id, channel: channel, parameter: 'setOpticalSignalBehaviour' },
             }),
         );
