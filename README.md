@@ -69,7 +69,7 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
-### 1.27.0-alpha.0 (2025-03-24)
+### **WORK IN PROGRESS**
 * (SliX185) Support to control opticalSignalBehaviour for HMIP-BSL has been added.
 * (mcm1957) Adapter requires admin 7, js-controller 5 and node.js 20 now.
 * (SliX185) Logging of PIN has been removed
