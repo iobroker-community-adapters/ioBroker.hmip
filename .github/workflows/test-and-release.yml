@@ -52,34 +52,34 @@ jobs:
                   # Uncomment the following line if your adapter cannot be installed using 'npm ci'
                   # install-command: 'npm install'
 
-    # # Runs admin UI tests on main node version and linux only
-    # gui-tests:
-    #     if: contains(github.event.head_commit.message, '[skip ci]') == false
-    #     needs: [check-and-lint, adapter-tests]
+    # Runs admin UI tests on main node version and linux only
+    gui-tests:
+        if: contains(github.event.head_commit.message, '[skip ci]') == false
+        needs: [check-and-lint, adapter-tests]
         
-    #     runs-on: ${{ matrix.os }}
-    #     strategy:
-    #         matrix:
-    #             node-version: [20.x]
-    #             os: [ubuntu-latest]
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                node-version: [20.x]
+                os: [ubuntu-latest]
                 
-    #     steps:
-    #         - name: gui tests
-    #           uses: ioBroker/testing-action-adapter@v1
-    #           with:
-    #               node-version: ${{ matrix.node-version }}
-    #               os: ${{ matrix.os }}
-    #               extra-tests: npm run test:gui
-    #               # Uncomment the following line if your adapter cannot be installed using 'npm ci'
-    #               # install-command: 'npm install'
-    #         - name: Archive screenshots
-    #           if: always()
-    #             # if: failure()
-    #           uses: actions/upload-artifact@v4
-    #           with:
-    #               path: tmp/screenshots/**/*.png
-    #               retention-days: 3
-    #               name: artifacts-${{ matrix.os }}-${{ matrix.node-version }}
+        steps:
+            - name: gui tests
+              uses: ioBroker/testing-action-adapter@v1
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  os: ${{ matrix.os }}
+                  extra-tests: npm run test:gui
+                  # Uncomment the following line if your adapter cannot be installed using 'npm ci'
+                  # install-command: 'npm install'
+            - name: Archive screenshots
+              if: always()
+                # if: failure()
+              uses: actions/upload-artifact@v4
+              with:
+                  path: tmp/screenshots/**/*.png
+                  retention-days: 3
+                  name: artifacts-${{ matrix.os }}-${{ matrix.node-version }}
 
     # TODO: To enable automatic npm releases, create a token on npmjs.org
     # Enter this token as a GitHub secret (with name NPM_TOKEN) in the repository options
@@ -87,8 +87,7 @@ jobs:
 
     # Deploys the final package to NPM
     deploy:
-        # needs: [check-and-lint, adapter-tests, gui-tests]
-        needs: [check-and-lint, adapter-tests]
+        needs: [check-and-lint, adapter-tests, gui-tests]
 
         # Trigger this step only when a commit on any branch is tagged with a version number
         if: |
