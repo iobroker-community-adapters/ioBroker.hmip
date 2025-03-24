@@ -479,6 +479,41 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         );
                     }
                     break;
+                case 'setOpticalSignalBehaviour':
+                    {
+                        let rgb = await this.getStateAsync(
+                            `devices.${o.native.id}.channels.${o.native.channel}.simpleRGBColorState`,
+                        );
+                        let dimLevel = await this.getStateAsync(
+                            `devices.${o.native.id}.channels.${o.native.channel}.dimLevel`,
+                        );
+                        let opticalSignal = await this.getStateAsync(
+                            `devices.${o.native.id}.channels.${o.native.channel}.opticalSignalBehaviour`,
+                        );
+                        if (dimLevel > 1) {
+                            dimLevel = dimLevel / 100;
+                        }
+                        if (
+                            rgb.val ===
+                                this.currentValues[
+                                    `devices.${o.native.id}.channels.${o.native.channel}.simpleRGBColorState`
+                                ] &&
+                            dimLevel.val ===
+                                this.currentValues[`devices.${o.native.id}.channels.${o.native.channel}.dimLevel`]
+                        ) {
+                            this.log.info(`Value unchanged, do not send this value`);
+                            await this.secureSetStateAsync(id, this.currentValues[id], true);
+                            return;
+                        }
+                        await this._api.deviceControlOpticalSignalBehaviour(
+                            o.native.id,
+                            rgb.val,
+                            dimLevel.val,
+                            o.native.channel,
+                            opticalSignal.val,
+                        );
+                    }
+                    break;
                 case 'setAcousticAlarmSignal':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
@@ -1456,6 +1491,13 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             this.secureSetStateAsync(
                 `devices.${device.id}.channels.${channel}.simpleRGBColorState`,
                 device.functionalChannels[channel].simpleRGBColorState,
+                true,
+            ),
+        );
+        promises.push(
+            this.secureSetStateAsync(
+                `devices.${device.id}.channels.${channel}.opticalSignalBehaviour`,
+                device.functionalChannels[channel].opticalSignalBehaviour,
                 true,
             ),
         );
@@ -4425,6 +4467,25 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 type: 'state',
                 common: { name: 'simpleRGBColorState', type: 'string', role: 'text', read: true, write: true },
                 native: { id: device.id, channel: channel, parameter: 'setRgbDimLevel' },
+            }),
+        );
+        promises.push(
+            this.extendObject(`devices.${device.id}.channels.${channel}.opticalSignalBehaviour`, {
+                type: 'state',
+                common: {
+                    name: 'opticalSignalBehaviour',
+                    type: 'string',
+                    states: {
+                        ON: 'ON',
+                        BLINKING_MIDDLE: 'BLINKING_MIDDLE',
+                        FLASH_MIDDLE: 'FLASH_MIDDLE',
+                        BILLOW_MIDDLE: 'BILLOW_MIDDLE',
+                    },
+                    role: 'state',
+                    read: true,
+                    write: true,
+                },
+                native: { id: device.id, channel: channel, parameter: 'setOpticalSignalBehaviour' },
             }),
         );
         return promises;
