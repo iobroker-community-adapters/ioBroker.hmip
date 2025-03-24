@@ -69,7 +69,7 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
-### 1.27.0-alpha.2 (2025-03-24)
+### **WORK IN PROGRESS**
 * (mcm1957) Adapter requires admin 7.6.3, js-controller 6.0.11 and node.js 20 now.
 * (@GermanBluefox) GUI was migrated to TypeScript (Admin 7.6)
 * (SliX185) Support to control opticalSignalBehaviour for HMIP-BSL has been added.
