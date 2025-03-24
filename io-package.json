@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.26.5",
+    "version": "1.27.0-alpha.0",
     "news": {
+      "1.27.0-alpha.0": {
+        "en": "Support to control opticalSignalBehaviour for HMIP-BSL has been added.\nAdapter requires admin 7, js-controller 5 and node.js 20 now.\nLogging of PIN has been removed\nDependencies have been updated.",
+        "de": "Unterstützung für die optische Steuerung SignalBehaviour für HMIP-BSL wurde hinzugefügt.\nAdapter benötigt jetzt Admin 7, js-Controller 5 und node.js 20.\nProtokollierung von PIN wurde entfernt\nAbhängigkeiten wurden aktualisiert.",
+        "ru": "Поддержка управления оптическим Добавлено поведение сигнала для HMIP-BSL.\nАдаптер требует админ 7, js-контроллер 5 и node.js 20.\nЗапись PIN-кода была удалена\nЗависимости были обновлены.",
+        "pt": "Suporte para controle óptico SignalBehaviour para HMIP-BSL foi adicionado.\nAdaptador requer admin 7, js-controller 5 e node.js 20 agora.\nO registro de PIN foi removido\nAs dependências foram atualizadas.",
+        "nl": "Ondersteuning voor optische controle Signaalgedrag voor HMIP-BSL is toegevoegd.\nAdapter vereist admin 7, js-controller 5 en node.js 20 nu.\nLogging van PIN is verwijderd\nAfhankelijkheden zijn bijgewerkt.",
+        "fr": "Prise en charge de la commande optique Signalcomportement pour HMIP-BSL a été ajouté.\nAdaptateur nécessite admin 7, js-controller 5 et node.js 20 maintenant.\nL'enregistrement du NIP a été supprimé\nLes dépendances ont été actualisées.",
+        "it": "Supporto per il controllo ottico SignalBehaviour per HMIP-BSL è stato aggiunto.\nAdattatore richiede admin 7, js-controller 5 e node.js 20 ora.\nLogging di PIN è stato rimosso\nLe dipendenze sono state aggiornate.",
+        "es": "Soporte para control óptico SignalBehaviour for HMIP-BSL has been added.\nAdaptador requiere admin 7, js-controller 5 y node.js 20 ahora.\nLogging of PIN has been removed\nSe han actualizado las dependencias.",
+        "pl": "Obsługa sterowania optycznego Dodano SignalBehaviour dla HMIP- BSL.\nAdapter wymaga admin 7, js- controller 5 i node.js 20 teraz.\nUsunięto logowanie PIN\nZaktualizowano zależność.",
+        "uk": "Підтримка контролю оптичної Додано SignalBehaviour для HMIP-BSL.\nАдаптер вимагає адміністратора 7, js-controller 5 і node.js 20 тепер.\nЗняття ПІН\nОновлено залежність.",
+        "zh-cn": "支持控制光学 增加了HMIP-BSL的信号行为.\n适配器需要admin 7,js控制器 5和节点.js现在20.\n已删除 PIN 日志\n附属关系已经更新."
+      },
       "1.26.5": {
         "en": "Fixed Websocket disconnect cases",
         "de": "Feste Websocket Trennfälle",
@@ -80,19 +93,6 @@
         "pl": "Interfejs GUI został wyemigrowany do Admin 7\nUsunięty przełyk",
         "uk": "GUI був мігрований для адміністратора 7\nВиданий гель",
         "zh-cn": "管理员 7 的图形用户界面已迁移\n删除的 gulp"
-      },
-      "1.24.1": {
-        "en": "GUI was migrated for Admin 7",
-        "de": "GUI wurde für Admin 7 migriert",
-        "ru": "GUI был перенесен на Админ 7",
-        "pt": "GUI foi migrado para Admin 7",
-        "nl": "GUI is gemigreerd voor Admin 7",
-        "fr": "GUI a été migré pour l'Admin 7",
-        "it": "GUI è stata migrata per Admin 7",
-        "es": "GUI was migrated for Admin 7",
-        "pl": "Interfejs GUI został wyemigrowany do Admin 7",
-        "uk": "GUI був мігрований для адміністратора 7",
-        "zh-cn": "管理员 7 的图形用户界面已迁移"
       }
     },
     "titleLang": {
