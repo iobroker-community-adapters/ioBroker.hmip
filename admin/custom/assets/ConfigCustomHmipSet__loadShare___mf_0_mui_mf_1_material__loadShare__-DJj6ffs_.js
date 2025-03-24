@@ -1,0 +1,1 @@
+import{C as e,i as t}from"./ConfigCustomHmipSet__mf_v__runtimeInit__mf_v__-Bt-QxDJH.js";const{loadShare:i}=t,{initPromise:o}=e,r=o.then(_=>i("@mui/material",{customShareInfo:{shareConfig:{singleton:!0,strictVersion:!1,requiredVersion:"*"}}})),a=await r.then(_=>_());var n=a;export{n as C};

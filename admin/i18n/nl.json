@@ -1,0 +1,14 @@
+{
+    "Enter Access point Sgtin & pin here and press 'Create token' button": "Voer hieronder de toegangspuntcode en pincode in en druk op de knop 'Token maken'",
+    "accesspoint sgtin": "Toegangspunt Sgtin",
+    "authToken": "Authenticatietoken",
+    "caution - this adapter is only for communication with a homematic ip cloudaccesspoint": "Let op: deze adapter is alleen bedoeld voor communicatie met een Homematic IP Cloud-Access-Point of HCU!",
+    "clientAuthToken": "Clientverificatietoken",
+    "clientId": "Klant-ID",
+    "device name": "Apparaatnaam",
+    "id for your homematic device, leave empty or reuse already created one (if you remove adapter and install again)": "ID van uw HMIP-apparaat, leeg laten of een reeds aangemaakte gebruiken (van een eerdere adapterinstallatie)",
+    "name for the device shown in the app": "Naam voor het apparaat weergegeven in de app",
+    "normally filled by token creation": "Deze gegevens worden normaal gesproken automatisch ingevuld bij het maken van het token.",
+    "pin": "PIN",
+    "token data": "HMIP-tokengegevens"
+}

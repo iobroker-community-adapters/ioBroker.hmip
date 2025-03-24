@@ -1,0 +1,1 @@
+import{C as o}from"./ConfigCustomHmipSet__loadShare__react__loadShare__-C2rb-Q_t.js";import{X as n}from"./createTheme-DeCINnsN.js";function r(e){return Object.keys(e).length===0}function u(e=null){const t=o.useContext(n);return!t||r(t)?e:t}export{u};

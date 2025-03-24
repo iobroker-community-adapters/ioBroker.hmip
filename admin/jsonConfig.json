@@ -1,135 +1,136 @@
 {
-  "i18n": true,
-  "type": "panel",
-  "items": {
-    "_info1": {
-      "type": "staticText",
-      "text": "caution - this adapter is only for communication with a homematic ip cloudaccesspoint",
-      "style": {
-        "fontSize": 20
-      },
-      "xs": 12,
-      "sm": 12,
-      "md": 12,
-      "lg": 12,
-      "xl": 12
-    },
-    "_info2": {
-      "type": "staticText",
-      "text": "Enter Access point Sgtin & pin here and press 'Create token' button",
-      "hidden": "!!data.authToken",
-      "xs": 12,
-      "sm": 12,
-      "md": 12,
-      "lg": 12,
-      "xl": 12
-    },
-    "accessPointSgtin": {
-      "label": "accesspoint sgtin",
-      "newLine": true,
-      "type": "text",
-      "xs": 12,
-      "sm": 12,
-      "md": 12,
-      "lg": 8,
-      "xl": 8
-    },
-    "deviceName": {
-      "newLine": true,
-      "label": "device name",
-      "help": "name for the device shown in the app",
-      "type": "text",
-      "xs": 12,
-      "sm": 12,
-      "md": 6,
-      "lg": 4,
-      "xl": 4
-    },
-    "deviceId": {
-      "label": "device id",
-      "type": "text",
-      "help": "id for your homematic device, leave empty or reuse already created one (if you remove adapter and install again)",
-      "xs": 12,
-      "sm": 12,
-      "md": 6,
-      "lg": 4,
-      "xl": 4
-    },
-    "pin": {
-      "newLine": true,
-      "label": "pin",
-      "type": "text",
-      "xs": 12,
-      "sm": 12,
-      "md": 4,
-      "lg": 2,
-      "xl": 2
-    },
-    "_custom": {
-      "newLine": true,
-      "type": "custom",
-      "xs": 12,
-      "sm": 12,
-      "md": 12,
-      "lg": 12,
-      "xl": 12,
-      "i18n": true,
-      "url": "custom/customComponents.js",
-      "name": "ConfigCustomHmipSet/Components/HmipComponent"
-    },
-    "_header": {
-      "newLine": true,
-      "type": "header",
-      "size": 4,
-      "text": "token data",
-      "xs": 12,
-      "sm": 12,
-      "md": 12,
-      "lg": 12,
-      "xl": 12
-    },
-    "_info": {
-      "newLine": true,
-      "style": {
-        "fontSize": 14
-      },
-      "type": "staticText",
-      "text": "normally filled by token creation",
-      "xs": 12,
-      "sm": 12,
-      "md": 12,
-      "lg": 12,
-      "xl": 12
-    },
-    "authToken": {
-      "newLine": true,
-      "label": "authToken",
-      "type": "text",
-      "xs": 12,
-      "sm": 12,
-      "md": 4,
-      "lg": 2,
-      "xl": 2
-    },
-    "clientAuthToken": {
-      "newLine": true,
-      "label": "clientAuthToken",
-      "type": "text",
-      "xs": 12,
-      "sm": 12,
-      "md": 4,
-      "lg": 2,
-      "xl": 2
-    },
-    "clientId": {
-      "newLine": true,
-      "label": "clientId",
-      "type": "text",
-      "xs": 12,
-      "sm": 12,
-      "md": 4,
-      "lg": 2,
-      "xl": 2
+    "i18n": true,
+    "type": "panel",
+    "items": {
+        "_info1": {
+            "type": "staticText",
+            "text": "caution - this adapter is only for communication with a homematic ip cloudaccesspoint",
+            "style": {
+                "fontSize": 20
+            },
+            "xs": 12,
+            "sm": 12,
+            "md": 12,
+            "lg": 12,
+            "xl": 12
+        },
+        "_info2": {
+            "type": "staticText",
+            "text": "Enter Access point Sgtin & pin here and press 'Create token' button",
+            "hidden": "!!data.authToken",
+            "xs": 12,
+            "sm": 12,
+            "md": 12,
+            "lg": 12,
+            "xl": 12
+        },
+        "accessPointSgtin": {
+            "label": "accesspoint sgtin",
+            "newLine": true,
+            "type": "text",
+            "xs": 12,
+            "sm": 12,
+            "md": 12,
+            "lg": 8,
+            "xl": 8
+        },
+        "deviceName": {
+            "newLine": true,
+            "label": "device name",
+            "help": "name for the device shown in the app",
+            "type": "text",
+            "xs": 12,
+            "sm": 12,
+            "md": 6,
+            "lg": 4,
+            "xl": 4
+        },
+        "deviceId": {
+            "label": "device id",
+            "type": "text",
+            "help": "id for your homematic device, leave empty or reuse already created one (if you remove adapter and install again)",
+            "xs": 12,
+            "sm": 12,
+            "md": 6,
+            "lg": 4,
+            "xl": 4
+        },
+        "pin": {
+            "newLine": true,
+            "label": "pin",
+            "type": "text",
+            "xs": 12,
+            "sm": 12,
+            "md": 4,
+            "lg": 2,
+            "xl": 2
+        },
+        "_custom": {
+            "newLine": true,
+            "type": "custom",
+            "xs": 12,
+            "sm": 12,
+            "md": 12,
+            "lg": 12,
+            "xl": 12,
+            "i18n": true,
+            "url": "custom/customComponents.js",
+            "name": "ConfigCustomHmipSet/Components/HmipComponent",
+            "bundlerType": "module"
+        },
+        "_header": {
+            "newLine": true,
+            "type": "header",
+            "size": 4,
+            "text": "token data",
+            "xs": 12,
+            "sm": 12,
+            "md": 12,
+            "lg": 12,
+            "xl": 12
+        },
+        "_info": {
+            "newLine": true,
+            "style": {
+                "fontSize": 14
+            },
+            "type": "staticText",
+            "text": "normally filled by token creation",
+            "xs": 12,
+            "sm": 12,
+            "md": 12,
+            "lg": 12,
+            "xl": 12
+        },
+        "authToken": {
+            "newLine": true,
+            "label": "authToken",
+            "type": "text",
+            "xs": 12,
+            "sm": 12,
+            "md": 4,
+            "lg": 2,
+            "xl": 2
+        },
+        "clientAuthToken": {
+            "newLine": true,
+            "label": "clientAuthToken",
+            "type": "text",
+            "xs": 12,
+            "sm": 12,
+            "md": 4,
+            "lg": 2,
+            "xl": 2
+        },
+        "clientId": {
+            "newLine": true,
+            "label": "clientId",
+            "type": "text",
+            "xs": 12,
+            "sm": 12,
+            "md": 4,
+            "lg": 2,
+            "xl": 2
+        }
     }
-  }
 }

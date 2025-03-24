@@ -1,0 +1,14 @@
+{
+    "Enter Access point Sgtin & pin here and press 'Create token' button": "在下面输入接入点 Sgtin 和 PIN，然后按“创建令牌”按钮",
+    "accesspoint sgtin": "接入点 Sgtin",
+    "authToken": "身份验证令牌",
+    "caution - this adapter is only for communication with a homematic ip cloudaccesspoint": "注意 - 该适配器仅用于与 Homematic IP 云接入点或 HCU 通信！",
+    "clientAuthToken": "客户端身份验证令牌",
+    "clientId": "客户ID",
+    "device name": "设备名称",
+    "id for your homematic device, leave empty or reuse already created one (if you remove adapter and install again)": "您的 HMIP 设备的 ID，留空或重复使用已创建的设备（来自较早的适配器安装）",
+    "name for the device shown in the app": "应用程序中显示的设备名称",
+    "normally filled by token creation": "这些数据通常在创建令牌时自动填充。",
+    "pin": "别针",
+    "token data": "HMIP 令牌数据"
+}
