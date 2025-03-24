@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.27.0-alpha.1",
+    "version": "1.27.0-alpha.2",
     "news": {
+      "1.27.0-alpha.2": {
+        "en": "Adapter requires admin 7.6.3, js-controller 6.0.11 and node.js 20 now.\nGUI was migrated to TypeScript (Admin 7.6)\nSupport to control opticalSignalBehaviour for HMIP-BSL has been added.\nLogging of PIN has been removed\nDependencies have been updated.",
+        "de": "Adapter benötigt jetzt Admin 7.6.3, js-Controller 6.0.11 und node.js 20.\nGUI wurde zu TypeScript (Admin 7.6) migriert\nUnterstützung für die optische Steuerung SignalBehaviour für HMIP-BSL wurde hinzugefügt.\nProtokollierung von PIN wurde entfernt\nAbhängigkeiten wurden aktualisiert.",
+        "ru": "Адаптер требует админ 7.6.3, js-контроллер 6.0.11 и node.js 20.\nGUI был перенесен в TypeScript (Admin 7.6)\nПоддержка управления оптическим Добавлено поведение сигнала для HMIP-BSL.\nЗапись PIN-кода была удалена\nЗависимости были обновлены.",
+        "pt": "Adaptador requer admin 7.6.3, js-controller 6.0.11 e node.js 20 agora.\nGUI foi migrado para TypeScript (Admin 7.6)\nSuporte para controle óptico SignalBehaviour para HMIP-BSL foi adicionado.\nO registro de PIN foi removido\nAs dependências foram atualizadas.",
+        "nl": "Adapter vereist admin 7.6.3, js-controller 6.0.11 en node.js 20 nu.\nGUI is gemigreerd naar TypeScript (Admin 7.6)\nOndersteuning voor optische controle Signaalgedrag voor HMIP-BSL is toegevoegd.\nLogging van PIN is verwijderd\nAfhankelijkheden zijn bijgewerkt.",
+        "fr": "Adaptateur nécessite admin 7.6.3, js-controller 6.0.11 et node.js 20 maintenant.\nL'interface graphique a été migré vers TypeScript (Admin 7.6)\nPrise en charge de la commande optique Signalcomportement pour HMIP-BSL a été ajouté.\nL'enregistrement du NIP a été supprimé\nLes dépendances ont été actualisées.",
+        "it": "Adattatore richiede admin 7.6.3, js-controller 6.0.11 e node.js 20 ora.\nGUI è stata migrata a TypeScript (Admin 7.6)\nSupporto per il controllo ottico SignalBehaviour per HMIP-BSL è stato aggiunto.\nLogging di PIN è stato rimosso\nLe dipendenze sono state aggiornate.",
+        "es": "Adaptador requiere admin 7.6.3, js-controller 6.0.11 y node.js 20 ahora.\nGUI fue migrado a TipoScript (Admin 7.6)\nSoporte para control óptico SignalBehaviour for HMIP-BSL has been added.\nLogging of PIN has been removed\nSe han actualizado las dependencias.",
+        "pl": "Adapter wymaga admin 7.6.3, kontroler js- 6.0.11 i node.js 20 teraz.\nInterfejs użytkownika został przeniesiony do TypeScript (Admin 7.6)\nObsługa sterowania optycznego Dodano SignalBehaviour dla HMIP- BSL.\nUsunięto logowanie PIN\nZaktualizowano zależność.",
+        "uk": "Адаптер вимагає адміністратора 7.6.3, js-controller 6.0.11 і node.js 20 тепер.\nGUI був мігрований до TypeScript (Admin 7.6)\nПідтримка контролю оптичної Додано SignalBehaviour для HMIP-BSL.\nЗняття ПІН\nОновлено залежність.",
+        "zh-cn": "适配器需要admin 7.6.3,js控制器 6.0.11和节点.js现在20.\nGUI 已迁移到 TypeScript (Admin 7.6)\n支持控制光学 增加了HMIP-BSL的信号行为.\n已删除 PIN 日志\n附属关系已经更新."
+      },
       "1.27.0-alpha.1": {
         "en": "Support to control opticalSignalBehaviour for HMIP-BSL has been added.\nAdapter requires admin 7, js-controller 5 and node.js 20 now.\nLogging of PIN has been removed\nDependencies have been updated.",
         "de": "Unterstützung für die optische Steuerung SignalBehaviour für HMIP-BSL wurde hinzugefügt.\nAdapter benötigt jetzt Admin 7, js-Controller 5 und node.js 20.\nProtokollierung von PIN wurde entfernt\nAbhängigkeiten wurden aktualisiert.",
@@ -80,19 +93,6 @@
         "pl": "Adapter wymaga node.js 20 teraz\nDodano wsparcie dla Home Control Unit\nPoprawiono interfejs administratora",
         "uk": "Адаптер вимагає node.js 20 тепер\nДодано підтримку для домашнього управління\nВиправлено графічний інтерфейс адміністратора",
         "zh-cn": "适配器现在需要节点20\n增加了对家庭控制股的支助\n纠正了管理界面"
-      },
-      "1.25.0": {
-        "en": "Updated packages\nUser prettier for code\nAdded GUI test for the admin component",
-        "de": "Aktualisierte Pakete\nBenutzeroberfläche für Code\nGUI Test für die Admin-Komponente hinzugefügt",
-        "ru": "Обновленные пакеты\nПользовательский красивее для кода\nДобавить тест GUI для компонента администратора",
-        "pt": "Pacotes atualizados\nMais bonito do usuário para o código\nAdicionado teste GUI para o componente admin",
-        "nl": "Bijgewerkte pakketten\nGebruiker mooier voor code\nGUI-test toegevoegd voor het admin-component",
-        "fr": "Paquets mis à jour\nUtilisateur meilleur pour le code\nAjout du test GUI pour le composant admin",
-        "it": "Pacchetti aggiornati\nPrettier utente per codice\nAggiunto test GUI per il componente admin",
-        "es": "Paquetes actualizados\nMás alto usuario para código\nPrueba GUI agregada para el componente admin",
-        "pl": "Aktualizacja pakietów\nUser pretier for code\nDodano test GUI dla komponentu admin",
-        "uk": "Оновлені пакети\nКористувач предтетер за код\nДодано графічний тест для компонента адміністратора",
-        "zh-cn": "更新软件包\n代码用户更美\n为管理员组件添加的图形用户界面测试"
       }
     },
     "titleLang": {
