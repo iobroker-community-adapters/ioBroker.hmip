@@ -1,6 +1,6 @@
 {
   "name": "iobroker.hmip",
-  "version": "1.27.0-alpha.0",
+  "version": "1.27.0-alpha.1",
   "description": "ioBroker Adapter to use the Homematic Cloud IP AccessPoint via Hommeatic Cloud Rest API",
   "author": {
     "name": "Apollon77",

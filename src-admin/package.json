@@ -1,7 +1,7 @@
 {
     "name": "iobroker-admin-component-hmip",
     "private": true,
-    "version": "1.27.0-alpha.0",
+    "version": "1.27.0-alpha.1",
     "scripts": {
         "start": "set PORT=4173 && craco start",
         "build": "craco build"
