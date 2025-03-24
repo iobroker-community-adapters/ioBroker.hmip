@@ -23,7 +23,7 @@
         "@rollup/plugin-node-resolve": "^16.0.1",
         "@rollup/plugin-replace": "^6.0.2",
         "@types/react": "^18.3.18",
-        "@types/react-dom": "^18.3.5",
+        "@types/react-dom": "^19.0.4",
         "craco-esbuild": "^0.6.1",
         "craco-module-federation": "^1.1.0",
         "jsverify": "^0.8.4",
