@@ -10,7 +10,7 @@
     },
     "type": "module",
     "devDependencies": {
-        "@iobroker/adapter-react-v5": "^7.6.18",
+        "@iobroker/adapter-react-v5": "^7.7.1",
         "@iobroker/json-config": "^7.7.0",
         "@module-federation/runtime": "^0.14.3",
         "@module-federation/vite": "^1.5.1",
