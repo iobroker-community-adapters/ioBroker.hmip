@@ -12,7 +12,7 @@
     "devDependencies": {
         "@iobroker/adapter-react-v5": "^7.7.2",
         "@iobroker/json-config": "^7.7.2",
-        "@module-federation/runtime": "^0.17.1",
+        "@module-federation/runtime": "^0.18.3",
         "@module-federation/vite": "^1.7.2",
         "@mui/icons-material": "^6.4.8",
         "@mui/material": "^6.4.8",
