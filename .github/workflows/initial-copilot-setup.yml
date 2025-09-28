@@ -1,0 +1,234 @@
+name: Initial ioBroker Copilot Setup
+
+on:
+  workflow_dispatch:  # Manual triggering for initial setup
+    inputs:
+      force_setup:
+        description: 'Force setup even if copilot-instructions.md already exists'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  initial-setup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Check repository structure
+        id: repo-check
+        run: |
+          echo "🔍 Analyzing repository structure..."
+          
+          # Check if this is an ioBroker adapter
+          ADAPTER_DETECTED="false"
+          ADAPTER_NAME=""
+          
+          if [ -f "package.json" ] && [ -f "io-package.json" ]; then
+            # Get adapter name from io-package.json
+            ADAPTER_NAME=$(grep -o '"name": *"[^"]*"' io-package.json | sed 's/"name": *"\([^"]*\)"/\1/' | head -1)
+            
+            if [ -n "$ADAPTER_NAME" ]; then
+              ADAPTER_DETECTED="true"
+              echo "✅ ioBroker adapter detected: $ADAPTER_NAME"
+            fi
+          fi
+          
+          if [ "$ADAPTER_DETECTED" == "false" ]; then
+            echo "❌ This does not appear to be an ioBroker adapter repository"
+            exit 1
+          fi
+          
+          # Check for existing copilot instructions
+          COPILOT_EXISTS="false"
+          if [ -f ".github/copilot-instructions.md" ]; then
+            COPILOT_EXISTS="true"
+            echo "📋 Existing copilot-instructions.md found"
+          else
+            echo "📋 No copilot-instructions.md found"
+          fi
+          
+          echo "adapter_detected=$ADAPTER_DETECTED" >> $GITHUB_OUTPUT
+          echo "adapter_name=$ADAPTER_NAME" >> $GITHUB_OUTPUT
+          echo "copilot_exists=$COPILOT_EXISTS" >> $GITHUB_OUTPUT
+
+      - name: Setup decision
+        id: setup-decision
+        run: |
+          FORCE_SETUP="${{ github.event.inputs.force_setup }}"
+          COPILOT_EXISTS="${{ steps.repo-check.outputs.copilot_exists }}"
+          
+          if [ "$COPILOT_EXISTS" == "true" ] && [ "$FORCE_SETUP" != "true" ]; then
+            echo "⏭️  Copilot instructions already exist and force_setup is false"
+            echo "should_setup=false" >> $GITHUB_OUTPUT
+            echo "reason=already_exists" >> $GITHUB_OUTPUT
+          else
+            echo "✅ Proceeding with setup"
+            echo "should_setup=true" >> $GITHUB_OUTPUT
+            if [ "$FORCE_SETUP" == "true" ]; then
+              echo "reason=forced" >> $GITHUB_OUTPUT
+            else
+              echo "reason=new_setup" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - name: Get latest template version
+        if: steps.setup-decision.outputs.should_setup == 'true'
+        id: get-version
+        run: |
+          # Get latest version from centralized metadata
+          LATEST_VERSION=$(curl -s "https://raw.githubusercontent.com/DrozmotiX/ioBroker-Copilot-Instructions/main/config/metadata.json" | grep '"version":' | head -1 | sed 's/.*"version": *"\([^"]*\)".*/\1/')
+          
+          if [ -z "$LATEST_VERSION" ]; then
+            echo "❌ Failed to fetch latest version"
+            exit 1
+          fi
+          
+          echo "✅ Latest template version: $LATEST_VERSION"
+          echo "latest_version=$LATEST_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create adapter-specific copilot instructions
+        if: steps.setup-decision.outputs.should_setup == 'true'
+        id: create-instructions
+        run: |
+          echo "🛠️  Creating adapter-specific copilot instructions..."
+          
+          # Create .github directory if it doesn't exist
+          mkdir -p .github
+          
+          # Download template
+          curl -s "https://raw.githubusercontent.com/DrozmotiX/ioBroker-Copilot-Instructions/main/template.md" > template_raw.md
+          
+          # Remove template comment block
+          sed '/^<!--$/,/^-->$/d' template_raw.md > template_clean.md
+          
+          # Get adapter information for customization
+          ADAPTER_NAME="${{ steps.repo-check.outputs.adapter_name }}"
+          
+          # Basic adapter context detection
+          ADAPTER_PURPOSE=""
+          if grep -q -i "homematic\|hmip" package.json README.md 2>/dev/null; then
+            ADAPTER_PURPOSE="HomeMatic IP Cloud integration"
+          elif grep -q -i "shelly" package.json README.md 2>/dev/null; then
+            ADAPTER_PURPOSE="Shelly device integration"
+          elif grep -q -i "mqtt" package.json README.md 2>/dev/null; then
+            ADAPTER_PURPOSE="MQTT broker/client integration"
+          elif grep -q -i "modbus" package.json README.md 2>/dev/null; then
+            ADAPTER_PURPOSE="Modbus protocol communication"
+          else
+            ADAPTER_PURPOSE="Device/service integration"
+          fi
+          
+          # Create customized instructions
+          cp template_clean.md .github/copilot-instructions.md
+          
+          # Update version
+          sed -i "s/\*\*Version:\*\* [0-9.]*/\*\*Version:\*\* ${{ steps.get-version.outputs.latest_version }}/" .github/copilot-instructions.md
+          
+          # Add basic adapter-specific customization placeholder
+          sed -i "s|\[CUSTOMIZE: Add specific context about your adapter's purpose, target devices/services, and unique requirements\]|### $ADAPTER_NAME Adapter Specifics\n\nThis adapter provides $ADAPTER_PURPOSE functionality for ioBroker.\n\n**Key Characteristics:**\n- Adapter Name: $ADAPTER_NAME\n- Primary Function: $ADAPTER_PURPOSE\n- [CUSTOMIZE: Add specific device types, API details, and unique requirements]\n- [CUSTOMIZE: Add any special configuration or authentication requirements]\n- [CUSTOMIZE: Add specific error handling or rate limiting considerations]|" .github/copilot-instructions.md
+          
+          # Clean up temporary files
+          rm template_raw.md template_clean.md
+          
+          echo "✅ Copilot instructions created successfully"
+          echo "instructions_created=true" >> $GITHUB_OUTPUT
+
+      - name: Commit and push changes
+        if: steps.create-instructions.outputs.instructions_created == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          git add .github/copilot-instructions.md .github/workflows/check-copilot-template.yml
+          
+          # Check if there are changes to commit
+          if git diff --staged --quiet; then
+            echo "📝 No changes to commit"
+          else
+            git commit -m "🤖 Setup GitHub Copilot instructions (v${{ steps.get-version.outputs.latest_version }})"
+            git push
+            echo "✅ Changes committed and pushed successfully"
+          fi
+
+      - name: Create setup completion issue
+        if: steps.create-instructions.outputs.instructions_created == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueBody = `# ✅ ioBroker Copilot Instructions Setup Complete
+
+            **Adapter:** ${{ steps.repo-check.outputs.adapter_name }}
+            **Template Version:** ${{ steps.get-version.outputs.latest_version }}
+            **Setup Reason:** ${{ steps.setup-decision.outputs.reason }}
+            
+            ## 🎯 Setup Results
+            
+            GitHub Copilot instructions have been successfully set up for this ioBroker adapter repository.
+            
+            ### ✅ Files Created/Updated
+            - \`.github/copilot-instructions.md\` - Main copilot instructions with adapter-specific customizations
+            - \`.github/workflows/check-copilot-template.yml\` - Automated version checking workflow
+            
+            ## 🔧 Next Steps (Manual Customization)
+            
+            **GitHub Copilot**: Please review and enhance the copilot instructions:
+            
+            1. **Review Adapter-Specific Sections**:
+               - Check the \`[CUSTOMIZE]\` placeholders in \`.github/copilot-instructions.md\`
+               - Add specific details about device types, APIs, authentication methods
+               - Include any unique error handling or rate limiting requirements
+            
+            2. **Test Enhanced Suggestions**:
+               - Try typing \`this.setState(\` in a .js file to verify improved suggestions
+               - Test that Copilot recognizes adapter-specific patterns
+               - Verify context-aware completions for ioBroker development
+            
+            3. **Validate Template Integration**:
+               - Ensure custom sections don't duplicate standard template content
+               - Verify all adapter-specific customizations are meaningful and unique
+               - Check that version tracking is properly set up
+            
+            ## 🔄 Automated Maintenance
+            
+            - **Weekly Version Checks**: The workflow will automatically check for template updates every Sunday
+            - **Update Notifications**: Issues will be created automatically when new template versions are available  
+            - **Custom Content Preservation**: Your adapter-specific customizations will be preserved during updates
+            
+            ## 📚 Documentation
+            
+            - **Template Repository**: https://github.com/DrozmotiX/ioBroker-Copilot-Instructions
+            - **Current Template**: https://raw.githubusercontent.com/DrozmotiX/ioBroker-Copilot-Instructions/main/template.md
+            
+            ---
+            
+            *This issue was automatically created after successful setup. You can close it once you've reviewed and customized the copilot instructions.*`;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '✅ GitHub Copilot Instructions Setup Complete',
+              body: issueBody,
+              labels: ['copilot-setup', 'automation']
+            });
+            
+            console.log('✅ Setup completion issue created');
+
+      - name: Setup summary
+        run: |
+          if [ "${{ steps.setup-decision.outputs.should_setup }}" == "true" ]; then
+            echo "🎉 ioBroker Copilot setup completed successfully!"
+            echo "📋 Adapter: ${{ steps.repo-check.outputs.adapter_name }}"
+            echo "📋 Template Version: ${{ steps.get-version.outputs.latest_version }}"
+            echo "📋 Setup Reason: ${{ steps.setup-decision.outputs.reason }}"
+            echo ""
+            echo "✅ Next: Review and customize the [CUSTOMIZE] sections in .github/copilot-instructions.md"
+          else
+            echo "⏭️  Setup skipped: ${{ steps.setup-decision.outputs.reason }}"
+          fi
