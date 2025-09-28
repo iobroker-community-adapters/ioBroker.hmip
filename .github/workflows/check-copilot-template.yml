@@ -1,0 +1,154 @@
+name: Check ioBroker Copilot Template Version
+
+on:
+  schedule:
+    - cron: '23 3 * * 0'  # Weekly check optimized for off-peak hours (3:23 AM UTC Sunday)
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  check-template:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Dynamic template version check
+        id: version-check
+        run: |
+          echo "🔍 Starting dynamic ioBroker Copilot template version check..."
+          
+          # Get current version from local copilot instructions
+          LOCAL_VERSION=""
+          if [ -f ".github/copilot-instructions.md" ]; then
+            LOCAL_VERSION=$(grep "^\*\*Version:\*\*" .github/copilot-instructions.md | sed 's/.*Version:\*\* *\([0-9.]*\).*/\1/' | head -1)
+          fi
+          
+          if [ -z "$LOCAL_VERSION" ]; then
+            echo "⚠️  No version found in local copilot instructions"
+            LOCAL_VERSION="0.0.0"
+          fi
+          
+          # Get latest version from centralized metadata
+          LATEST_VERSION=$(curl -s "https://raw.githubusercontent.com/DrozmotiX/ioBroker-Copilot-Instructions/main/config/metadata.json" | grep '"version":' | head -1 | sed 's/.*"version": *"\([^"]*\)".*/\1/')
+          
+          if [ -z "$LATEST_VERSION" ]; then
+            echo "❌ Failed to fetch latest version from metadata"
+            exit 1
+          fi
+          
+          echo "📋 Local version: $LOCAL_VERSION"
+          echo "📋 Latest version: $LATEST_VERSION"
+          
+          # Version comparison
+          if [ "$LOCAL_VERSION" != "$LATEST_VERSION" ]; then
+            echo "🆕 Update available: $LOCAL_VERSION → $LATEST_VERSION"
+            echo "update_available=true" >> $GITHUB_OUTPUT
+            echo "local_version=$LOCAL_VERSION" >> $GITHUB_OUTPUT
+            echo "latest_version=$LATEST_VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "✅ Template is up to date"
+            echo "update_available=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check for existing update issues
+        if: steps.version-check.outputs.update_available == 'true'
+        id: check-issues
+        run: |
+          # Check if there's already an open issue for template updates
+          EXISTING_ISSUES=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/issues?labels=template-update,automation&state=open")
+          
+          ISSUE_COUNT=$(echo "$EXISTING_ISSUES" | jq '. | length')
+          
+          if [ "$ISSUE_COUNT" -gt 0 ]; then
+            echo "⏭️  Existing template update issue found, skipping creation"
+            echo "create_issue=false" >> $GITHUB_OUTPUT
+          else
+            echo "✨ No existing issues found, will create update issue"
+            echo "create_issue=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create template update issue
+        if: steps.version-check.outputs.update_available == 'true' && steps.check-issues.outputs.create_issue == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueBody = `# 🤖 Automated ioBroker Copilot Template Update Available
+
+            **Current Version:** ${{ steps.version-check.outputs.local_version }}
+            **Latest Version:** ${{ steps.version-check.outputs.latest_version }}
+            
+            ## 🔍 Update Detection
+            
+            A new version of the ioBroker Copilot instructions template is available. This issue was automatically created by the weekly version check workflow.
+            
+            ## 🚀 How to Update
+            
+            **GitHub Copilot**: Please update the copilot instructions using the centralized template:
+            
+            **Configuration Reference**: https://raw.githubusercontent.com/DrozmotiX/ioBroker-Copilot-Instructions/main/config/automation-setup.yml
+            
+            ### Quick Update Steps
+            
+            1. **Fetch Latest Template**:
+               - Download: https://raw.githubusercontent.com/DrozmotiX/ioBroker-Copilot-Instructions/main/template.md
+               - Remove the template comment block (\`<!-- TEMPLATE FILE -->\` section)
+               - Update version to **${{ steps.version-check.outputs.latest_version }}**
+            
+            2. **Preserve Custom Sections**:
+               - Keep all content in \`[CUSTOMIZE]\` sections that is specific to this adapter
+               - Do NOT duplicate content that exists in both custom and standard sections
+               - Merge any new standard template sections with existing customizations
+            
+            3. **Update Template Version**:
+               - Set \`**Version:** ${{ steps.version-check.outputs.latest_version }}\` in .github/copilot-instructions.md
+               - Do NOT modify package.json for version tracking
+            
+            4. **Validation**:
+               - Verify GitHub Copilot suggestions improve after update
+               - Test that custom adapter-specific context is preserved
+               - Ensure no duplicate content between standard and custom sections
+            
+            ## 📋 Success Criteria
+            
+            - [ ] Template updated to version ${{ steps.version-check.outputs.latest_version }}
+            - [ ] All \`[CUSTOMIZE]\` sections preserved with unique, adapter-specific content
+            - [ ] No content duplication between custom and standard sections  
+            - [ ] Version stored in copilot-instructions.md (NOT package.json)
+            - [ ] Enhanced GitHub Copilot suggestions validated
+            
+            ## 🔗 Reference Links
+            
+            - **Latest Template**: https://raw.githubusercontent.com/DrozmotiX/ioBroker-Copilot-Instructions/main/template.md
+            - **Template Repository**: https://github.com/DrozmotiX/ioBroker-Copilot-Instructions
+            - **Centralized Metadata**: https://raw.githubusercontent.com/DrozmotiX/ioBroker-Copilot-Instructions/main/config/metadata.json
+            
+            ---
+            
+            *This issue was automatically created by GitHub Actions. The workflow runs weekly to check for template updates.*`;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🤖 Update ioBroker Copilot Instructions Template',
+              body: issueBody,
+              labels: ['template-update', 'automation']
+            });
+            
+            console.log('✅ Template update issue created successfully');
+
+      - name: Summary
+        run: |
+          if [ "${{ steps.version-check.outputs.update_available }}" == "true" ]; then
+            if [ "${{ steps.check-issues.outputs.create_issue }}" == "true" ]; then
+              echo "🎯 Template update issue created for version ${{ steps.version-check.outputs.latest_version }}"
+            else
+              echo "⏭️  Update available but issue already exists"
+            fi
+          else
+            echo "✅ ioBroker Copilot template is up to date"
+          fi
