@@ -34,7 +34,7 @@
     "@iobroker/adapter-core": "^3.2.3",
     "axios": "^1.8.4",
     "js-sha512": "^0.9.0",
-    "uuid": "^11.1.0",
+    "uuid": "^13.0.0",
     "ws": "^8.18.3"
   },
   "devDependencies": {
