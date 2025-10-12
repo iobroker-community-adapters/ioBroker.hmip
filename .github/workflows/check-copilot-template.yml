@@ -74,7 +74,7 @@ jobs:
 
       - name: Create template update issue
         if: steps.version-check.outputs.update_available == 'true' && steps.check-issues.outputs.create_issue == 'true'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const issueBody = `# 🤖 Automated ioBroker Copilot Template Update Available
