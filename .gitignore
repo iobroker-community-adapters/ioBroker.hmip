@@ -9,3 +9,6 @@ src-admin/node_modules
 src-admin/build
 *.tgz
 /tmp/
+
+#ignore .commitinfo created by ioBroker release script
+.commitinfo
