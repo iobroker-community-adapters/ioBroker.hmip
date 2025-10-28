@@ -973,5 +973,3 @@ tests.integration(path.join(__dirname, ".."), {
     }
 });
 ```
-
-[CUSTOMIZE: Add any adapter-specific coding standards or patterns here]
