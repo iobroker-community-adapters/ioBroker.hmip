@@ -83,7 +83,8 @@
       "uk": "Хмарна точка доступу HomeMaticIP"
     },
     "authors": [
-      "jogibear9988 <jochen.kuehner@gmx.de>"
+      "jogibear9988 <jochen.kuehner@gmx.de>",
+      "iobroker-community-adapters <iobroker-community-adapters@gmx.de>"
     ],
     "platform": "Javascript/Node.js",
     "mode": "daemon",
@@ -120,7 +121,7 @@
     ],
     "globalDependencies": [
       {
-        "admin": ">=7.6.3"
+        "admin": ">=7.6.17"
       }
     ],
     "connectionType": "cloud",
