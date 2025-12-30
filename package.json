@@ -2,19 +2,11 @@
   "name": "iobroker.hmip",
   "version": "1.27.0",
   "description": "ioBroker Adapter to use the Homematic Cloud IP AccessPoint via Hommeatic Cloud Rest API",
-  "author": {
-    "name": "Apollon77",
-    "email": "iobroker@fischer-ka.de"
-  },
+  "author": "Apollon77 <iobroker@fischer-ka.de>",
   "contributors": [
-    {
-      "name": "jogibear9988",
-      "email": "jochen.kuehner@gmx.de"
-    },
-    {
-      "name": "Apollon77",
-      "email": "iobroker@fischer-ka.de"
-    }
+    "jogibear9988 <jochen.kuehner@gmx.de>",
+    "Apollon77 <iobroker@fischer-ka.de>",
+    "iobroker-community-adapters <iobroker-community-adapters@gmx.de>"
   ],
   "homepage": "https://github.com/iobroker-community-adapters/ioBroker.hmip",
   "license": "MIT",
