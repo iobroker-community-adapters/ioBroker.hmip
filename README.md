@@ -361,7 +361,7 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 ## License
 The MIT License (MIT)
 
-Copyright (c) 2023-2025 iobroker-community-adapters <iobroker-community-adapters@gmx.de>  
+Copyright (c) 2023-2026 iobroker-community-adapters <iobroker-community-adapters@gmx.de>  
 Copyright (c) 2018-2022 jogibear9988 <jochen.kuehner@gmx.de>, Apollon77
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
