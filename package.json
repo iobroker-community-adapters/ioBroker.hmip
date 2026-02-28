@@ -23,7 +23,7 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@iobroker/adapter-core": "^3.2.3",
+    "@iobroker/adapter-core": "^3.3.2",
     "axios": "^1.8.4",
     "js-sha512": "^0.9.0",
     "uuid": "^11.1.0",
