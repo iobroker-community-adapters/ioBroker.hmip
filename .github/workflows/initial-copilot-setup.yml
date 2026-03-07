@@ -159,7 +159,7 @@ jobs:
 
       - name: Create setup completion issue
         if: steps.create-instructions.outputs.instructions_created == 'true'
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const issueBody = `# ✅ ioBroker Copilot Instructions Setup Complete
