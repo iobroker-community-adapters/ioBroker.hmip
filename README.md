@@ -359,6 +359,8 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 ### 0.0.1
 * (jogibear9988) initial release
 
+[Older changelogs can be found there](CHANGELOG_OLD.md)
+
 ## License
 The MIT License (MIT)
 
