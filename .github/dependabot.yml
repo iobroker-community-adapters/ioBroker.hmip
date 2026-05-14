@@ -11,7 +11,7 @@ updates:
       interval: 'cron'
       timezone: 'Europe/Berlin'
       cronjob: '21 3 3 * *'
-    open-pull-requests-limit: 25
+    open-pull-requests-limit: 35
     versioning-strategy: 'increase'
     cooldown:
       default-days: 7
@@ -26,7 +26,7 @@ updates:
       interval: 'cron'
       timezone: 'Europe/Berlin'
       cronjob: '21 3 3 * *'
-    open-pull-requests-limit: 25
+    open-pull-requests-limit: 35
     versioning-strategy: 'increase'
     cooldown:
       default-days: 7
