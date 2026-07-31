@@ -6,7 +6,7 @@ import { LinearProgress, Button, CircularProgress } from '@mui/material';
 // invalid
 // import ConfigGeneric from '@iobroker/adapter-react-v5/ConfigGeneric';
 // valid
-import { I18n } from '@iobroker/adapter-react-v5';
+import { I18n } from '@iobroker/gui-components';
 import { ConfigGeneric, type ConfigGenericProps, type ConfigGenericState } from '@iobroker/json-config';
 
 interface HmipComponentState extends ConfigGenericState {

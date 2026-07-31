@@ -76,7 +76,8 @@
             "i18n": true,
             "url": "custom/customComponents.js",
             "name": "ConfigCustomHmipSet/Components/HmipComponent",
-            "bundlerType": "module"
+            "bundlerType": "module",
+            "guiApi": 2
         },
         "_header": {
             "newLine": true,

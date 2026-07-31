@@ -11,7 +11,7 @@ import {
     Loader,
     type GenericAppProps,
     type GenericAppState,
-} from '@iobroker/adapter-react-v5';
+} from '@iobroker/gui-components';
 
 import HmipComponent from './HmipComponent';
 
@@ -69,7 +69,7 @@ class App extends GenericApp<GenericAppProps, AppState> {
             'zh-cn': zhCNLocal,
         };
 
-        I18n.setTranslations(translations);
+        I18n.extendTranslations(translations);
         // @ts-expect-error userLanguage could exist
         I18n.setLanguage((navigator.language || navigator.userLanguage || 'en').substring(0, 2).toLowerCase());
     }
