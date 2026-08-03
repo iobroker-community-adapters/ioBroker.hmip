@@ -9,6 +9,7 @@ export default [
         // specify files to exclude from linting here
         ignores: [
             '.__mf__temp/',
+            '.mf/',
             'admin/',
             '**/*.test.js',
             'test/**/*.js',
