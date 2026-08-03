@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "hmip",
-    "version": "1.27.0",
+    "version": "2.0.0",
     "news": {
+      "2.0.0": {
+        "en": "Adapter requires node.js >= 22 now\nAdapter requires admin >= 7.7.22 now\nDependencies have been updated.\nMigrated to admin 8",
+        "de": "Der Adapter benötigt jetzt Node.js >= 22.\nDer Adapter benötigt jetzt Administratorrechte ab Version 7.7.22.\nDie Abhängigkeiten wurden aktualisiert.\nMigriert zu Admin 8",
+        "ru": "Для работы адаптера требуется Node.js версии >= 22.\nДля работы адаптера требуется версия admin >= 7.7.22.\nЗависимости обновлены.\nПеренесено на административный интерфейс 8.",
+        "pt": "O adaptador agora requer Node.js >= 22.\nO adaptador agora requer o administrador na versão 7.7.22 ou superior.\nAs dependências foram atualizadas.\nMigrado para admin 8",
+        "nl": "De adapter vereist nu Node.js versie 22 of hoger.\nAdapter vereist nu beheerdersversie >= 7.7.22.\nDe afhankelijkheden zijn bijgewerkt.\nOvergezet naar beheerder 8",
+        "fr": "L'adaptateur nécessite désormais Node.js >= 22.\nL'adaptateur nécessite désormais une version d'administrateur supérieure ou égale à 7.7.22.\nLes dépendances ont été mises à jour.\nMigré vers l'administrateur 8",
+        "it": "L'adattatore ora richiede Node.js >= 22\nL'adattatore richiede ora l'amministratore >= 7.7.22\nLe dipendenze sono state aggiornate.\nMigrato ad admin 8",
+        "es": "El adaptador ahora requiere node.js >= 22.\nEl adaptador ahora requiere administrador >= 7.7.22\nSe han actualizado las dependencias.\nMigrado a admin 8",
+        "pl": "Adapter wymaga teraz node.js >= 22\nAdapter wymaga teraz administratora >= 7.7.22\nZaktualizowano zależności.\nPrzeniesiono do administratora 8",
+        "uk": "Адаптер тепер вимагає node.js >= 22\nАдаптер тепер вимагає адміністратора >= 7.7.22\nЗалежності оновлено.\nПеренесено до адміністратора 8",
+        "zh-cn": "适配器现在需要 node.js 版本 >= 22。\n适配器现在需要管理员版本 >= 7.7.22。\n依赖项已更新。\n已迁移至 admin 8"
+      },
       "1.27.0": {
         "en": "Adapter requires admin 7.6.3, js-controller 6.0.11 and node.js 20 now.\nGUI was migrated to TypeScript (Admin 7.6)\nSupport to control opticalSignalBehaviour for HMIP-BSL has been added.\nLogging of PIN has been removed\nDependencies have been updated.",
         "de": "Adapter benötigt jetzt Admin 7.6.3, js-Controller 6.0.11 und node.js 20.\nGUI wurde zu TypeScript (Admin 7.6) migriert\nUnterstützung für die optische Steuerung SignalBehaviour für HMIP-BSL wurde hinzugefügt.\nProtokollierung von PIN wurde entfernt\nAbhängigkeiten wurden aktualisiert.",
