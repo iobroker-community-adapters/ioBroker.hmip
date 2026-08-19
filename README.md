@@ -67,8 +67,8 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 <!--
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
--->
-## Changelog
+- (@Apollon77) Fixed removed groups and clients being deleted from the wrong internal cache
+
 ### 2.0.0 (2026-08-03)
 - (copilot) Adapter requires node.js >= 22 now
 - (copilot) Adapter requires admin >= 8.0.0 now

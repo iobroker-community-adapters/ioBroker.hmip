@@ -317,10 +317,10 @@ class HmCloudAPI {
                     ev.device && delete this.devices[ev.device.id];
                     break;
                 case 'GROUP_REMOVED':
-                    ev.group && delete this.clients[ev.group.id];
+                    ev.group && delete this.groups[ev.group.id];
                     break;
                 case 'CLIENT_REMOVED':
-                    ev.client && delete this.groups[ev.client.id];
+                    ev.client && delete this.clients[ev.client.id];
                     break;
                 case 'HOME_CHANGED':
                     this.home = ev.home;
