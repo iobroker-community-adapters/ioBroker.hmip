@@ -704,9 +704,122 @@ class HmCloudAPI {
         await this.callRestApi('home/security/setIntrusionAlertThroughSmokeDetectors', data);
     }
 
+    _securityZoneGroups() {
+        return Object.values(this.groups || {}).filter(group => group && group.type === 'SECURITY_ZONE');
+    }
+
+    hasRequestBasedSecurityZones() {
+        return this._securityZoneGroups().some(group => group.label === 'ABSENCE' || group.label === 'PRESENCE');
+    }
+
+    hasClassicSecurityZones() {
+        return this._securityZoneGroups().some(group => group.label === 'INTERNAL' || group.label === 'EXTERNAL');
+    }
+
+    _buildZonesActivation(requestBased, internal, external) {
+        if (requestBased) {
+            // the classic internal zone is the away mode, and ABSENCE/PRESENCE are mutually
+            // exclusive: away -> ABSENCE, home -> PRESENCE, neither -> disarmed
+            return { PRESENCE: external && !internal, ABSENCE: internal };
+        }
+        return { INTERNAL: internal, EXTERNAL: external };
+    }
+
+    _asReasonList(reasons) {
+        return (Array.isArray(reasons) ? reasons : [reasons])
+            .filter(reason => reason !== undefined && reason !== null)
+            .map(reason => (typeof reason === 'object' ? JSON.stringify(reason) : String(reason)));
+    }
+
+    _securityZoneActivationProblems(response) {
+        // device labels are user-chosen, so a plain object would inherit "constructor", "toString", ...
+        const problems = Object.create(null);
+        if (!response || typeof response !== 'object') {
+            return problems;
+        }
+        const add = (label, reasons) => {
+            const list = this._asReasonList(reasons);
+            if (list.length) {
+                problems[label] = (problems[label] || []).concat(list);
+            }
+        };
+        add('', response.activationProblems);
+        const channelProblems = response.channelActivationProblems;
+        if (channelProblems && typeof channelProblems === 'object') {
+            for (const key of Object.keys(channelProblems)) {
+                const device = this.devices && this.devices[String(key).split(':')[0]];
+                add(device && device.label ? device.label : String(key), channelProblems[key]);
+            }
+        }
+        return problems;
+    }
+
+    _lowBatteryDevicesInZones(zonesActivation) {
+        const labels = new Set();
+        let unresolved = 0;
+        for (const group of this._securityZoneGroups()) {
+            if (zonesActivation[group.label] !== true) {
+                continue;
+            }
+            for (const channel of group.channels || []) {
+                const device = channel && this.devices && this.devices[channel.deviceId];
+                const baseChannel = device && device.functionalChannels && device.functionalChannels['0'];
+                if (!baseChannel) {
+                    unresolved++;
+                    continue;
+                }
+                if (baseChannel.lowBat === true) {
+                    labels.add(device.label || channel.deviceId);
+                }
+            }
+        }
+        return { devices: [...labels], unresolved };
+    }
+
+    /**
+     * Arms or disarms the alarm system.
+     *
+     * @param {boolean} internal arm the internal zone
+     * @param {boolean} external arm the external zone
+     * @returns {Promise<{requestBased: boolean, classicZonesPresent: boolean, requestFailed: boolean,
+     *          problems: object|null, lowBatteryDevices: string[], lowBatteryLookupIncomplete: boolean}>}
+     *          `requestFailed` marks a request that never reached the cloud. `problems` names what blocked the
+     *          activation as {device label: [reason]} and is null on panels that give no such feedback.
+     */
     async homeSetZonesActivation(internal, external) {
-        let data = { zonesActivation: { INTERNAL: internal, EXTERNAL: external } };
-        await this.callRestApi('home/security/setZonesActivation', data);
+        const requestBased = this.hasRequestBasedSecurityZones();
+        const zonesActivation = this._buildZonesActivation(requestBased, internal, external);
+        const data = { zonesActivation };
+        const outcome = {
+            requestBased,
+            classicZonesPresent: this.hasClassicSecurityZones(),
+            requestFailed: false,
+            problems: null,
+            lowBatteryDevices: [],
+            lowBatteryLookupIncomplete: false,
+        };
+
+        if (!requestBased) {
+            outcome.requestFailed = (await this.callRestApi('home/security/setZonesActivation', data)) === undefined;
+            return outcome;
+        }
+
+        // the request-based panel answers setZonesActivation with 400, and answers the extended call
+        // with 200 even when a sensor blocks arming - hence both the endpoint and the problem check.
+        // A low battery cannot be fixed at arming time, so it must not leave the whole home unarmed.
+        data.ignoreLowBat = true;
+        const response = await this.callRestApi('home/security/setExtendedZonesActivation', data);
+        if (response === undefined) {
+            outcome.requestFailed = true;
+            return outcome;
+        }
+        outcome.problems = this._securityZoneActivationProblems(response);
+        if (!Object.keys(outcome.problems).length) {
+            const lowBattery = this._lowBatteryDevicesInZones(zonesActivation);
+            outcome.lowBatteryDevices = lowBattery.devices;
+            outcome.lowBatteryLookupIncomplete = lowBattery.unresolved > 0;
+        }
+        return outcome;
     }
 }
 

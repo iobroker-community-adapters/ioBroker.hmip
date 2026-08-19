@@ -670,16 +670,16 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     await this._api.homeHeatingDeactivateVacation();
                     break;
                 case 'setSecurityZonesActivationNone':
-                    await this._api.homeSetZonesActivation(false, false);
+                    await this._setSecurityZonesActivation(false, false);
                     break;
                 case 'setSecurityZonesActivationInternal':
-                    await this._api.homeSetZonesActivation(true, false);
+                    await this._setSecurityZonesActivation(true, false);
                     break;
                 case 'setSecurityZonesActivationExternal':
-                    await this._api.homeSetZonesActivation(false, true);
+                    await this._setSecurityZonesActivation(false, true);
                     break;
                 case 'setSecurityZonesActivationInternalAndExternal':
-                    await this._api.homeSetZonesActivation(true, true);
+                    await this._setSecurityZonesActivation(true, true);
                     break;
                 case 'setOnTime':
                     if (Array.isArray(o.native.id)) {
@@ -930,6 +930,49 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 break;
             default:
                 this.log.warn(`unhandled event - ${JSON.stringify(ev)}`);
+        }
+    }
+
+    async _setSecurityZonesActivation(internal, external) {
+        const requested = `internal=${internal}, external=${external}`;
+        const outcome = await this._api.homeSetZonesActivation(internal, external);
+
+        if (outcome.requestBased && outcome.classicZonesPresent) {
+            this.log.warn(
+                'This home has ABSENCE/PRESENCE and INTERNAL/EXTERNAL security zones at the same time. Only the ABSENCE/PRESENCE zones are addressed - please report this setup.',
+            );
+        }
+
+        if (outcome.requestFailed) {
+            this.log.error(
+                `Could not set the alarm system to ${requested}, it is unchanged. See the request error above.`,
+            );
+            return;
+        }
+
+        const problems = outcome.problems || {};
+        const blocking = Object.keys(problems);
+        if (blocking.length) {
+            for (const label of blocking) {
+                this.log.warn(
+                    `Alarm activation for ${requested} was blocked${label ? ` by ${label}` : ''}: ${problems[label].join(', ')}`,
+                );
+            }
+            return;
+        }
+
+        if (outcome.requestBased && internal && !external) {
+            this.log.info(
+                'This home only offers a combined ABSENCE mode, so arming the internal zone armed the external zone as well.',
+            );
+        }
+        if (outcome.lowBatteryLookupIncomplete) {
+            this.log.debug(
+                'Not every security zone channel could be resolved to a device, so the low battery check may be incomplete.',
+            );
+        }
+        for (const label of outcome.lowBatteryDevices) {
+            this.log.warn(`Alarm zone armed although ${label} reports a low battery`);
         }
     }
 
@@ -3753,7 +3796,8 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     break;
                 }
                 case 'SECURITY_ZONE': {
-                    promises.push(this.secureSetStateAsync(`groups.${group.id}.active`, group.active, true));
+                    // request-based panels omit "active" on a disarmed zone
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.active`, group.active === true, true));
                     break;
                 }
             }

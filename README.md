@@ -67,6 +67,12 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 <!--
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
+-->
+## Changelog
+### **WORK IN PROGRESS**
+- (@Apollon77) Fixed arming/disarming the alarm system on the new request-based security dashboard (ABSENCE/PRESENCE security zones)
+- (@Apollon77) On the request-based security dashboard a blocked alarm activation is now logged with the devices that prevented it, instead of looking like it succeeded
+- (@Apollon77) On the request-based security dashboard a low battery no longer blocks arming; the affected devices are logged as a warning instead
 - (@Apollon77) Fixed removed groups and clients being deleted from the wrong internal cache
 
 ### 2.0.0 (2026-08-03)
