@@ -59,7 +59,7 @@
         "io-package.json"
     ],
     "scripts": {
-        "test:js": "mocha --config test/mocharc.custom.json \"{!(node_modules|test)/**/*.test.js,*.test.js,test/**/test!(PackageFiles|Startup).js}\"",
+        "test:js": "mocha --config test/mocharc.custom.json \"{!(node_modules|test)/**/*.test.js,*.test.js,test/**/test!(PackageFiles|Startup|Adapter.gui).js}\"",
         "test:gui": "mocha test/testAdapter.gui --exit",
         "test:package": "mocha test/package --exit",
         "test:integration": "mocha test/integration --exit",
