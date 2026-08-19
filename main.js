@@ -1,6 +1,13 @@
 const { Adapter } = require('@iobroker/adapter-core'); // Get common adapter utils
 const { v4: uuidv4 } = require('uuid');
 const apiClass = require('./api/hmCloudAPI');
+const {
+    DEVICE_BASE_STATES,
+    CHANNEL_STATES,
+    STATELESS_CHANNELS,
+    channelStateObjects,
+    channelStateValues,
+} = require('./lib/channelStates');
 
 const adapterName = require('./package.json').name.split('.').pop();
 
@@ -1223,6 +1230,14 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         promises.push(...this._updateUniversalLightChannelStates(device, i));
                         break;
                     default:
+                        if (CHANNEL_STATES[fc.functionalChannelType]) {
+                            promises.push(...this._updateGenericChannelStates(device, i, fc.functionalChannelType));
+                            break;
+                        }
+                        if (STATELESS_CHANNELS.includes(fc.functionalChannelType)) {
+                            this.log.silly(`Ignore channel type ${fc.functionalChannelType} - ${device.id}`);
+                            break;
+                        }
                         if (Object.keys(fc).length <= 6) {
                             // we only have the minimum fields, so nothing to display
                             break;
@@ -1274,6 +1289,46 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 }, 30000);
             }
         }, 5000);
+    }
+
+    _updateTableChannelStates(device, channel, states) {
+        return channelStateValues(states, device.functionalChannels[channel]).map(({ field, value }) =>
+            this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.${field}`, value, true),
+        );
+    }
+
+    _createTableChannel(device, channel, states) {
+        return channelStateObjects(states).map(({ field, common }) =>
+            this.extendObject(`devices.${device.id}.channels.${channel}.${field}`, {
+                type: 'state',
+                common,
+                native: {},
+            }),
+        );
+    }
+
+    _updateGenericChannelStates(device, channel, channelType) {
+        const entry = CHANNEL_STATES[channelType];
+        let promises = [];
+        if (entry.extends === 'DEVICE_BASE') {
+            promises.push(...this._updateDeviceBaseChannelStates(device, channel));
+        } else if (entry.extends === 'DEVICE_OPERATIONLOCK') {
+            promises.push(...this._updateDeviceOperationLockChannelStates(device, channel));
+        }
+        promises.push(...this._updateTableChannelStates(device, channel, entry.states));
+        return promises;
+    }
+
+    _createGenericChannel(device, channel, channelType) {
+        const entry = CHANNEL_STATES[channelType];
+        let promises = [];
+        if (entry.extends === 'DEVICE_BASE') {
+            promises.push(...this._createDeviceBaseChannel(device, channel));
+        } else if (entry.extends === 'DEVICE_OPERATIONLOCK') {
+            promises.push(...this._createDeviceOperationLockChannel(device, channel));
+        }
+        promises.push(...this._createTableChannel(device, channel, entry.states));
+        return promises;
     }
 
     /* Start Channel Types */
@@ -1882,6 +1937,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 true,
             ),
         );
+        promises.push(...this._updateTableChannelStates(device, channel, DEVICE_BASE_STATES));
         return promises;
     }
 
@@ -4320,6 +4376,14 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     promises.push(...this._createUniversalLightChannel(device, i));
                     break;
                 default:
+                    if (CHANNEL_STATES[fc.functionalChannelType]) {
+                        promises.push(...this._createGenericChannel(device, i, fc.functionalChannelType));
+                        break;
+                    }
+                    if (STATELESS_CHANNELS.includes(fc.functionalChannelType)) {
+                        this.log.silly(`Ignore channel type ${fc.functionalChannelType} - ${device.id}`);
+                        break;
+                    }
                     this.log.info(`Unknown channel type - ${fc.functionalChannelType} - ${JSON.stringify(device)}`);
                     break;
             }
@@ -5217,6 +5281,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 native: {},
             }),
         );
+        promises.push(...this._createTableChannel(device, channel, DEVICE_BASE_STATES));
         return promises;
     }
 

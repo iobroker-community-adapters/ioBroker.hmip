@@ -74,6 +74,9 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 - (@Apollon77) On the request-based security dashboard a blocked alarm activation is now logged with the devices that prevented it, instead of looking like it succeeded
 - (@Apollon77) On the request-based security dashboard a low battery no longer blocks arming; the affected devices are logged as a warning instead
 - (@Apollon77) Fixed removed groups and clients being deleted from the wrong internal cache
+- (@Apollon77) Added support for 37 further device channel types with 227 new states, covering the door lock pro, the keypads, the wired Wiegand interface, the watering actuator, the water supply stop, the wall switch status LEDs, the glass displays and thermostats, and devices bridged through the HCU
+- (@Apollon77) Every device now reports its own hardware faults: overheated, overloaded, undervoltage, temperature out of range and the three co-processor states
+- (@Apollon77) 6 channel types that carry no value of their own are no longer reported as unknown
 
 ### 2.0.0 (2026-08-03)
 - (copilot) Adapter requires node.js >= 22 now
