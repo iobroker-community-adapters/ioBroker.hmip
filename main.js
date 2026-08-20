@@ -164,6 +164,8 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         await this._createObjectsForGroups();
         this.log.debug('createObjectsForClients');
         await this._createObjectsForClients();
+        this.log.debug('createObjectsForRules');
+        await this._createObjectsForRules();
         this.log.debug('createObjectsForHomes');
         await this._createObjectsForHomes();
         this.log.debug('connectWebsocket');
@@ -199,8 +201,19 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         } else {
             this.log.debug('No clients');
         }
+        if (this._api.rules) {
+            for (let r in this._api.rules) {
+                if (!Object.prototype.hasOwnProperty.call(this._api.rules, r)) {
+                    continue;
+                }
+                await this._updateRuleStates(this._api.rules[r]);
+            }
+        } else {
+            this.log.debug('No rules');
+        }
         if (this._api.home) {
             await this._updateHomeStates(this._api.home);
+            await this._updateSecurityJournal();
         } else {
             this.log.debug('No home');
         }
@@ -886,39 +899,92 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     await this._api.homeSetZoneActivationDelay(state.val);
                     break;
                 case 'setOnTime':
-                    if (Array.isArray(o.native.id)) {
-                        for (let id of o.native.id) {
-                            await this._api.groupSwitchingAlarmSetOnTime(id, state.val);
-                        }
+                    for (let id of this._targetGroups(o.native, o.native.parameter)) {
+                        await this._api.groupSwitchingAlarmSetOnTime(id, state.val);
                     }
                     break;
                 case 'testSignalOptical':
-                    if (Array.isArray(o.native.id)) {
-                        for (let id of o.native.id) {
-                            await this._api.groupSwitchingAlarmTestSignalOptical(id, state.val);
-                        }
+                    for (let id of this._targetGroups(o.native, o.native.parameter)) {
+                        await this._api.groupSwitchingAlarmTestSignalOptical(id, state.val);
                     }
                     break;
                 case 'setSignalOptical':
-                    if (Array.isArray(o.native.id)) {
-                        for (let id of o.native.id) {
-                            await this._api.groupSwitchingAlarmSetSignalOptical(id, state.val);
-                        }
+                    for (let id of this._targetGroups(o.native, o.native.parameter)) {
+                        await this._api.groupSwitchingAlarmSetSignalOptical(id, state.val);
                     }
                     break;
                 case 'testSignalAcoustic':
-                    if (Array.isArray(o.native.id)) {
-                        for (let id of o.native.id) {
-                            await this._api.groupSwitchingAlarmTestSignalAcoustic(id, state.val);
-                        }
+                    for (let id of this._targetGroups(o.native, o.native.parameter)) {
+                        await this._api.groupSwitchingAlarmTestSignalAcoustic(id, state.val);
                     }
                     break;
                 case 'setSignalAcoustic':
-                    if (Array.isArray(o.native.id)) {
-                        for (let id of o.native.id) {
-                            await this._api.groupSwitchingAlarmSetSignalAcoustic(id, state.val);
-                        }
+                    for (let id of this._targetGroups(o.native, o.native.parameter)) {
+                        await this._api.groupSwitchingAlarmSetSignalAcoustic(id, state.val);
                     }
+                    break;
+                case 'setZonesSilentAlarmNone':
+                    await this._setZonesSilentAlarm(false, false);
+                    break;
+                case 'setZonesSilentAlarmInternal':
+                    await this._setZonesSilentAlarm(true, false);
+                    break;
+                case 'setZonesSilentAlarmExternal':
+                    await this._setZonesSilentAlarm(false, true);
+                    break;
+                case 'setZonesSilentAlarmInternalAndExternal':
+                    await this._setZonesSilentAlarm(true, true);
+                    break;
+                case 'setProfileMode':
+                    if (state.val === this.currentValues[id]) {
+                        this.log.info(`Value unchanged, do not send this value`);
+                        await this.secureSetStateAsync(id, this.currentValues[id], true);
+                        return;
+                    }
+                    await this._api.groupHeatingSetProfileMode(o.native.id, state.val);
+                    break;
+                case 'groupLinkedOnTime':
+                    if (state.val === this.currentValues[id]) {
+                        this.log.info(`Value unchanged, do not send this value`);
+                        await this.secureSetStateAsync(id, this.currentValues[id], true);
+                        return;
+                    }
+                    await this._api.groupSwitchingLinkedSetOnTime(o.native.id, state.val);
+                    break;
+                case 'setPowerMeterUnitPrice':
+                    if (state.val === this.currentValues[id]) {
+                        this.log.info(`Value unchanged, do not send this value`);
+                        await this.secureSetStateAsync(id, this.currentValues[id], true);
+                        return;
+                    }
+                    await this._api.homeSetPowerMeterUnitPrice(state.val);
+                    break;
+                case 'getSecurityJournal':
+                    await this._updateSecurityJournal();
+                    break;
+                case 'setRuleEnabled':
+                    if (state.val === this.currentValues[id]) {
+                        this.log.info(`Value unchanged, do not send this value`);
+                        await this.secureSetStateAsync(id, this.currentValues[id], true);
+                        return;
+                    }
+                    if ((await this._api.ruleEnableSimpleRule(o.native.id, state.val)) === undefined) {
+                        this.log.error(`Could not enable rule ${o.native.id}, it is unchanged.`);
+                        return;
+                    }
+                    await this._ackRuleValue(o.native.id, 'active', state.val);
+                    break;
+                case 'setRuleLabel':
+                    if (state.val === this.currentValues[id]) {
+                        this.log.info(`Value unchanged, do not send this value`);
+                        await this.secureSetStateAsync(id, this.currentValues[id], true);
+                        return;
+                    }
+                    if ((await this._api.ruleSetRuleLabel(o.native.id, state.val)) === undefined) {
+                        this.log.error(`Could not relabel rule ${o.native.id}, it is unchanged.`);
+                        return;
+                    }
+                    await this._ackRuleValue(o.native.id, 'label', state.val);
                     break;
             }
         } catch (err) {
@@ -1157,6 +1223,66 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         const onTime = onTimeState && onTimeState.val ? onTimeState.val : 0;
         const rampTime = rampTimeState && rampTimeState.val ? rampTimeState.val : 0;
         return { onTime, rampTime, timed: onTime > 0 || rampTime > 0 };
+    }
+
+    /**
+     * Sets the silent alarm and reports a request that never reached the cloud.
+     *
+     * The zones are named INTERNAL and EXTERNAL whatever the panel calls its zones, because no
+     * capture of this call against an ABSENCE/PRESENCE panel exists to say otherwise.
+     *
+     * @param {boolean} internal silence the internal zone
+     * @param {boolean} external silence the external zone
+     */
+    /**
+     * The 0..1 fraction the cloud takes for a level.
+     *
+     * Levels are published on two scales: the older channels on 0..100 and the newer ones on
+     * 0..1, so a value above 1 can only be a percentage and anything else is already a fraction.
+     * 1 itself is ambiguous and is read as fully on, which is why a 0..100 channel cannot express
+     * 1 percent.
+     *
+     * @param {number|null|undefined} value the level as it was written
+     * @returns {number|null|undefined} the level as the cloud takes it
+     */
+    /**
+     * The groups a command targets, for a state that is set on the channel's groups.
+     *
+     * @param {object} native the object's native block
+     * @param {string} parameter the command being dispatched, for the log line
+     * @returns {string[]} the group ids, empty when the channel belongs to none
+     */
+    _targetGroups(native, parameter) {
+        const groups = Array.isArray(native.id) ? native.id : [];
+        if (!groups.length) {
+            this.log.warn(`${parameter} has no group to act on - assign the channel to a group first`);
+        }
+        return groups;
+    }
+
+    _levelFraction(value) {
+        return typeof value === 'number' && value > 1 ? value / 100 : value;
+    }
+
+    /**
+     * Reads a state of the given channel together with the id it is cached under.
+     *
+     * @param {object} native the object's native block, carrying the device id and channel
+     * @param {string} field the state below the channel
+     * @returns {Promise<{id: string, val: boolean|number|string|null}>} the cache id and the value
+     */
+    async _channelState(native, field) {
+        const path = `devices.${native.id}.channels.${native.channel}.${field}`;
+        const state = await this.getStateAsync(path);
+        return { id: `${this.namespace}.${path}`, val: state ? state.val : null };
+    }
+
+    async _setZonesSilentAlarm(internal, external) {
+        if ((await this._api.homeSetZonesSilentAlarm(internal, external)) === undefined) {
+            this.log.error(
+                `Could not set the silent alarm to internal=${internal}, external=${external}, it is unchanged.`,
+            );
+        }
     }
 
     async _setSecurityZonesActivation(internal, external) {
@@ -2287,11 +2413,478 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         native: {},
                     }),
                 );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.silent`, {
+                        type: 'state',
+                        common: { name: 'silent', type: 'boolean', role: 'indicator', read: true, write: false },
+                        native: {},
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.windowState`, {
+                        type: 'state',
+                        common: { name: 'windowState', type: 'string', role: 'text', read: true, write: false },
+                        native: {},
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.motionDetected`, {
+                        type: 'state',
+                        common: {
+                            name: 'motionDetected',
+                            type: 'boolean',
+                            role: 'indicator.motion',
+                            read: true,
+                            write: false,
+                        },
+                        native: {},
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.presenceDetected`, {
+                        type: 'state',
+                        common: {
+                            name: 'presenceDetected',
+                            type: 'boolean',
+                            role: 'indicator',
+                            read: true,
+                            write: false,
+                        },
+                        native: {},
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.sabotage`, {
+                        type: 'state',
+                        common: {
+                            name: 'sabotage',
+                            type: 'boolean',
+                            role: 'indicator.alarm',
+                            read: true,
+                            write: false,
+                        },
+                        native: {},
+                    }),
+                );
+                break;
+            }
+            case 'HOT_WATER': {
+                promises.push(
+                    this.extendObject(`groups.${group.id}.profileMode`, {
+                        type: 'state',
+                        common: {
+                            name: 'profileMode',
+                            type: 'string',
+                            role: 'text',
+                            read: true,
+                            write: true,
+                            states: { AUTOMATIC: 'AUTOMATIC', MANUAL: 'MANUAL' },
+                        },
+                        native: { id: group.id, parameter: 'setProfileMode' },
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.profileId`, {
+                        type: 'state',
+                        common: { name: 'profileId', type: 'string', role: 'text', read: true, write: false },
+                        native: {},
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.on`, {
+                        type: 'state',
+                        common: { name: 'on', type: 'boolean', role: 'indicator', read: true, write: false },
+                        native: {},
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.onTime`, {
+                        type: 'state',
+                        common: {
+                            name: 'onTime',
+                            type: 'number',
+                            role: 'value.interval',
+                            unit: 's',
+                            read: true,
+                            write: false,
+                        },
+                        native: {},
+                    }),
+                );
+                break;
+            }
+            case 'SHUTTER_PROFILE': {
+                promises.push(
+                    this.extendObject(`groups.${group.id}.profileMode`, {
+                        type: 'state',
+                        common: {
+                            name: 'profileMode',
+                            type: 'string',
+                            role: 'text',
+                            read: true,
+                            write: true,
+                            states: { AUTOMATIC: 'AUTOMATIC', MANUAL: 'MANUAL' },
+                        },
+                        native: { id: group.id, parameter: 'setProfileMode' },
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.profileId`, {
+                        type: 'state',
+                        common: { name: 'profileId', type: 'string', role: 'text', read: true, write: false },
+                        native: {},
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.shutterLevel`, {
+                        type: 'state',
+                        common: {
+                            name: 'shutterLevel',
+                            type: 'number',
+                            role: 'level.blind',
+                            min: 0,
+                            max: 1,
+                            read: true,
+                            write: true,
+                        },
+                        native: { id: group.id, parameter: 'groupShutterLevel', step: 0.05, debounce: 5000 },
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.slatsLevel`, {
+                        type: 'state',
+                        common: {
+                            name: 'slatsLevel',
+                            type: 'number',
+                            role: 'level.blind',
+                            min: 0,
+                            max: 1,
+                            read: true,
+                            write: true,
+                        },
+                        native: { id: group.id, parameter: 'groupSlatsLevel', step: 0.05, debounce: 5000 },
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.stop`, {
+                        type: 'state',
+                        common: { name: 'stop', type: 'boolean', role: 'button', read: false, write: true },
+                        native: { id: group.id, parameter: 'groupStop' },
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.primaryShadingLevel`, {
+                        type: 'state',
+                        common: {
+                            name: 'primaryShadingLevel',
+                            type: 'number',
+                            role: 'value',
+                            read: true,
+                            write: false,
+                        },
+                        native: {},
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.primaryShadingStateType`, {
+                        type: 'state',
+                        common: {
+                            name: 'primaryShadingStateType',
+                            type: 'string',
+                            role: 'text',
+                            read: true,
+                            write: false,
+                        },
+                        native: {},
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.secondaryShadingLevel`, {
+                        type: 'state',
+                        common: {
+                            name: 'secondaryShadingLevel',
+                            type: 'number',
+                            role: 'value',
+                            read: true,
+                            write: false,
+                        },
+                        native: {},
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.secondaryShadingStateType`, {
+                        type: 'state',
+                        common: {
+                            name: 'secondaryShadingStateType',
+                            type: 'string',
+                            role: 'text',
+                            read: true,
+                            write: false,
+                        },
+                        native: {},
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.processing`, {
+                        type: 'state',
+                        common: { name: 'processing', type: 'boolean', role: 'indicator', read: true, write: false },
+                        native: {},
+                    }),
+                );
+                break;
+            }
+            case 'EXTENDED_LINKED_NOTIFICATION':
+                promises.push(
+                    this.extendObject(`groups.${group.id}.opticalSignalBehaviour`, {
+                        type: 'state',
+                        common: {
+                            name: 'opticalSignalBehaviour',
+                            type: 'string',
+                            role: 'text',
+                            read: true,
+                            write: false,
+                        },
+                        native: {},
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.onOpticalSignalBehaviour`, {
+                        type: 'state',
+                        common: {
+                            name: 'onOpticalSignalBehaviour',
+                            type: 'string',
+                            role: 'text',
+                            read: true,
+                            write: false,
+                        },
+                        native: {},
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.simpleRGBColorState`, {
+                        type: 'state',
+                        common: {
+                            name: 'simpleRGBColorState',
+                            type: 'string',
+                            role: 'text',
+                            read: true,
+                            write: false,
+                        },
+                        native: {},
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.onSimpleRGBColor`, {
+                        type: 'state',
+                        common: { name: 'onSimpleRGBColor', type: 'string', role: 'text', read: true, write: false },
+                        native: {},
+                    }),
+                );
+            // eslint-disable-next-line no-fallthrough
+            case 'EXTENDED_LINKED_SWITCHING': {
+                promises.push(
+                    this.extendObject(`groups.${group.id}.on`, {
+                        type: 'state',
+                        common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true },
+                        native: { id: group.id, parameter: 'groupSwitchState' },
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.dimLevel`, {
+                        type: 'state',
+                        common: {
+                            name: 'dimLevel',
+                            type: 'number',
+                            role: 'value.dimmer',
+                            min: 0,
+                            max: 1,
+                            read: true,
+                            write: false,
+                        },
+                        native: {},
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.onLevel`, {
+                        type: 'state',
+                        common: { name: 'onLevel', type: 'number', role: 'value', read: true, write: false },
+                        native: {},
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.onTime`, {
+                        type: 'state',
+                        common: {
+                            name: 'onTime',
+                            type: 'number',
+                            role: 'level.timer',
+                            unit: 's',
+                            read: true,
+                            write: true,
+                        },
+                        native: { id: group.id, parameter: 'groupLinkedOnTime', debounce: 5000 },
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.dutyCycle`, {
+                        type: 'state',
+                        common: { name: 'dutyCycle', type: 'boolean', role: 'indicator', read: true, write: false },
+                        native: {},
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.lowBat`, {
+                        type: 'state',
+                        common: {
+                            name: 'lowBat',
+                            type: 'boolean',
+                            role: 'indicator.lowbat',
+                            read: true,
+                            write: false,
+                        },
+                        native: {},
+                    }),
+                );
                 break;
             }
         }
 
         return Promise.all(promises);
+    }
+
+    async _createObjectsForRules() {
+        this.log.silly(`Rules: ${JSON.stringify(this._api.rules)}`);
+        for (let i in this._api.rules) {
+            if (!Object.prototype.hasOwnProperty.call(this._api.rules, i)) {
+                continue;
+            }
+            await this._createObjectsForRule(this._api.rules[i]);
+        }
+    }
+
+    _createObjectsForRule(rule) {
+        this.log.silly(`createObjectsForRule - ${JSON.stringify(rule)}`);
+        let promises = [];
+        promises.push(
+            this.extendObject(`rules.${rule.id}`, { type: 'device', common: { name: rule.label }, native: {} }),
+        );
+        promises.push(
+            this.extendObject(`rules.${rule.id}.info.type`, {
+                type: 'state',
+                common: { name: 'type', type: 'string', role: 'text', read: true, write: false },
+                native: {},
+            }),
+        );
+        promises.push(
+            this.extendObject(`rules.${rule.id}.info.label`, {
+                type: 'state',
+                common: { name: 'label', type: 'string', role: 'text', read: true, write: true },
+                native: { id: rule.id, parameter: 'setRuleLabel' },
+            }),
+        );
+        // only a SIMPLE rule can be enabled through the cloud. extendObject merges native, so a
+        // rule that stops being SIMPLE has to have its parameter cleared rather than left out.
+        const simple = rule.type === 'SIMPLE';
+        promises.push(
+            this.extendObject(`rules.${rule.id}.active`, {
+                type: 'state',
+                common: {
+                    name: 'active',
+                    type: 'boolean',
+                    role: simple ? 'switch' : 'indicator',
+                    read: true,
+                    write: simple,
+                },
+                native: { id: rule.id, parameter: simple ? 'setRuleEnabled' : null },
+            }),
+        );
+        this.initializedChannels[`rules.${rule.id}`] = true;
+        return Promise.all(promises);
+    }
+
+    _updateRuleStates(rule) {
+        this.log.silly(`_updateRuleStates - ${JSON.stringify(rule)}`);
+        if (this.initializedChannels[`rules.${rule.id}`]) {
+            let promises = [];
+            promises.push(this.secureSetStateAsync(`rules.${rule.id}.info.type`, rule.type, true));
+            promises.push(this.secureSetStateAsync(`rules.${rule.id}.info.label`, rule.label, true));
+            promises.push(this.secureSetStateAsync(`rules.${rule.id}.active`, rule.active, true));
+            return Promise.all(promises);
+        }
+        this._reinitializeData(`Rule ${rule.id}`);
+    }
+
+    /**
+     * Confirms a rule value the adapter just sent.
+     *
+     * The cloud raises no push event for a rule, so without this the state would stay unconfirmed
+     * until the next full read of the configuration.
+     *
+     * @param {string} ruleId the rule that was written to
+     * @param {string} field the rule field that was written
+     * @param {boolean|string} value the value the cloud accepted
+     */
+    async _ackRuleValue(ruleId, field, value) {
+        const rule = this._api.rules && this._api.rules[ruleId];
+        if (rule) {
+            rule[field] = value;
+        }
+        const path = field === 'label' ? `rules.${ruleId}.info.label` : `rules.${ruleId}.${field}`;
+        await this.secureSetStateAsync(path, value, true);
+    }
+
+    /**
+     * Reads the security journal and publishes it.
+     *
+     * A burst of journal events must not turn into a burst of reads: a read already running
+     * absorbs the ones that arrive while it is in flight and repeats once afterwards, so the
+     * published journal and the entry split out of it always come from the same response.
+     *
+     * @returns {Promise<void>}
+     */
+    async _updateSecurityJournal() {
+        if (!this._api.home) {
+            return;
+        }
+        if (this._journalReadRunning) {
+            this._journalReadPending = true;
+            return;
+        }
+        this._journalReadRunning = true;
+        try {
+            do {
+                this._journalReadPending = false;
+                await this._publishSecurityJournal();
+            } while (this._journalReadPending && !this._unloaded);
+        } finally {
+            this._journalReadRunning = false;
+        }
+    }
+
+    /**
+     * @returns {Promise<void>}
+     */
+    async _publishSecurityJournal() {
+        const base = `homes.${this._api.home.id}.functionalHomes.securityAndAlarm`;
+        const journal = await this._api.homeGetSecurityJournal();
+        if (this._unloaded) {
+            return;
+        }
+        if (!journal || !Array.isArray(journal.entries)) {
+            this.log.debug('No security journal received');
+            return;
+        }
+        // the cloud documents no order for the entries, so the newest is the latest timestamp
+        const newest =
+            journal.entries.reduce(
+                (latest, entry) =>
+                    latest && (latest.eventTimestamp ?? 0) >= (entry.eventTimestamp ?? 0) ? latest : entry,
+                null,
+            ) || {};
+        await this.secureSetStateAsync(`${base}.securityJournal`, JSON.stringify(journal.entries), true);
+        await this.secureSetStateAsync(`${base}.securityJournalEventTimestamp`, newest.eventTimestamp ?? null, true);
+        await this.secureSetStateAsync(`${base}.securityJournalEventType`, newest.eventType ?? null, true);
+        await this.secureSetStateAsync(`${base}.securityJournalLabel`, newest.label ?? null, true);
     }
 
     _createObjectsForClient(client) {
@@ -2318,7 +2911,24 @@ class HmIpCloudAccesspointAdapter extends Adapter {
     _createObjectsForHome(home) {
         this.log.silly(`createObjectsForHome - ${JSON.stringify(home)}`);
         let promises = [];
+        // a home the cloud sent without a security solution still gets its objects
+        const securityAndAlarm = (home.functionalHomes || {}).SECURITY_AND_ALARM || {};
         promises.push(this.extendObject(`homes.${home.id}`, { type: 'device', common: {}, native: {} }));
+
+        promises.push(
+            this.extendObject(`homes.${home.id}.powerMeterCurrency`, {
+                type: 'state',
+                common: { name: 'powerMeterCurrency', type: 'string', role: 'text', read: true, write: false },
+                native: {},
+            }),
+        );
+        promises.push(
+            this.extendObject(`homes.${home.id}.powerMeterUnitPrice`, {
+                type: 'state',
+                common: { name: 'powerMeterUnitPrice', type: 'number', role: 'level', read: true, write: true },
+                native: { id: home.id, parameter: 'setPowerMeterUnitPrice', debounce: 5000 },
+            }),
+        );
 
         promises.push(
             this.extendObject(`homes.${home.id}.weather.temperature`, {

@@ -198,6 +198,7 @@ class HmCloudAPI {
             this.groups = state.groups;
             this.clients = state.clients;
             this.devices = state.devices;
+            this.rules = (state.home && state.home.ruleMetaDatas) || {};
         } else {
             throw new Error('No current State received');
         }
@@ -397,7 +398,12 @@ class HmCloudAPI {
     }
 
     async deviceControlSetLockState(deviceId, lockState, pin, channelIndex = 1) {
-        let data = { deviceId, channelIndex, authorizationPin: pin.toString(), targetLockState: lockState };
+        let data = {
+            deviceId,
+            channelIndex,
+            authorizationPin: pin === null || pin === undefined ? '' : String(pin),
+            targetLockState: lockState,
+        };
         await this.callRestApi('device/control/setLockState', data);
     }
 
@@ -874,8 +880,8 @@ class HmCloudAPI {
         await this.callRestApi('home/heating/deactivateAbsence');
     }
 
-    async homeHeatingActivateVacation(temperature, endtime) {
-        let data = { temperature, endtime };
+    async homeHeatingActivateVacation(temperature, endTime) {
+        let data = { temperature, endTime };
         await this.callRestApi('home/heating/activateVacation', data);
     }
 
@@ -897,9 +903,14 @@ class HmCloudAPI {
         await this.callRestApi('home/heating/setCooling', data);
     }
 
+    /**
+     * @param {boolean} internal silence the internal zone
+     * @param {boolean} external silence the external zone
+     * @returns {Promise<object|string|undefined>} undefined when the request never reached the cloud
+     */
     async homeSetZonesSilentAlarm(internal, external) {
         let data = { zonesSilentAlarm: { INTERNAL: internal, EXTERNAL: external } };
-        await this.callRestApi('home/security/setZonesSilentAlarm', data);
+        return this.callRestApi('home/security/setZonesSilentAlarm', data);
     }
 
     async homeSetZoneActivationDelay(zoneActivationDelay) {
@@ -931,14 +942,24 @@ class HmCloudAPI {
         await this.callRestApi('home/startInclusionModeForDevice', data);
     }
 
+    /**
+     * @param {string} ruleId the rule to enable or disable
+     * @param {boolean} enabled whether the rule should run
+     * @returns {Promise<object|string|undefined>} undefined when the request never reached the cloud
+     */
     async ruleEnableSimpleRule(ruleId, enabled) {
         let data = { ruleId, enabled };
-        await this.callRestApi('rule/enableSimpleRule', data);
+        return this.callRestApi('rule/enableSimpleRule', data);
     }
 
+    /**
+     * @param {string} ruleId the rule to relabel
+     * @param {string} label the new label
+     * @returns {Promise<object|string|undefined>} undefined when the request never reached the cloud
+     */
     async ruleSetRuleLabel(ruleId, label) {
         let data = { ruleId, label };
-        await this.callRestApi('rule/setRuleLabel', data);
+        return this.callRestApi('rule/setRuleLabel', data);
     }
 
     hasRequestBasedSecurityZones() {
