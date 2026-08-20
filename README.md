@@ -91,6 +91,7 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 - (@Apollon77) Fixed motionBufferActive, endpositionAutoDetectionEnabled, dim2WarmActive and humanCentricLightActive, which switched the device on or off instead of doing what their name says
 - (@Apollon77) Dimming, colour, optical signals and watering can now be given a time: set controlOnTime and/or controlRampTime on the channel and the command ramps instead of jumping. Both default to 0, which keeps the previous behaviour
 - (@Apollon77) Fixed the dim level never being scaled for RGB and optical signal commands, where a state object was compared against a number
+- (@Apollon77) Corrected the role of 54 writable datapoints, which carried a read-only role and so were not recognised by the ioBroker type detector - dimmers, blinds, switches and timers are now typed as such
 
 ### 2.0.0 (2026-08-03)
 - (copilot) Adapter requires node.js >= 22 now

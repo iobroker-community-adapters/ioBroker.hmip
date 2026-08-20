@@ -2468,7 +2468,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 common: {
                     name: 'zoneActivationDelay',
                     type: 'number',
-                    role: 'value.interval',
+                    role: 'level.timer',
                     unit: 's',
                     read: true,
                     write: true,
