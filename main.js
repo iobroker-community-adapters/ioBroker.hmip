@@ -54,6 +54,10 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         this.expectWsError && clearTimeout(this.expectWsError);
         this.reInitTimeout && clearTimeout(this.reInitTimeout);
         this.reInitDataTimeout && clearTimeout(this.reInitDataTimeout);
+        for (const pending of Object.values(this.delayTimeouts)) {
+            pending && pending.timeout && clearTimeout(pending.timeout);
+        }
+        this.delayTimeouts = {};
         this._api.dispose();
         try {
             this.log.info('cleaned everything up...');
@@ -789,9 +793,6 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     }
                     await this._api.deviceConfigurationSetRouterModuleEnabled(o.native.id, state.val, o.native.channel);
                     break;
-                case 'changeOverDelay':
-                    //await  this._api.deviceConfigurationChangeOverDelay(o.native.id, state.val, o.native.channel)
-                    break;
                 case 'setAbsenceEndTime':
                     await this._api.homeHeatingActivateAbsenceWithPeriod(state.val);
                     break;
@@ -814,10 +815,16 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     break;
                 case 'activateVacation':
                     {
-                        let vacTemp = await this.getStateAsync(
+                        const vacTemp = await this.getStateAsync(
                             `homes.${o.native.id}.functionalHomes.indoorClimate.vacationTemperature`,
-                        ).val;
-                        await this._api.homeHeatingActivateVacation(vacTemp, state.val);
+                        );
+                        if (!vacTemp || vacTemp.val === null || vacTemp.val === undefined) {
+                            this.log.warn(
+                                'Set functionalHomes.indoorClimate.vacationTemperature before activating vacation mode.',
+                            );
+                            return;
+                        }
+                        await this._api.homeHeatingActivateVacation(vacTemp.val, state.val);
                     }
                     break;
                 case 'deactivateVacation':
@@ -1391,7 +1398,8 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }
         await this.setStateAsync(id, value, ack);
         if (ack) {
-            this.currentValues[`${this.namespace}.${id}`] = value;
+            const prefix = `${this.namespace}.`;
+            this.currentValues[id.startsWith(prefix) ? id : `${prefix}${id}`] = value;
         }
     }
 
@@ -1775,164 +1783,165 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             );
         }
 
-        if (home.functionalHomes.SECURITY_AND_ALARM) {
+        const functionalHomes = home.functionalHomes || {};
+        if (functionalHomes.SECURITY_AND_ALARM) {
             promises.push(
                 this.secureSetStateAsync(
                     `homes.${home.id}.functionalHomes.securityAndAlarm.alarmEventTimestamp`,
-                    home.functionalHomes.SECURITY_AND_ALARM.alarmEventTimestamp,
+                    functionalHomes.SECURITY_AND_ALARM.alarmEventTimestamp,
                     true,
                 ),
             );
             promises.push(
                 this.secureSetStateAsync(
                     `homes.${home.id}.functionalHomes.securityAndAlarm.alarmEventDeviceId`,
-                    home.functionalHomes.SECURITY_AND_ALARM.alarmEventDeviceId,
+                    functionalHomes.SECURITY_AND_ALARM.alarmEventDeviceId,
                     true,
                 ),
             );
             promises.push(
                 this.secureSetStateAsync(
                     `homes.${home.id}.functionalHomes.securityAndAlarm.alarmEventTriggerId`,
-                    home.functionalHomes.SECURITY_AND_ALARM.alarmEventTriggerId,
+                    functionalHomes.SECURITY_AND_ALARM.alarmEventTriggerId,
                     true,
                 ),
             );
             promises.push(
                 this.secureSetStateAsync(
                     `homes.${home.id}.functionalHomes.securityAndAlarm.alarmEventDeviceChannel`,
-                    home.functionalHomes.SECURITY_AND_ALARM.alarmEventDeviceChannel,
+                    functionalHomes.SECURITY_AND_ALARM.alarmEventDeviceChannel,
                     true,
                 ),
             );
             promises.push(
                 this.secureSetStateAsync(
                     `homes.${home.id}.functionalHomes.securityAndAlarm.alarmSecurityJournalEntryType`,
-                    home.functionalHomes.SECURITY_AND_ALARM.alarmSecurityJournalEntryType,
+                    functionalHomes.SECURITY_AND_ALARM.alarmSecurityJournalEntryType,
                     true,
                 ),
             );
             promises.push(
                 this.secureSetStateAsync(
                     `homes.${home.id}.functionalHomes.securityAndAlarm.alarmActive`,
-                    home.functionalHomes.SECURITY_AND_ALARM.alarmActive,
+                    functionalHomes.SECURITY_AND_ALARM.alarmActive,
                     true,
                 ),
             );
             promises.push(
                 this.secureSetStateAsync(
                     `homes.${home.id}.functionalHomes.securityAndAlarm.zoneActivationDelay`,
-                    home.functionalHomes.SECURITY_AND_ALARM.zoneActivationDelay,
+                    functionalHomes.SECURITY_AND_ALARM.zoneActivationDelay,
                     true,
                 ),
             );
             promises.push(
                 this.secureSetStateAsync(
                     `homes.${home.id}.functionalHomes.securityAndAlarm.intrusionAlertThroughSmokeDetectors`,
-                    home.functionalHomes.SECURITY_AND_ALARM.intrusionAlertThroughSmokeDetectors,
+                    functionalHomes.SECURITY_AND_ALARM.intrusionAlertThroughSmokeDetectors,
                     true,
                 ),
             );
             promises.push(
                 this.secureSetStateAsync(
                     `homes.${home.id}.functionalHomes.securityAndAlarm.securityZoneActivationMode`,
-                    home.functionalHomes.SECURITY_AND_ALARM.securityZoneActivationMode,
+                    functionalHomes.SECURITY_AND_ALARM.securityZoneActivationMode,
                     true,
                 ),
             );
             promises.push(
                 this.secureSetStateAsync(
                     `homes.${home.id}.functionalHomes.securityAndAlarm.solution`,
-                    home.functionalHomes.SECURITY_AND_ALARM.solution,
+                    functionalHomes.SECURITY_AND_ALARM.solution,
                     true,
                 ),
             );
             promises.push(
                 this.secureSetStateAsync(
                     `homes.${home.id}.functionalHomes.securityAndAlarm.activationInProgress`,
-                    home.functionalHomes.SECURITY_AND_ALARM.activationInProgress,
+                    functionalHomes.SECURITY_AND_ALARM.activationInProgress,
                     true,
                 ),
             );
             promises.push(
                 this.secureSetStateAsync(
                     `homes.${home.id}.functionalHomes.securityAndAlarm.active`,
-                    home.functionalHomes.SECURITY_AND_ALARM.active,
+                    functionalHomes.SECURITY_AND_ALARM.active,
                     true,
                 ),
             );
         }
-        if (home.functionalHomes.INDOOR_CLIMATE) {
+        if (functionalHomes.INDOOR_CLIMATE) {
             promises.push(
                 this.secureSetStateAsync(
                     `homes.${home.id}.functionalHomes.indoorClimate.absenceType`,
-                    home.functionalHomes.INDOOR_CLIMATE.absenceType,
+                    functionalHomes.INDOOR_CLIMATE.absenceType,
                     true,
                 ),
             );
             promises.push(
                 this.secureSetStateAsync(
                     `homes.${home.id}.functionalHomes.indoorClimate.absenceEndTime`,
-                    home.functionalHomes.INDOOR_CLIMATE.absenceEndTime,
+                    functionalHomes.INDOOR_CLIMATE.absenceEndTime,
                     true,
                 ),
             );
             promises.push(
                 this.secureSetStateAsync(
                     `homes.${home.id}.functionalHomes.indoorClimate.ecoTemperature`,
-                    home.functionalHomes.INDOOR_CLIMATE.ecoTemperature,
+                    functionalHomes.INDOOR_CLIMATE.ecoTemperature,
                     true,
                 ),
             );
             promises.push(
                 this.secureSetStateAsync(
                     `homes.${home.id}.functionalHomes.indoorClimate.coolingEnabled`,
-                    home.functionalHomes.INDOOR_CLIMATE.coolingEnabled,
+                    functionalHomes.INDOOR_CLIMATE.coolingEnabled,
                     true,
                 ),
             );
             promises.push(
                 this.secureSetStateAsync(
                     `homes.${home.id}.functionalHomes.indoorClimate.ecoDuration`,
-                    home.functionalHomes.INDOOR_CLIMATE.ecoDuration,
+                    functionalHomes.INDOOR_CLIMATE.ecoDuration,
                     true,
                 ),
             );
             promises.push(
                 this.secureSetStateAsync(
                     `homes.${home.id}.functionalHomes.indoorClimate.optimumStartStopEnabled`,
-                    home.functionalHomes.INDOOR_CLIMATE.optimumStartStopEnabled,
+                    functionalHomes.INDOOR_CLIMATE.optimumStartStopEnabled,
                     true,
                 ),
             );
             promises.push(
                 this.secureSetStateAsync(
                     `homes.${home.id}.functionalHomes.indoorClimate.solution`,
-                    home.functionalHomes.INDOOR_CLIMATE.solution,
+                    functionalHomes.INDOOR_CLIMATE.solution,
                     true,
                 ),
             );
             promises.push(
                 this.secureSetStateAsync(
                     `homes.${home.id}.functionalHomes.indoorClimate.active`,
-                    home.functionalHomes.INDOOR_CLIMATE.active,
+                    functionalHomes.INDOOR_CLIMATE.active,
                     true,
                 ),
             );
         }
-        if (home.functionalHomes.LIGHT_AND_SHADOW) {
+        if (functionalHomes.LIGHT_AND_SHADOW) {
             promises.push(
                 this.secureSetStateAsync(
                     `homes.${home.id}.functionalHomes.lightAndShadow.active`,
-                    home.functionalHomes.LIGHT_AND_SHADOW.active,
+                    functionalHomes.LIGHT_AND_SHADOW.active,
                     true,
                 ),
             );
         }
-        if (home.functionalHomes.WEATHER_AND_ENVIRONMENT) {
+        if (functionalHomes.WEATHER_AND_ENVIRONMENT) {
             promises.push(
                 this.secureSetStateAsync(
                     `homes.${home.id}.functionalHomes.weatherAndEnvironment.active`,
-                    home.functionalHomes.WEATHER_AND_ENVIRONMENT.active,
+                    functionalHomes.WEATHER_AND_ENVIRONMENT.active,
                     true,
                 ),
             );
@@ -3304,7 +3313,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             this.extendObject(`homes.${home.id}.functionalHomes.securityAndAlarm.setOnTime`, {
                 type: 'state',
                 common: { name: 'setOnTime', type: 'string', role: 'text', read: true, write: true },
-                native: { id: home.functionalHomes.SECURITY_AND_ALARM.functionalGroups, parameter: 'setOnTime' },
+                native: { id: securityAndAlarm.functionalGroups, parameter: 'setOnTime' },
             }),
         );
         promises.push(
@@ -3328,7 +3337,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     },
                 },
                 native: {
-                    id: home.functionalHomes.SECURITY_AND_ALARM.securitySwitchingGroups,
+                    id: securityAndAlarm.securitySwitchingGroups,
                     parameter: 'testSignalOptical',
                 },
             }),
@@ -3354,7 +3363,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     },
                 },
                 native: {
-                    id: home.functionalHomes.SECURITY_AND_ALARM.securitySwitchingGroups,
+                    id: securityAndAlarm.securitySwitchingGroups,
                     parameter: 'setSignalOptical',
                 },
             }),
@@ -3390,7 +3399,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     },
                 },
                 native: {
-                    id: home.functionalHomes.SECURITY_AND_ALARM.securitySwitchingGroups,
+                    id: securityAndAlarm.securitySwitchingGroups,
                     parameter: 'testSignalAcoustic',
                 },
             }),
@@ -3426,7 +3435,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     },
                 },
                 native: {
-                    id: home.functionalHomes.SECURITY_AND_ALARM.securitySwitchingGroups,
+                    id: securityAndAlarm.securitySwitchingGroups,
                     parameter: 'setSignalAcoustic',
                 },
             }),
@@ -3505,6 +3514,104 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         );
 
         promises.push(
+            this.extendObject(`homes.${home.id}.functionalHomes.securityAndAlarm.setZonesSilentAlarmNone`, {
+                type: 'state',
+                common: {
+                    name: 'setZonesSilentAlarmNone',
+                    type: 'boolean',
+                    role: 'button',
+                    read: false,
+                    write: true,
+                },
+                native: { parameter: 'setZonesSilentAlarmNone' },
+            }),
+        );
+        promises.push(
+            this.extendObject(`homes.${home.id}.functionalHomes.securityAndAlarm.setZonesSilentAlarmInternal`, {
+                type: 'state',
+                common: {
+                    name: 'setZonesSilentAlarmInternal',
+                    type: 'boolean',
+                    role: 'button',
+                    read: false,
+                    write: true,
+                },
+                native: { parameter: 'setZonesSilentAlarmInternal' },
+            }),
+        );
+        promises.push(
+            this.extendObject(`homes.${home.id}.functionalHomes.securityAndAlarm.setZonesSilentAlarmExternal`, {
+                type: 'state',
+                common: {
+                    name: 'setZonesSilentAlarmExternal',
+                    type: 'boolean',
+                    role: 'button',
+                    read: false,
+                    write: true,
+                },
+                native: { parameter: 'setZonesSilentAlarmExternal' },
+            }),
+        );
+        promises.push(
+            this.extendObject(
+                `homes.${home.id}.functionalHomes.securityAndAlarm.setZonesSilentAlarmInternalAndExternal`,
+                {
+                    type: 'state',
+                    common: {
+                        name: 'setZonesSilentAlarmInternalAndExternal',
+                        type: 'boolean',
+                        role: 'button',
+                        read: false,
+                        write: true,
+                    },
+                    native: { parameter: 'setZonesSilentAlarmInternalAndExternal' },
+                },
+            ),
+        );
+
+        promises.push(
+            this.extendObject(`homes.${home.id}.functionalHomes.securityAndAlarm.securityJournal`, {
+                type: 'state',
+                common: { name: 'securityJournal', type: 'string', role: 'json', read: true, write: false },
+                native: {},
+            }),
+        );
+        promises.push(
+            this.extendObject(`homes.${home.id}.functionalHomes.securityAndAlarm.securityJournalEventTimestamp`, {
+                type: 'state',
+                common: {
+                    name: 'securityJournalEventTimestamp',
+                    type: 'number',
+                    role: 'value.time',
+                    read: true,
+                    write: false,
+                },
+                native: {},
+            }),
+        );
+        promises.push(
+            this.extendObject(`homes.${home.id}.functionalHomes.securityAndAlarm.securityJournalEventType`, {
+                type: 'state',
+                common: { name: 'securityJournalEventType', type: 'string', role: 'text', read: true, write: false },
+                native: {},
+            }),
+        );
+        promises.push(
+            this.extendObject(`homes.${home.id}.functionalHomes.securityAndAlarm.securityJournalLabel`, {
+                type: 'state',
+                common: { name: 'securityJournalLabel', type: 'string', role: 'text', read: true, write: false },
+                native: {},
+            }),
+        );
+        promises.push(
+            this.extendObject(`homes.${home.id}.functionalHomes.securityAndAlarm.readSecurityJournal`, {
+                type: 'state',
+                common: { name: 'readSecurityJournal', type: 'boolean', role: 'button', read: false, write: true },
+                native: { parameter: 'getSecurityJournal' },
+            }),
+        );
+
+        promises.push(
             this.extendObject(`homes.${home.id}.functionalHomes.indoorClimate.absenceType`, {
                 type: 'state',
                 common: { name: 'absenceType', type: 'string', role: 'text', read: true, write: false },
@@ -3570,7 +3677,14 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         promises.push(
             this.extendObject(`homes.${home.id}.functionalHomes.indoorClimate.vacationTemperature`, {
                 type: 'state',
-                common: { name: 'vacationTemperature', type: 'number', role: 'level', read: true, write: false },
+                common: {
+                    name: 'vacationTemperature',
+                    type: 'number',
+                    role: 'level',
+                    unit: '°C',
+                    read: true,
+                    write: true,
+                },
                 native: {},
             }),
         );
