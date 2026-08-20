@@ -89,6 +89,8 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 - (@Apollon77) New controls: motion detection on and off, pull latch, watering toggle and water volume reset, passage counter reset, favourite shading position, MP3 sound file and volume, light scenes, whole-home cooling and the alarm zone activation delay
 - (@Apollon77) Fixed the misspelled setNotificationSoundTyp endpoint, which meant the notification sound was never set
 - (@Apollon77) Fixed motionBufferActive, endpositionAutoDetectionEnabled, dim2WarmActive and humanCentricLightActive, which switched the device on or off instead of doing what their name says
+- (@Apollon77) Dimming, colour, optical signals and watering can now be given a time: set controlOnTime and/or controlRampTime on the channel and the command ramps instead of jumping. Both default to 0, which keeps the previous behaviour
+- (@Apollon77) Fixed the dim level never being scaled for RGB and optical signal commands, where a state object was compared against a number
 
 ### 2.0.0 (2026-08-03)
 - (copilot) Adapter requires node.js >= 22 now

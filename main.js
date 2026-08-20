@@ -447,7 +447,20 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
-                    await this._api.deviceControlSetDimLevel(o.native.id, state.val, o.native.channel);
+                    {
+                        const times = await this._controlTimes(o.native);
+                        if (times.timed) {
+                            await this._api.deviceControlSetDimLevelWithTime(
+                                o.native.id,
+                                state.val,
+                                times.onTime,
+                                times.rampTime,
+                                o.native.channel,
+                            );
+                        } else {
+                            await this._api.deviceControlSetDimLevel(o.native.id, state.val, o.native.channel);
+                        }
+                    }
                     break;
                 case 'setRgbDimLevel':
                     {
@@ -457,27 +470,40 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         let dimLevel = await this.getStateAsync(
                             `devices.${o.native.id}.channels.${o.native.channel}.dimLevel`,
                         );
-                        if (dimLevel > 1) {
-                            dimLevel = dimLevel / 100;
+                        let dimLevelValue = dimLevel ? dimLevel.val : null;
+                        if (typeof dimLevelValue === 'number' && dimLevelValue > 1) {
+                            dimLevelValue = dimLevelValue / 100;
                         }
                         if (
                             rgb.val ===
                                 this.currentValues[
                                     `devices.${o.native.id}.channels.${o.native.channel}.simpleRGBColorState`
                                 ] &&
-                            dimLevel.val ===
+                            dimLevelValue ===
                                 this.currentValues[`devices.${o.native.id}.channels.${o.native.channel}.dimLevel`]
                         ) {
                             this.log.info(`Value unchanged, do not send this value`);
                             await this.secureSetStateAsync(id, this.currentValues[id], true);
                             return;
                         }
-                        await this._api.deviceControlSetRgbDimLevel(
-                            o.native.id,
-                            rgb.val,
-                            dimLevel.val,
-                            o.native.channel,
-                        );
+                        const times = await this._controlTimes(o.native);
+                        if (times.timed) {
+                            await this._api.deviceControlSetRgbDimLevelWithTime(
+                                o.native.id,
+                                rgb.val,
+                                dimLevelValue,
+                                times.onTime,
+                                times.rampTime,
+                                o.native.channel,
+                            );
+                        } else {
+                            await this._api.deviceControlSetRgbDimLevel(
+                                o.native.id,
+                                rgb.val,
+                                dimLevelValue,
+                                o.native.channel,
+                            );
+                        }
                     }
                     break;
                 case 'toggleWateringState':
@@ -534,7 +560,23 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     }
                     break;
                 case 'setWateringSwitchState':
-                    await this._api.deviceControlSetWateringSwitchState(o.native.id, state.val, o.native.channel);
+                    {
+                        const times = await this._controlTimes(o.native);
+                        if (times.onTime > 0) {
+                            await this._api.deviceControlSetWateringSwitchStateWithTime(
+                                o.native.id,
+                                state.val,
+                                times.onTime,
+                                o.native.channel,
+                            );
+                        } else {
+                            await this._api.deviceControlSetWateringSwitchState(
+                                o.native.id,
+                                state.val,
+                                o.native.channel,
+                            );
+                        }
+                    }
                     break;
                 case 'setHueSaturationDimLevel':
                     {
@@ -542,13 +584,26 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         const hue = await this.getStateAsync(`${base}.hue`);
                         const saturation = await this.getStateAsync(`${base}.saturationLevel`);
                         const dimLevel = await this.getStateAsync(`${base}.dimLevel`);
-                        await this._api.deviceControlSetHueSaturationDimLevel(
-                            o.native.id,
-                            hue ? hue.val : null,
-                            saturation ? saturation.val : null,
-                            dimLevel ? dimLevel.val : null,
-                            o.native.channel,
-                        );
+                        const times = await this._controlTimes(o.native);
+                        if (times.timed) {
+                            await this._api.deviceControlSetHueSaturationDimLevelWithTime(
+                                o.native.id,
+                                hue ? hue.val : null,
+                                saturation ? saturation.val : null,
+                                dimLevel ? dimLevel.val : null,
+                                times.onTime,
+                                times.rampTime,
+                                o.native.channel,
+                            );
+                        } else {
+                            await this._api.deviceControlSetHueSaturationDimLevel(
+                                o.native.id,
+                                hue ? hue.val : null,
+                                saturation ? saturation.val : null,
+                                dimLevel ? dimLevel.val : null,
+                                o.native.channel,
+                            );
+                        }
                     }
                     break;
                 case 'setColorTemperatureDimLevel':
@@ -556,12 +611,24 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         const base = `devices.${o.native.id}.channels.${o.native.channel}`;
                         const colorTemperature = await this.getStateAsync(`${base}.colorTemperature`);
                         const dimLevel = await this.getStateAsync(`${base}.dimLevel`);
-                        await this._api.deviceControlSetColorTemperatureDimLevel(
-                            o.native.id,
-                            colorTemperature ? colorTemperature.val : null,
-                            dimLevel ? dimLevel.val : null,
-                            o.native.channel,
-                        );
+                        const times = await this._controlTimes(o.native);
+                        if (times.timed) {
+                            await this._api.deviceControlSetColorTemperatureDimLevelWithTime(
+                                o.native.id,
+                                colorTemperature ? colorTemperature.val : null,
+                                dimLevel ? dimLevel.val : null,
+                                times.onTime,
+                                times.rampTime,
+                                o.native.channel,
+                            );
+                        } else {
+                            await this._api.deviceControlSetColorTemperatureDimLevel(
+                                o.native.id,
+                                colorTemperature ? colorTemperature.val : null,
+                                dimLevel ? dimLevel.val : null,
+                                o.native.channel,
+                            );
+                        }
                     }
                     break;
                 case 'setOpticalSignalBehaviour':
@@ -575,28 +642,42 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         let opticalSignal = await this.getStateAsync(
                             `devices.${o.native.id}.channels.${o.native.channel}.opticalSignalBehaviour`,
                         );
-                        if (dimLevel > 1) {
-                            dimLevel = dimLevel / 100;
+                        let dimLevelValue = dimLevel ? dimLevel.val : null;
+                        if (typeof dimLevelValue === 'number' && dimLevelValue > 1) {
+                            dimLevelValue = dimLevelValue / 100;
                         }
                         if (
                             rgb.val ===
                                 this.currentValues[
                                     `devices.${o.native.id}.channels.${o.native.channel}.simpleRGBColorState`
                                 ] &&
-                            dimLevel.val ===
+                            dimLevelValue ===
                                 this.currentValues[`devices.${o.native.id}.channels.${o.native.channel}.dimLevel`]
                         ) {
                             this.log.info(`Value unchanged, do not send this value`);
                             await this.secureSetStateAsync(id, this.currentValues[id], true);
                             return;
                         }
-                        await this._api.deviceControlOpticalSignalBehaviour(
-                            o.native.id,
-                            rgb.val,
-                            dimLevel.val,
-                            o.native.channel,
-                            opticalSignal.val,
-                        );
+                        const times = await this._controlTimes(o.native);
+                        if (times.timed) {
+                            await this._api.deviceControlSetOpticalSignalWithTime(
+                                o.native.id,
+                                opticalSignal.val,
+                                rgb.val,
+                                dimLevelValue,
+                                times.onTime,
+                                times.rampTime,
+                                o.native.channel,
+                            );
+                        } else {
+                            await this._api.deviceControlOpticalSignalBehaviour(
+                                o.native.id,
+                                rgb.val,
+                                dimLevelValue,
+                                o.native.channel,
+                                opticalSignal.val,
+                            );
+                        }
                     }
                     break;
                 case 'setAcousticAlarmSignal':
@@ -1053,6 +1134,24 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             default:
                 this.log.warn(`unhandled event - ${JSON.stringify(ev)}`);
         }
+    }
+
+    /**
+     * The on and ramp time a channel is configured to control with.
+     *
+     * Both default to 0, which selects the plain command; anything above 0 selects the cloud's
+     * ...WithTime variant, so a channel only ramps once someone asks it to.
+     *
+     * @param {object} native the object's native block, carrying the device id and channel
+     * @returns {Promise<{onTime: number, rampTime: number, timed: boolean}>} the configured times
+     */
+    async _controlTimes(native) {
+        const base = `devices.${native.id}.channels.${native.channel}`;
+        const onTimeState = await this.getStateAsync(`${base}.controlOnTime`);
+        const rampTimeState = await this.getStateAsync(`${base}.controlRampTime`);
+        const onTime = onTimeState && onTimeState.val ? onTimeState.val : 0;
+        const rampTime = rampTimeState && rampTimeState.val ? rampTimeState.val : 0;
+        return { onTime, rampTime, timed: onTime > 0 || rampTime > 0 };
     }
 
     async _setSecurityZonesActivation(internal, external) {

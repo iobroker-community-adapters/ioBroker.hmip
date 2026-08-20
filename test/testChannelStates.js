@@ -26,6 +26,7 @@ const SPEC_KEYS = [
     'step',
     'debounce',
     'targetGroups',
+    'def',
     'from',
     'derive',
     'constant',
@@ -75,9 +76,10 @@ describe('lib/channelStates table', () => {
         });
     });
 
-    // `pin` is writable without a parameter on purpose: the setLockState handler reads it back
-    // as an input rather than dispatching it.
-    const NO_DISPATCH = ['pin'];
+    // Writable without a parameter on purpose: these hold a value that a handler reads back
+    // rather than dispatching one of their own. `pin` is read by setLockState and pullLatch, the
+    // two control times pick the cloud's ...WithTime endpoint variants.
+    const NO_DISPATCH = ['pin', 'controlOnTime', 'controlRampTime'];
 
     it('gives every writable state a way to dispatch, and nothing else one', () => {
         eachState((channelType, field, spec) => {
@@ -220,6 +222,34 @@ describe('lib/channelStates builders', () => {
         assert.strictEqual(built.fixed, false, 'a constant is written as given');
         assert.strictEqual(built.layout, '[{"tile":1}]', 'a json state must reach ioBroker as a string');
         assert.strictEqual(built.flag, undefined, 'a field the channel does not carry stays undefined');
+    });
+
+    it('gives every ...WithTime capable channel a pair of control times the cloud cannot overwrite', () => {
+        const withTime = [
+            'setDimLevel',
+            'setRgbDimLevel',
+            'setHueSaturationDimLevel',
+            'setColorTemperatureDimLevel',
+            'setOpticalSignalBehaviour',
+            'setWateringSwitchState',
+        ];
+        let checked = 0;
+        for (const [channelType, entry] of Object.entries(CHANNEL_STATES)) {
+            const canRamp = Object.values(entry.states).some(spec => withTime.includes(spec.parameter));
+            if (!canRamp) {
+                continue;
+            }
+            checked++;
+            for (const field of ['controlOnTime', 'controlRampTime']) {
+                const spec = entry.states[field];
+                assert.ok(spec, `${channelType} can ramp but has no ${field}`);
+                assert.strictEqual(spec.def, 0, `${channelType}.${field} must default to 0`);
+                assert.strictEqual(spec.write, true, `${channelType}.${field} must be writable`);
+                assert.strictEqual(spec.writeOnly, true, `${channelType}.${field} must never be written back`);
+                assert.strictEqual(spec.parameter, undefined, `${channelType}.${field} must not dispatch`);
+            }
+        }
+        assert.ok(checked > 8, `only found ${checked} channels that can ramp`);
     });
 
     it('never writes a value for a write-only state', () => {
