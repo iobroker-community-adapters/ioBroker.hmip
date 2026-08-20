@@ -78,6 +78,7 @@ describe('homeSetZonesActivation on a classic panel', () => {
             requestBased: false,
             classicZonesPresent: true,
             requestFailed: false,
+            confirmed: true,
             problems: null,
             lowBatteryDevices: [],
             lowBatteryLookupIncomplete: false,
@@ -133,12 +134,59 @@ describe('homeSetZonesActivation on a request-based panel', () => {
         assert.deepStrictEqual({ ...outcome.problems }, {});
     });
 
-    it('treats an empty 200 body as armed rather than as a failure', async () => {
+    it('treats an empty 200 body as accepted but unconfirmed', async () => {
         const api = createApi(REQUEST_BASED_GROUPS, '');
         const outcome = await api.homeSetZonesActivation(true, true);
-        // inferred, not verified against the cloud: a 200 with no body is treated as "armed, nothing blocked"
         assert.strictEqual(outcome.requestFailed, false, 'axios yields an empty string for a body-less 200');
+        assert.strictEqual(outcome.confirmed, false, 'a body-less 200 carries no blocker detail to inspect');
         assert.deepStrictEqual({ ...outcome.problems }, {});
+    });
+
+    // an empty problems map means "nothing blocked it" only when there was something to inspect,
+    // so nothing downstream may claim the zones armed
+    it('does not claim the zones armed when the panel reported no detail', async () => {
+        const flatBatteries = {
+            'DEV-1': { id: 'DEV-1', label: 'Front door', functionalChannels: { 0: { lowBat: true } } },
+            'DEV-2': { id: 'DEV-2', label: 'Terrace door', functionalChannels: { 0: { lowBat: true } } },
+        };
+        for (const response of ['', 0, 'OK', null]) {
+            const api = createApi(REQUEST_BASED_GROUPS, response, flatBatteries);
+            const outcome = await api.homeSetZonesActivation(true, true);
+            assert.strictEqual(outcome.confirmed, false, `${JSON.stringify(response)} is nothing to inspect`);
+            assert.deepStrictEqual(
+                outcome.lowBatteryDevices,
+                [],
+                'naming a low battery would assert the zone armed, which the panel never said',
+            );
+            assert.strictEqual(outcome.lowBatteryLookupIncomplete, false);
+        }
+    });
+
+    it('still names low-battery devices once the panel has confirmed the activation', async () => {
+        const api = createApi(
+            REQUEST_BASED_GROUPS,
+            {},
+            {
+                'DEV-1': { id: 'DEV-1', label: 'Front door', functionalChannels: { 0: { lowBat: true } } },
+                'DEV-2': { id: 'DEV-2', label: 'Terrace door', functionalChannels: { 0: { lowBat: true } } },
+            },
+        );
+        const outcome = await api.homeSetZonesActivation(true, true);
+        assert.strictEqual(outcome.confirmed, true);
+        assert.ok(outcome.lowBatteryDevices.length, 'a confirmed activation still reports a flat battery');
+    });
+
+    it('confirms an activation the panel did describe', async () => {
+        const api = createApi(REQUEST_BASED_GROUPS, { activationProblems: [], channelActivationProblems: {} });
+        const outcome = await api.homeSetZonesActivation(true, true);
+        assert.strictEqual(outcome.confirmed, true);
+    });
+
+    it('confirms a classic panel, whose 200 is the whole answer', async () => {
+        const api = createApi(CLASSIC_GROUPS, '');
+        const outcome = await api.homeSetZonesActivation(true, true);
+        assert.strictEqual(outcome.confirmed, true, 'a classic panel reports no detail by design');
+        assert.strictEqual(outcome.requestFailed, false);
     });
 
     it('marks a request that never reached the cloud as failed', async () => {

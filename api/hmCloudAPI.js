@@ -1036,9 +1036,12 @@ class HmCloudAPI {
      * @param {boolean} internal arm the internal zone
      * @param {boolean} external arm the external zone
      * @returns {Promise<{requestBased: boolean, classicZonesPresent: boolean, requestFailed: boolean,
-     *          problems: object|null, lowBatteryDevices: string[], lowBatteryLookupIncomplete: boolean}>}
+     *          confirmed: boolean, problems: object|null, lowBatteryDevices: string[],
+     *          lowBatteryLookupIncomplete: boolean}>}
      *          `requestFailed` marks a request that never reached the cloud. `problems` names what blocked the
      *          activation as {device label: [reason]} and is null on panels that give no such feedback.
+     *          `confirmed` is false when the panel answered 200 with nothing to inspect, so an empty
+     *          `problems` means "nothing was reported" rather than "nothing blocked it".
      */
     async homeSetZonesActivation(internal, external) {
         const requestBased = this.hasRequestBasedSecurityZones();
@@ -1048,6 +1051,7 @@ class HmCloudAPI {
             requestBased,
             classicZonesPresent: this.hasClassicSecurityZones(),
             requestFailed: false,
+            confirmed: true,
             problems: null,
             lowBatteryDevices: [],
             lowBatteryLookupIncomplete: false,
@@ -1067,8 +1071,11 @@ class HmCloudAPI {
             outcome.requestFailed = true;
             return outcome;
         }
+        // a 200 with no body is an accepted request with no blocker detail, and arming is
+        // asynchronous (the home reports activationInProgress), so it cannot be confirmed here
+        outcome.confirmed = !!response && typeof response === 'object';
         outcome.problems = this._securityZoneActivationProblems(response);
-        if (!Object.keys(outcome.problems).length) {
+        if (outcome.confirmed && !Object.keys(outcome.problems).length) {
             const lowBattery = this._lowBatteryDevicesInZones(zonesActivation);
             outcome.lowBatteryDevices = lowBattery.devices;
             outcome.lowBatteryLookupIncomplete = lowBattery.unresolved > 0;

@@ -1367,6 +1367,11 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 'This home only offers a combined ABSENCE mode, so arming the internal zone armed the external zone as well.',
             );
         }
+        if (!outcome.confirmed) {
+            this.log.info(
+                `The alarm system accepted ${requested} but reported no detail, so it is not confirmed. Check securityAndAlarm.active.`,
+            );
+        }
         if (outcome.lowBatteryLookupIncomplete) {
             this.log.debug(
                 'Not every security zone channel could be resolved to a device, so the low battery check may be incomplete.',
