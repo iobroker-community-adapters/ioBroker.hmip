@@ -29,18 +29,24 @@ const OPERATION_LOCK_FIELDS = [...BASE_FIELDS, 'operationLockActive'];
 
 const main = fs.readFileSync(path.join(__dirname, '..', 'main.js'), 'utf8');
 
-/** the channel types main.js dispatches with an explicit case label */
-function explicitlyHandledChannelTypes() {
-    const handled = new Set();
-    for (const range of [
-        main.slice(main.indexOf('_updateDeviceStates(device) {'), main.indexOf('_reinitializeData(id) {')),
-        main.slice(main.indexOf('_createObjectsForDevice(device) {'), main.indexOf('/* Start Channel Types */')),
-    ]) {
-        for (const m of range.matchAll(/case '([A-Z_0-9]+)':/g)) {
-            handled.add(m[1]);
-        }
-    }
-    return handled;
+/**
+ * The two channel dispatch switches in main.js, as source text.
+ *
+ * Both end markers occur more than once in the file, so each has to be searched for from the
+ * start of its own method - a plain indexOf finds the earlier copy and slice() then silently
+ * yields an empty string.
+ */
+function channelDispatchRanges() {
+    const updateStart = main.indexOf('_updateDeviceStates(device) {');
+    const createStart = main.indexOf('_createObjectsForDevice(device) {');
+    return {
+        update: main.slice(updateStart, main.indexOf('_reinitializeData(id) {', updateStart)),
+        create: main.slice(createStart, main.indexOf('/* Start Channel Types */', createStart)),
+    };
+}
+
+function caseLabels(range) {
+    return new Set([...range.matchAll(/case '([A-Z_0-9]+)':/g)].map(match => match[1]));
 }
 
 function eachState(callback) {
@@ -128,14 +134,25 @@ describe('lib/channelStates table', () => {
         );
     });
 
+    it('reads both channel dispatch switches out of main.js', () => {
+        const ranges = channelDispatchRanges();
+        for (const [name, range] of Object.entries(ranges)) {
+            const labels = caseLabels(range);
+            assert.ok(range.length > 0, `the ${name} dispatch range came out empty`);
+            assert.ok(labels.size > 50, `only found ${labels.size} case labels in the ${name} switch`);
+        }
+    });
+
     it('never shadows a channel type main.js dispatches explicitly', () => {
-        const explicit = explicitlyHandledChannelTypes();
-        assert.ok(explicit.size > 50, 'failed to parse the channel dispatch switches from main.js');
-        for (const channelType of [...Object.keys(CHANNEL_STATES), ...STATELESS_CHANNELS]) {
-            assert.ok(
-                !explicit.has(channelType),
-                `${channelType} has an explicit case in main.js, so its table entry is dead`,
-            );
+        const ranges = channelDispatchRanges();
+        for (const [name, range] of Object.entries(ranges)) {
+            const explicit = caseLabels(range);
+            for (const channelType of [...Object.keys(CHANNEL_STATES), ...STATELESS_CHANNELS]) {
+                assert.ok(
+                    !explicit.has(channelType),
+                    `${channelType} has an explicit case in the ${name} switch, so its table entry is dead`,
+                );
+            }
         }
     });
 });
