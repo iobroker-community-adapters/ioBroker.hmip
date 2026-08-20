@@ -656,32 +656,20 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     break;
                 case 'setOpticalSignalBehaviour':
                     {
-                        let rgb = await this.getStateAsync(
-                            `devices.${o.native.id}.channels.${o.native.channel}.simpleRGBColorState`,
-                        );
-                        let dimLevel = await this.getStateAsync(
-                            `devices.${o.native.id}.channels.${o.native.channel}.dimLevel`,
-                        );
-                        let opticalSignal = await this.getStateAsync(
-                            `devices.${o.native.id}.channels.${o.native.channel}.opticalSignalBehaviour`,
-                        );
-                        let dimLevelValue = dimLevel ? dimLevel.val : null;
-                        if (typeof dimLevelValue === 'number' && dimLevelValue > 1) {
-                            dimLevelValue = dimLevelValue / 100;
-                        }
+                        const rgb = await this._channelState(o.native, 'simpleRGBColorState');
+                        const dimLevel = await this._channelState(o.native, 'dimLevel');
+                        const opticalSignal = await this._channelState(o.native, 'opticalSignalBehaviour');
+                        const times = await this._controlTimes(o.native);
                         if (
-                            rgb.val ===
-                                this.currentValues[
-                                    `devices.${o.native.id}.channels.${o.native.channel}.simpleRGBColorState`
-                                ] &&
-                            dimLevelValue ===
-                                this.currentValues[`devices.${o.native.id}.channels.${o.native.channel}.dimLevel`]
+                            rgb.val === this.currentValues[rgb.id] &&
+                            dimLevel.val === this.currentValues[dimLevel.id] &&
+                            !times.timed
                         ) {
                             this.log.info(`Value unchanged, do not send this value`);
                             await this.secureSetStateAsync(id, this.currentValues[id], true);
                             return;
                         }
-                        const times = await this._controlTimes(o.native);
+                        const dimLevelValue = this._levelFraction(dimLevel.val);
                         if (times.timed) {
                             await this._api.deviceControlSetOpticalSignalWithTime(
                                 o.native.id,
@@ -1675,6 +1663,95 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 case 'SECURITY_ZONE': {
                     // request-based panels omit "active" on a disarmed zone
                     promises.push(this.secureSetStateAsync(`groups.${group.id}.active`, group.active === true, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.silent`, group.silent, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.windowState`, group.windowState, true));
+                    promises.push(
+                        this.secureSetStateAsync(`groups.${group.id}.motionDetected`, group.motionDetected, true),
+                    );
+                    promises.push(
+                        this.secureSetStateAsync(`groups.${group.id}.presenceDetected`, group.presenceDetected, true),
+                    );
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.sabotage`, group.sabotage, true));
+                    break;
+                }
+                case 'HOT_WATER': {
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.profileMode`, group.profileMode, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.profileId`, group.profileId, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.on`, group.on, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.onTime`, group.onTime, true));
+                    break;
+                }
+                case 'SHUTTER_PROFILE': {
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.profileMode`, group.profileMode, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.profileId`, group.profileId, true));
+                    promises.push(
+                        this.secureSetStateAsync(`groups.${group.id}.shutterLevel`, group.shutterLevel, true),
+                    );
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.slatsLevel`, group.slatsLevel, true));
+                    promises.push(
+                        this.secureSetStateAsync(
+                            `groups.${group.id}.primaryShadingLevel`,
+                            group.primaryShadingLevel,
+                            true,
+                        ),
+                    );
+                    promises.push(
+                        this.secureSetStateAsync(
+                            `groups.${group.id}.primaryShadingStateType`,
+                            group.primaryShadingStateType,
+                            true,
+                        ),
+                    );
+                    promises.push(
+                        this.secureSetStateAsync(
+                            `groups.${group.id}.secondaryShadingLevel`,
+                            group.secondaryShadingLevel,
+                            true,
+                        ),
+                    );
+                    promises.push(
+                        this.secureSetStateAsync(
+                            `groups.${group.id}.secondaryShadingStateType`,
+                            group.secondaryShadingStateType,
+                            true,
+                        ),
+                    );
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.processing`, group.processing, true));
+                    break;
+                }
+                case 'EXTENDED_LINKED_NOTIFICATION':
+                    promises.push(
+                        this.secureSetStateAsync(
+                            `groups.${group.id}.opticalSignalBehaviour`,
+                            group.opticalSignalBehaviour,
+                            true,
+                        ),
+                    );
+                    promises.push(
+                        this.secureSetStateAsync(
+                            `groups.${group.id}.onOpticalSignalBehaviour`,
+                            group.onOpticalSignalBehaviour,
+                            true,
+                        ),
+                    );
+                    promises.push(
+                        this.secureSetStateAsync(
+                            `groups.${group.id}.simpleRGBColorState`,
+                            group.simpleRGBColorState,
+                            true,
+                        ),
+                    );
+                    promises.push(
+                        this.secureSetStateAsync(`groups.${group.id}.onSimpleRGBColor`, group.onSimpleRGBColor, true),
+                    );
+                // eslint-disable-next-line no-fallthrough
+                case 'EXTENDED_LINKED_SWITCHING': {
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.on`, group.on, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.dimLevel`, group.dimLevel, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.onLevel`, group.onLevel, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.onTime`, group.onTime, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.dutyCycle`, group.dutyCycle, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.lowBat`, group.lowBat, true));
                     break;
                 }
             }
@@ -1697,6 +1774,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
     _updateHomeStates(home) {
         this.log.silly(`_updateHomeStates - ${JSON.stringify(home)}`);
         let promises = [];
+
+        promises.push(this.secureSetStateAsync(`homes.${home.id}.powerMeterCurrency`, home.powerMeterCurrency, true));
+        promises.push(this.secureSetStateAsync(`homes.${home.id}.powerMeterUnitPrice`, home.powerMeterUnitPrice, true));
 
         if (home.weather) {
             promises.push(
