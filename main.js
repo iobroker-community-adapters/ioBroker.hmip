@@ -3291,7 +3291,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         );
         promises.push(
             this.secureSetStateAsync(
-                `devices.${device.id}.channels.${channel}.stoparticulateNumberConcentrationTenrm`,
+                `devices.${device.id}.channels.${channel}.particulateNumberConcentrationTen`,
                 device.functionalChannels[channel].particulateNumberConcentrationTen,
                 true,
             ),

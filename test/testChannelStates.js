@@ -223,3 +223,72 @@ describe('lib/channelStates helpers', () => {
         }
     });
 });
+
+describe('main.js channel handlers', () => {
+    // states that exist to be written to, so nothing ever writes a value back
+    const WRITE_ONLY = ['stop', 'pin', 'resetEnergyCounter'];
+
+    function handlerBodies(prefix) {
+        const bodies = {};
+        for (const m of main.matchAll(
+            new RegExp(`\\n    (${prefix}\\w+)\\(device, channel\\) \\{([\\s\\S]*?)\\n    \\}\\n`, 'g'),
+        )) {
+            bodies[m[1]] = m[2];
+        }
+        return bodies;
+    }
+
+    function stateIds(body) {
+        return new Set([...body.matchAll(/channels\.\$\{channel\}\.(\w+)`/g)].map(m => m[1]));
+    }
+
+    /** a handler's own state ids plus those of every handler it delegates to */
+    function resolved(name, bodies, prefix, seen = new Set()) {
+        if (seen.has(name) || !bodies[name]) {
+            return new Set();
+        }
+        seen.add(name);
+        const out = stateIds(bodies[name]);
+        for (const m of bodies[name].matchAll(new RegExp(`this\\.(${prefix}\\w+)\\(device, channel\\)`, 'g'))) {
+            for (const id of resolved(m[1], bodies, prefix, seen)) {
+                out.add(id);
+            }
+        }
+        return out;
+    }
+
+    function handlerPairs() {
+        const creates = handlerBodies('_create');
+        const updates = handlerBodies('_update');
+        const pairs = [];
+        for (const create of Object.keys(creates)) {
+            const stem = create.slice('_create'.length);
+            const base = stem.replace('Channel', '');
+            const update = [
+                `_update${stem}States`,
+                `_update${stem}ChannelStates`,
+                `_update${base}ChannelStates`,
+                `_update${base}States`,
+            ].find(candidate => updates[candidate]);
+            if (update) {
+                pairs.push({ create, update, creates, updates });
+            }
+        }
+        return pairs;
+    }
+
+    it('finds the handler pairs in main.js', () => {
+        assert.ok(handlerPairs().length > 50, 'failed to parse the channel handlers out of main.js');
+    });
+
+    it('writes every state it declares, and declares every state it writes', () => {
+        for (const { create, update, creates, updates } of handlerPairs()) {
+            const declared = resolved(create, creates, '_create');
+            const written = resolved(update, updates, '_update');
+            const neverWritten = [...declared].filter(id => !written.has(id) && !WRITE_ONLY.includes(id));
+            const neverDeclared = [...written].filter(id => !declared.has(id));
+            assert.deepStrictEqual(neverWritten, [], `${create} declares states ${update} never writes`);
+            assert.deepStrictEqual(neverDeclared, [], `${update} writes states ${create} never declares`);
+        }
+    });
+});
