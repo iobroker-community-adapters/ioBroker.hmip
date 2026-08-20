@@ -360,7 +360,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
-                    for (let id of o.native.id) {
+                    for (let id of this._targetGroups(o.native, o.native.parameter)) {
                         await this._api.groupHeatingSetPointTemperature(id, state.val);
                     }
                     break;
@@ -370,7 +370,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
-                    for (let id of o.native.id) {
+                    for (let id of this._targetGroups(o.native, o.native.parameter)) {
                         await this._api.groupHeatingSetBoost(id, state.val);
                     }
                     break;
@@ -380,7 +380,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
-                    for (let id of o.native.id) {
+                    for (let id of this._targetGroups(o.native, o.native.parameter)) {
                         await this._api.groupHeatingSetBoostDuration(id, state.val);
                     }
                     break;
@@ -390,7 +390,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
-                    for (let id of o.native.id) {
+                    for (let id of this._targetGroups(o.native, o.native.parameter)) {
                         await this._api.groupHeatingSetActiveProfile(id, state.val);
                     }
                     break;
@@ -400,7 +400,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
-                    for (let id of o.native.id) {
+                    for (let id of this._targetGroups(o.native, o.native.parameter)) {
                         await this._api.groupHeatingSetControlMode(id, state.val);
                     }
                     break;
@@ -3249,7 +3249,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         promises.push(
             this.extendObject(`homes.${home.id}.functionalHomes.indoorClimate.setCooling`, {
                 type: 'state',
-                common: { name: 'setCooling', type: 'boolean', role: 'switch', read: false, write: true },
+                common: { name: 'setCooling', type: 'boolean', role: 'switch', read: true, write: true },
                 native: { id: home.id, parameter: 'setCooling' },
             }),
         );

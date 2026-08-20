@@ -33,6 +33,11 @@ const SPEC_KEYS = [
     'writeOnly',
 ];
 
+// Writable without a parameter on purpose: these hold a value that a handler reads back rather
+// than dispatching one of their own. `pin` is read by setLockState and pullLatch, the two control
+// times pick the cloud's ...WithTime endpoint variants.
+const NO_DISPATCH = ['pin', 'controlOnTime', 'controlRampTime'];
+
 function eachState(callback) {
     for (const [channelType, entry] of Object.entries(CHANNEL_STATES)) {
         for (const [field, spec] of Object.entries(entry.states)) {
@@ -75,11 +80,6 @@ describe('lib/channelStates table', () => {
             assert.match(field, /^[A-Za-z][A-Za-z0-9]*$/, `${where}: not a plain identifier`);
         });
     });
-
-    // Writable without a parameter on purpose: these hold a value that a handler reads back
-    // rather than dispatching one of their own. `pin` is read by setLockState and pullLatch, the
-    // two control times pick the cloud's ...WithTime endpoint variants.
-    const NO_DISPATCH = ['pin', 'controlOnTime', 'controlRampTime'];
 
     it('gives every writable state a way to dispatch, and nothing else one', () => {
         eachState((channelType, field, spec) => {
@@ -180,7 +180,7 @@ describe('lib/channelStates builders', () => {
         assert.deepStrictEqual(flag, {
             field: 'flag',
             common: { name: 'flag', type: 'boolean', role: 'indicator', read: true, write: false },
-            native: {},
+            native: { parameter: null },
         });
     });
 
@@ -200,7 +200,50 @@ describe('lib/channelStates builders', () => {
             channelStateObjects(states, 'DEV', 1, channel).map(entry => [entry.field, entry.native]),
         );
         assert.deepStrictEqual(built.level, { id: 'DEV', channel: 1, parameter: 'shutterlevel' });
-        assert.deepStrictEqual(built.flag, {}, 'a read-only state needs no native');
+        // extendObject merges, so a state that once dispatched must have its parameter cleared
+        assert.deepStrictEqual(built.flag, { parameter: null }, 'a read-only state must clear any parameter');
+    });
+
+    it('gives a group-targeted state an empty list when the channel is in no group', () => {
+        const built = Object.fromEntries(
+            channelStateObjects(states, 'DEV', 1, {}).map(entry => [entry.field, entry.native]),
+        );
+        assert.deepStrictEqual(built.setPoint.id, [], 'the dispatcher iterates this, so it must be a list');
+    });
+
+    it('never leaves a writable state without a way to be dispatched', () => {
+        for (const [channelType, entry] of Object.entries(CHANNEL_STATES)) {
+            for (const { field, common, native } of channelStateObjects(entry.states, 'DEV', 1, {})) {
+                if (common.write && !NO_DISPATCH.includes(field)) {
+                    assert.ok(native.parameter, `${channelType}.${field} is writable with no parameter`);
+                } else if (!NO_DISPATCH.includes(field)) {
+                    assert.strictEqual(
+                        native.parameter,
+                        null,
+                        `${channelType}.${field} is not writable but still carries a parameter`,
+                    );
+                }
+            }
+        }
+    });
+
+    it('declares every state as readable, writable or both', () => {
+        eachState((channelType, field, spec) => {
+            const read = spec.read ?? true;
+            const write = spec.write ?? false;
+            assert.ok(read || write, `${channelType}.${field} can be neither read nor written`);
+        });
+    });
+
+    it('never gives an unwritable state a role that promises control', () => {
+        eachState((channelType, field, spec) => {
+            if ((spec.read ?? true) === false) {
+                return;
+            }
+            if (/^(switch|button|level)/.test(spec.role)) {
+                assert.strictEqual(spec.write, true, `${channelType}.${field} looks controllable but is not writable`);
+            }
+        });
     });
 
     it('points a setpoint at the heating groups the channel belongs to', () => {
