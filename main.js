@@ -480,6 +480,37 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         );
                     }
                     break;
+                case 'setWateringSwitchState':
+                    await this._api.deviceControlSetWateringSwitchState(o.native.id, state.val, o.native.channel);
+                    break;
+                case 'setHueSaturationDimLevel':
+                    {
+                        const base = `devices.${o.native.id}.channels.${o.native.channel}`;
+                        const hue = await this.getStateAsync(`${base}.hue`);
+                        const saturation = await this.getStateAsync(`${base}.saturationLevel`);
+                        const dimLevel = await this.getStateAsync(`${base}.dimLevel`);
+                        await this._api.deviceControlSetHueSaturationDimLevel(
+                            o.native.id,
+                            hue ? hue.val : null,
+                            saturation ? saturation.val : null,
+                            dimLevel ? dimLevel.val : null,
+                            o.native.channel,
+                        );
+                    }
+                    break;
+                case 'setColorTemperatureDimLevel':
+                    {
+                        const base = `devices.${o.native.id}.channels.${o.native.channel}`;
+                        const colorTemperature = await this.getStateAsync(`${base}.colorTemperature`);
+                        const dimLevel = await this.getStateAsync(`${base}.dimLevel`);
+                        await this._api.deviceControlSetColorTemperatureDimLevel(
+                            o.native.id,
+                            colorTemperature ? colorTemperature.val : null,
+                            dimLevel ? dimLevel.val : null,
+                            o.native.channel,
+                        );
+                    }
+                    break;
                 case 'setOpticalSignalBehaviour':
                     {
                         let rgb = await this.getStateAsync(
@@ -538,6 +569,18 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         return;
                     }
                     await this._api.deviceConfigurationSetAcousticWaterAlarmTrigger(
+                        o.native.id,
+                        state.val,
+                        o.native.channel,
+                    );
+                    break;
+                case 'setInAppWaterAlarmTrigger':
+                    if (state.val === this.currentValues[id]) {
+                        this.log.info(`Value unchanged, do not send this value`);
+                        await this.secureSetStateAsync(id, this.currentValues[id], true);
+                        return;
+                    }
+                    await this._api.deviceConfigurationSetInAppWaterAlarmTrigger(
                         o.native.id,
                         state.val,
                         o.native.channel,

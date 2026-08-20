@@ -419,6 +419,21 @@ class HmCloudAPI {
     }
 
     // float 0.0 = open - 1.0 = closed
+    async deviceControlSetWateringSwitchState(deviceId, wateringActive, channelIndex = 1) {
+        let data = { deviceId, channelIndex, wateringActive };
+        await this.callRestApi('device/control/setWateringSwitchState', data);
+    }
+
+    async deviceControlSetHueSaturationDimLevel(deviceId, hue, saturationLevel, dimLevel, channelIndex = 1) {
+        let data = { deviceId, channelIndex, hue, saturationLevel, dimLevel };
+        await this.callRestApi('device/control/setHueSaturationDimLevel', data);
+    }
+
+    async deviceControlSetColorTemperatureDimLevel(deviceId, colorTemperature, dimLevel, channelIndex = 1) {
+        let data = { deviceId, channelIndex, colorTemperature, dimLevel };
+        await this.callRestApi('device/control/setColorTemperatureDimLevel', data);
+    }
+
     async deviceControlSetShutterLevel(deviceId, shutterLevel, channelIndex = 1) {
         let data = { deviceId, channelIndex, shutterLevel };
         await this.callRestApi('device/control/setShutterLevel', data);

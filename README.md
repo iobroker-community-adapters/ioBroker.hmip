@@ -79,6 +79,11 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 - (@Apollon77) Every device now reports its own hardware faults: overheated, overloaded, undervoltage, temperature out of range and the three co-processor states
 - (@Apollon77) 3 channel types that carry no value of their own are no longer reported as unknown
 - (@Apollon77) All device channel handling now comes from one table instead of 122 hand-written methods, with no change to any object or value
+- (@Apollon77) The newly supported channels can now be controlled, not only read: the wall switch status LEDs, the display backlight, the universal dimmer and actuator, the door lock pro, the door opener, the watering actuator, bridged switches and lights, and bridged window coverings
+- (@Apollon77) Fixed hue, saturationLevel and colorTemperature on universal lights, which were writable but dispatched to a command that did not exist (HmIP-RGBW)
+- (@Apollon77) Fixed inAppWaterAlarmTrigger, which was writable but never sent to the cloud
+- (@Apollon77) 18 states that were writable with no command behind them are now read-only, and changeOverDelay no longer throws when written
+- (@Apollon77) Fixed the stop and resetEnergyCounter buttons being labelled "on" in the admin UI
 
 ### 2.0.0 (2026-08-03)
 - (copilot) Adapter requires node.js >= 22 now
