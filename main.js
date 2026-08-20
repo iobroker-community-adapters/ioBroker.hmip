@@ -1,7 +1,16 @@
 const { Adapter } = require('@iobroker/adapter-core'); // Get common adapter utils
 const { v4: uuidv4 } = require('uuid');
 const apiClass = require('./api/hmCloudAPI');
-const { CHANNEL_STATES, STATELESS_CHANNELS, channelStateObjects, channelStateValues } = require('./lib/channelStates');
+const {
+    CHANNEL_STATES,
+    STATELESS_CHANNELS,
+    CHANNEL_EVENTS,
+    CODE_STATES,
+    CODE_STATE_CHANNELS,
+    EVENT_CHANNELS,
+    channelStateObjects,
+    channelStateValues,
+} = require('./lib/channelStates');
 
 const adapterName = require('./package.json').name.split('.').pop();
 
@@ -1194,17 +1203,104 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 if (ev && ev.home) {
                     await this._updateHomeStates(ev.home);
                 } else {
+                    // the alarm event fields on the home are what this event announces, and only
+                    // the full read carries them
                     this.log.debug(`Read Home for SECURITY_JOURNAL_CHANGED: ${JSON.stringify(ev)}`);
                     const state = await this._api.callRestApi('home/getCurrentState', this._api._clientCharacteristics);
                     state && state.home && (await this._updateHomeStates(state.home));
                 }
+                await this._updateSecurityJournal();
                 break;
             case 'DEVICE_CHANNEL_EVENT':
-                this.log.debug(`unhandled known event - ${JSON.stringify(ev)}`);
+                await this._channelEventRaised(ev);
+                break;
+            case 'DEVICE_CODE_STATE_EVENT':
+                await this._codeStateEventRaised(ev);
                 break;
             default:
                 this.log.warn(`unhandled event - ${JSON.stringify(ev)}`);
         }
+    }
+
+    /**
+     * An indicator for something the cloud reports as a moment rather than as a state.
+     *
+     * @param {string} id the state to create
+     * @param {string} name the event the state stands for
+     * @returns {Promise<void>} when the object exists
+     */
+    _createEventState(id, name) {
+        return this.extendObject(id, {
+            type: 'state',
+            common: { name, type: 'boolean', role: 'indicator', read: true, write: false },
+            native: {},
+        });
+    }
+
+    /**
+     * Marks an event as raised.
+     *
+     * The datapoint is never reset: ioBroker notifies subscribers of every write whether or not
+     * the value changed, so every press stays an update and `lc` carries when it last happened.
+     *
+     * @param {string} id the state to raise
+     * @param {string} name the event the state stands for
+     * @returns {Promise<void>} when the event has been published
+     */
+    async _raiseEventState(id, name) {
+        await this._createEventState(id, name);
+        await this.secureSetStateAsync(id, true, true);
+    }
+
+    /**
+     * A name the cloud sent that is safe to build a state id from.
+     *
+     * @param {unknown} name the name as it arrived
+     * @returns {boolean} whether it is one of the cloud's own upper-case identifiers
+     */
+    _isEventName(name) {
+        return typeof name === 'string' && /^[A-Z][A-Z0-9_]*$/.test(name);
+    }
+
+    /**
+     * @param {object} ev the DEVICE_CHANNEL_EVENT as the cloud sent it
+     * @returns {Promise<void>} when the event has been published
+     */
+    async _channelEventRaised(ev) {
+        // the cloud names the channel either way round
+        const channel = ev.channelIndex ?? ev.functionalChannelIndex;
+        if (!ev.deviceId || channel === undefined || channel === null || !this._isEventName(ev.channelEventType)) {
+            this.log.warn(`Unusable channel event - ${JSON.stringify(ev)}`);
+            return;
+        }
+        this.log.debug(`channel event ${ev.channelEventType} on ${ev.deviceId}:${channel}`);
+        await this._raiseEventState(
+            `devices.${ev.deviceId}.channels.${channel}.events.${ev.channelEventType}`,
+            ev.channelEventType,
+        );
+    }
+
+    /**
+     * @param {object} ev the DEVICE_CODE_STATE_EVENT as the cloud sent it
+     * @returns {Promise<void>} when the event has been published
+     */
+    async _codeStateEventRaised(ev) {
+        if (!ev.deviceId || !this._isEventName(ev.codeState)) {
+            this.log.warn(`Unusable code state event - ${JSON.stringify(ev)}`);
+            return;
+        }
+        const base = `devices.${ev.deviceId}.events`;
+        this.log.debug(`code state ${ev.codeState} on ${ev.deviceId}`);
+        // the index is written first, so a script woken by the event below already reads this one
+        if (typeof ev.codeIndex === 'number') {
+            await this.extendObject(`${base}.codeIndex`, {
+                type: 'state',
+                common: { name: 'codeIndex', type: 'number', role: 'value', read: true, write: false },
+                native: {},
+            });
+            await this.secureSetStateAsync(`${base}.codeIndex`, ev.codeIndex, true);
+        }
+        await this._raiseEventState(`${base}.${ev.codeState}`, ev.codeState);
     }
 
     /**
@@ -1906,6 +2002,20 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     native: {},
                 }),
             );
+            if (EVENT_CHANNELS.includes(fc.functionalChannelType)) {
+                promises.push(
+                    ...CHANNEL_EVENTS.map(event =>
+                        this._createEventState(`devices.${device.id}.channels.${i}.events.${event}`, event),
+                    ),
+                );
+            }
+            if (CODE_STATE_CHANNELS.includes(fc.functionalChannelType)) {
+                promises.push(
+                    ...CODE_STATES.map(codeState =>
+                        this._createEventState(`devices.${device.id}.events.${codeState}`, codeState),
+                    ),
+                );
+            }
             if (CHANNEL_STATES[fc.functionalChannelType]) {
                 promises.push(...this._createChannel(device, i, fc.functionalChannelType));
             } else if (STATELESS_CHANNELS.includes(fc.functionalChannelType)) {
