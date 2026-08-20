@@ -5,6 +5,11 @@ const { v4: uuidv4 } = require('uuid');
 const webSocket = require('ws');
 const axios = require('axios');
 
+const WS_PING_INTERVAL = 5000;
+// four unanswered pings. The cloud drops a connection silently often enough that this deadline is
+// the only thing that notices; too short a one would recycle a connection that is merely slow.
+const WS_STALE_TIMEOUT = 25000;
+
 class HmCloudAPI {
     constructor(configDataOrApId, pin) {
         if (configDataOrApId !== undefined) {
@@ -207,13 +212,37 @@ class HmCloudAPI {
         }
         if (this._connectTimeout) {
             clearTimeout(this._connectTimeout);
+            this._connectTimeout = null;
         }
         if (this._pingInterval) {
             clearInterval(this._pingInterval);
+            this._pingInterval = null;
         }
     }
 
+    /**
+     * Pings the cloud, and gives up on a connection that has stopped answering.
+     *
+     * A connection the cloud or a NAT table drops silently stays readyState OPEN and raises
+     * neither an error nor a close, so this deadline is the only thing that ever notices.
+     */
+    _checkConnectionAlive() {
+        if (!this._ws) {
+            return;
+        }
+        const silentFor = Date.now() - this._lastAlive;
+        if (silentFor > WS_STALE_TIMEOUT) {
+            this.staleConnection && this.staleConnection(silentFor);
+            this._ws.terminate();
+            return;
+        }
+        this._ws.ping(() => {});
+    }
+
     connectWebsocket() {
+        // dispose() disables the reconnect below, and a reconnect is exactly what this is
+        this.isClosed = false;
+        this._lastAlive = Date.now();
         if (this._pingInterval) {
             clearInterval(this._pingInterval);
             this._pingInterval = null;
@@ -230,8 +259,9 @@ class HmCloudAPI {
         this._ws.on('open', () => {
             this.opened && this.opened();
 
+            this._lastAlive = Date.now();
             this._pingInterval && clearInterval(this._pingInterval);
-            this._pingInterval = setInterval(() => this._ws.ping(() => {}), 5000);
+            this._pingInterval = setInterval(() => this._checkConnectionAlive(), WS_PING_INTERVAL);
         });
 
         this._ws.on('close', (code, reason) => {
@@ -280,15 +310,22 @@ class HmCloudAPI {
         });
 
         this._ws.on('message', d => {
+            this._lastAlive = Date.now();
             const dString = d.toString('utf8');
             this.dataReceived && this.dataReceived(dString);
             const data = JSON.parse(dString);
             this._parseEventdata(data);
         });
 
-        this._ws.on('ping', () => this.dataReceived && this.dataReceived('ping'));
+        this._ws.on('ping', () => {
+            this._lastAlive = Date.now();
+            this.dataReceived && this.dataReceived('ping');
+        });
 
-        this._ws.on('pong', () => this.dataReceived && this.dataReceived('pong'));
+        this._ws.on('pong', () => {
+            this._lastAlive = Date.now();
+            this.dataReceived && this.dataReceived('pong');
+        });
     }
 
     _parseEventdata(data) {

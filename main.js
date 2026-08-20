@@ -17,6 +17,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         this._api.errored = this._errored.bind(this);
         this._api.requestError = this._requestError.bind(this);
         this._api.unexpectedResponse = this._unexpectedResponse.bind(this);
+        this._api.staleConnection = this._staleConnection.bind(this);
 
         this.on('unload', this._unload);
         this.on('objectChange', this._objectChange);
@@ -1039,6 +1040,10 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 await this._ready();
             }, 30000);
         }
+    }
+
+    _staleConnection(silentFor) {
+        this.log.warn(`ws connection stopped answering ${Math.round(silentFor / 1000)}s ago, reconnecting`);
     }
 
     _errored(error) {
