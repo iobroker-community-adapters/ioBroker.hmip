@@ -480,6 +480,59 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         );
                     }
                     break;
+                case 'toggleWateringState':
+                    await this._api.deviceControlToggleWateringState(o.native.id, o.native.channel);
+                    break;
+                case 'resetWaterVolume':
+                    await this._api.deviceControlResetWaterVolume(o.native.id, o.native.channel);
+                    break;
+                case 'resetPassageCounter':
+                    await this._api.deviceControlResetPassageCounter(o.native.id, o.native.channel);
+                    break;
+                case 'setFavoriteShadingPosition':
+                    await this._api.deviceControlSetFavoriteShadingPosition(o.native.id, o.native.channel);
+                    break;
+                case 'setMotionDetectionActive':
+                    await this._api.deviceControlSetMotionDetectionActive(o.native.id, state.val, o.native.channel);
+                    break;
+                case 'pullLatch':
+                    {
+                        const latchPin = await this.getStateAsync(
+                            `devices.${o.native.id}.channels.${o.native.channel}.pin`,
+                        );
+                        await this._api.deviceControlPullLatch(
+                            o.native.id,
+                            latchPin ? latchPin.val : '',
+                            o.native.channel,
+                        );
+                    }
+                    break;
+                case 'setSoundFileVolumeLevel':
+                    {
+                        const base = `devices.${o.native.id}.channels.${o.native.channel}`;
+                        const soundFile = await this.getStateAsync(`${base}.soundFile`);
+                        const volumeLevel = await this.getStateAsync(`${base}.volumeLevel`);
+                        await this._api.deviceControlSetSoundFileVolumeLevel(
+                            o.native.id,
+                            soundFile ? soundFile.val : null,
+                            volumeLevel ? volumeLevel.val : null,
+                            o.native.channel,
+                        );
+                    }
+                    break;
+                case 'startLightScene':
+                    {
+                        const base = `devices.${o.native.id}.channels.${o.native.channel}`;
+                        const sceneId = await this.getStateAsync(`${base}.lightSceneId`);
+                        const sceneDimLevel = await this.getStateAsync(`${base}.dimLevel`);
+                        await this._api.deviceControlStartLightScene(
+                            o.native.id,
+                            sceneId ? sceneId.val : null,
+                            sceneDimLevel ? sceneDimLevel.val : null,
+                            o.native.channel,
+                        );
+                    }
+                    break;
                 case 'setWateringSwitchState':
                     await this._api.deviceControlSetWateringSwitchState(o.native.id, state.val, o.native.channel);
                     break;
@@ -658,13 +711,13 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         o.native.channel,
                     );
                     break;
-                case 'setNotificationSoundTyp':
+                case 'setNotificationSoundType':
                     if (state.val === this.currentValues[id]) {
                         this.log.info(`Value unchanged, do not send this value`);
                         await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
-                    await this._api.deviceConfigurationSetNotificationSoundTyp(
+                    await this._api.deviceConfigurationSetNotificationSoundType(
                         o.native.id,
                         state.val,
                         id.endsWith('HighToLow'),
@@ -724,6 +777,31 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     break;
                 case 'setSecurityZonesActivationInternalAndExternal':
                     await this._setSecurityZonesActivation(true, true);
+                    break;
+                case 'groupSwitchState':
+                    await this._api.groupSwitchingSetState(o.native.id, state.val);
+                    break;
+                case 'groupShutterLevel':
+                    await this._api.groupSwitchingSetShutterLevel(o.native.id, state.val);
+                    break;
+                case 'groupSlatsLevel':
+                    {
+                        const groupShutter = await this.getStateAsync(`groups.${o.native.id}.shutterLevel`);
+                        await this._api.groupSwitchingSetSlatsLevel(
+                            o.native.id,
+                            state.val,
+                            groupShutter ? groupShutter.val : null,
+                        );
+                    }
+                    break;
+                case 'groupStop':
+                    await this._api.groupSwitchingStop(o.native.id);
+                    break;
+                case 'setCooling':
+                    await this._api.homeHeatingSetCooling(state.val);
+                    break;
+                case 'setZoneActivationDelay':
+                    await this._api.homeSetZoneActivationDelay(state.val);
                     break;
                 case 'setOnTime':
                     if (Array.isArray(o.native.id)) {
@@ -1262,6 +1340,10 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 }
                 case 'SWITCHING': {
                     promises.push(this.secureSetStateAsync(`groups.${group.id}.on`, group.on, true));
+                    promises.push(
+                        this.secureSetStateAsync(`groups.${group.id}.shutterLevel`, group.shutterLevel, true),
+                    );
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.slatsLevel`, group.slatsLevel, true));
                     break;
                 }
                 case 'SECURITY_ZONE': {
@@ -2051,7 +2133,44 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     this.extendObject(`groups.${group.id}.on`, {
                         type: 'state',
                         common: { name: 'on', type: 'boolean', role: 'switch', read: true, write: true },
-                        native: {},
+                        native: { id: group.id, parameter: 'groupSwitchState' },
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.shutterLevel`, {
+                        type: 'state',
+                        common: {
+                            name: 'shutterLevel',
+                            type: 'number',
+                            role: 'level.blind',
+                            min: 0,
+                            max: 1,
+                            read: true,
+                            write: true,
+                        },
+                        native: { id: group.id, parameter: 'groupShutterLevel', step: 0.05, debounce: 5000 },
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.slatsLevel`, {
+                        type: 'state',
+                        common: {
+                            name: 'slatsLevel',
+                            type: 'number',
+                            role: 'level.blind',
+                            min: 0,
+                            max: 1,
+                            read: true,
+                            write: true,
+                        },
+                        native: { id: group.id, parameter: 'groupSlatsLevel', step: 0.05, debounce: 5000 },
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.stop`, {
+                        type: 'state',
+                        common: { name: 'stop', type: 'boolean', role: 'button', read: false, write: true },
+                        native: { id: group.id, parameter: 'groupStop' },
                     }),
                 );
                 break;
@@ -2247,8 +2366,22 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         promises.push(
             this.extendObject(`homes.${home.id}.functionalHomes.securityAndAlarm.zoneActivationDelay`, {
                 type: 'state',
-                common: { name: 'zoneActivationDelay', type: 'number', role: 'value', read: true, write: false },
-                native: {},
+                common: {
+                    name: 'zoneActivationDelay',
+                    type: 'number',
+                    role: 'value.interval',
+                    unit: 's',
+                    read: true,
+                    write: true,
+                },
+                native: { id: home.id, parameter: 'setZoneActivationDelay', debounce: 5000 },
+            }),
+        );
+        promises.push(
+            this.extendObject(`homes.${home.id}.functionalHomes.indoorClimate.setCooling`, {
+                type: 'state',
+                common: { name: 'setCooling', type: 'boolean', role: 'switch', read: false, write: true },
+                native: { id: home.id, parameter: 'setCooling' },
             }),
         );
         promises.push(

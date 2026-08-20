@@ -233,67 +233,19 @@ describe('lib/channelStates builders', () => {
     });
 });
 
-describe('lib/channelStates matches the pre-migration handlers', () => {
-    const golden = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'preMigrationChannels.json'), 'utf8'));
+describe('lib/channelStates against the recorded snapshot', () => {
+    // Every object definition and value the table produces for a fixed probe channel. The
+    // snapshot started as a capture of the hand-written handlers it replaced, and is updated
+    // deliberately when behaviour is meant to change - so an unexplained diff here is a
+    // regression, and the git diff on the fixture is the review.
+    const snapshot = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'expectedChannels.json'), 'utf8'));
 
-    // The fixture pins what the hand-written handlers produced. These are the only places the
-    // table is meant to differ from it, so anything else showing up is a regression.
-    const RENAMED = [
-        'BLIND_CHANNEL.stop',
-        'MULTI_MODE_INPUT_BLIND_CHANNEL.stop',
-        'SHUTTER_CHANNEL.stop',
-        'SWITCH_MEASURING_CHANNEL.resetEnergyCounter',
-    ];
-    const DEMOTED_TO_READ_ONLY = [
-        'DIMMER_CHANNEL.profileMode',
-        'DIMMER_CHANNEL.userDesiredProfileMode',
-        'MULTI_MODE_INPUT_DIMMER_CHANNEL.powerUpSwitchState',
-        'MULTI_MODE_INPUT_DIMMER_CHANNEL.userDesiredProfileMode',
-        'MULTI_MODE_INPUT_SWITCH_CHANNEL.powerUpSwitchState',
-        'MULTI_MODE_INPUT_SWITCH_CHANNEL.userDesiredProfileMode',
-        'NOTIFICATION_MP3_SOUND_CHANNEL.profileMode',
-        'NOTIFICATION_MP3_SOUND_CHANNEL.soundFile',
-        'NOTIFICATION_MP3_SOUND_CHANNEL.userDesiredProfileMode',
-        'SHUTTER_CHANNEL.changeOverDelay',
-        'SINGLE_KEY_CHANNEL.on',
-        'SWITCH_CHANNEL.powerUpSwitchState',
-        'SWITCH_CHANNEL.userDesiredProfileMode',
-        'SWITCH_MEASURING_CHANNEL.powerUpSwitchState',
-        'SWITCH_MEASURING_CHANNEL.userDesiredProfileMode',
-        'UNIVERSAL_LIGHT_CHANNEL.lightSceneId',
-        'UNIVERSAL_LIGHT_CHANNEL.profileMode',
-        'UNIVERSAL_LIGHT_CHANNEL.userDesiredProfileMode',
-    ];
-    const REWIRED = {
-        'UNIVERSAL_LIGHT_CHANNEL.colorTemperature': 'setColorTemperatureDimLevel',
-        'UNIVERSAL_LIGHT_CHANNEL.hue': 'setHueSaturationDimLevel',
-        'UNIVERSAL_LIGHT_CHANNEL.saturationLevel': 'setHueSaturationDimLevel',
-    };
-
-    /** the fixture entry with this PR's deliberate changes applied */
-    function expectedFor(channelType, field, pinned) {
-        const key = `${channelType}.${field}`;
-        const out = JSON.parse(JSON.stringify(pinned));
-        if (RENAMED.includes(key)) {
-            out.common.name = field;
-        }
-        if (DEMOTED_TO_READ_ONLY.includes(key)) {
-            out.common.read = true;
-            out.common.write = false;
-            out.native = {};
-        }
-        if (REWIRED[key]) {
-            out.native.parameter = REWIRED[key];
-        }
-        return out;
-    }
-
-    it('pins every channel type the hand-written handlers used to serve', () => {
-        assert.ok(Object.keys(golden).length > 60, 'the fixture lost channel types');
+    it('still covers every channel type the hand-written handlers used to serve', () => {
+        assert.ok(Object.keys(snapshot).length > 60, 'the snapshot lost channel types');
     });
 
-    for (const [channelType, expected] of Object.entries(golden)) {
-        it(`produces the same objects and values for ${channelType}`, () => {
+    for (const [channelType, expected] of Object.entries(snapshot)) {
+        it(`produces the recorded objects and values for ${channelType}`, () => {
             assert.ok(CHANNEL_STATES[channelType], `${channelType} is no longer in the table`);
             const states = allStates(channelType);
 
@@ -306,11 +258,7 @@ describe('lib/channelStates matches the pre-migration handlers', () => {
                 values[field] = value;
             }
 
-            const wanted = {};
-            for (const [field, pinned] of Object.entries(expected.objects)) {
-                wanted[field] = expectedFor(channelType, field, pinned);
-            }
-            assert.deepStrictEqual(JSON.parse(JSON.stringify(objects)), wanted);
+            assert.deepStrictEqual(JSON.parse(JSON.stringify(objects)), expected.objects);
             assert.deepStrictEqual(JSON.parse(JSON.stringify(values)), expected.values);
         });
     }

@@ -84,6 +84,11 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 - (@Apollon77) Fixed inAppWaterAlarmTrigger, which was writable but never sent to the cloud
 - (@Apollon77) 18 states that were writable with no command behind them are now read-only, and changeOverDelay no longer throws when written
 - (@Apollon77) Fixed the stop and resetEnergyCounter buttons being labelled "on" in the admin UI
+- (@Apollon77) Added the remaining commands the HomematicIP cloud offers, 88 endpoints in total, and exposed the ones with a datapoint to attach to
+- (@Apollon77) Switching groups can now be switched, and their shutter and slats levels set - the group on/off datapoint never reached the cloud before
+- (@Apollon77) New controls: motion detection on and off, pull latch, watering toggle and water volume reset, passage counter reset, favourite shading position, MP3 sound file and volume, light scenes, whole-home cooling and the alarm zone activation delay
+- (@Apollon77) Fixed the misspelled setNotificationSoundTyp endpoint, which meant the notification sound was never set
+- (@Apollon77) Fixed motionBufferActive, endpositionAutoDetectionEnabled, dim2WarmActive and humanCentricLightActive, which switched the device on or off instead of doing what their name says
 
 ### 2.0.0 (2026-08-03)
 - (copilot) Adapter requires node.js >= 22 now

@@ -419,6 +419,98 @@ class HmCloudAPI {
     }
 
     // float 0.0 = open - 1.0 = closed
+    async deviceControlPullLatch(deviceId, authorizationPin = '', channelIndex = 1) {
+        let data = {
+            deviceId,
+            channelIndex,
+            authorizationPin: authorizationPin === null ? '' : String(authorizationPin),
+        };
+        await this.callRestApi('device/control/pullLatch', data);
+    }
+
+    async deviceControlResetPassageCounter(deviceId, channelIndex = 1) {
+        let data = { deviceId, channelIndex };
+        await this.callRestApi('device/control/resetPassageCounter', data);
+    }
+
+    async deviceControlResetWaterVolume(deviceId, channelIndex = 1) {
+        let data = { deviceId, channelIndex };
+        await this.callRestApi('device/control/resetWaterVolume', data);
+    }
+
+    async deviceControlToggleWateringState(deviceId, channelIndex = 1) {
+        let data = { deviceId, channelIndex };
+        await this.callRestApi('device/control/toggleWateringState', data);
+    }
+
+    async deviceControlSetWateringSwitchStateWithTime(deviceId, wateringActive, wateringTime, channelIndex = 1) {
+        let data = { deviceId, channelIndex, wateringActive, wateringTime };
+        await this.callRestApi('device/control/setWateringSwitchStateWithTime', data);
+    }
+
+    async deviceControlSetFavoriteShadingPosition(deviceId, channelIndex = 1) {
+        let data = { deviceId, channelIndex };
+        await this.callRestApi('device/control/setFavoriteShadingPosition', data);
+    }
+
+    async deviceControlSetMotionDetectionActive(deviceId, motionDetectionActive, channelIndex = 1) {
+        let data = { deviceId, channelIndex, motionDetectionActive };
+        await this.callRestApi('device/control/setMotionDetectionActive', data);
+    }
+
+    async deviceControlSetSoundFileVolumeLevel(deviceId, soundFile, volumeLevel, channelIndex = 1) {
+        let data = { deviceId, channelIndex, soundFile, volumeLevel };
+        await this.callRestApi('device/control/setSoundFileVolumeLevel', data);
+    }
+
+    async deviceControlStartLightScene(deviceId, id, dimLevel, channelIndex = 1) {
+        let data = { deviceId, channelIndex, id, dimLevel };
+        await this.callRestApi('device/control/startLightScene', data);
+    }
+
+    async deviceControlSetDimLevelWithTime(deviceId, dimLevel, onTime, rampTime, channelIndex = 1) {
+        let data = { deviceId, channelIndex, dimLevel, onTime, rampTime };
+        await this.callRestApi('device/control/setDimLevelWithTime', data);
+    }
+
+    async deviceControlSetHueSaturationDimLevelWithTime(
+        deviceId,
+        hue,
+        saturationLevel,
+        dimLevel,
+        onTime,
+        rampTime,
+        channelIndex = 1,
+    ) {
+        let data = { deviceId, channelIndex, hue, saturationLevel, dimLevel, onTime, rampTime };
+        await this.callRestApi('device/control/setHueSaturationDimLevelWithTime', data);
+    }
+
+    async deviceControlSetColorTemperatureDimLevelWithTime(
+        deviceId,
+        colorTemperature,
+        dimLevel,
+        onTime,
+        rampTime,
+        channelIndex = 1,
+    ) {
+        let data = { deviceId, channelIndex, colorTemperature, dimLevel, onTime, rampTime };
+        await this.callRestApi('device/control/setColorTemperatureDimLevelWithTime', data);
+    }
+
+    async deviceControlSetOpticalSignalWithTime(
+        deviceId,
+        opticalSignalBehaviour,
+        simpleRGBColorState,
+        dimLevel,
+        onTime,
+        rampTime,
+        channelIndex = 1,
+    ) {
+        let data = { deviceId, channelIndex, opticalSignalBehaviour, simpleRGBColorState, dimLevel, onTime, rampTime };
+        await this.callRestApi('device/control/setOpticalSignalWithTime', data);
+    }
+
     async deviceControlSetWateringSwitchState(deviceId, wateringActive, channelIndex = 1) {
         let data = { deviceId, channelIndex, wateringActive };
         await this.callRestApi('device/control/setWateringSwitchState', data);
@@ -595,9 +687,9 @@ class HmCloudAPI {
     //     SOUND_SHORT = auto()
     //     SOUND_SHORT_SHORT = auto()
     //     SOUND_LONG = auto()
-    async deviceConfigurationSetNotificationSoundTyp(deviceId, notificationSoundType, isHighToLow, channelIndex = 1) {
+    async deviceConfigurationSetNotificationSoundType(deviceId, notificationSoundType, isHighToLow, channelIndex = 1) {
         let data = { deviceId, notificationSoundType, isHighToLow, channelIndex };
-        await this.callRestApi('device/configuration/setNotificationSoundTyp', data);
+        await this.callRestApi('device/configuration/setNotificationSoundType', data);
     }
 
     async deviceConfigurationSetRouterModuleEnabled(deviceId, routerModuleEnabled, channelIndex = 1) {
@@ -651,6 +743,46 @@ class HmCloudAPI {
     async groupHeatingSetActiveProfile(groupId, profileIndex) {
         let data = { groupId, profileIndex };
         await this.callRestApi('group/heating/setActiveProfile', data);
+    }
+
+    async groupSwitchingSetState(groupId, on) {
+        let data = { groupId, on };
+        await this.callRestApi('group/switching/setState', data);
+    }
+
+    async groupSwitchingSetShutterLevel(groupId, shutterLevel) {
+        let data = { groupId, shutterLevel };
+        await this.callRestApi('group/switching/setShutterLevel', data);
+    }
+
+    async groupSwitchingSetSlatsLevel(groupId, slatsLevel, shutterLevel) {
+        let data = { groupId, shutterLevel, slatsLevel };
+        await this.callRestApi('group/switching/setSlatsLevel', data);
+    }
+
+    async groupSwitchingStop(groupId) {
+        let data = { groupId };
+        await this.callRestApi('group/switching/stop', data);
+    }
+
+    async groupSwitchingLinkedSetOnTime(groupId, onTime) {
+        let data = { groupId, onTime };
+        await this.callRestApi('group/switching/linked/setOnTime', data);
+    }
+
+    async groupHeatingSetProfileMode(groupId, profileMode) {
+        let data = { groupId, profileMode };
+        await this.callRestApi('group/heating/setProfileMode', data);
+    }
+
+    async groupSetGroupLabel(groupId, label) {
+        let data = { groupId, label };
+        await this.callRestApi('group/setGroupLabel', data);
+    }
+
+    async groupDeleteGroup(groupId) {
+        let data = { groupId };
+        await this.callRestApi('group/deleteGroup', data);
     }
 
     async groupSwitchingAlarmSetOnTime(groupId, onTime) {
@@ -721,6 +853,55 @@ class HmCloudAPI {
 
     _securityZoneGroups() {
         return Object.values(this.groups || {}).filter(group => group && group.type === 'SECURITY_ZONE');
+    }
+
+    async homeHeatingSetCooling(cooling) {
+        let data = { cooling };
+        await this.callRestApi('home/heating/setCooling', data);
+    }
+
+    async homeSetZonesSilentAlarm(internal, external) {
+        let data = { zonesSilentAlarm: { INTERNAL: internal, EXTERNAL: external } };
+        await this.callRestApi('home/security/setZonesSilentAlarm', data);
+    }
+
+    async homeSetZoneActivationDelay(zoneActivationDelay) {
+        let data = { zoneActivationDelay };
+        await this.callRestApi('home/security/setZoneActivationDelay', data);
+    }
+
+    async homeGetSecurityJournal() {
+        return this.callRestApi('home/security/getSecurityJournal');
+    }
+
+    async homeSetLocation(city, latitude, longitude) {
+        let data = { city, latitude, longitude };
+        await this.callRestApi('home/setLocation', data);
+    }
+
+    async homeSetTimezone(timezoneId) {
+        let data = { timezoneId };
+        await this.callRestApi('home/setTimezone', data);
+    }
+
+    async homeSetPowerMeterUnitPrice(powerMeterUnitPrice) {
+        let data = { powerMeterUnitPrice };
+        await this.callRestApi('home/setPowerMeterUnitPrice', data);
+    }
+
+    async homeStartInclusionModeForDevice(deviceId) {
+        let data = { deviceId };
+        await this.callRestApi('home/startInclusionModeForDevice', data);
+    }
+
+    async ruleEnableSimpleRule(ruleId, enabled) {
+        let data = { ruleId, enabled };
+        await this.callRestApi('rule/enableSimpleRule', data);
+    }
+
+    async ruleSetRuleLabel(ruleId, label) {
+        let data = { ruleId, label };
+        await this.callRestApi('rule/setRuleLabel', data);
     }
 
     hasRequestBasedSecurityZones() {
