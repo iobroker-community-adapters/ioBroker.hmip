@@ -108,6 +108,20 @@ describe('lib/channelStates table', () => {
         });
     });
 
+    // a deriver the builder does not dispatch is silently ignored, and the state publishes the raw
+    // cloud value while the table claims it is derived
+    it('actually dispatches every deriver the table names', () => {
+        const named = new Set();
+        eachState((channelType, field, spec) => spec.derive && named.add(spec.derive));
+        assert.ok(named.size >= 3, `only ${named.size} derivers in use`);
+        for (const deriver of named) {
+            const probe = { probe: { type: 'number', role: 'value', derive: deriver } };
+            const [{ value }] = channelStateValues(probe, { probe: 0.5 });
+            const direct = deriver === 'windowOpen' ? DERIVERS[deriver]({ probe: 0.5 }) : DERIVERS[deriver](0.5);
+            assert.strictEqual(value, direct, `${deriver} is named by the table but not dispatched`);
+        }
+    });
+
     it('extends only channel types that are in the table, without cycles', () => {
         for (const [channelType, entry] of Object.entries(CHANNEL_STATES)) {
             const seen = new Set([channelType]);

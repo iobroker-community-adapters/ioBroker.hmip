@@ -702,6 +702,46 @@ describe('reporting an alarm activation', () => {
     });
 });
 
+describe('rain counters', () => {
+    const { CHANNEL_STATES, channelStateObjects, channelStateValues } = require('../lib/channelStates');
+
+    // the cloud accumulates the counter in floating point and hands the drift over with it
+    it('publishes the millimetres the sensor measured, not the accumulated drift', () => {
+        const spec = { todayRainCounter: CHANNEL_STATES.WEATHER_SENSOR_PRO_CHANNEL.states.todayRainCounter };
+        for (const [raw, expected] of [
+            [0.3000000000001819, 0.3],
+            [0.6000000000003638, 0.6],
+            [12.34, 12.34],
+            [0, 0],
+        ]) {
+            assert.strictEqual(channelStateValues(spec, { todayRainCounter: raw })[0].value, expected);
+        }
+    });
+
+    it('leaves a counter the sensor has not reported alone', () => {
+        const spec = { todayRainCounter: CHANNEL_STATES.WEATHER_SENSOR_PRO_CHANNEL.states.todayRainCounter };
+        assert.strictEqual(channelStateValues(spec, {})[0].value, undefined);
+        assert.strictEqual(channelStateValues(spec, { todayRainCounter: null })[0].value, null);
+    });
+
+    it('rounds and labels every rain counter the table carries', () => {
+        let checked = 0;
+        for (const [channelType, entry] of Object.entries(CHANNEL_STATES)) {
+            for (const [field, spec] of Object.entries(entry.states)) {
+                if (!/RainCounter/.test(field)) {
+                    continue;
+                }
+                checked++;
+                assert.strictEqual(spec.derive, 'millimetres', `${channelType}.${field} is not rounded`);
+                assert.strictEqual(spec.unit, 'mm', `${channelType}.${field} carries no unit`);
+                const [built] = channelStateObjects({ [field]: spec }, 'DEV', 1, {});
+                assert.strictEqual(built.common.unit, 'mm');
+            }
+        }
+        assert.ok(checked >= 9, `only found ${checked} rain counters`);
+    });
+});
+
 describe('level scaling', () => {
     // the cloud works in 0..1 and ioBroker in 0..100, and the older channels declare 0..100 while
     // the newer ones declare 0..1, so a written value above 1 can only ever be a percentage

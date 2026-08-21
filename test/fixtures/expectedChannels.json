@@ -10148,6 +10148,7 @@
                     "name": "todayRainCounter",
                     "type": "number",
                     "role": "value.rain.today",
+                    "unit": "mm",
                     "read": true,
                     "write": false
                 },
@@ -10172,6 +10173,7 @@
                     "name": "totalRainCounter",
                     "type": "number",
                     "role": "value",
+                    "unit": "mm",
                     "read": true,
                     "write": false
                 },
@@ -10238,6 +10240,7 @@
                     "name": "yesterdayRainCounter",
                     "type": "number",
                     "role": "value",
+                    "unit": "mm",
                     "read": true,
                     "write": false
                 },
@@ -10394,6 +10397,7 @@
                     "name": "todayRainCounter",
                     "type": "number",
                     "role": "value.rain.today",
+                    "unit": "mm",
                     "read": true,
                     "write": false
                 },
@@ -10418,6 +10422,7 @@
                     "name": "totalRainCounter",
                     "type": "number",
                     "role": "value",
+                    "unit": "mm",
                     "read": true,
                     "write": false
                 },
@@ -10520,6 +10525,7 @@
                     "name": "yesterdayRainCounter",
                     "type": "number",
                     "role": "value",
+                    "unit": "mm",
                     "read": true,
                     "write": false
                 },
