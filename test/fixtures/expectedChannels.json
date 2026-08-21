@@ -5384,7 +5384,8 @@
                 "common": {
                     "name": "valvePosition",
                     "type": "number",
-                    "role": "value",
+                    "role": "valve",
+                    "unit": "%",
                     "read": true,
                     "write": false
                 },
@@ -5409,7 +5410,7 @@
             "setPointTemperature": 0.5,
             "temperatureOffset": 0.5,
             "valveActualTemperature": 0.5,
-            "valvePosition": 0.5,
+            "valvePosition": 50,
             "valveState": "OPEN"
         }
     },
@@ -5484,6 +5485,19 @@
             "valveProtectionSwitchingInterval": 0.5
         },
         "objects": {
+            "valvePosition": {
+                "common": {
+                    "name": "valvePosition",
+                    "type": "number",
+                    "role": "valve",
+                    "unit": "%",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
+            },
             "frostProtectionTemperature": {
                 "common": {
                     "name": "frostProtectionTemperature",

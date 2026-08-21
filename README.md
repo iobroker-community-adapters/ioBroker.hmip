@@ -112,6 +112,7 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 - (@Apollon77) A command meant for the channel's groups now reports that the channel belongs to none, instead of failing silently
 - (@Apollon77) Fixed locking a door failing when no authorization PIN had been set
 - (@Apollon77) On the request-based security dashboard an activation the panel accepts without reporting any detail is now logged as unconfirmed, instead of being reported as armed and possibly carrying a low-battery warning that implied it armed
+- (@Apollon77) **Breaking:** valvePosition on a heating thermostat now reports 0..100 with a unit, like the floor terminal block already did - the cloud sends a 0..1 fraction for both and only one of them was scaled. The internal switch channel now reports its valvePosition too
 
 ### 2.0.0 (2026-08-03)
 - (copilot) Adapter requires node.js >= 22 now
