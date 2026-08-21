@@ -70,6 +70,7 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 -->
 ## Changelog
 ### **WORK IN PROGRESS**
+- (@Apollon77) **Breaking:** shutterLevel, slatsLevel, dimLevel, primaryShadingLevel, secondaryShadingLevel and minimumFloorHeatingValvePosition now report 0..100 on the channels that declare that range, matching the ioBroker convention and the range the datapoint has always advertised. They previously advertised 0..100 but reported the cloud's 0..1 fraction. Writing is unchanged: a value above 1 is read as a percentage, anything else as a fraction
 - (@Apollon77) Fixed arming/disarming the alarm system on the new request-based security dashboard (ABSENCE/PRESENCE security zones)
 - (@Apollon77) On the request-based security dashboard a blocked alarm activation is now logged with the devices that prevented it, instead of looking like it succeeded
 - (@Apollon77) On the request-based security dashboard a low battery no longer blocks arming; the affected devices are logged as a warning instead
@@ -92,7 +93,6 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 - (@Apollon77) Dimming, colour, optical signals and watering can now be given a time: set controlOnTime and/or controlRampTime on the channel and the command ramps instead of jumping. Both default to 0, which keeps the previous behaviour
 - (@Apollon77) Fixed the dim level never being scaled for RGB and optical signal commands, where a state object was compared against a number
 - (@Apollon77) Corrected the role of 54 writable datapoints, which carried a read-only role and so were not recognised by the ioBroker type detector - dimmers, blinds, switches and timers are now typed as such
-- (@Apollon77) **Breaking:** shutterLevel, slatsLevel, dimLevel, primaryShadingLevel, secondaryShadingLevel and minimumFloorHeatingValvePosition now report 0..100 on the channels that declare that range, matching the ioBroker convention and the range the datapoint has always advertised. They previously advertised 0..100 but reported the cloud's 0..1 fraction. Writing is unchanged: a value above 1 is read as a percentage, anything else as a fraction
 - (@Apollon77) Fixed the dim level being sent unscaled by the light scene, hue/saturation and colour temperature commands, so a percentage reached a cloud endpoint that expects a fraction
 - (@Apollon77) Fixed a valve with no reported position being published as 0 percent, and one that reports nothing at all as NaN
 - (@Apollon77) A level command with a control time is no longer suppressed when the level is unchanged, so "switch on for 30 seconds" works at the level the device already has
