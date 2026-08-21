@@ -46,7 +46,7 @@
         "colorette": "^2.0.20",
         "configstore": "^8.0.0",
         "puppeteer": "^25.8.0",
-        "typescript": "~6.0.3"
+        "typescript": "~7.0.2"
     },
     "main": "main.js",
     "files": [
