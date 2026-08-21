@@ -1784,6 +1784,10 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }
 
         const functionalHomes = home.functionalHomes || {};
+        // the cloud names the device that raised the alarm only inside alarmEventDeviceChannel,
+        // and there is no alarmEventDeviceId beside it
+        const alarmEventChannel = (functionalHomes.SECURITY_AND_ALARM || {}).alarmEventDeviceChannel || {};
+        const alarmEventDevice = (this._api.devices || {})[alarmEventChannel.deviceId];
         if (functionalHomes.SECURITY_AND_ALARM) {
             promises.push(
                 this.secureSetStateAsync(
@@ -1795,7 +1799,14 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             promises.push(
                 this.secureSetStateAsync(
                     `homes.${home.id}.functionalHomes.securityAndAlarm.alarmEventDeviceId`,
-                    functionalHomes.SECURITY_AND_ALARM.alarmEventDeviceId,
+                    alarmEventChannel.deviceId,
+                    true,
+                ),
+            );
+            promises.push(
+                this.secureSetStateAsync(
+                    `homes.${home.id}.functionalHomes.securityAndAlarm.alarmEventDeviceLabel`,
+                    alarmEventDevice ? alarmEventDevice.label : null,
                     true,
                 ),
             );
@@ -1809,7 +1820,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             promises.push(
                 this.secureSetStateAsync(
                     `homes.${home.id}.functionalHomes.securityAndAlarm.alarmEventDeviceChannel`,
-                    functionalHomes.SECURITY_AND_ALARM.alarmEventDeviceChannel,
+                    alarmEventChannel.channelIndex,
                     true,
                 ),
             );
@@ -3220,9 +3231,16 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             }),
         );
         promises.push(
+            this.extendObject(`homes.${home.id}.functionalHomes.securityAndAlarm.alarmEventDeviceLabel`, {
+                type: 'state',
+                common: { name: 'alarmEventDeviceLabel', type: 'string', role: 'text', read: true, write: false },
+                native: {},
+            }),
+        );
+        promises.push(
             this.extendObject(`homes.${home.id}.functionalHomes.securityAndAlarm.alarmEventDeviceChannel`, {
                 type: 'state',
-                common: { name: 'alarmEventDeviceChannel', type: 'string', role: 'text', read: true, write: false },
+                common: { name: 'alarmEventDeviceChannel', type: 'number', role: 'value', read: true, write: false },
                 native: {},
             }),
         );

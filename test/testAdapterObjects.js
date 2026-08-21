@@ -702,6 +702,68 @@ describe('reporting an alarm activation', () => {
     });
 });
 
+describe('the device that raised an alarm', () => {
+    // the cloud sends only alarmEventDeviceChannel, an object; there is no alarmEventDeviceId
+    // beside it, and writing the object to a string state silently produced null
+    const HOME_WITH_ALARM = {
+        id: 'HOME',
+        weather: {},
+        functionalHomes: {
+            SECURITY_AND_ALARM: {
+                functionalGroups: [],
+                securitySwitchingGroups: [],
+                alarmActive: true,
+                alarmEventTimestamp: 1524504122047,
+                alarmEventDeviceChannel: { channelIndex: 1, deviceId: 'DEV-7' },
+                alarmSecurityJournalEntryType: 'SENSOR_EVENT',
+            },
+            INDOOR_CLIMATE: {},
+        },
+    };
+    const base = 'homes.HOME.functionalHomes.securityAndAlarm';
+
+    it('names the device, its channel and its label', async () => {
+        const adapter = createHarness();
+        adapter._api.devices = { 'DEV-7': { id: 'DEV-7', label: 'Fenster Büro' } };
+        await adapter._createObjectsForHome(HOME_WITH_ALARM);
+        await adapter._updateHomeStates(HOME_WITH_ALARM);
+
+        assert.deepStrictEqual(adapter.states[`${base}.alarmEventDeviceId`], { val: 'DEV-7', ack: true });
+        assert.deepStrictEqual(adapter.states[`${base}.alarmEventDeviceChannel`], { val: 1, ack: true });
+        assert.deepStrictEqual(adapter.states[`${base}.alarmEventDeviceLabel`], { val: 'Fenster Büro', ack: true });
+    });
+
+    it('declares the channel as the number the cloud sends', async () => {
+        const adapter = createHarness();
+        await adapter._createObjectsForHome(HOME_WITH_ALARM);
+
+        assert.strictEqual(adapter.objects[`${base}.alarmEventDeviceChannel`].common.type, 'number');
+    });
+
+    it('reports no device when the cloud names none', async () => {
+        const adapter = createHarness();
+        const quiet = {
+            ...HOME_WITH_ALARM,
+            functionalHomes: { SECURITY_AND_ALARM: { functionalGroups: [], securitySwitchingGroups: [] } },
+        };
+        await adapter._createObjectsForHome(quiet);
+        await adapter._updateHomeStates(quiet);
+
+        assert.deepStrictEqual(adapter.states[`${base}.alarmEventDeviceId`], { val: null, ack: true });
+        assert.deepStrictEqual(adapter.states[`${base}.alarmEventDeviceLabel`], { val: null, ack: true });
+    });
+
+    it('still names the device when the adapter does not know its label', async () => {
+        const adapter = createHarness();
+        adapter._api.devices = {};
+        await adapter._createObjectsForHome(HOME_WITH_ALARM);
+        await adapter._updateHomeStates(HOME_WITH_ALARM);
+
+        assert.deepStrictEqual(adapter.states[`${base}.alarmEventDeviceId`], { val: 'DEV-7', ack: true });
+        assert.deepStrictEqual(adapter.states[`${base}.alarmEventDeviceLabel`], { val: null, ack: true });
+    });
+});
+
 describe('rain counters', () => {
     const { CHANNEL_STATES, channelStateObjects, channelStateValues } = require('../lib/channelStates');
 
