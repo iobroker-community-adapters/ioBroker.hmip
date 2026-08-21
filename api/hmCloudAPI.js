@@ -5,6 +5,11 @@ const { v4: uuidv4 } = require('uuid');
 const webSocket = require('ws');
 const axios = require('axios');
 
+const WS_PING_INTERVAL = 5000;
+// four unanswered pings. The cloud drops a connection silently often enough that this deadline is
+// the only thing that notices; too short a one would recycle a connection that is merely slow.
+const WS_STALE_TIMEOUT = 25000;
+
 class HmCloudAPI {
     constructor(configDataOrApId, pin) {
         if (configDataOrApId !== undefined) {
@@ -193,6 +198,7 @@ class HmCloudAPI {
             this.groups = state.groups;
             this.clients = state.clients;
             this.devices = state.devices;
+            this.rules = (state.home && state.home.ruleMetaDatas) || {};
         } else {
             throw new Error('No current State received');
         }
@@ -207,13 +213,37 @@ class HmCloudAPI {
         }
         if (this._connectTimeout) {
             clearTimeout(this._connectTimeout);
+            this._connectTimeout = null;
         }
         if (this._pingInterval) {
             clearInterval(this._pingInterval);
+            this._pingInterval = null;
         }
     }
 
+    /**
+     * Pings the cloud, and gives up on a connection that has stopped answering.
+     *
+     * A connection the cloud or a NAT table drops silently stays readyState OPEN and raises
+     * neither an error nor a close, so this deadline is the only thing that ever notices.
+     */
+    _checkConnectionAlive() {
+        if (!this._ws) {
+            return;
+        }
+        const silentFor = Date.now() - this._lastAlive;
+        if (silentFor > WS_STALE_TIMEOUT) {
+            this.staleConnection && this.staleConnection(silentFor);
+            this._ws.terminate();
+            return;
+        }
+        this._ws.ping(() => {});
+    }
+
     connectWebsocket() {
+        // dispose() disables the reconnect below, and a reconnect is exactly what this is
+        this.isClosed = false;
+        this._lastAlive = Date.now();
         if (this._pingInterval) {
             clearInterval(this._pingInterval);
             this._pingInterval = null;
@@ -230,8 +260,9 @@ class HmCloudAPI {
         this._ws.on('open', () => {
             this.opened && this.opened();
 
+            this._lastAlive = Date.now();
             this._pingInterval && clearInterval(this._pingInterval);
-            this._pingInterval = setInterval(() => this._ws.ping(() => {}), 5000);
+            this._pingInterval = setInterval(() => this._checkConnectionAlive(), WS_PING_INTERVAL);
         });
 
         this._ws.on('close', (code, reason) => {
@@ -280,15 +311,22 @@ class HmCloudAPI {
         });
 
         this._ws.on('message', d => {
+            this._lastAlive = Date.now();
             const dString = d.toString('utf8');
             this.dataReceived && this.dataReceived(dString);
             const data = JSON.parse(dString);
             this._parseEventdata(data);
         });
 
-        this._ws.on('ping', () => this.dataReceived && this.dataReceived('ping'));
+        this._ws.on('ping', () => {
+            this._lastAlive = Date.now();
+            this.dataReceived && this.dataReceived('ping');
+        });
 
-        this._ws.on('pong', () => this.dataReceived && this.dataReceived('pong'));
+        this._ws.on('pong', () => {
+            this._lastAlive = Date.now();
+            this.dataReceived && this.dataReceived('pong');
+        });
     }
 
     _parseEventdata(data) {
@@ -317,10 +355,10 @@ class HmCloudAPI {
                     ev.device && delete this.devices[ev.device.id];
                     break;
                 case 'GROUP_REMOVED':
-                    ev.group && delete this.clients[ev.group.id];
+                    ev.group && delete this.groups[ev.group.id];
                     break;
                 case 'CLIENT_REMOVED':
-                    ev.client && delete this.groups[ev.client.id];
+                    ev.client && delete this.clients[ev.client.id];
                     break;
                 case 'HOME_CHANGED':
                     this.home = ev.home;
@@ -360,7 +398,12 @@ class HmCloudAPI {
     }
 
     async deviceControlSetLockState(deviceId, lockState, pin, channelIndex = 1) {
-        let data = { deviceId, channelIndex, authorizationPin: pin.toString(), targetLockState: lockState };
+        let data = {
+            deviceId,
+            channelIndex,
+            authorizationPin: pin === null || pin === undefined ? '' : String(pin),
+            targetLockState: lockState,
+        };
         await this.callRestApi('device/control/setLockState', data);
     }
 
@@ -419,6 +462,113 @@ class HmCloudAPI {
     }
 
     // float 0.0 = open - 1.0 = closed
+    async deviceControlPullLatch(deviceId, authorizationPin = '', channelIndex = 1) {
+        let data = {
+            deviceId,
+            channelIndex,
+            authorizationPin: authorizationPin === null ? '' : String(authorizationPin),
+        };
+        await this.callRestApi('device/control/pullLatch', data);
+    }
+
+    async deviceControlResetPassageCounter(deviceId, channelIndex = 1) {
+        let data = { deviceId, channelIndex };
+        await this.callRestApi('device/control/resetPassageCounter', data);
+    }
+
+    async deviceControlResetWaterVolume(deviceId, channelIndex = 1) {
+        let data = { deviceId, channelIndex };
+        await this.callRestApi('device/control/resetWaterVolume', data);
+    }
+
+    async deviceControlToggleWateringState(deviceId, channelIndex = 1) {
+        let data = { deviceId, channelIndex };
+        await this.callRestApi('device/control/toggleWateringState', data);
+    }
+
+    async deviceControlSetWateringSwitchStateWithTime(deviceId, wateringActive, wateringTime, channelIndex = 1) {
+        let data = { deviceId, channelIndex, wateringActive, wateringTime };
+        await this.callRestApi('device/control/setWateringSwitchStateWithTime', data);
+    }
+
+    async deviceControlSetFavoriteShadingPosition(deviceId, channelIndex = 1) {
+        let data = { deviceId, channelIndex };
+        await this.callRestApi('device/control/setFavoriteShadingPosition', data);
+    }
+
+    async deviceControlSetMotionDetectionActive(deviceId, motionDetectionActive, channelIndex = 1) {
+        let data = { deviceId, channelIndex, motionDetectionActive };
+        await this.callRestApi('device/control/setMotionDetectionActive', data);
+    }
+
+    async deviceControlSetSoundFileVolumeLevel(deviceId, soundFile, volumeLevel, channelIndex = 1) {
+        let data = { deviceId, channelIndex, soundFile, volumeLevel };
+        await this.callRestApi('device/control/setSoundFileVolumeLevel', data);
+    }
+
+    async deviceControlStartLightScene(deviceId, id, dimLevel, channelIndex = 1) {
+        let data = { deviceId, channelIndex, id, dimLevel };
+        await this.callRestApi('device/control/startLightScene', data);
+    }
+
+    async deviceControlSetDimLevelWithTime(deviceId, dimLevel, onTime, rampTime, channelIndex = 1) {
+        let data = { deviceId, channelIndex, dimLevel, onTime, rampTime };
+        await this.callRestApi('device/control/setDimLevelWithTime', data);
+    }
+
+    async deviceControlSetHueSaturationDimLevelWithTime(
+        deviceId,
+        hue,
+        saturationLevel,
+        dimLevel,
+        onTime,
+        rampTime,
+        channelIndex = 1,
+    ) {
+        let data = { deviceId, channelIndex, hue, saturationLevel, dimLevel, onTime, rampTime };
+        await this.callRestApi('device/control/setHueSaturationDimLevelWithTime', data);
+    }
+
+    async deviceControlSetColorTemperatureDimLevelWithTime(
+        deviceId,
+        colorTemperature,
+        dimLevel,
+        onTime,
+        rampTime,
+        channelIndex = 1,
+    ) {
+        let data = { deviceId, channelIndex, colorTemperature, dimLevel, onTime, rampTime };
+        await this.callRestApi('device/control/setColorTemperatureDimLevelWithTime', data);
+    }
+
+    async deviceControlSetOpticalSignalWithTime(
+        deviceId,
+        opticalSignalBehaviour,
+        simpleRGBColorState,
+        dimLevel,
+        onTime,
+        rampTime,
+        channelIndex = 1,
+    ) {
+        let data = { deviceId, channelIndex, opticalSignalBehaviour, simpleRGBColorState, dimLevel, onTime, rampTime };
+        await this.callRestApi('device/control/setOpticalSignalWithTime', data);
+    }
+
+    async deviceControlSetWateringSwitchState(deviceId, wateringActive, channelIndex = 1) {
+        let data = { deviceId, channelIndex, wateringActive };
+        await this.callRestApi('device/control/setWateringSwitchState', data);
+    }
+
+    async deviceControlSetHueSaturationDimLevel(deviceId, hue, saturationLevel, dimLevel, channelIndex = 1) {
+        let data = { deviceId, channelIndex, hue, saturationLevel, dimLevel };
+        await this.callRestApi('device/control/setHueSaturationDimLevel', data);
+    }
+
+    async deviceControlSetColorTemperatureDimLevel(deviceId, colorTemperature, dimLevel, channelIndex = 1) {
+        let data = { deviceId, channelIndex, colorTemperature, dimLevel };
+        await this.callRestApi('device/control/setColorTemperatureDimLevel', data);
+    }
+
     async deviceControlSetShutterLevel(deviceId, shutterLevel, channelIndex = 1) {
         let data = { deviceId, channelIndex, shutterLevel };
         await this.callRestApi('device/control/setShutterLevel', data);
@@ -580,9 +730,9 @@ class HmCloudAPI {
     //     SOUND_SHORT = auto()
     //     SOUND_SHORT_SHORT = auto()
     //     SOUND_LONG = auto()
-    async deviceConfigurationSetNotificationSoundTyp(deviceId, notificationSoundType, isHighToLow, channelIndex = 1) {
+    async deviceConfigurationSetNotificationSoundType(deviceId, notificationSoundType, isHighToLow, channelIndex = 1) {
         let data = { deviceId, notificationSoundType, isHighToLow, channelIndex };
-        await this.callRestApi('device/configuration/setNotificationSoundTyp', data);
+        await this.callRestApi('device/configuration/setNotificationSoundType', data);
     }
 
     async deviceConfigurationSetRouterModuleEnabled(deviceId, routerModuleEnabled, channelIndex = 1) {
@@ -638,6 +788,46 @@ class HmCloudAPI {
         await this.callRestApi('group/heating/setActiveProfile', data);
     }
 
+    async groupSwitchingSetState(groupId, on) {
+        let data = { groupId, on };
+        await this.callRestApi('group/switching/setState', data);
+    }
+
+    async groupSwitchingSetShutterLevel(groupId, shutterLevel) {
+        let data = { groupId, shutterLevel };
+        await this.callRestApi('group/switching/setShutterLevel', data);
+    }
+
+    async groupSwitchingSetSlatsLevel(groupId, slatsLevel, shutterLevel) {
+        let data = { groupId, shutterLevel, slatsLevel };
+        await this.callRestApi('group/switching/setSlatsLevel', data);
+    }
+
+    async groupSwitchingStop(groupId) {
+        let data = { groupId };
+        await this.callRestApi('group/switching/stop', data);
+    }
+
+    async groupSwitchingLinkedSetOnTime(groupId, onTime) {
+        let data = { groupId, onTime };
+        await this.callRestApi('group/switching/linked/setOnTime', data);
+    }
+
+    async groupHeatingSetProfileMode(groupId, profileMode) {
+        let data = { groupId, profileMode };
+        await this.callRestApi('group/heating/setProfileMode', data);
+    }
+
+    async groupSetGroupLabel(groupId, label) {
+        let data = { groupId, label };
+        await this.callRestApi('group/setGroupLabel', data);
+    }
+
+    async groupDeleteGroup(groupId) {
+        let data = { groupId };
+        await this.callRestApi('group/deleteGroup', data);
+    }
+
     async groupSwitchingAlarmSetOnTime(groupId, onTime) {
         let data = { groupId, onTime };
         await this.callRestApi('group/switching/alarm/setOnTime', data);
@@ -690,8 +880,8 @@ class HmCloudAPI {
         await this.callRestApi('home/heating/deactivateAbsence');
     }
 
-    async homeHeatingActivateVacation(temperature, endtime) {
-        let data = { temperature, endtime };
+    async homeHeatingActivateVacation(temperature, endTime) {
+        let data = { temperature, endTime };
         await this.callRestApi('home/heating/activateVacation', data);
     }
 
@@ -704,9 +894,193 @@ class HmCloudAPI {
         await this.callRestApi('home/security/setIntrusionAlertThroughSmokeDetectors', data);
     }
 
+    _securityZoneGroups() {
+        return Object.values(this.groups || {}).filter(group => group && group.type === 'SECURITY_ZONE');
+    }
+
+    async homeHeatingSetCooling(cooling) {
+        let data = { cooling };
+        await this.callRestApi('home/heating/setCooling', data);
+    }
+
+    /**
+     * @param {boolean} internal silence the internal zone
+     * @param {boolean} external silence the external zone
+     * @returns {Promise<object|string|undefined>} undefined when the request never reached the cloud
+     */
+    async homeSetZonesSilentAlarm(internal, external) {
+        let data = { zonesSilentAlarm: { INTERNAL: internal, EXTERNAL: external } };
+        return this.callRestApi('home/security/setZonesSilentAlarm', data);
+    }
+
+    async homeSetZoneActivationDelay(zoneActivationDelay) {
+        let data = { zoneActivationDelay };
+        await this.callRestApi('home/security/setZoneActivationDelay', data);
+    }
+
+    async homeGetSecurityJournal() {
+        return this.callRestApi('home/security/getSecurityJournal');
+    }
+
+    async homeSetLocation(city, latitude, longitude) {
+        let data = { city, latitude, longitude };
+        await this.callRestApi('home/setLocation', data);
+    }
+
+    async homeSetTimezone(timezoneId) {
+        let data = { timezoneId };
+        await this.callRestApi('home/setTimezone', data);
+    }
+
+    async homeSetPowerMeterUnitPrice(powerMeterUnitPrice) {
+        let data = { powerMeterUnitPrice };
+        await this.callRestApi('home/setPowerMeterUnitPrice', data);
+    }
+
+    async homeStartInclusionModeForDevice(deviceId) {
+        let data = { deviceId };
+        await this.callRestApi('home/startInclusionModeForDevice', data);
+    }
+
+    /**
+     * @param {string} ruleId the rule to enable or disable
+     * @param {boolean} enabled whether the rule should run
+     * @returns {Promise<object|string|undefined>} undefined when the request never reached the cloud
+     */
+    async ruleEnableSimpleRule(ruleId, enabled) {
+        let data = { ruleId, enabled };
+        return this.callRestApi('rule/enableSimpleRule', data);
+    }
+
+    /**
+     * @param {string} ruleId the rule to relabel
+     * @param {string} label the new label
+     * @returns {Promise<object|string|undefined>} undefined when the request never reached the cloud
+     */
+    async ruleSetRuleLabel(ruleId, label) {
+        let data = { ruleId, label };
+        return this.callRestApi('rule/setRuleLabel', data);
+    }
+
+    hasRequestBasedSecurityZones() {
+        return this._securityZoneGroups().some(group => group.label === 'ABSENCE' || group.label === 'PRESENCE');
+    }
+
+    hasClassicSecurityZones() {
+        return this._securityZoneGroups().some(group => group.label === 'INTERNAL' || group.label === 'EXTERNAL');
+    }
+
+    _buildZonesActivation(requestBased, internal, external) {
+        if (requestBased) {
+            // the classic internal zone is the away mode, and ABSENCE/PRESENCE are mutually
+            // exclusive: away -> ABSENCE, home -> PRESENCE, neither -> disarmed
+            return { PRESENCE: external && !internal, ABSENCE: internal };
+        }
+        return { INTERNAL: internal, EXTERNAL: external };
+    }
+
+    _asReasonList(reasons) {
+        return (Array.isArray(reasons) ? reasons : [reasons])
+            .filter(reason => reason !== undefined && reason !== null)
+            .map(reason => (typeof reason === 'object' ? JSON.stringify(reason) : String(reason)));
+    }
+
+    _securityZoneActivationProblems(response) {
+        // device labels are user-chosen, so a plain object would inherit "constructor", "toString", ...
+        const problems = Object.create(null);
+        if (!response || typeof response !== 'object') {
+            return problems;
+        }
+        const add = (label, reasons) => {
+            const list = this._asReasonList(reasons);
+            if (list.length) {
+                problems[label] = (problems[label] || []).concat(list);
+            }
+        };
+        add('', response.activationProblems);
+        const channelProblems = response.channelActivationProblems;
+        if (channelProblems && typeof channelProblems === 'object') {
+            for (const key of Object.keys(channelProblems)) {
+                const device = this.devices && this.devices[String(key).split(':')[0]];
+                add(device && device.label ? device.label : String(key), channelProblems[key]);
+            }
+        }
+        return problems;
+    }
+
+    _lowBatteryDevicesInZones(zonesActivation) {
+        const labels = new Set();
+        let unresolved = 0;
+        for (const group of this._securityZoneGroups()) {
+            if (zonesActivation[group.label] !== true) {
+                continue;
+            }
+            for (const channel of group.channels || []) {
+                const device = channel && this.devices && this.devices[channel.deviceId];
+                const baseChannel = device && device.functionalChannels && device.functionalChannels['0'];
+                if (!baseChannel) {
+                    unresolved++;
+                    continue;
+                }
+                if (baseChannel.lowBat === true) {
+                    labels.add(device.label || channel.deviceId);
+                }
+            }
+        }
+        return { devices: [...labels], unresolved };
+    }
+
+    /**
+     * Arms or disarms the alarm system.
+     *
+     * @param {boolean} internal arm the internal zone
+     * @param {boolean} external arm the external zone
+     * @returns {Promise<{requestBased: boolean, classicZonesPresent: boolean, requestFailed: boolean,
+     *          confirmed: boolean, problems: object|null, lowBatteryDevices: string[],
+     *          lowBatteryLookupIncomplete: boolean}>}
+     *          `requestFailed` marks a request that never reached the cloud. `problems` names what blocked the
+     *          activation as {device label: [reason]} and is null on panels that give no such feedback.
+     *          `confirmed` is false when the panel answered 200 with nothing to inspect, so an empty
+     *          `problems` means "nothing was reported" rather than "nothing blocked it".
+     */
     async homeSetZonesActivation(internal, external) {
-        let data = { zonesActivation: { INTERNAL: internal, EXTERNAL: external } };
-        await this.callRestApi('home/security/setZonesActivation', data);
+        const requestBased = this.hasRequestBasedSecurityZones();
+        const zonesActivation = this._buildZonesActivation(requestBased, internal, external);
+        const data = { zonesActivation };
+        const outcome = {
+            requestBased,
+            classicZonesPresent: this.hasClassicSecurityZones(),
+            requestFailed: false,
+            confirmed: true,
+            problems: null,
+            lowBatteryDevices: [],
+            lowBatteryLookupIncomplete: false,
+        };
+
+        if (!requestBased) {
+            outcome.requestFailed = (await this.callRestApi('home/security/setZonesActivation', data)) === undefined;
+            return outcome;
+        }
+
+        // the request-based panel answers setZonesActivation with 400, and answers the extended call
+        // with 200 even when a sensor blocks arming - hence both the endpoint and the problem check.
+        // A low battery cannot be fixed at arming time, so it must not leave the whole home unarmed.
+        data.ignoreLowBat = true;
+        const response = await this.callRestApi('home/security/setExtendedZonesActivation', data);
+        if (response === undefined) {
+            outcome.requestFailed = true;
+            return outcome;
+        }
+        // a 200 with no body is an accepted request with no blocker detail, and arming is
+        // asynchronous (the home reports activationInProgress), so it cannot be confirmed here
+        outcome.confirmed = !!response && typeof response === 'object';
+        outcome.problems = this._securityZoneActivationProblems(response);
+        if (outcome.confirmed && !Object.keys(outcome.problems).length) {
+            const lowBattery = this._lowBatteryDevicesInZones(zonesActivation);
+            outcome.lowBatteryDevices = lowBattery.devices;
+            outcome.lowBatteryLookupIncomplete = lowBattery.unresolved > 0;
+        }
+        return outcome;
     }
 }
 
