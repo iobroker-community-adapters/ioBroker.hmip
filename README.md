@@ -69,7 +69,7 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 3.0.0 (2026-08-24)
 - (@Apollon77) **Breaking:** shutterLevel, slatsLevel, dimLevel, primaryShadingLevel, secondaryShadingLevel and minimumFloorHeatingValvePosition now report 0..100 on the channels that declare that range, matching the ioBroker convention and the range the datapoint has always advertised. They previously advertised 0..100 but reported the cloud's 0..1 fraction. Writing is unchanged: a value above 1 is read as a percentage, anything else as a fraction
 - (@Apollon77) Fixed arming/disarming the alarm system on the new request-based security dashboard (ABSENCE/PRESENCE security zones)
 - (@Apollon77) On the request-based security dashboard a blocked alarm activation is now logged with the devices that prevented it, instead of looking like it succeeded
@@ -134,9 +134,6 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 
 ### 1.26.4 (2025-01-03)
 * (@Apollon77) Optimized Websocket disconnect cases
-
-### 1.26.3 (2024-12-29)
-* (@GermanBluefox) Updated packages
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 
