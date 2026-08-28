@@ -1190,6 +1190,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             case 'HOME_CHANGED':
                 if (ev && ev.home) {
                     await this._updateHomeStates(ev.home);
+                    this._dropHomeReadThePushAnswered(ev.home);
                 } else {
                     this.log.warn(`No home in HOME_CHANGED: ${JSON.stringify(ev)}`);
                 }
@@ -1197,6 +1198,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             case 'SECURITY_JOURNAL_CHANGED':
                 if (ev && ev.home) {
                     await this._updateHomeStates(ev.home);
+                    this._dropHomeReadThePushAnswered(ev.home);
                 } else {
                     await this._readHomeForAlarmFields();
                 }
@@ -3117,6 +3119,26 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             if (this._homeReadPending && !this._unloaded) {
                 this._deferHomeRead(Math.max(this._nextHomeRead - performance.now(), 0));
             }
+        }
+    }
+
+    /**
+     * Drops a deferred read of the home once a push has carried the fields it was waiting for.
+     *
+     * Only a push does this. The read publishes the same fields, but from a response the cloud
+     * composed before the deferred event arrived, so it cannot answer that event.
+     *
+     * @param {object} home the home a push carried
+     * @returns {void}
+     */
+    _dropHomeReadThePushAnswered(home) {
+        if (!home.functionalHomes || !home.functionalHomes.SECURITY_AND_ALARM) {
+            return;
+        }
+        this._homeReadPending = false;
+        if (this._homeReadTimeout) {
+            clearTimeout(this._homeReadTimeout);
+            this._homeReadTimeout = null;
         }
     }
 

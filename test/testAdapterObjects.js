@@ -615,6 +615,47 @@ describe('security journal', () => {
         assert.strictEqual(reads, 2, 'the stale timer would read again with no event behind it');
     });
 
+    // a push carries the alarm fields the deferred read was for, and the read is expensive
+    it('drops a deferred read once a push has carried the alarm fields', async () => {
+        const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
+        adapter._homeReadInterval = 30;
+        let reads = 0;
+        adapter._api.callRestApi = () => {
+            reads++;
+            return Promise.resolve({ home: HOME });
+        };
+
+        await adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' });
+        await adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' });
+        assert.ok(adapter._homeReadTimeout, 'the second event has to defer a read');
+        await adapter._eventRaised({ pushEventType: 'HOME_CHANGED', home: HOME });
+
+        await new Promise(resolve => setTimeout(resolve, 60));
+        adapter._unload(() => {});
+        assert.strictEqual(reads, 1, 'the push published what the deferred read would have fetched');
+    });
+
+    it('keeps the deferred read when the push carries no alarm fields', async () => {
+        const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
+        adapter._homeReadInterval = 30;
+        let reads = 0;
+        adapter._api.callRestApi = () => {
+            reads++;
+            return Promise.resolve({ home: HOME });
+        };
+
+        await adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' });
+        await adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' });
+        await adapter._eventRaised({
+            pushEventType: 'HOME_CHANGED',
+            home: { ...HOME, functionalHomes: { INDOOR_CLIMATE: {} } },
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 60));
+        adapter._unload(() => {});
+        assert.strictEqual(reads, 2, 'a push without the alarm fields answers nothing');
+    });
+
     it('waits only what is left of the interval before the deferred read', async () => {
         const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
         adapter._homeReadInterval = 200;
