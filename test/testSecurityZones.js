@@ -207,6 +207,11 @@ describe('securityZonesArmedState', () => {
             external: true,
             mode: 'ABSENCE',
         });
+        assert.deepStrictEqual(
+            zones(mixed({ INTERNAL: true, PRESENCE: true })),
+            { requestBased: true, internal: true, external: true, mode: 'INTERNAL_AND_EXTERNAL' },
+            'an armed zone of either family is an armed zone, so neither may be dropped',
+        );
     });
 
     it('only reads a zone the cloud calls active as armed', () => {

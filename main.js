@@ -196,6 +196,8 @@ class HmIpCloudAccesspointAdapter extends Adapter {
 
     async _initData() {
         await this._api.loadCurrentConfig();
+        // a read that started before this snapshot answers for the configuration it replaces
+        this._dataEpoch++;
         this._nextHomeRead = performance.now() + this._homeReadInterval;
         this.log.debug('createObjectsForDevices');
         await this._createObjectsForDevices();
@@ -3124,7 +3126,6 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         this._homeReadRunning = true;
         try {
             do {
-                this._homeReadPending = false;
                 // wall clock steps, and this measures an elapsed interval
                 const wait = this._nextHomeRead - performance.now();
                 if (wait > 0) {
@@ -3133,6 +3134,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 if (this._unloaded) {
                     return;
                 }
+                // the request about to go out answers for every event that waited for it, so only
+                // the ones arriving while it is in flight are worth another read
+                this._homeReadPending = false;
                 await this._publishHomeFromCloud();
             } while (this._homeReadPending && !this._unloaded);
         } finally {

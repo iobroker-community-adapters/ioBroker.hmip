@@ -553,21 +553,54 @@ describe('security journal', () => {
         assert.strictEqual(reads, 2);
     });
 
-    // _parseEventdata does not await the handler, so a burst arrives as concurrent callers
-    it('answers a burst with one read, not one per event', async () => {
+    // the request answers for them, so a read they only waited for is not worth repeating
+    it('does not read again for events that arrived while it was waiting for its slot', async () => {
         const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
-        adapter._homeReadInterval = 30;
+        adapter._homeReadInterval = 40;
         let reads = 0;
         adapter._api.callRestApi = () => {
             reads++;
             return Promise.resolve({ home: HOME });
         };
 
+        await adapter._readHomeForAlarmFields();
+        const waiting = adapter._readHomeForAlarmFields();
+        adapter._readHomeForAlarmFields();
+        adapter._readHomeForAlarmFields();
+        await waiting;
+
+        assert.strictEqual(reads, 2, 'one read for the events that waited, not one each');
+    });
+
+    it('discards a read the configuration was reloaded under, reload included', async () => {
+        const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
+        let refreshed = 0;
+        adapter._api.refreshGroups = () => refreshed++;
+        adapter._api.loadCurrentConfig = () => Promise.resolve();
+        adapter._api.callRestApi = () => new Promise(resolve => setTimeout(() => resolve({ home: HOME }), 30));
+
         const reading = adapter._readHomeForAlarmFields();
-        adapter._readHomeForAlarmFields();
-        adapter._readHomeForAlarmFields();
-        adapter._readHomeForAlarmFields();
+        await adapter._initData().catch(() => {});
         await reading;
+
+        assert.strictEqual(refreshed, 0, 'the snapshot is older than the configuration just loaded');
+    });
+
+    // _parseEventdata does not await the handler, so a burst arrives as concurrent callers
+    it('answers a burst that arrives during the request with one further read', async () => {
+        const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
+        adapter._homeReadInterval = 30;
+        let reads = 0;
+        adapter._api.callRestApi = () => {
+            reads++;
+            if (reads === 1) {
+                // the burst has to land while the request is in flight, which is where it matters
+                [1, 2, 3].forEach(() => adapter._readHomeForAlarmFields());
+            }
+            return Promise.resolve({ home: HOME });
+        };
+
+        await adapter._readHomeForAlarmFields();
 
         assert.strictEqual(reads, 2, 'one read for the first event, one for everything it absorbed');
     });

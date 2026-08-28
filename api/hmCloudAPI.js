@@ -1026,32 +1026,50 @@ class HmCloudAPI {
             // request-based panels omit "active" on a disarmed zone
             armed[group.label] = group.active === true;
         }
+        // a home can carry both zone families, and an armed zone of either is an armed zone: the
+        // pair is the union, so no armed zone can be lost whichever family the panel prefers
         const away = armed.ABSENCE === true;
-        const perimeter = armed.PRESENCE === true;
-        const internal = armed.INTERNAL === true;
-        const external = armed.EXTERNAL === true;
-        const requestBased = this.hasRequestBasedSecurityZones();
-        // a home can carry both zone families, and then the armed one is the state to report: in
-        // its own vocabulary, so the mode and the two booleans cannot contradict each other
-        if (requestBased && (away || perimeter || !(internal || external))) {
-            let mode = 'OFF';
-            if (away) {
-                mode = 'ABSENCE';
-            } else if (perimeter) {
-                mode = 'PRESENCE';
-            }
-            // the cloud arms the away zone as both of the classic zones
-            return { requestBased, internal: away, external: away || perimeter, mode };
+        const internal = armed.INTERNAL === true || away;
+        const external = armed.EXTERNAL === true || away || armed.PRESENCE === true;
+        // the mode is only a name for that pair, never a second opinion about it, and it is the
+        // classic one whenever a classic zone is armed - ABSENCE and PRESENCE could not say so
+        const classicArmed = armed.INTERNAL === true || armed.EXTERNAL === true;
+        return {
+            requestBased: this.hasRequestBasedSecurityZones(),
+            internal,
+            external,
+            mode:
+                this.hasRequestBasedSecurityZones() && !classicArmed
+                    ? this._requestBasedZoneMode(internal, external)
+                    : this._classicZoneMode(internal, external),
+        };
+    }
+
+    /**
+     * @param {boolean} internal whether the internal zone is armed
+     * @param {boolean} external whether the external zone is armed
+     * @returns {string} OFF, PRESENCE or ABSENCE, the modes an ABSENCE/PRESENCE dashboard offers
+     */
+    _requestBasedZoneMode(internal, external) {
+        if (internal) {
+            return 'ABSENCE';
         }
-        let mode = 'OFF';
+        return external ? 'PRESENCE' : 'OFF';
+    }
+
+    /**
+     * @param {boolean} internal whether the internal zone is armed
+     * @param {boolean} external whether the external zone is armed
+     * @returns {string} the zone combination as an INTERNAL/EXTERNAL dashboard names it
+     */
+    _classicZoneMode(internal, external) {
         if (internal && external) {
-            mode = 'INTERNAL_AND_EXTERNAL';
-        } else if (internal) {
-            mode = 'INTERNAL';
-        } else if (external) {
-            mode = 'EXTERNAL';
+            return 'INTERNAL_AND_EXTERNAL';
         }
-        return { requestBased, internal, external, mode };
+        if (internal) {
+            return 'INTERNAL';
+        }
+        return external ? 'EXTERNAL' : 'OFF';
     }
 
     _buildZonesActivation(requestBased, internal, external) {
