@@ -1094,7 +1094,11 @@ describe('the security zones on the home', () => {
         adapter._api.home = undefined;
         await adapter._updateGroupStates(group);
 
-        assert.strictEqual(adapter.states[`${BASE}.securityZonesArmedMode`], undefined);
+        assert.deepStrictEqual(
+            Object.keys(adapter.states).filter(id => id.includes('securityZonesArmedMode')),
+            [],
+            'without a home there is no id to publish under, and homes.undefined is not one',
+        );
         assert.deepStrictEqual(adapter.states['groups.G-1.active'], { val: true, ack: true });
     });
 
