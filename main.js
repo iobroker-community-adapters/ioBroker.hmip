@@ -58,7 +58,6 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         this._nextHomeRead = 0;
         this._homeReadRunning = false;
         this._homeReadPending = false;
-        this._homeReadRequestedSeq = 0;
         this._homePublishSeq = 0;
         this._groupsChangedDuringRead = null;
         this._dataEpoch = 0;
@@ -3120,15 +3119,12 @@ class HmIpCloudAccesspointAdapter extends Adapter {
     async _readHomeForAlarmFields() {
         if (this._homeReadRunning) {
             this._homeReadPending = true;
-            this._homeReadRequestedSeq = this._homePublishSeq;
             return;
         }
         this._homeReadRunning = true;
-        this._homeReadRequestedSeq = this._homePublishSeq;
         try {
             do {
                 this._homeReadPending = false;
-                const requestedSeq = this._homeReadRequestedSeq;
                 // wall clock steps, and this measures an elapsed interval
                 const wait = this._nextHomeRead - performance.now();
                 if (wait > 0) {
@@ -3136,10 +3132,6 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 }
                 if (this._unloaded) {
                     return;
-                }
-                if (this._homePublishSeq !== requestedSeq) {
-                    // a push published these fields after the event asked for them
-                    continue;
                 }
                 await this._publishHomeFromCloud();
             } while (this._homeReadPending && !this._unloaded);
@@ -3171,12 +3163,14 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             return;
         }
         this._nextHomeRead = performance.now() + this._homeReadInterval;
+        // the zone groups of a panel that pushes none of its own would go stale otherwise, and a
+        // push carries no groups, so this part of the answer is never superseded by one
+        this._api.refreshGroups(state.groups, changedSince);
         if (this._homePublishSeq !== publishSeq) {
-            this.log.debug('Discard the home read a push overtook');
+            this.log.debug('Publish only the armed zones of a home read a push overtook');
+            await Promise.all(this._updateSecurityZonesArmed(state.home.id));
             return;
         }
-        // the zone groups of a panel that pushes none of its own would go stale otherwise
-        this._api.refreshGroups(state.groups, changedSince);
         await this._updateHomeStates(state.home);
     }
 

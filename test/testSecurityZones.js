@@ -183,17 +183,30 @@ describe('securityZonesArmedState', () => {
         });
     });
 
-    it('arms the zones of both families when a home carries both', () => {
+    it("reports the armed family of a mixed home, in that family's own words", () => {
+        const mixed = active => ({
+            g1: { type: 'SECURITY_ZONE', label: 'INTERNAL', active: active.INTERNAL === true },
+            g2: { type: 'SECURITY_ZONE', label: 'EXTERNAL', active: active.EXTERNAL === true },
+            g4: { type: 'SECURITY_ZONE', label: 'ABSENCE', active: active.ABSENCE === true },
+            g5: { type: 'SECURITY_ZONE', label: 'PRESENCE', active: active.PRESENCE === true },
+        });
+
         assert.deepStrictEqual(
-            zones({
-                g1: { type: 'SECURITY_ZONE', label: 'INTERNAL', active: true },
-                g2: { type: 'SECURITY_ZONE', label: 'EXTERNAL', active: true },
-                g4: { type: 'SECURITY_ZONE', label: 'ABSENCE', active: false },
-                g5: { type: 'SECURITY_ZONE', label: 'PRESENCE', active: false },
-            }),
-            { requestBased: true, internal: true, external: true, mode: 'ABSENCE' },
+            zones(mixed({ INTERNAL: true, EXTERNAL: true })),
+            { requestBased: true, internal: true, external: true, mode: 'INTERNAL_AND_EXTERNAL' },
             'the classic zones of a mixed home must not read as disarmed',
         );
+        assert.deepStrictEqual(
+            zones(mixed({ INTERNAL: true })),
+            { requestBased: true, internal: true, external: false, mode: 'INTERNAL' },
+            'ABSENCE means both zones, so it must not name a state where only one is armed',
+        );
+        assert.deepStrictEqual(zones(mixed({ ABSENCE: true })), {
+            requestBased: true,
+            internal: true,
+            external: true,
+            mode: 'ABSENCE',
+        });
     });
 
     it('only reads a zone the cloud calls active as armed', () => {
