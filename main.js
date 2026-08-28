@@ -56,11 +56,12 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         this._requestTokenState = { state: 'idle' };
         this._homeReadInterval = HOME_REREAD_INTERVAL;
         this._nextHomeRead = 0;
-        this._homeReadTimeout = null;
         this._homeReadRunning = false;
         this._homeReadPending = false;
+        this._homeReadRequestedSeq = 0;
         this._homePublishSeq = 0;
-        this._cachePushSeq = 0;
+        this._groupsChangedDuringRead = null;
+        this._dataEpoch = 0;
 
         this.wsConnected = false;
         this.wsConnectionStableTimeout = null;
@@ -79,7 +80,6 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         this.expectWsError && clearTimeout(this.expectWsError);
         this.reInitTimeout && clearTimeout(this.reInitTimeout);
         this.reInitDataTimeout && clearTimeout(this.reInitDataTimeout);
-        this._homeReadTimeout && clearTimeout(this._homeReadTimeout);
         for (const pending of Object.values(this.delayTimeouts)) {
             pending && pending.timeout && clearTimeout(pending.timeout);
         }
@@ -1170,12 +1170,12 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 await this._updateDeviceStates(ev.device);
                 break;
             case 'GROUP_ADDED':
-                this._cachePushSeq++;
+                this._noteGroupChangedDuringRead(ev.group);
                 await this._createObjectsForGroup(ev.group);
                 await this._updateGroupStates(ev.group);
                 break;
             case 'GROUP_CHANGED':
-                this._cachePushSeq++;
+                this._noteGroupChangedDuringRead(ev.group);
                 await this._updateGroupStates(ev.group);
                 break;
             case 'CLIENT_ADDED':
@@ -1189,7 +1189,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 break;
             case 'GROUP_REMOVED':
                 // the api has already dropped the group, so the armed zones are whatever is left
-                this._cachePushSeq++;
+                this._noteGroupChangedDuringRead(ev.group);
                 if (this._api.home) {
                     await Promise.all(this._updateSecurityZonesArmed(this._api.home.id));
                 }
@@ -1198,20 +1198,21 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 break;
             case 'HOME_CHANGED':
                 if (ev && ev.home) {
-                    this._homePublishSeq++;
+                    this._notePushPublishedAlarmFields(ev.home);
                     await this._updateHomeStates(ev.home);
-                    this._dropHomeReadThePushAnswered(ev.home);
                 } else {
                     this.log.warn(`No home in HOME_CHANGED: ${JSON.stringify(ev)}`);
                 }
                 break;
             case 'SECURITY_JOURNAL_CHANGED':
                 if (ev && ev.home) {
-                    this._homePublishSeq++;
+                    this._notePushPublishedAlarmFields(ev.home);
                     await this._updateHomeStates(ev.home);
-                    this._dropHomeReadThePushAnswered(ev.home);
                 } else {
-                    await this._readHomeForAlarmFields();
+                    // the read waits out its interval, which must not hold up the journal
+                    this._readHomeForAlarmFields().catch(err =>
+                        this.log.warn(`Could not read the home for its alarm fields: ${err}`),
+                    );
                 }
                 await this._updateSecurityJournal();
                 break;
@@ -1511,8 +1512,8 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             return;
         }
         this.log.info(`New data structures detected ... reinitialize in 5s... ${id}`);
-        this._homeReadTimeout && clearTimeout(this._homeReadTimeout);
-        this._homeReadTimeout = null;
+        // a read still in flight answers for the configuration this replaces
+        this._dataEpoch++;
         this._api.dispose();
         this.reInitDataTimeout = setTimeout(async () => {
             this.reInitDataTimeout = null;
@@ -3083,100 +3084,111 @@ class HmIpCloudAccesspointAdapter extends Adapter {
     }
 
     /**
+     * Records that a push carried the fields a read exists for, so a read cannot publish over it.
+     *
+     * @param {object} home the home a push carried
+     * @returns {void}
+     */
+    _notePushPublishedAlarmFields(home) {
+        if (home.functionalHomes && home.functionalHomes.SECURITY_AND_ALARM) {
+            this._homePublishSeq++;
+        }
+    }
+
+    /**
+     * Records a group a push changed, so a read in flight cannot roll it back.
+     *
+     * @param {object} group the group a push carried, if it named one
+     * @returns {void}
+     */
+    _noteGroupChangedDuringRead(group) {
+        if (this._groupsChangedDuringRead && group && group.id) {
+            this._groupsChangedDuringRead.add(group.id);
+        }
+    }
+
+    /**
      * Reads the home so its alarm fields can be published, at most once per `_homeReadInterval`.
      *
-     * The security journal event announces those fields but carries them only sometimes, and the
-     * read that does is the whole configuration. An event that cannot read now therefore defers to
-     * the end of the interval rather than dropping it: an alarm must not wait for the next event.
-     * A read that failed reserves a short interval only, so it is retried rather than silencing the
-     * datapoints for the full one.
+     * Only a full read carries those fields, and the event announcing them arrives every few
+     * minutes on some homes, so the interval is waited out inside the lock: events arriving
+     * meanwhile are absorbed and answered by one read afterwards. `_updateSecurityJournal` holds
+     * its reads apart the same way.
      *
      * @returns {Promise<void>}
      */
     async _readHomeForAlarmFields() {
         if (this._homeReadRunning) {
             this._homeReadPending = true;
+            this._homeReadRequestedSeq = this._homePublishSeq;
             return;
         }
-        // wall clock steps, and this measures an elapsed interval
-        const now = performance.now();
-        if (now < this._nextHomeRead) {
-            this._deferHomeRead(this._nextHomeRead - now);
-            return;
-        }
-        this._homeReadTimeout && clearTimeout(this._homeReadTimeout);
-        this._homeReadTimeout = null;
-        this._homeReadPending = false;
         this._homeReadRunning = true;
-        // the cloud composes the response before these can change, so the answer to a read is only
-        // ever as new as the moment it was sent
-        const publishSeq = this._homePublishSeq;
-        const cachePushSeq = this._cachePushSeq;
+        this._homeReadRequestedSeq = this._homePublishSeq;
         try {
-            this.log.debug('Read Home for SECURITY_JOURNAL_CHANGED');
-            const state = await this._api.callRestApi('home/getCurrentState', this._api._clientCharacteristics);
-            if (this._unloaded) {
-                return;
-            }
-            if (!state || !state.home) {
-                // the api logs why; retrying beats leaving the alarm fields unpublished for five minutes
-                this._nextHomeRead = performance.now() + HOME_READ_RETRY_INTERVAL;
-                this._homeReadPending = true;
-                return;
-            }
-            this._nextHomeRead = performance.now() + this._homeReadInterval;
-            if (this._homePublishSeq !== publishSeq) {
-                this.log.debug('Discard the home read a push has answered while it was in flight');
-                return;
-            }
-            if (this._cachePushSeq === cachePushSeq) {
-                // the response is the only fresh snapshot between reconnects, and the states
-                // published below are derived from the cache, not from the home alone
-                this._api.applyCurrentState(state);
-            }
-            await this._updateHomeStates(state.home);
+            do {
+                this._homeReadPending = false;
+                const requestedSeq = this._homeReadRequestedSeq;
+                // wall clock steps, and this measures an elapsed interval
+                const wait = this._nextHomeRead - performance.now();
+                if (wait > 0) {
+                    await this._sleep(wait);
+                }
+                if (this._unloaded) {
+                    return;
+                }
+                if (this._homePublishSeq !== requestedSeq) {
+                    // a push published these fields after the event asked for them
+                    continue;
+                }
+                await this._publishHomeFromCloud();
+            } while (this._homeReadPending && !this._unloaded);
         } finally {
             this._homeReadRunning = false;
-            if (this._homeReadPending && !this._unloaded) {
-                this._deferHomeRead(Math.max(this._nextHomeRead - performance.now(), 0));
-            }
+            this._groupsChangedDuringRead = null;
         }
     }
 
     /**
-     * Drops a deferred read of the home once a push has carried the fields it was waiting for.
+     * Reads the configuration and publishes the home out of it.
      *
-     * Only a push does this. The read publishes the same fields, but from a response the cloud
-     * composed before the deferred event arrived, so it cannot answer that event.
-     *
-     * @param {object} home the home a push carried
-     * @returns {void}
+     * @returns {Promise<void>}
      */
-    _dropHomeReadThePushAnswered(home) {
-        if (!home.functionalHomes || !home.functionalHomes.SECURITY_AND_ALARM) {
+    async _publishHomeFromCloud() {
+        const epoch = this._dataEpoch;
+        const publishSeq = this._homePublishSeq;
+        const changedSince = new Set();
+        this._groupsChangedDuringRead = changedSince;
+        this.log.debug('Read Home for its alarm fields');
+        const state = await this._api.callRestApi('home/getCurrentState', this._api._clientCharacteristics);
+        this._groupsChangedDuringRead = null;
+        if (this._unloaded || this._dataEpoch !== epoch) {
             return;
         }
-        this._homeReadPending = false;
-        if (this._homeReadTimeout) {
-            clearTimeout(this._homeReadTimeout);
-            this._homeReadTimeout = null;
+        if (!state || !state.home) {
+            // the api logs why; retrying beats leaving the alarm fields unpublished for the interval
+            this._nextHomeRead = performance.now() + HOME_READ_RETRY_INTERVAL;
+            return;
         }
+        this._nextHomeRead = performance.now() + this._homeReadInterval;
+        if (this._homePublishSeq !== publishSeq) {
+            this.log.debug('Discard the home read a push overtook');
+            return;
+        }
+        // the zone groups of a panel that pushes none of its own would go stale otherwise
+        this._api.refreshGroups(state.groups, changedSince);
+        await this._updateHomeStates(state.home);
     }
 
     /**
-     * @param {number} delay how long is left of the interval
-     * @returns {void}
+     * @param {number} ms how long to wait
+     * @returns {Promise<void>}
      */
-    _deferHomeRead(delay) {
-        if (this._homeReadTimeout) {
-            return;
-        }
-        this._homeReadTimeout = setTimeout(() => {
-            this._homeReadTimeout = null;
-            this._readHomeForAlarmFields().catch(err =>
-                this.log.warn(`Could not read the home for its alarm fields: ${err}`),
-            );
-        }, delay);
+    _sleep(ms) {
+        return new Promise(resolve => {
+            const timer = setTimeout(resolve, ms);
+            timer.unref && timer.unref();
+        });
     }
 
     /**
