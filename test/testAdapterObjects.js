@@ -615,6 +615,50 @@ describe('security journal', () => {
         assert.strictEqual(reads, 2, 'the stale timer would read again with no event behind it');
     });
 
+    // the cloud composed the response before the push, so the push is the newer truth
+    it('discards a read whose answer a push overtook', async () => {
+        const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
+        let applied = 0;
+        adapter._api.applyCurrentState = () => applied++;
+        adapter._api.callRestApi = () => new Promise(resolve => setTimeout(() => resolve({ home: HOME }), 40));
+
+        const reading = adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' });
+        await adapter._eventRaised({
+            pushEventType: 'HOME_CHANGED',
+            home: { ...HOME, powerMeterCurrency: 'CHF' },
+        });
+        await reading;
+
+        assert.strictEqual(applied, 0, 'the older snapshot must not roll the caches back');
+        assert.deepStrictEqual(
+            adapter.states['homes.HOME.powerMeterCurrency'],
+            { val: 'CHF', ack: true },
+            'the older snapshot must not be republished over the push',
+        );
+    });
+
+    for (const pushEventType of ['GROUP_ADDED', 'GROUP_CHANGED']) {
+        it(`keeps the cache a ${pushEventType} refreshed while the read was in flight`, async () => {
+            const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
+            const group = { id: 'G-7', type: 'SECURITY_ZONE', label: 'ABSENCE', active: true };
+            await adapter._createObjectsForGroup(group);
+            let applied = 0;
+            adapter._api.applyCurrentState = () => applied++;
+            adapter._api.callRestApi = () => new Promise(resolve => setTimeout(() => resolve({ home: HOME }), 40));
+
+            const reading = adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' });
+            await adapter._eventRaised({ pushEventType, group });
+            await reading;
+
+            assert.strictEqual(applied, 0, 'the group state the event carried would be rolled back');
+            assert.deepStrictEqual(
+                adapter.states['homes.HOME.powerMeterCurrency'],
+                { val: 'EUR', ack: true },
+                'the home fields the read was for still have to be published',
+            );
+        });
+    }
+
     // a push carries the alarm fields the deferred read was for, and the read is expensive
     it('drops a deferred read once a push has carried the alarm fields', async () => {
         const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });

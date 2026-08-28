@@ -59,6 +59,8 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         this._homeReadTimeout = null;
         this._homeReadRunning = false;
         this._homeReadPending = false;
+        this._homePublishSeq = 0;
+        this._cachePushSeq = 0;
 
         this.wsConnected = false;
         this.wsConnectionStableTimeout = null;
@@ -1168,10 +1170,12 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 await this._updateDeviceStates(ev.device);
                 break;
             case 'GROUP_ADDED':
+                this._cachePushSeq++;
                 await this._createObjectsForGroup(ev.group);
                 await this._updateGroupStates(ev.group);
                 break;
             case 'GROUP_CHANGED':
+                this._cachePushSeq++;
                 await this._updateGroupStates(ev.group);
                 break;
             case 'CLIENT_ADDED':
@@ -1189,6 +1193,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 break;
             case 'HOME_CHANGED':
                 if (ev && ev.home) {
+                    this._homePublishSeq++;
                     await this._updateHomeStates(ev.home);
                     this._dropHomeReadThePushAnswered(ev.home);
                 } else {
@@ -1197,6 +1202,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 break;
             case 'SECURITY_JOURNAL_CHANGED':
                 if (ev && ev.home) {
+                    this._homePublishSeq++;
                     await this._updateHomeStates(ev.home);
                     this._dropHomeReadThePushAnswered(ev.home);
                 } else {
@@ -3097,6 +3103,10 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         this._homeReadTimeout = null;
         this._homeReadPending = false;
         this._homeReadRunning = true;
+        // the cloud composes the response before these can change, so the answer to a read is only
+        // ever as new as the moment it was sent
+        const publishSeq = this._homePublishSeq;
+        const cachePushSeq = this._cachePushSeq;
         try {
             this.log.debug('Read Home for SECURITY_JOURNAL_CHANGED');
             const state = await this._api.callRestApi('home/getCurrentState', this._api._clientCharacteristics);
@@ -3110,9 +3120,15 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 return;
             }
             this._nextHomeRead = performance.now() + this._homeReadInterval;
-            // the response is the only fresh snapshot between reconnects, and the states published
-            // below are derived from the cache, not from the home alone
-            this._api.applyCurrentState(state);
+            if (this._homePublishSeq !== publishSeq) {
+                this.log.debug('Discard the home read a push has answered while it was in flight');
+                return;
+            }
+            if (this._cachePushSeq === cachePushSeq) {
+                // the response is the only fresh snapshot between reconnects, and the states
+                // published below are derived from the cache, not from the home alone
+                this._api.applyCurrentState(state);
+            }
             await this._updateHomeStates(state.home);
         } finally {
             this._homeReadRunning = false;
