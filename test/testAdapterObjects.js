@@ -123,7 +123,6 @@ function createHarness(apiOverrides) {
         callRestApi: record('callRestApi'),
         homeGetSecurityJournal: () => Promise.resolve({ entries: [] }),
         applyCurrentState: () => {},
-        refreshGroups: () => {},
         hasRequestBasedSecurityZones: () => false,
         securityZonesArmedState: () => ({ requestBased: false, internal: false, external: false, mode: 'OFF' }),
         homeSetZonesActivation: (...args) => {
@@ -523,18 +522,6 @@ describe('security journal', () => {
         assert.strictEqual(adapter.states[`${base}.securityJournalEventType`].val, 'ACTIVATION_CHANGED');
     });
 
-    it('refreshes the zone groups from the response it read', async () => {
-        const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
-        const groups = { 'G-9': { id: 'G-9', type: 'SECURITY_ZONE', label: 'ABSENCE', active: true } };
-        let refreshed = null;
-        adapter._api.refreshGroups = (fresh, changedSince) => (refreshed = { fresh, changedSince });
-        adapter._api.callRestApi = () => Promise.resolve({ home: HOME, groups });
-        await adapter._readHomeForAlarmFields();
-
-        assert.strictEqual(refreshed.fresh, groups, 'a panel that pushes no group event has only this');
-        assert.deepStrictEqual([...refreshed.changedSince], []);
-    });
-
     it('holds the next read until the interval has passed', async () => {
         const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
         adapter._homeReadInterval = 40;
@@ -574,8 +561,6 @@ describe('security journal', () => {
 
     it('discards a read the configuration was reloaded under, reload included', async () => {
         const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
-        let refreshed = 0;
-        adapter._api.refreshGroups = () => refreshed++;
         adapter._api.loadCurrentConfig = () => Promise.resolve();
         adapter._api.callRestApi = () => new Promise(resolve => setTimeout(() => resolve({ home: HOME }), 30));
 
@@ -583,7 +568,34 @@ describe('security journal', () => {
         await adapter._initData().catch(() => {});
         await reading;
 
-        assert.strictEqual(refreshed, 0, 'the snapshot is older than the configuration just loaded');
+        assert.strictEqual(
+            adapter.states['homes.HOME.powerMeterCurrency'],
+            undefined,
+            'the snapshot is older than the configuration just loaded',
+        );
+    });
+
+    it('waits again when a reload moved the deadline while it slept', async () => {
+        const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
+        adapter._homeReadInterval = 30;
+        const readAt = [];
+        adapter._api.callRestApi = () => {
+            readAt.push(performance.now());
+            return Promise.resolve({ home: HOME });
+        };
+
+        await adapter._readHomeForAlarmFields();
+        const waiting = adapter._readHomeForAlarmFields();
+        // a reload has just read the whole configuration, so it moves the deadline out again
+        const moved = performance.now() + 90;
+        adapter._nextHomeRead = moved;
+        await waiting;
+
+        assert.strictEqual(readAt.length, 2);
+        assert.ok(
+            readAt[1] >= moved,
+            `the read started ${(moved - readAt[1]).toFixed(0)}ms before the deadline a reload moved`,
+        );
     });
 
     // _parseEventdata does not await the handler, so a burst arrives as concurrent callers
@@ -620,40 +632,9 @@ describe('security journal', () => {
         assert.ok(reserved < adapter._homeReadInterval, 'it must not reserve the whole interval');
     });
 
-    // a push carries no groups, so the read is still the only way the zone groups of a panel that
-    // pushes none of its own get refreshed
-    it('reads for the zone groups even when a push published the alarm fields meanwhile', async () => {
+    // the cloud composed the answer before the push, so the push is the newer of the two
+    it('keeps the fields of a push a read overtook', async () => {
         const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
-        adapter._homeReadInterval = 40;
-        let reads = 0;
-        let refreshed = 0;
-        adapter._api.refreshGroups = () => refreshed++;
-        adapter._api.callRestApi = () => {
-            reads++;
-            return Promise.resolve({ home: HOME });
-        };
-
-        await adapter._readHomeForAlarmFields();
-        const waiting = adapter._readHomeForAlarmFields();
-        await adapter._eventRaised({ pushEventType: 'HOME_CHANGED', home: HOME });
-        await waiting;
-
-        assert.strictEqual(reads, 2);
-        assert.strictEqual(refreshed, 2, 'the groups the push did not carry are this read to publish');
-    });
-
-    // the cloud composed the response before the push, so for the home's own fields the push is
-    // the newer truth - but not for the groups, which it did not carry
-    it('keeps the fields of a push a read overtook, and still publishes the armed zones', async () => {
-        const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
-        // what the refreshed groups say, so the read's own publish is distinguishable
-        let mode = 'PRESENCE';
-        let refreshed = 0;
-        adapter._api.securityZonesArmedState = () => ({ requestBased: true, internal: true, external: true, mode });
-        adapter._api.refreshGroups = () => {
-            refreshed++;
-            mode = 'ABSENCE';
-        };
         adapter._api.callRestApi = () => new Promise(resolve => setTimeout(() => resolve({ home: HOME }), 30));
 
         const reading = adapter._readHomeForAlarmFields();
@@ -663,49 +644,26 @@ describe('security journal', () => {
         });
         await reading;
 
-        assert.strictEqual(refreshed, 1, 'the groups are the part of the answer no push supersedes');
         assert.deepStrictEqual(
             adapter.states['homes.HOME.powerMeterCurrency'],
             { val: 'CHF', ack: true },
             'the older snapshot must not be republished over the push',
         );
-        assert.deepStrictEqual(
-            adapter.states[`${base}.securityZonesArmedMode`],
-            { val: 'ABSENCE', ack: true },
-            'the zones it refreshed have to be published, or the refresh was pointless',
-        );
     });
 
-    for (const pushEventType of ['GROUP_ADDED', 'GROUP_CHANGED', 'GROUP_REMOVED']) {
-        it(`keeps a group a ${pushEventType} changed while the read was in flight`, async () => {
-            const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
-            const group = { id: 'G-7', type: 'SECURITY_ZONE', label: 'ABSENCE', active: true };
-            await adapter._createObjectsForGroup(group);
-            let changedSince = null;
-            adapter._api.refreshGroups = (fresh, changed) => (changedSince = changed);
-            adapter._api.callRestApi = () => new Promise(resolve => setTimeout(() => resolve({ home: HOME }), 30));
-
-            const reading = adapter._readHomeForAlarmFields();
-            await adapter._eventRaised({ pushEventType, group });
-            await reading;
-
-            assert.deepStrictEqual([...changedSince], ['G-7'], 'the group the event carried would be rolled back');
-        });
-    }
-
-    it('discards a read the configuration was reloaded under', async () => {
+    // it publishes every field of the home, not only the alarm ones
+    it('keeps the fields of a push that carried no alarm section', async () => {
         const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
-        let refreshed = 0;
-        adapter._api.refreshGroups = () => refreshed++;
         adapter._api.callRestApi = () => new Promise(resolve => setTimeout(() => resolve({ home: HOME }), 30));
 
         const reading = adapter._readHomeForAlarmFields();
-        adapter._reinitializeData('test');
+        await adapter._eventRaised({
+            pushEventType: 'HOME_CHANGED',
+            home: { ...HOME, powerMeterCurrency: 'CHF', functionalHomes: { INDOOR_CLIMATE: {} } },
+        });
         await reading;
-        adapter._unload(() => {});
 
-        assert.strictEqual(refreshed, 0, 'the snapshot answers for the configuration that was replaced');
-        assert.strictEqual(adapter.states['homes.HOME.powerMeterCurrency'], undefined);
+        assert.deepStrictEqual(adapter.states['homes.HOME.powerMeterCurrency'], { val: 'CHF', ack: true });
     });
 
     it('does not read after the adapter unloaded while it waited', async () => {

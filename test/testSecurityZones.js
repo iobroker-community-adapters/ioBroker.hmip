@@ -64,49 +64,6 @@ describe('hmCloudAPI security zone detection', () => {
     });
 });
 
-describe('refreshGroups', () => {
-    function api(groups) {
-        const instance = new HmCloudAPI();
-        instance.groups = groups;
-        return instance;
-    }
-
-    it('takes the groups of the response', () => {
-        const instance = api({ g1: { id: 'g1', active: false } });
-        instance.refreshGroups({ g1: { id: 'g1', active: true }, g2: { id: 'g2' } }, new Set());
-
-        assert.deepStrictEqual(instance.groups, { g1: { id: 'g1', active: true }, g2: { id: 'g2' } });
-    });
-
-    it('drops a group the response no longer has', () => {
-        const instance = api({ g1: { id: 'g1' }, gone: { id: 'gone' } });
-        instance.refreshGroups({ g1: { id: 'g1' } }, new Set());
-
-        assert.deepStrictEqual(Object.keys(instance.groups), ['g1']);
-    });
-
-    it('keeps a group a push changed while the response was in flight', () => {
-        const instance = api({ g1: { id: 'g1', active: true } });
-        instance.refreshGroups({ g1: { id: 'g1', active: false } }, new Set(['g1']));
-
-        assert.strictEqual(instance.groups.g1.active, true, 'the push is newer than the response');
-    });
-
-    it('keeps a group a push added while the response was in flight', () => {
-        const instance = api({ fresh: { id: 'fresh' } });
-        instance.refreshGroups({}, new Set(['fresh']));
-
-        assert.deepStrictEqual(Object.keys(instance.groups), ['fresh']);
-    });
-
-    it('leaves the cache alone when the response carries no groups', () => {
-        const instance = api({ g1: { id: 'g1' } });
-        instance.refreshGroups(undefined, new Set());
-
-        assert.deepStrictEqual(Object.keys(instance.groups), ['g1']);
-    });
-});
-
 describe('securityZonesArmedState', () => {
     function zones(groups) {
         const api = new HmCloudAPI();

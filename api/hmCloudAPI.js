@@ -205,33 +205,6 @@ class HmCloudAPI {
         this.rules = (state.home && state.home.ruleMetaDatas) || {};
     }
 
-    /**
-     * Merges a fresh group snapshot into the cache, keeping the groups a push has changed since.
-     *
-     * A getCurrentState response is composed before it is sent, so it is older than any push that
-     * arrived while it was in flight; those groups must survive it, removals included.
-     *
-     * @param {object} groups the groups of a getCurrentState response
-     * @param {Set<string>} changedSince ids a push touched while the response was in flight
-     * @returns {void}
-     */
-    refreshGroups(groups, changedSince) {
-        if (!groups) {
-            return;
-        }
-        this.groups = this.groups || {};
-        for (const [id, group] of Object.entries(groups)) {
-            if (!changedSince.has(id)) {
-                this.groups[id] = group;
-            }
-        }
-        for (const id of Object.keys(this.groups)) {
-            if (!groups[id] && !changedSince.has(id)) {
-                delete this.groups[id];
-            }
-        }
-    }
-
     async loadCurrentConfig() {
         let state = await this.callRestApi('home/getCurrentState', this._clientCharacteristics);
         if (!state) {

@@ -59,7 +59,6 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         this._homeReadRunning = false;
         this._homeReadPending = false;
         this._homePublishSeq = 0;
-        this._groupsChangedDuringRead = null;
         this._dataEpoch = 0;
 
         this.wsConnected = false;
@@ -1171,12 +1170,10 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 await this._updateDeviceStates(ev.device);
                 break;
             case 'GROUP_ADDED':
-                this._noteGroupChangedDuringRead(ev.group);
                 await this._createObjectsForGroup(ev.group);
                 await this._updateGroupStates(ev.group);
                 break;
             case 'GROUP_CHANGED':
-                this._noteGroupChangedDuringRead(ev.group);
                 await this._updateGroupStates(ev.group);
                 break;
             case 'CLIENT_ADDED':
@@ -1190,7 +1187,6 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 break;
             case 'GROUP_REMOVED':
                 // the api has already dropped the group, so the armed zones are whatever is left
-                this._noteGroupChangedDuringRead(ev.group);
                 if (this._api.home) {
                     await Promise.all(this._updateSecurityZonesArmed(this._api.home.id));
                 }
@@ -1199,7 +1195,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 break;
             case 'HOME_CHANGED':
                 if (ev && ev.home) {
-                    this._notePushPublishedAlarmFields(ev.home);
+                    this._homePublishSeq++;
                     await this._updateHomeStates(ev.home);
                 } else {
                     this.log.warn(`No home in HOME_CHANGED: ${JSON.stringify(ev)}`);
@@ -1207,7 +1203,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 break;
             case 'SECURITY_JOURNAL_CHANGED':
                 if (ev && ev.home) {
-                    this._notePushPublishedAlarmFields(ev.home);
+                    this._homePublishSeq++;
                     await this._updateHomeStates(ev.home);
                 } else {
                     // the read waits out its interval, which must not hold up the journal
@@ -3085,30 +3081,6 @@ class HmIpCloudAccesspointAdapter extends Adapter {
     }
 
     /**
-     * Records that a push carried the fields a read exists for, so a read cannot publish over it.
-     *
-     * @param {object} home the home a push carried
-     * @returns {void}
-     */
-    _notePushPublishedAlarmFields(home) {
-        if (home.functionalHomes && home.functionalHomes.SECURITY_AND_ALARM) {
-            this._homePublishSeq++;
-        }
-    }
-
-    /**
-     * Records a group a push changed, so a read in flight cannot roll it back.
-     *
-     * @param {object} group the group a push carried, if it named one
-     * @returns {void}
-     */
-    _noteGroupChangedDuringRead(group) {
-        if (this._groupsChangedDuringRead && group && group.id) {
-            this._groupsChangedDuringRead.add(group.id);
-        }
-    }
-
-    /**
      * Reads the home so its alarm fields can be published, at most once per `_homeReadInterval`.
      *
      * Only a full read carries those fields, and the event announcing them arrives every few
@@ -3126,13 +3098,15 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         this._homeReadRunning = true;
         try {
             do {
-                // wall clock steps, and this measures an elapsed interval
-                const wait = this._nextHomeRead - performance.now();
-                if (wait > 0) {
+                // wall clock steps, and this measures an elapsed interval. A reload reads the
+                // configuration itself and moves the deadline, so it is sampled again after waking
+                let wait = this._nextHomeRead - performance.now();
+                while (wait > 0) {
                     await this._sleep(wait);
-                }
-                if (this._unloaded) {
-                    return;
+                    if (this._unloaded) {
+                        return;
+                    }
+                    wait = this._nextHomeRead - performance.now();
                 }
                 // the request about to go out answers for every event that waited for it, so only
                 // the ones arriving while it is in flight are worth another read
@@ -3141,7 +3115,6 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             } while (this._homeReadPending && !this._unloaded);
         } finally {
             this._homeReadRunning = false;
-            this._groupsChangedDuringRead = null;
         }
     }
 
@@ -3153,11 +3126,8 @@ class HmIpCloudAccesspointAdapter extends Adapter {
     async _publishHomeFromCloud() {
         const epoch = this._dataEpoch;
         const publishSeq = this._homePublishSeq;
-        const changedSince = new Set();
-        this._groupsChangedDuringRead = changedSince;
         this.log.debug('Read Home for its alarm fields');
         const state = await this._api.callRestApi('home/getCurrentState', this._api._clientCharacteristics);
-        this._groupsChangedDuringRead = null;
         if (this._unloaded || this._dataEpoch !== epoch) {
             return;
         }
@@ -3167,12 +3137,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             return;
         }
         this._nextHomeRead = performance.now() + this._homeReadInterval;
-        // the zone groups of a panel that pushes none of its own would go stale otherwise, and a
-        // push carries no groups, so this part of the answer is never superseded by one
-        this._api.refreshGroups(state.groups, changedSince);
         if (this._homePublishSeq !== publishSeq) {
-            this.log.debug('Publish only the armed zones of a home read a push overtook');
-            await Promise.all(this._updateSecurityZonesArmed(state.home.id));
+            // the cloud composed this answer before that push, so it is the older of the two
+            this.log.debug('Discard the home read a push overtook');
             return;
         }
         await this._updateHomeStates(state.home);
