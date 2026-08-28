@@ -55,6 +55,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         this._unloaded = false;
         this._requestTokenState = { state: 'idle' };
         this._homeReadInterval = HOME_REREAD_INTERVAL;
+        this._homeReadRetryInterval = HOME_READ_RETRY_INTERVAL;
         this._nextHomeRead = 0;
         this._homeReadRunning = false;
         this._homeReadPending = false;
@@ -3133,15 +3134,18 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }
         if (!state || !state.home) {
             // the api logs why; retrying beats leaving the alarm fields unpublished for the interval
-            this._nextHomeRead = performance.now() + HOME_READ_RETRY_INTERVAL;
+            this._nextHomeRead = performance.now() + this._homeReadRetryInterval;
+            return;
+        }
+        if (this._homePublishSeq !== publishSeq) {
+            // the cloud composed this answer before that push, so it is the older of the two. The
+            // push need not have carried the alarm fields, so this read is owed another attempt
+            this.log.debug('Discard the home read a push overtook');
+            this._nextHomeRead = performance.now() + this._homeReadRetryInterval;
+            this._homeReadPending = true;
             return;
         }
         this._nextHomeRead = performance.now() + this._homeReadInterval;
-        if (this._homePublishSeq !== publishSeq) {
-            // the cloud composed this answer before that push, so it is the older of the two
-            this.log.debug('Discard the home read a push overtook');
-            return;
-        }
         await this._updateHomeStates(state.home);
     }
 

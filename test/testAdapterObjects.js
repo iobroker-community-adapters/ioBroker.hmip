@@ -632,10 +632,22 @@ describe('security journal', () => {
         assert.ok(reserved < adapter._homeReadInterval, 'it must not reserve the whole interval');
     });
 
-    // the cloud composed the answer before the push, so the push is the newer of the two
-    it('keeps the fields of a push a read overtook', async () => {
+    // the cloud composed the answer before the push, so the push is the newer of the two, and the
+    // answer that follows the push carries what it published
+    function overtakenHarness() {
         const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
-        adapter._api.callRestApi = () => new Promise(resolve => setTimeout(() => resolve({ home: HOME }), 30));
+        adapter._homeReadRetryInterval = 20;
+        adapter.reads = 0;
+        adapter._api.callRestApi = () => {
+            adapter.reads++;
+            const home = adapter.reads === 1 ? HOME : { ...HOME, powerMeterCurrency: 'CHF' };
+            return new Promise(resolve => setTimeout(() => resolve({ home }), 30));
+        };
+        return adapter;
+    }
+
+    it('keeps the fields of a push a read overtook', async () => {
+        const adapter = overtakenHarness();
 
         const reading = adapter._readHomeForAlarmFields();
         await adapter._eventRaised({
@@ -651,10 +663,26 @@ describe('security journal', () => {
         );
     });
 
+    it('comes back soon for a read a push overtook, since the push may carry no alarm fields', async () => {
+        const adapter = overtakenHarness();
+
+        const reading = adapter._readHomeForAlarmFields();
+        await adapter._eventRaised({
+            pushEventType: 'HOME_CHANGED',
+            home: { ...HOME, powerMeterCurrency: 'CHF', functionalHomes: { INDOOR_CLIMATE: {} } },
+        });
+        await reading;
+
+        assert.strictEqual(adapter.reads, 2, 'the discarded read must not wait out the whole interval');
+        assert.ok(
+            adapter._nextHomeRead - performance.now() > 1000,
+            'the read that was not discarded reserves the full interval',
+        );
+    });
+
     // it publishes every field of the home, not only the alarm ones
     it('keeps the fields of a push that carried no alarm section', async () => {
-        const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
-        adapter._api.callRestApi = () => new Promise(resolve => setTimeout(() => resolve({ home: HOME }), 30));
+        const adapter = overtakenHarness();
 
         const reading = adapter._readHomeForAlarmFields();
         await adapter._eventRaised({
@@ -975,6 +1003,28 @@ describe('the security zones on the home', () => {
         await change(adapter, `${BASE}.activateSecurityZones`, ' absence ');
 
         assert.deepStrictEqual(adapter.calls, [{ method: 'homeSetZonesActivation', args: [true, true] }]);
+    });
+
+    it('republishes the armed zones when a security zone is removed', async () => {
+        let armed = { requestBased: true, internal: true, external: true, mode: 'ABSENCE' };
+        const adapter = createHarness({ securityZonesArmedState: () => armed });
+        await adapter._createObjectsForHome(HOME);
+        await adapter._updateHomeStates(HOME);
+        assert.strictEqual(adapter.states[`${BASE}.securityZonesArmedMode`].val, 'ABSENCE');
+
+        armed = { requestBased: true, internal: false, external: false, mode: 'OFF' };
+        await adapter._eventRaised({
+            pushEventType: 'GROUP_REMOVED',
+            group: { id: 'G-1', type: 'SECURITY_ZONE', label: 'ABSENCE' },
+        });
+
+        assert.deepStrictEqual(
+            adapter.states[`${BASE}.securityZonesArmedMode`],
+            { val: 'OFF', ack: true },
+            'the zone that was armed is gone, so the home cannot still report it armed',
+        );
+        assert.deepStrictEqual(adapter.states[`${BASE}.internalZoneArmed`], { val: false, ack: true });
+        assert.deepStrictEqual(adapter.states[`${BASE}.externalZoneArmed`], { val: false, ack: true });
     });
 
     it('publishes nothing for a zone group while no home is known', async () => {
