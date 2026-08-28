@@ -1188,6 +1188,11 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             case 'DEVICE_REMOVED':
                 break;
             case 'GROUP_REMOVED':
+                // the api has already dropped the group, so the armed zones are whatever is left
+                this._cachePushSeq++;
+                if (this._api.home) {
+                    await Promise.all(this._updateSecurityZonesArmed(this._api.home.id));
+                }
                 break;
             case 'CLIENT_REMOVED':
                 break;

@@ -35,7 +35,7 @@ I may also need a JSON of a state change.
 
 Thank you!
 
-If you are looking for the information whether the alarm system is armed, read `homes.<homeId>.functionalHomes.securityAndAlarm.securityZonesArmedMode`. It reports `OFF`, `PRESENCE`/`EXTERNAL` (perimeter only) or `ABSENCE`/`INTERNAL_AND_EXTERNAL` (away), in the vocabulary of the dashboard the home uses - `ABSENCE`/`PRESENCE` on the request-based dashboard, `INTERNAL`/`EXTERNAL` on the classic one. `internalZoneArmed` and `externalZoneArmed` beside it carry the same information as the classic pair of booleans on either dashboard. To arm or disarm, write a mode to `activateSecurityZones`.
+If you are looking for the information whether the alarm system is armed, read `homes.<homeId>.functionalHomes.securityAndAlarm.securityZonesArmedMode`. It reports the armed zones in the vocabulary of the dashboard the home uses: `OFF`, `PRESENCE` (perimeter only) or `ABSENCE` (away) on the request-based dashboard, and `OFF`, `INTERNAL`, `EXTERNAL` or `INTERNAL_AND_EXTERNAL` on the classic one. `internalZoneArmed` and `externalZoneArmed` beside it carry the same information as the classic pair of booleans on either dashboard. To arm or disarm, write a mode to `activateSecurityZones`.
 
 Note that `functionalHomes.securityAndAlarm.active` is not the armed state - it reports whether the home has the security solution at all.
 

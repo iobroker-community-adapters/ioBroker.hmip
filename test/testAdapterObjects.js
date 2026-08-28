@@ -615,6 +615,42 @@ describe('security journal', () => {
         assert.strictEqual(reads, 2, 'the stale timer would read again with no event behind it');
     });
 
+    it('republishes the armed zones when a security zone is removed', async () => {
+        let armed = { requestBased: true, internal: true, external: true, mode: 'ABSENCE' };
+        const adapter = createHarness({ securityZonesArmedState: () => armed });
+        await adapter._createObjectsForHome(HOME);
+        await adapter._updateHomeStates(HOME);
+        assert.strictEqual(adapter.states[`${base}.securityZonesArmedMode`].val, 'ABSENCE');
+
+        armed = { requestBased: true, internal: false, external: false, mode: 'OFF' };
+        await adapter._eventRaised({
+            pushEventType: 'GROUP_REMOVED',
+            group: { id: 'G-1', type: 'SECURITY_ZONE', label: 'ABSENCE' },
+        });
+
+        assert.deepStrictEqual(
+            adapter.states[`${base}.securityZonesArmedMode`],
+            { val: 'OFF', ack: true },
+            'the zone that was armed is gone, so the home cannot still report it armed',
+        );
+    });
+
+    it('keeps the cache a GROUP_REMOVED emptied while the read was in flight', async () => {
+        const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
+        let applied = 0;
+        adapter._api.applyCurrentState = () => applied++;
+        adapter._api.callRestApi = () => new Promise(resolve => setTimeout(() => resolve({ home: HOME }), 40));
+
+        const reading = adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' });
+        await adapter._eventRaised({
+            pushEventType: 'GROUP_REMOVED',
+            group: { id: 'G-1', type: 'SECURITY_ZONE', label: 'ABSENCE' },
+        });
+        await reading;
+
+        assert.strictEqual(applied, 0, 'an older snapshot would put the removed group back');
+    });
+
     // the cloud composed the response before the push, so the push is the newer truth
     it('discards a read whose answer a push overtook', async () => {
         const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
