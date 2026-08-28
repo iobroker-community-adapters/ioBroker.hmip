@@ -26,14 +26,21 @@ class AdapterStub {
 
     on() {}
 
-    // ioBroker merges an extendObject into what is already stored, so a stale native survives
+    // ioBroker merges an extendObject into what is already stored, deeply, so neither a stale
+    // native nor a key of a states map a later start narrows is ever removed
     extendObject(id, obj) {
         const previous = this.objects[id];
         this.objects[id] = previous
             ? {
                   ...previous,
                   ...obj,
-                  common: { ...previous.common, ...obj.common },
+                  common: {
+                      ...previous.common,
+                      ...obj.common,
+                      ...(previous.common && previous.common.states
+                          ? { states: { ...previous.common.states, ...(obj.common || {}).states } }
+                          : {}),
+                  },
                   native: { ...previous.native, ...obj.native },
               }
             : obj;
@@ -115,6 +122,21 @@ function createHarness(apiOverrides) {
         ruleSetRuleLabel: record('ruleSetRuleLabel'),
         callRestApi: record('callRestApi'),
         homeGetSecurityJournal: () => Promise.resolve({ entries: [] }),
+        applyCurrentState: () => {},
+        hasRequestBasedSecurityZones: () => false,
+        securityZonesArmedState: () => ({ requestBased: false, internal: false, external: false, mode: 'OFF' }),
+        homeSetZonesActivation: (...args) => {
+            adapter.calls.push({ method: 'homeSetZonesActivation', args });
+            return Promise.resolve({
+                requestBased: false,
+                classicZonesPresent: false,
+                requestFailed: false,
+                confirmed: true,
+                problems: {},
+                lowBatteryDevices: [],
+                lowBatteryLookupIncomplete: false,
+            });
+        },
         ...apiOverrides,
     };
     return adapter;
@@ -131,7 +153,12 @@ const HOME = {
     powerMeterUnitPrice: 0.31,
     weather: {},
     functionalHomes: {
-        SECURITY_AND_ALARM: { functionalGroups: ['G-1'], securitySwitchingGroups: ['G-2'] },
+        SECURITY_AND_ALARM: {
+            functionalGroups: ['G-1'],
+            securitySwitchingGroups: ['G-2'],
+            alarmActive: true,
+            activationInProgress: false,
+        },
         INDOOR_CLIMATE: {},
     },
 };
@@ -478,20 +505,169 @@ describe('security journal', () => {
         assert.deepStrictEqual(adapter.states['homes.HOME.powerMeterCurrency'], { val: 'EUR', ack: true });
     });
 
-    // the alarm event fields on the home are what this event announces, and an event without a
-    // home is the only way to learn them, so that read has to stay
-    it('still refreshes the home when the event carries none', async () => {
+    // the home's alarm fields arrive only with a full read, so an event carrying no home still
+    // needs one - but that read answers with every device in the home
+    it('reads the home when the event carries none', async () => {
         const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
-        let configurationReads = 0;
+        let reads = 0;
         adapter._api.callRestApi = () => {
-            configurationReads++;
+            reads++;
             return Promise.resolve({ home: HOME });
         };
         await adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' });
 
-        assert.strictEqual(configurationReads, 1);
-        assert.deepStrictEqual(adapter.states['homes.HOME.powerMeterCurrency'], { val: 'EUR', ack: true });
+        assert.strictEqual(reads, 1);
+        assert.deepStrictEqual(adapter.states[`${base}.alarmActive`], { val: true, ack: true });
+        assert.deepStrictEqual(adapter.states[`${base}.activationInProgress`], { val: false, ack: true });
         assert.strictEqual(adapter.states[`${base}.securityJournalEventType`].val, 'ACTIVATION_CHANGED');
+    });
+
+    it('refreshes the cached configuration from the response it read', async () => {
+        const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
+        const snapshot = { home: HOME, groups: { 'G-9': { id: 'G-9' } }, devices: {}, clients: {} };
+        let applied = null;
+        adapter._api.applyCurrentState = state => (applied = state);
+        adapter._api.callRestApi = () => Promise.resolve(snapshot);
+        await adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' });
+
+        assert.strictEqual(applied, snapshot, 'the states published from the cache would stay stale otherwise');
+    });
+
+    // some panels raise this event every few minutes; without the interval each one would pull
+    // every device in the home again
+    it('reads the home once per interval, however many events arrive', async () => {
+        const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
+        let reads = 0;
+        adapter._api.callRestApi = () => {
+            reads++;
+            return Promise.resolve({ home: HOME });
+        };
+
+        await adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' });
+        await adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' });
+        await adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' });
+
+        adapter._unload(() => {});
+        assert.strictEqual(reads, 1, 'the events inside the interval must not read again');
+    });
+
+    // _parseEventdata does not await the handler, so a burst arrives as concurrent callers
+    it('reads once for a burst that arrives while the read is in flight', async () => {
+        const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
+        adapter._homeReadInterval = 20;
+        let reads = 0;
+        adapter._api.callRestApi = () => {
+            reads++;
+            return new Promise(resolve => setTimeout(() => resolve({ home: HOME }), 30));
+        };
+
+        await Promise.all([
+            adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' }),
+            adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' }),
+            adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' }),
+        ]);
+
+        assert.strictEqual(reads, 1, 'a second read must not start while one is in flight');
+        await new Promise(resolve => setTimeout(resolve, 40));
+        adapter._unload(() => {});
+        assert.strictEqual(reads, 2, 'the events it absorbed are still worth one read afterwards');
+    });
+
+    it('retries soon after a read that answered nothing, rather than waiting out the interval', async () => {
+        const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
+        let reads = 0;
+        adapter._api.callRestApi = () => {
+            reads++;
+            return Promise.resolve(reads === 1 ? undefined : { home: HOME });
+        };
+        await adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' });
+
+        assert.strictEqual(reads, 1);
+        assert.ok(
+            adapter._nextHomeRead < performance.now() + 60000,
+            `a failed read must not reserve the whole interval, it reserved ${adapter._nextHomeRead - performance.now()}ms`,
+        );
+        assert.ok(adapter._homeReadTimeout, 'the read that published nothing has to be retried');
+        adapter._unload(() => {});
+    });
+
+    // a timer that came due while the loop was busy is still armed when the next event reads
+    it('disarms a deferred read the event it was waiting for has already done', async () => {
+        const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
+        adapter._homeReadInterval = 20;
+        let reads = 0;
+        adapter._api.callRestApi = () => {
+            reads++;
+            return Promise.resolve({ home: HOME });
+        };
+
+        await adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' });
+        await adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' });
+        const busyUntil = performance.now() + 40;
+        while (performance.now() < busyUntil) {
+            // hold the loop, so the deferred read comes due without being able to run
+        }
+        await adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' });
+        assert.strictEqual(reads, 2);
+
+        await new Promise(resolve => setTimeout(resolve, 60));
+        adapter._unload(() => {});
+        assert.strictEqual(reads, 2, 'the stale timer would read again with no event behind it');
+    });
+
+    it('waits only what is left of the interval before the deferred read', async () => {
+        const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
+        adapter._homeReadInterval = 200;
+        let reads = 0;
+        adapter._api.callRestApi = () => {
+            reads++;
+            return Promise.resolve({ home: HOME });
+        };
+
+        await adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' });
+        await new Promise(resolve => setTimeout(resolve, 150));
+        await adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' });
+        assert.strictEqual(reads, 1);
+
+        await new Promise(resolve => setTimeout(resolve, 100));
+        adapter._unload(() => {});
+        assert.strictEqual(reads, 2, 'the deferred read has to land at the end of the interval, not one later');
+    });
+
+    it('defers the read of an event inside the interval instead of dropping it', async () => {
+        const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
+        adapter._homeReadInterval = 20;
+        let reads = 0;
+        adapter._api.callRestApi = () => {
+            reads++;
+            return Promise.resolve({ home: HOME });
+        };
+
+        await adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' });
+        await adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' });
+        assert.strictEqual(reads, 1);
+
+        await new Promise(resolve => setTimeout(resolve, 60));
+        assert.strictEqual(reads, 2, 'the deferred read has to happen once the interval is over');
+    });
+
+    it('leaves no deferred read behind when the adapter unloads', async () => {
+        const adapter = createHarness({ homeGetSecurityJournal: () => Promise.resolve({ entries: ENTRIES }) });
+        adapter._homeReadInterval = 20;
+        let reads = 0;
+        adapter._api.callRestApi = () => {
+            reads++;
+            return Promise.resolve({ home: HOME });
+        };
+
+        await adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' });
+        await adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' });
+        await adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' });
+        await adapter._eventRaised({ pushEventType: 'SECURITY_JOURNAL_CHANGED' });
+        adapter._unload(() => {});
+
+        await new Promise(resolve => setTimeout(resolve, 60));
+        assert.strictEqual(reads, 1, 'a timer that outlives the adapter would read against a disposed api');
     });
 
     // _parseEventdata does not await the handler, so a burst arrives as concurrent callers
@@ -699,6 +875,114 @@ describe('reporting an alarm activation', () => {
         await adapter._setSecurityZonesActivation(true, true);
 
         assert.match(adapter.logged.warn.join(' '), /blocked by Front door: WINDOW_OPEN/);
+    });
+});
+
+describe('the security zones on the home', () => {
+    const BASE = 'homes.HOME.functionalHomes.securityAndAlarm';
+
+    it('publishes the armed zones where a user looks for them, not only on the zone group', async () => {
+        const adapter = createHarness({
+            securityZonesArmedState: () => ({ requestBased: true, internal: true, external: true, mode: 'ABSENCE' }),
+        });
+        await adapter._createObjectsForHome(HOME);
+        await adapter._updateHomeStates(HOME);
+
+        assert.deepStrictEqual(adapter.states[`${BASE}.securityZonesArmedMode`], { val: 'ABSENCE', ack: true });
+        assert.deepStrictEqual(adapter.states[`${BASE}.internalZoneArmed`], { val: true, ack: true });
+        assert.deepStrictEqual(adapter.states[`${BASE}.externalZoneArmed`], { val: true, ack: true });
+    });
+
+    it('refreshes them from a zone group event, which is what a panel sends when it arms', async () => {
+        const adapter = createHarness({
+            securityZonesArmedState: () => ({ requestBased: true, internal: false, external: true, mode: 'PRESENCE' }),
+        });
+        const group = { id: 'G-1', type: 'SECURITY_ZONE', label: 'PRESENCE', active: true };
+        await adapter._createObjectsForGroup(group);
+        await adapter._updateGroupStates(group);
+
+        assert.deepStrictEqual(adapter.states[`${BASE}.securityZonesArmedMode`], { val: 'PRESENCE', ack: true });
+        assert.deepStrictEqual(adapter.states[`${BASE}.externalZoneArmed`], { val: true, ack: true });
+    });
+
+    const ALL_MODES = ['OFF', 'PRESENCE', 'ABSENCE', 'INTERNAL', 'EXTERNAL', 'INTERNAL_AND_EXTERNAL'];
+
+    it('offers every mode it can dispatch, and nothing else', async () => {
+        const adapter = createHarness();
+        await adapter._createObjectsForHome(HOME);
+
+        const control = adapter.objects[`${BASE}.activateSecurityZones`];
+        assert.deepStrictEqual(Object.keys(control.common.states), ALL_MODES);
+        assert.strictEqual(control.common.write, true);
+        assert.strictEqual(control.common.read, false, 'the armed mode is read on securityZonesArmedMode');
+    });
+
+    // extendObject merges, so a mode list narrowed for the panel of the day could never lose the
+    // keys of the wider one again - a home migrated to the request-based dashboard would keep
+    // offering INTERNAL for good
+    it('offers the same modes whichever dashboard the home has today', async () => {
+        const adapter = createHarness({ hasRequestBasedSecurityZones: () => false });
+        await adapter._createObjectsForHome(HOME);
+        adapter._api.hasRequestBasedSecurityZones = () => true;
+        await adapter._createObjectsForHome(HOME);
+
+        assert.deepStrictEqual(Object.keys(adapter.objects[`${BASE}.activateSecurityZones`].common.states), ALL_MODES);
+        assert.deepStrictEqual(Object.keys(adapter.objects[`${BASE}.securityZonesArmedMode`].common.states), ALL_MODES);
+    });
+
+    for (const [mode, args] of [
+        ['OFF', [false, false]],
+        ['PRESENCE', [false, true]],
+        ['ABSENCE', [true, true]],
+        ['INTERNAL', [true, false]],
+        ['EXTERNAL', [false, true]],
+        ['INTERNAL_AND_EXTERNAL', [true, true]],
+    ]) {
+        it(`arms ${mode} as internal=${args[0]}, external=${args[1]}`, async () => {
+            const adapter = createHarness();
+            await adapter._createObjectsForHome(HOME);
+            await change(adapter, `${BASE}.activateSecurityZones`, mode);
+
+            assert.deepStrictEqual(adapter.calls, [{ method: 'homeSetZonesActivation', args }]);
+        });
+    }
+
+    it('sends nothing for a mode the panel does not have', async () => {
+        const adapter = createHarness();
+        await adapter._createObjectsForHome(HOME);
+        await change(adapter, `${BASE}.activateSecurityZones`, 'ARMED');
+
+        assert.deepStrictEqual(adapter.calls, []);
+        assert.match(adapter.logged.info.join(' '), /Ignore invalid value for activateSecurityZones/);
+    });
+
+    it('takes a mode a script wrote in lower case', async () => {
+        const adapter = createHarness();
+        await adapter._createObjectsForHome(HOME);
+        await change(adapter, `${BASE}.activateSecurityZones`, ' absence ');
+
+        assert.deepStrictEqual(adapter.calls, [{ method: 'homeSetZonesActivation', args: [true, true] }]);
+    });
+
+    it('publishes nothing for a zone group while no home is known', async () => {
+        const adapter = createHarness({
+            securityZonesArmedState: () => ({ requestBased: true, internal: true, external: true, mode: 'ABSENCE' }),
+        });
+        const group = { id: 'G-1', type: 'SECURITY_ZONE', label: 'ABSENCE', active: true };
+        await adapter._createObjectsForGroup(group);
+        adapter._api.home = undefined;
+        await adapter._updateGroupStates(group);
+
+        assert.strictEqual(adapter.states[`${BASE}.securityZonesArmedMode`], undefined);
+        assert.deepStrictEqual(adapter.states['groups.G-1.active'], { val: true, ack: true });
+    });
+
+    it('sends nothing for a value that only inherits from Object.prototype', async () => {
+        const adapter = createHarness();
+        await adapter._createObjectsForHome(HOME);
+        await change(adapter, `${BASE}.activateSecurityZones`, 'constructor');
+
+        assert.deepStrictEqual(adapter.calls, []);
     });
 });
 

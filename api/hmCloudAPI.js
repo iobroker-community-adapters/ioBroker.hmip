@@ -191,17 +191,26 @@ class HmCloudAPI {
     }
 
     // =========== API for HM ===========
+    /**
+     * Replaces the cached configuration with a getCurrentState response.
+     *
+     * @param {object} state a getCurrentState response
+     * @returns {void}
+     */
+    applyCurrentState(state) {
+        this.home = state.home;
+        this.groups = state.groups || {};
+        this.clients = state.clients || {};
+        this.devices = state.devices || {};
+        this.rules = (state.home && state.home.ruleMetaDatas) || {};
+    }
+
     async loadCurrentConfig() {
         let state = await this.callRestApi('home/getCurrentState', this._clientCharacteristics);
-        if (state) {
-            this.home = state.home;
-            this.groups = state.groups;
-            this.clients = state.clients;
-            this.devices = state.devices;
-            this.rules = (state.home && state.home.ruleMetaDatas) || {};
-        } else {
+        if (!state) {
             throw new Error('No current State received');
         }
+        this.applyCurrentState(state);
     }
 
     // =========== Event Handling ===========
@@ -968,6 +977,55 @@ class HmCloudAPI {
 
     hasClassicSecurityZones() {
         return this._securityZoneGroups().some(group => group.label === 'INTERNAL' || group.label === 'EXTERNAL');
+    }
+
+    /**
+     * Reports which security zones are armed, mapped onto the classic internal/external pair.
+     *
+     * A request-based panel arms the mutually exclusive ABSENCE or PRESENCE zone instead, so
+     * ABSENCE reads as armed away (both) and PRESENCE as armed at home (external only) - the
+     * same mapping `_buildZonesActivation` writes.
+     *
+     * @returns {{requestBased: boolean, internal: boolean, external: boolean, mode: string}}
+     *          `mode` is the zone combination in the panel's own vocabulary: OFF, PRESENCE or
+     *          ABSENCE on a request-based panel, OFF, INTERNAL, EXTERNAL or INTERNAL_AND_EXTERNAL
+     *          on a classic one.
+     */
+    securityZonesArmedState() {
+        // zone labels come from the cloud, so they must not reach an object's prototype
+        const armed = Object.create(null);
+        for (const group of this._securityZoneGroups()) {
+            // request-based panels omit "active" on a disarmed zone
+            armed[group.label] = group.active === true;
+        }
+        // a home can carry both zone families at once, and then either of them can be the armed
+        // one, so neither may be ignored - reading only one family reports a disarmed home
+        const internal = armed.INTERNAL === true || armed.ABSENCE === true;
+        const external = armed.EXTERNAL === true || armed.ABSENCE === true || armed.PRESENCE === true;
+        const requestBased = this.hasRequestBasedSecurityZones();
+        return { requestBased, internal, external, mode: this._securityZoneMode(requestBased, internal, external) };
+    }
+
+    /**
+     * @param {boolean} requestBased whether the home has ABSENCE/PRESENCE zones
+     * @param {boolean} internal whether the internal zone is armed
+     * @param {boolean} external whether the external zone is armed
+     * @returns {string} the armed combination in the vocabulary the panel's own dashboard uses
+     */
+    _securityZoneMode(requestBased, internal, external) {
+        if (requestBased) {
+            if (internal) {
+                return 'ABSENCE';
+            }
+            return external ? 'PRESENCE' : 'OFF';
+        }
+        if (internal && external) {
+            return 'INTERNAL_AND_EXTERNAL';
+        }
+        if (internal) {
+            return 'INTERNAL';
+        }
+        return external ? 'EXTERNAL' : 'OFF';
     }
 
     _buildZonesActivation(requestBased, internal, external) {

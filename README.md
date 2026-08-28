@@ -35,7 +35,9 @@ I may also need a JSON of a state change.
 
 Thank you!
 
-If you are looking for the information, if the alarm settings are active, you have to check the active status of the group INTERNAL and EXTERNAL, they represent in combination the three alarm states. INTERNAL and EXTERNAL actives means Away, only EXTERNAL active means only Perimeter active.
+If you are looking for the information whether the alarm system is armed, read `homes.<homeId>.functionalHomes.securityAndAlarm.securityZonesArmedMode`. It reports `OFF`, `PRESENCE`/`EXTERNAL` (perimeter only) or `ABSENCE`/`INTERNAL_AND_EXTERNAL` (away), in the vocabulary of the dashboard the home uses - `ABSENCE`/`PRESENCE` on the request-based dashboard, `INTERNAL`/`EXTERNAL` on the classic one. `internalZoneArmed` and `externalZoneArmed` beside it carry the same information as the classic pair of booleans on either dashboard. To arm or disarm, write a mode to `activateSecurityZones`.
+
+Note that `functionalHomes.securityAndAlarm.active` is not the armed state - it reports whether the home has the security solution at all.
 
 ## Important Info what can be done with this adapter
 !!! You can only trigger events with this adapter that can be triggered through the original Homematic IP app. 
@@ -69,6 +71,11 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
+### **WORK IN PROGRESS**
+- (@Apollon77) The armed state of the alarm system is now published on the home, as functionalHomes.securityAndAlarm.securityZonesArmedMode plus internalZoneArmed and externalZoneArmed. It was only readable on the opaque security zone group before, whose label differs between the classic (INTERNAL/EXTERNAL) and the request-based (ABSENCE/PRESENCE) dashboard
+- (@Apollon77) Added functionalHomes.securityAndAlarm.activateSecurityZones, which arms the alarm system by mode name: OFF, PRESENCE, ABSENCE, INTERNAL, EXTERNAL or INTERNAL_AND_EXTERNAL. Every mode works on either dashboard - on the request-based one PRESENCE and EXTERNAL both arm the perimeter, ABSENCE and INTERNAL_AND_EXTERNAL both arm away - so securityZonesArmedMode can report the written mode under the other dashboard's name. The setSecurityZonesActivation* buttons still work
+- (@Apollon77) A security journal event that carries no home now reads the whole configuration at most once every five minutes, instead of once per event. Some homes raise that event every few minutes, which made the adapter re-read every device each time. The home's alarm fields (alarmActive, the alarmEvent* datapoints, activationInProgress) still get published; an event inside the five minutes defers the read to the end of them rather than dropping it, and a read that answered nothing is retried after 30 seconds instead of silencing the datapoints for the whole interval
+
 ### 3.0.0 (2026-08-24)
 - (@Apollon77) **Breaking:** shutterLevel, slatsLevel, dimLevel, primaryShadingLevel, secondaryShadingLevel and minimumFloorHeatingValvePosition now report 0..100 on the channels that declare that range, matching the ioBroker convention and the range the datapoint has always advertised. They previously advertised 0..100 but reported the cloud's 0..1 fraction. Writing is unchanged: a value above 1 is read as a percentage, anything else as a fraction
 - (@Apollon77) Fixed arming/disarming the alarm system on the new request-based security dashboard (ABSENCE/PRESENCE security zones)

@@ -64,6 +64,120 @@ describe('hmCloudAPI security zone detection', () => {
     });
 });
 
+describe('securityZonesArmedState', () => {
+    function zones(groups) {
+        const api = new HmCloudAPI();
+        api.groups = groups;
+        return api.securityZonesArmedState();
+    }
+
+    it('reads the classic zones as the pair they are', () => {
+        assert.deepStrictEqual(
+            zones({
+                g1: { type: 'SECURITY_ZONE', label: 'INTERNAL', active: true },
+                g2: { type: 'SECURITY_ZONE', label: 'EXTERNAL', active: true },
+            }),
+            { requestBased: false, internal: true, external: true, mode: 'INTERNAL_AND_EXTERNAL' },
+        );
+        assert.deepStrictEqual(
+            zones({
+                g1: { type: 'SECURITY_ZONE', label: 'INTERNAL', active: false },
+                g2: { type: 'SECURITY_ZONE', label: 'EXTERNAL', active: true },
+            }),
+            { requestBased: false, internal: false, external: true, mode: 'EXTERNAL' },
+        );
+        assert.deepStrictEqual(
+            zones({
+                g1: { type: 'SECURITY_ZONE', label: 'INTERNAL', active: true },
+                g2: { type: 'SECURITY_ZONE', label: 'EXTERNAL', active: false },
+            }),
+            { requestBased: false, internal: true, external: false, mode: 'INTERNAL' },
+        );
+        assert.deepStrictEqual(zones(CLASSIC_GROUPS), {
+            requestBased: false,
+            internal: false,
+            external: false,
+            mode: 'OFF',
+        });
+    });
+
+    it('maps an armed ABSENCE zone onto armed away', () => {
+        assert.deepStrictEqual(
+            zones({
+                g4: { type: 'SECURITY_ZONE', label: 'ABSENCE', active: true },
+                g5: { type: 'SECURITY_ZONE', label: 'PRESENCE' },
+            }),
+            { requestBased: true, internal: true, external: true, mode: 'ABSENCE' },
+        );
+    });
+
+    it('maps an armed PRESENCE zone onto armed at home', () => {
+        assert.deepStrictEqual(
+            zones({
+                g4: { type: 'SECURITY_ZONE', label: 'ABSENCE' },
+                g5: { type: 'SECURITY_ZONE', label: 'PRESENCE', active: true },
+            }),
+            { requestBased: true, internal: false, external: true, mode: 'PRESENCE' },
+        );
+    });
+
+    it('prefers ABSENCE when a panel reports both zones armed', () => {
+        assert.strictEqual(
+            zones({
+                g4: { type: 'SECURITY_ZONE', label: 'ABSENCE', active: true },
+                g5: { type: 'SECURITY_ZONE', label: 'PRESENCE', active: true },
+            }).mode,
+            'ABSENCE',
+        );
+    });
+
+    it('reads a request-based panel with no armed zone as off', () => {
+        assert.deepStrictEqual(zones(REQUEST_BASED_GROUPS), {
+            requestBased: true,
+            internal: false,
+            external: false,
+            mode: 'OFF',
+        });
+    });
+
+    it('arms the zones of both families when a home carries both', () => {
+        assert.deepStrictEqual(
+            zones({
+                g1: { type: 'SECURITY_ZONE', label: 'INTERNAL', active: true },
+                g2: { type: 'SECURITY_ZONE', label: 'EXTERNAL', active: true },
+                g4: { type: 'SECURITY_ZONE', label: 'ABSENCE', active: false },
+                g5: { type: 'SECURITY_ZONE', label: 'PRESENCE', active: false },
+            }),
+            { requestBased: true, internal: true, external: true, mode: 'ABSENCE' },
+            'the classic zones of a mixed home must not read as disarmed',
+        );
+    });
+
+    it('only reads a zone the cloud calls active as armed', () => {
+        assert.strictEqual(zones({ g1: { type: 'SECURITY_ZONE', label: 'EXTERNAL', active: 1 } }).external, false);
+        assert.strictEqual(zones({ g1: { type: 'SECURITY_ZONE', label: 'EXTERNAL', active: 'true' } }).external, false);
+    });
+
+    // characterization: the labels come from the cloud, and the accumulator is prototype-less
+    it('does not read a zone labelled __proto__ as armed', () => {
+        assert.deepStrictEqual(zones({ g1: { type: 'SECURITY_ZONE', label: '__proto__', active: true } }), {
+            requestBased: false,
+            internal: false,
+            external: false,
+            mode: 'OFF',
+        });
+    });
+
+    it('survives an absent group cache', () => {
+        assert.deepStrictEqual(zones(undefined), {
+            requestBased: false,
+            internal: false,
+            external: false,
+            mode: 'OFF',
+        });
+    });
+});
+
 describe('homeSetZonesActivation on a classic panel', () => {
     it('posts the additive INTERNAL/EXTERNAL zones to setZonesActivation', async () => {
         const api = createApi(CLASSIC_GROUPS, '');
