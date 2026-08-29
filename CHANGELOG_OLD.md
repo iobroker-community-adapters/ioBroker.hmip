@@ -1,7 +1,10 @@
 # Older changes
+## 1.26.4 (2025-01-03)
+* (@Apollon77) Optimized Websocket disconnect cases
+
+
 ## 1.26.3 (2024-12-29)
 * (@GermanBluefox) Updated packages
-
 
 ## 1.26.2 (2024-12-10)
 * (@mcm1957) Adapter requires node.js 20 now
