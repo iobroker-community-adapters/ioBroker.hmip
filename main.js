@@ -14,6 +14,24 @@ const {
 
 const adapterName = require('./package.json').name.split('.').pop();
 
+// the home's alarm fields only arrive with a full read, which answers with every device in the
+// home, so a panel raising the security journal event every few minutes must not drive one each time
+const HOME_REREAD_INTERVAL = 300000;
+
+// a read that failed published nothing, so it must not reserve the whole interval
+const HOME_READ_RETRY_INTERVAL = 30000;
+
+// what a mode selected in activateSecurityZones asks of the classic internal/external pair;
+// homeSetZonesActivation maps that onto a request-based panel's ABSENCE/PRESENCE zones
+const SECURITY_ZONE_MODES = Object.assign(Object.create(null), {
+    OFF: { internal: false, external: false },
+    PRESENCE: { internal: false, external: true },
+    ABSENCE: { internal: true, external: true },
+    INTERNAL: { internal: true, external: false },
+    EXTERNAL: { internal: false, external: true },
+    INTERNAL_AND_EXTERNAL: { internal: true, external: true },
+});
+
 class HmIpCloudAccesspointAdapter extends Adapter {
     constructor(options) {
         super({ ...options, name: adapterName });
@@ -36,6 +54,13 @@ class HmIpCloudAccesspointAdapter extends Adapter {
 
         this._unloaded = false;
         this._requestTokenState = { state: 'idle' };
+        this._homeReadInterval = HOME_REREAD_INTERVAL;
+        this._homeReadRetryInterval = HOME_READ_RETRY_INTERVAL;
+        this._nextHomeRead = 0;
+        this._homeReadRunning = false;
+        this._homeReadPending = false;
+        this._homePublishSeq = 0;
+        this._dataEpoch = 0;
 
         this.wsConnected = false;
         this.wsConnectionStableTimeout = null;
@@ -171,6 +196,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
 
     async _initData() {
         await this._api.loadCurrentConfig();
+        // a read that started before this snapshot answers for the configuration it replaces
+        this._dataEpoch++;
+        this._nextHomeRead = performance.now() + this._homeReadInterval;
         this.log.debug('createObjectsForDevices');
         await this._createObjectsForDevices();
         this.log.debug('createObjectsForGroups');
@@ -830,6 +858,16 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 case 'deactivateVacation':
                     await this._api.homeHeatingDeactivateVacation();
                     break;
+                case 'activateSecurityZones': {
+                    // scripts and widgets write the mode in whatever case they please
+                    const mode = SECURITY_ZONE_MODES[String(state.val).trim().toUpperCase()];
+                    if (!mode) {
+                        this.log.info(`Ignore invalid value for activateSecurityZones: ${state.val}`);
+                        return;
+                    }
+                    await this._setSecurityZonesActivation(mode.internal, mode.external);
+                    break;
+                }
                 case 'setSecurityZonesActivationNone':
                     await this._setSecurityZonesActivation(false, false);
                     break;
@@ -1149,11 +1187,16 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             case 'DEVICE_REMOVED':
                 break;
             case 'GROUP_REMOVED':
+                // the api has already dropped the group, so the armed zones are whatever is left
+                if (this._api.home) {
+                    await Promise.all(this._updateSecurityZonesArmed(this._api.home.id));
+                }
                 break;
             case 'CLIENT_REMOVED':
                 break;
             case 'HOME_CHANGED':
                 if (ev && ev.home) {
+                    this._homePublishSeq++;
                     await this._updateHomeStates(ev.home);
                 } else {
                     this.log.warn(`No home in HOME_CHANGED: ${JSON.stringify(ev)}`);
@@ -1161,13 +1204,13 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 break;
             case 'SECURITY_JOURNAL_CHANGED':
                 if (ev && ev.home) {
+                    this._homePublishSeq++;
                     await this._updateHomeStates(ev.home);
                 } else {
-                    // the alarm event fields on the home are what this event announces, and only
-                    // the full read carries them
-                    this.log.debug(`Read Home for SECURITY_JOURNAL_CHANGED: ${JSON.stringify(ev)}`);
-                    const state = await this._api.callRestApi('home/getCurrentState', this._api._clientCharacteristics);
-                    state && state.home && (await this._updateHomeStates(state.home));
+                    // the read waits out its interval, which must not hold up the journal
+                    this._readHomeForAlarmFields().catch(err =>
+                        this.log.warn(`Could not read the home for its alarm fields: ${err}`),
+                    );
                 }
                 await this._updateSecurityJournal();
                 break;
@@ -1376,7 +1419,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }
         if (!outcome.confirmed) {
             this.log.info(
-                `The alarm system accepted ${requested} but reported no detail, so it is not confirmed. Check securityAndAlarm.active.`,
+                `The alarm system accepted ${requested} but reported no detail, so it is not confirmed. Check securityAndAlarm.securityZonesArmedMode.`,
             );
         }
         if (outcome.lowBatteryLookupIncomplete) {
@@ -1467,6 +1510,8 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             return;
         }
         this.log.info(`New data structures detected ... reinitialize in 5s... ${id}`);
+        // a read still in flight answers for the configuration this replaces
+        this._dataEpoch++;
         this._api.dispose();
         this.reInitDataTimeout = setTimeout(async () => {
             this.reInitDataTimeout = null;
@@ -1641,6 +1686,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 case 'SECURITY_ZONE': {
                     // request-based panels omit "active" on a disarmed zone
                     promises.push(this.secureSetStateAsync(`groups.${group.id}.active`, group.active === true, true));
+                    if (this._api.home) {
+                        promises.push(...this._updateSecurityZonesArmed(this._api.home.id));
+                    }
                     promises.push(this.secureSetStateAsync(`groups.${group.id}.silent`, group.silent, true));
                     promises.push(this.secureSetStateAsync(`groups.${group.id}.windowState`, group.windowState, true));
                     promises.push(
@@ -1747,6 +1795,25 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             return Promise.all(promises);
         }
         this._reinitializeData(`Client ${client.id}`);
+    }
+
+    /**
+     * Publishes which security zones are armed on the home, where a user looks for it.
+     *
+     * The zone groups carry the armed flag, but their labels differ between panel generations
+     * and their ids are opaque, so the home is the only place a script can read it reliably.
+     *
+     * @param {string} homeId the home the security zones belong to
+     * @returns {Promise<void>[]} one promise per published state
+     */
+    _updateSecurityZonesArmed(homeId) {
+        const armed = this._api.securityZonesArmedState();
+        const base = `homes.${homeId}.functionalHomes.securityAndAlarm`;
+        return [
+            this.secureSetStateAsync(`${base}.securityZonesArmedMode`, armed.mode, true),
+            this.secureSetStateAsync(`${base}.internalZoneArmed`, armed.internal, true),
+            this.secureSetStateAsync(`${base}.externalZoneArmed`, armed.external, true),
+        ];
     }
 
     _updateHomeStates(home) {
@@ -1880,6 +1947,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     true,
                 ),
             );
+            promises.push(...this._updateSecurityZonesArmed(home.id));
         }
         if (functionalHomes.INDOOR_CLIMATE) {
             promises.push(
@@ -3014,6 +3082,85 @@ class HmIpCloudAccesspointAdapter extends Adapter {
     }
 
     /**
+     * Reads the home so its alarm fields can be published, at most once per `_homeReadInterval`.
+     *
+     * Only a full read carries those fields, and the event announcing them arrives every few
+     * minutes on some homes, so the interval is waited out inside the lock: events arriving
+     * meanwhile are absorbed and answered by one read afterwards. `_updateSecurityJournal` holds
+     * its reads apart the same way.
+     *
+     * @returns {Promise<void>}
+     */
+    async _readHomeForAlarmFields() {
+        if (this._homeReadRunning) {
+            this._homeReadPending = true;
+            return;
+        }
+        this._homeReadRunning = true;
+        try {
+            do {
+                // wall clock steps, and this measures an elapsed interval. A reload reads the
+                // configuration itself and moves the deadline, so it is sampled again after waking
+                let wait = this._nextHomeRead - performance.now();
+                while (wait > 0) {
+                    await this._sleep(wait);
+                    if (this._unloaded) {
+                        return;
+                    }
+                    wait = this._nextHomeRead - performance.now();
+                }
+                // the request about to go out answers for every event that waited for it, so only
+                // the ones arriving while it is in flight are worth another read
+                this._homeReadPending = false;
+                await this._publishHomeFromCloud();
+            } while (this._homeReadPending && !this._unloaded);
+        } finally {
+            this._homeReadRunning = false;
+        }
+    }
+
+    /**
+     * Reads the configuration and publishes the home out of it.
+     *
+     * @returns {Promise<void>}
+     */
+    async _publishHomeFromCloud() {
+        const epoch = this._dataEpoch;
+        const publishSeq = this._homePublishSeq;
+        this.log.debug('Read Home for its alarm fields');
+        const state = await this._api.callRestApi('home/getCurrentState', this._api._clientCharacteristics);
+        if (this._unloaded || this._dataEpoch !== epoch) {
+            return;
+        }
+        if (!state || !state.home) {
+            // the api logs why; retrying beats leaving the alarm fields unpublished for the interval
+            this._nextHomeRead = performance.now() + this._homeReadRetryInterval;
+            return;
+        }
+        if (this._homePublishSeq !== publishSeq) {
+            // the cloud composed this answer before that push, so it is the older of the two. The
+            // push need not have carried the alarm fields, so this read is owed another attempt
+            this.log.debug('Discard the home read a push overtook');
+            this._nextHomeRead = performance.now() + this._homeReadRetryInterval;
+            this._homeReadPending = true;
+            return;
+        }
+        this._nextHomeRead = performance.now() + this._homeReadInterval;
+        await this._updateHomeStates(state.home);
+    }
+
+    /**
+     * @param {number} ms how long to wait
+     * @returns {Promise<void>}
+     */
+    _sleep(ms) {
+        return new Promise(resolve => {
+            const timer = setTimeout(resolve, ms);
+            timer.unref && timer.unref();
+        });
+    }
+
+    /**
      * Reads the security journal and publishes it.
      *
      * A burst of journal events must not turn into a burst of reads: a read already running
@@ -3283,6 +3430,63 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 type: 'state',
                 common: { name: 'setCooling', type: 'boolean', role: 'switch', read: true, write: true },
                 native: { id: home.id, parameter: 'setCooling' },
+            }),
+        );
+        // every mode works on either dashboard, so this map must not depend on the panel a home
+        // has today: extendObject merges, and a narrowed map would leave the wider one's keys
+        const armedModes = Object.fromEntries(Object.keys(SECURITY_ZONE_MODES).map(mode => [mode, mode]));
+        promises.push(
+            this.extendObject(`homes.${home.id}.functionalHomes.securityAndAlarm.securityZonesArmedMode`, {
+                type: 'state',
+                common: {
+                    name: 'securityZonesArmedMode',
+                    type: 'string',
+                    role: 'text',
+                    read: true,
+                    write: false,
+                    states: armedModes,
+                },
+                native: {},
+            }),
+        );
+        promises.push(
+            this.extendObject(`homes.${home.id}.functionalHomes.securityAndAlarm.internalZoneArmed`, {
+                type: 'state',
+                common: {
+                    name: 'internalZoneArmed',
+                    type: 'boolean',
+                    role: 'indicator',
+                    read: true,
+                    write: false,
+                },
+                native: {},
+            }),
+        );
+        promises.push(
+            this.extendObject(`homes.${home.id}.functionalHomes.securityAndAlarm.externalZoneArmed`, {
+                type: 'state',
+                common: {
+                    name: 'externalZoneArmed',
+                    type: 'boolean',
+                    role: 'indicator',
+                    read: true,
+                    write: false,
+                },
+                native: {},
+            }),
+        );
+        promises.push(
+            this.extendObject(`homes.${home.id}.functionalHomes.securityAndAlarm.activateSecurityZones`, {
+                type: 'state',
+                common: {
+                    name: 'activateSecurityZones',
+                    type: 'string',
+                    role: 'text',
+                    read: false,
+                    write: true,
+                    states: armedModes,
+                },
+                native: { parameter: 'activateSecurityZones' },
             }),
         );
         promises.push(
