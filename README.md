@@ -71,7 +71,7 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 3.1.1 (2026-08-29)
 - (@Apollon77) Added functionalHomes.securityAndAlarm.securityZonesArmedMode, internalZoneArmed and externalZoneArmed, so the armed state of the alarm system is readable on the home instead of only on the security zone group
 - (@Apollon77) Added functionalHomes.securityAndAlarm.activateSecurityZones: write OFF, PRESENCE, ABSENCE, INTERNAL, EXTERNAL or INTERNAL_AND_EXTERNAL to arm or disarm. Every mode works on both the classic and the request-based dashboard
 - (@Apollon77) Fixed a home with both INTERNAL/EXTERNAL and ABSENCE/PRESENCE zones reading as disarmed while one of the families was armed
@@ -139,6 +139,7 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 
 ### 1.26.5 (2025-01-27)
 * (@Apollon77) Fixed Websocket disconnect cases
+
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 
