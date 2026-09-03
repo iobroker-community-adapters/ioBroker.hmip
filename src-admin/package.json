@@ -13,7 +13,7 @@
         "@iobroker/gui-components": "^10.1.0",
         "@iobroker/json-config": "^9.0.22",
         "@module-federation/runtime": "^2.8.2",
-        "@module-federation/vite": "^1.20.7",
+        "@module-federation/vite": "^1.20.9",
         "@mui/icons-material": "^9.3.1",
         "@mui/material": "^9.3.1",
         "@originjs/vite-plugin-federation": "^1.4.1",
