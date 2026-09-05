@@ -72,7 +72,7 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 -->
 ## Changelog
 ### **WORK IN PROGRESS**
-- (@Apollon77) Added the DISTANCE_SENSOR_CHANNEL, so the ELV-SH-DUSI ultrasonic distance sensor interface reports distance, calculatedHeight, referenceHeight, heightActivated, measuringInterval and distanceSensorVoltage
+- (@Apollon77) Added the DISTANCE_SENSOR_CHANNEL, so the ELV-SH-DUSI ultrasonic distance sensor interface reports distance, calculatedHeight and referenceHeight in cm, measuringInterval in minutes, heightActivated and distanceSensorVoltage
 - (@Apollon77) Added the FLOOR_TERMINAL_BLOCK_CHANNEL of the floor heating actuators (HmIP-FAL230-C6/C10, HmIP-FALMOT-C12), reporting valvePosition and the humidity limiter, dew point, external clock, emergency operation and frost protection states
 - (@Apollon77) The FLOOR_TERMINAL_BLOCK_LOCAL_PUMP_CHANNEL now reports those same states in addition to its pump times
 - (@Apollon77) The SINGLE_KEY_CHANNEL now reports acousticSendStateEnabled, actionParameter, doorBellSensorEventTimestamp, doublePressTime and visibleChannelIndex

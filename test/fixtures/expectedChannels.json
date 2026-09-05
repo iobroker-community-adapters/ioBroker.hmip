@@ -4686,6 +4686,7 @@
                     "name": "calculatedHeight",
                     "type": "number",
                     "role": "value",
+                    "unit": "cm",
                     "read": true,
                     "write": false
                 },
@@ -4698,6 +4699,7 @@
                     "name": "distance",
                     "type": "number",
                     "role": "value.distance",
+                    "unit": "cm",
                     "read": true,
                     "write": false
                 },
@@ -4734,6 +4736,7 @@
                     "name": "measuringInterval",
                     "type": "number",
                     "role": "value",
+                    "unit": "min",
                     "read": true,
                     "write": false
                 },
@@ -4746,6 +4749,7 @@
                     "name": "referenceHeight",
                     "type": "number",
                     "role": "value",
+                    "unit": "cm",
                     "read": true,
                     "write": false
                 },
