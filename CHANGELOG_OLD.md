@@ -1,4 +1,9 @@
 # Older changes
+## 1.26.5 (2025-01-27)
+* (@Apollon77) Fixed Websocket disconnect cases
+
+
+
 ## 1.26.4 (2025-01-03)
 * (@Apollon77) Optimized Websocket disconnect cases
 

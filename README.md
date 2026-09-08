@@ -71,7 +71,7 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 3.2.0 (2026-09-08)
 - (@Apollon77) Added the DISTANCE_SENSOR_CHANNEL, so the ELV-SH-DUSI ultrasonic distance sensor interface reports distance, calculatedHeight and referenceHeight in cm, measuringInterval in minutes, heightActivated and distanceSensorVoltage
 - (@Apollon77) Added the FLOOR_TERMINAL_BLOCK_CHANNEL of the floor heating actuators (HmIP-FAL230-C6/C10, HmIP-FALMOT-C12), reporting valvePosition and the humidity limiter, dew point, external clock, emergency operation and frost protection states
 - (@Apollon77) The FLOOR_TERMINAL_BLOCK_LOCAL_PUMP_CHANNEL now reports those same states in addition to its pump times
@@ -142,10 +142,6 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 * (SliX185) Support to control opticalSignalBehaviour for HMIP-BSL has been added.
 * (SliX185) Logging of PIN has been removed
 * (mcm1957) Dependencies have been updated.
-
-### 1.26.5 (2025-01-27)
-* (@Apollon77) Fixed Websocket disconnect cases
-
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 
