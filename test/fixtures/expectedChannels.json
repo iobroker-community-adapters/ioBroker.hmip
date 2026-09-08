@@ -4666,6 +4666,107 @@
             "userDesiredProfileMode": "OPEN"
         }
     },
+    "DISTANCE_SENSOR_CHANNEL": {
+        "channel": {
+            "functionalChannelType": "DISTANCE_SENSOR_CHANNEL",
+            "groups": [
+                "GRP-A",
+                "GRP-B"
+            ],
+            "calculatedHeight": 0.5,
+            "distance": 0.5,
+            "distanceSensorVoltage": "OPEN",
+            "heightActivated": true,
+            "measuringInterval": 0.5,
+            "referenceHeight": 0.5
+        },
+        "objects": {
+            "calculatedHeight": {
+                "common": {
+                    "name": "calculatedHeight",
+                    "type": "number",
+                    "role": "value",
+                    "unit": "cm",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
+            },
+            "distance": {
+                "common": {
+                    "name": "distance",
+                    "type": "number",
+                    "role": "value.distance",
+                    "unit": "cm",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
+            },
+            "distanceSensorVoltage": {
+                "common": {
+                    "name": "distanceSensorVoltage",
+                    "type": "string",
+                    "role": "text",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
+            },
+            "heightActivated": {
+                "common": {
+                    "name": "heightActivated",
+                    "type": "boolean",
+                    "role": "indicator",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
+            },
+            "measuringInterval": {
+                "common": {
+                    "name": "measuringInterval",
+                    "type": "number",
+                    "role": "value",
+                    "unit": "min",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
+            },
+            "referenceHeight": {
+                "common": {
+                    "name": "referenceHeight",
+                    "type": "number",
+                    "role": "value",
+                    "unit": "cm",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
+            }
+        },
+        "values": {
+            "calculatedHeight": 0.5,
+            "distance": 0.5,
+            "distanceSensorVoltage": "OPEN",
+            "heightActivated": true,
+            "measuringInterval": 0.5,
+            "referenceHeight": 0.5
+        }
+    },
     "DOOR_CHANNEL": {
         "channel": {
             "functionalChannelType": "DOOR_CHANNEL",
@@ -5183,6 +5284,118 @@
             "impulsesPerKWH": 0.5
         }
     },
+    "FLOOR_TERMINAL_BLOCK_CHANNEL": {
+        "channel": {
+            "functionalChannelType": "FLOOR_TERMINAL_BLOCK_CHANNEL",
+            "groups": [
+                "GRP-A",
+                "GRP-B"
+            ],
+            "dewPointAlarmActive": true,
+            "emergencyOperationActive": true,
+            "externalClockActive": true,
+            "frostProtectionActive": true,
+            "humidityLimiterAlarm": true,
+            "humidityLimiterPreAlarm": true,
+            "valvePosition": 0.5
+        },
+        "objects": {
+            "dewPointAlarmActive": {
+                "common": {
+                    "name": "dewPointAlarmActive",
+                    "type": "boolean",
+                    "role": "indicator",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
+            },
+            "emergencyOperationActive": {
+                "common": {
+                    "name": "emergencyOperationActive",
+                    "type": "boolean",
+                    "role": "indicator",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
+            },
+            "externalClockActive": {
+                "common": {
+                    "name": "externalClockActive",
+                    "type": "boolean",
+                    "role": "indicator",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
+            },
+            "frostProtectionActive": {
+                "common": {
+                    "name": "frostProtectionActive",
+                    "type": "boolean",
+                    "role": "indicator",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
+            },
+            "humidityLimiterAlarm": {
+                "common": {
+                    "name": "humidityLimiterAlarm",
+                    "type": "boolean",
+                    "role": "indicator",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
+            },
+            "humidityLimiterPreAlarm": {
+                "common": {
+                    "name": "humidityLimiterPreAlarm",
+                    "type": "boolean",
+                    "role": "indicator",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
+            },
+            "valvePosition": {
+                "common": {
+                    "name": "valvePosition",
+                    "type": "number",
+                    "role": "valve",
+                    "unit": "%",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
+            }
+        },
+        "values": {
+            "dewPointAlarmActive": true,
+            "emergencyOperationActive": true,
+            "externalClockActive": true,
+            "frostProtectionActive": true,
+            "humidityLimiterAlarm": true,
+            "humidityLimiterPreAlarm": true,
+            "valvePosition": 50
+        }
+    },
     "FLOOR_TERMINAL_BLOCK_LOCAL_PUMP_CHANNEL": {
         "channel": {
             "functionalChannelType": "FLOOR_TERMINAL_BLOCK_LOCAL_PUMP_CHANNEL",
@@ -5190,12 +5403,104 @@
                 "GRP-A",
                 "GRP-B"
             ],
+            "dewPointAlarmActive": true,
+            "emergencyOperationActive": true,
+            "externalClockActive": true,
+            "frostProtectionActive": true,
+            "humidityLimiterAlarm": true,
+            "humidityLimiterPreAlarm": true,
             "pumpFollowUpTime": 0.5,
             "pumpLeadTime": 0.5,
             "pumpProtectionDuration": 0.5,
-            "pumpProtectionSwitchingInterval": 0.5
+            "pumpProtectionSwitchingInterval": 0.5,
+            "valvePosition": 0.5
         },
         "objects": {
+            "dewPointAlarmActive": {
+                "common": {
+                    "name": "dewPointAlarmActive",
+                    "type": "boolean",
+                    "role": "indicator",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
+            },
+            "emergencyOperationActive": {
+                "common": {
+                    "name": "emergencyOperationActive",
+                    "type": "boolean",
+                    "role": "indicator",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
+            },
+            "externalClockActive": {
+                "common": {
+                    "name": "externalClockActive",
+                    "type": "boolean",
+                    "role": "indicator",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
+            },
+            "frostProtectionActive": {
+                "common": {
+                    "name": "frostProtectionActive",
+                    "type": "boolean",
+                    "role": "indicator",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
+            },
+            "humidityLimiterAlarm": {
+                "common": {
+                    "name": "humidityLimiterAlarm",
+                    "type": "boolean",
+                    "role": "indicator",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
+            },
+            "humidityLimiterPreAlarm": {
+                "common": {
+                    "name": "humidityLimiterPreAlarm",
+                    "type": "boolean",
+                    "role": "indicator",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
+            },
+            "valvePosition": {
+                "common": {
+                    "name": "valvePosition",
+                    "type": "number",
+                    "role": "valve",
+                    "unit": "%",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
+            },
             "pumpFollowUpTime": {
                 "common": {
                     "name": "pumpFollowUpTime",
@@ -5246,6 +5551,13 @@
             }
         },
         "values": {
+            "dewPointAlarmActive": true,
+            "emergencyOperationActive": true,
+            "externalClockActive": true,
+            "frostProtectionActive": true,
+            "humidityLimiterAlarm": true,
+            "humidityLimiterPreAlarm": true,
+            "valvePosition": 50,
             "pumpFollowUpTime": 0.5,
             "pumpLeadTime": 0.5,
             "pumpProtectionDuration": 0.5,
@@ -6199,7 +6511,7 @@
                 "common": {
                     "name": "doorBellSensorEventTimestamp",
                     "type": "number",
-                    "role": "date",
+                    "role": "value.time",
                     "read": true,
                     "write": false
                 },
@@ -8580,9 +8892,63 @@
                 "GRP-A",
                 "GRP-B"
             ],
-            "on": true
+            "acousticSendStateEnabled": true,
+            "actionParameter": "OPEN",
+            "doorBellSensorEventTimestamp": 0.5,
+            "doublePressTime": 0.5,
+            "on": true,
+            "visibleChannelIndex": 0.5
         },
         "objects": {
+            "acousticSendStateEnabled": {
+                "common": {
+                    "name": "acousticSendStateEnabled",
+                    "type": "boolean",
+                    "role": "indicator",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
+            },
+            "actionParameter": {
+                "common": {
+                    "name": "actionParameter",
+                    "type": "string",
+                    "role": "text",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
+            },
+            "doorBellSensorEventTimestamp": {
+                "common": {
+                    "name": "doorBellSensorEventTimestamp",
+                    "type": "number",
+                    "role": "value.time",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
+            },
+            "doublePressTime": {
+                "common": {
+                    "name": "doublePressTime",
+                    "type": "number",
+                    "role": "value",
+                    "unit": "s",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
+            },
             "on": {
                 "common": {
                     "name": "on",
@@ -8594,10 +8960,27 @@
                 "native": {
                     "parameter": null
                 }
+            },
+            "visibleChannelIndex": {
+                "common": {
+                    "name": "visibleChannelIndex",
+                    "type": "number",
+                    "role": "value",
+                    "read": true,
+                    "write": false
+                },
+                "native": {
+                    "parameter": null
+                }
             }
         },
         "values": {
-            "on": true
+            "acousticSendStateEnabled": true,
+            "actionParameter": "OPEN",
+            "doorBellSensorEventTimestamp": 0.5,
+            "doublePressTime": 0.5,
+            "on": true,
+            "visibleChannelIndex": 0.5
         }
     },
     "SMOKE_DETECTOR": {
