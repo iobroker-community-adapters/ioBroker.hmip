@@ -1633,10 +1633,50 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     promises.push(this.secureSetStateAsync(`groups.${group.id}.cooling`, group.cooling, true));
                     promises.push(this.secureSetStateAsync(`groups.${group.id}.partyMode`, group.partyMode, true));
                     promises.push(this.secureSetStateAsync(`groups.${group.id}.controlMode`, group.controlMode, true));
-                    promises.push(
-                        this.secureSetStateAsync(`groups.${group.id}.activeProfile`, group.activeProfile, true),
-                    );
-                    promises.push(this.secureSetStateAsync(`groups.${group.id}.boostMode`, group.boostMode, true));
+					promises.push(
+						this.secureSetStateAsync(`groups.${group.id}.activeProfile`, group.activeProfile, true),
+					);
+
+					// Profil und Profilnamen aus der REST-API übernehmen
+					if (group.profiles && typeof group.profiles === 'object') {
+						const defaultProfileNames = {
+							PROFILE_1: 'Standardprofil',
+							PROFILE_2: 'Alternativprofil 1',
+							PROFILE_3: 'Alternativprofil 2',
+							PROFILE_4: 'Kühlprofil',
+							PROFILE_5: 'Kühlprofil 2',
+							PROFILE_6: 'Kühlprofil 3',
+						};
+
+						for (const profileId of Object.keys(group.profiles)) {
+							const profile = group.profiles[profileId];
+							const profileName = profile.name || defaultProfileNames[profileId] || '';
+
+							promises.push(
+								this.secureSetStateAsync(
+									`groups.${group.id}.profiles.${profileId}.name`,
+									profileName,
+									true,
+								),
+							);
+						}
+
+						// Name des aktuell aktiven Profils ermitteln
+						const activeProfile = group.profiles[group.activeProfile];
+						const activeProfileName = activeProfile
+							? activeProfile.name || defaultProfileNames[group.activeProfile] || ''
+							: '';
+
+						promises.push(
+							this.secureSetStateAsync(
+								`groups.${group.id}.activeProfileName`,
+								activeProfileName,
+								true,
+							),
+						);
+					}
+
+					promises.push(this.secureSetStateAsync(`groups.${group.id}.boostMode`, group.boostMode, true));
                     promises.push(
                         this.secureSetStateAsync(`groups.${group.id}.boostDuration`, group.boostDuration, true),
                     );
@@ -2322,6 +2362,47 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         native: { id: [group.id], parameter: 'setActiveProfile' },
                     }),
                 );
+
+				// Namen der HmIP-Profile
+					if (group.profiles && typeof group.profiles === 'object') {
+						const defaultProfileNames = {
+							PROFILE_1: 'Standardprofil',
+							PROFILE_2: 'Alternativprofil 1',
+							PROFILE_3: 'Alternativprofil 2',
+							PROFILE_4: 'Kühlprofil',
+							PROFILE_5: 'Kühlprofil 2',
+							PROFILE_6: 'Kühlprofil 3',
+						};
+
+						for (const profileId of Object.keys(group.profiles)) {
+							const profile = group.profiles[profileId];
+
+							this.extendObject(`groups.${group.id}.profiles.${profileId}.name`, {
+								type: 'state',
+								common: {
+									name: profile.name || defaultProfileNames[profileId] || profileId,
+									type: 'string',
+									role: 'text',
+									read: true,
+									write: false,
+								},
+								native: {},
+							});
+						}
+					}
+
+					// Name des aktuell aktiven Profils
+					this.extendObject(`groups.${group.id}.activeProfileName`, {
+						type: 'state',
+						common: {
+							name: 'activeProfileName',
+							type: 'string',
+							role: 'text',
+							read: true,
+							write: false,
+						},
+						native: {},
+					});
                 promises.push(
                     this.extendObject(`groups.${group.id}.boostDuration`, {
                         type: 'state',
