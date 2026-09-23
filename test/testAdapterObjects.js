@@ -282,6 +282,140 @@ describe('group objects', () => {
         });
     }
 
+    // a captured getCurrentState answers with all six profiles of a heating group, and with an empty
+    // name for every profile the user never renamed, which is what the app shows a default name for
+    const PROFILES = {
+        PROFILE_1: { profileId: 'p1', index: 'PROFILE_1', name: '', visible: true, enabled: true },
+        PROFILE_2: { profileId: 'p2', index: 'PROFILE_2', name: 'Homeoffice', visible: true, enabled: true },
+        PROFILE_3: { profileId: 'p3', index: 'PROFILE_3', name: '', visible: false, enabled: true },
+        PROFILE_4: { profileId: 'p4', index: 'PROFILE_4', name: '', visible: false, enabled: false },
+        PROFILE_5: { profileId: 'p5', index: 'PROFILE_5', name: '', visible: false, enabled: false },
+        PROFILE_6: { profileId: 'p6', index: 'PROFILE_6', name: '', visible: false, enabled: false },
+    };
+
+    function heatingGroupWithProfiles(overrides) {
+        return {
+            id: 'G-P',
+            type: 'HEATING',
+            label: 'Living',
+            activeProfile: 'PROFILE_2',
+            profiles: JSON.parse(JSON.stringify(PROFILES)),
+            ...overrides,
+        };
+    }
+
+    it('publishes the name of every profile and of the one that is active', async () => {
+        const adapter = createHarness();
+        const group = heatingGroupWithProfiles();
+        await adapter._createObjectsForGroup(group);
+        await adapter._updateGroupStates(group);
+
+        assert.strictEqual(adapter.objects['groups.G-P.profiles'].type, 'channel');
+        assert.deepStrictEqual(adapter.states['groups.G-P.profiles.PROFILE_2'], { val: 'Homeoffice', ack: true });
+        assert.deepStrictEqual(adapter.states['groups.G-P.activeProfileName'], { val: 'Homeoffice', ack: true });
+    });
+
+    it('names a profile nobody renamed the way the app does', async () => {
+        const adapter = createHarness();
+        const group = heatingGroupWithProfiles({ activeProfile: 'PROFILE_1' });
+        await adapter._createObjectsForGroup(group);
+        await adapter._updateGroupStates(group);
+
+        assert.deepStrictEqual(adapter.states['groups.G-P.profiles.PROFILE_1'], {
+            val: 'Standard profile',
+            ack: true,
+        });
+        assert.deepStrictEqual(adapter.states['groups.G-P.profiles.PROFILE_4'], {
+            val: 'Cooling profile',
+            ack: true,
+        });
+        assert.deepStrictEqual(adapter.states['groups.G-P.activeProfileName'], {
+            val: 'Standard profile',
+            ack: true,
+        });
+    });
+
+    it('gives a default profile name in the language the rest of ioBroker is read in', async () => {
+        const adapter = createHarness();
+        adapter.profileNameLanguage = 'de';
+        const group = heatingGroupWithProfiles();
+        await adapter._createObjectsForGroup(group);
+        await adapter._updateGroupStates(group);
+
+        assert.deepStrictEqual(adapter.states['groups.G-P.profiles.PROFILE_1'], {
+            val: 'Standardprofil',
+            ack: true,
+        });
+        // a renamed profile keeps the name the user gave it, in every language
+        assert.deepStrictEqual(adapter.states['groups.G-P.profiles.PROFILE_2'], { val: 'Homeoffice', ack: true });
+    });
+
+    // the objects are built once, at startup and on GROUP_ADDED, so a name that lives in the object
+    // would go stale the moment the profile is renamed in the app
+    it('keeps the profile name in the value and the index in the object name', async () => {
+        const adapter = createHarness();
+        const group = heatingGroupWithProfiles();
+        await adapter._createObjectsForGroup(group);
+        await adapter._updateGroupStates(group);
+        assert.strictEqual(adapter.objects['groups.G-P.profiles.PROFILE_2'].common.name, 'PROFILE_2');
+
+        const renamed = heatingGroupWithProfiles();
+        renamed.profiles.PROFILE_2.name = 'Urlaub';
+        await adapter._updateGroupStates(renamed);
+
+        assert.deepStrictEqual(adapter.states['groups.G-P.profiles.PROFILE_2'], { val: 'Urlaub', ack: true });
+        assert.deepStrictEqual(adapter.states['groups.G-P.activeProfileName'], { val: 'Urlaub', ack: true });
+        assert.strictEqual(adapter.objects['groups.G-P.profiles.PROFILE_2'].common.name, 'PROFILE_2');
+    });
+
+    // the cloud answers for all six whatever this payload lists, so the objects must not depend on it
+    it('builds the profile objects of a heating group that reports no profiles yet', async () => {
+        const adapter = createHarness();
+        await adapter._createObjectsForGroup({ id: 'G-N', type: 'HEATING', label: 'Hall' });
+
+        for (const index of ['PROFILE_1', 'PROFILE_2', 'PROFILE_3', 'PROFILE_4', 'PROFILE_5', 'PROFILE_6']) {
+            assert.ok(adapter.objects[`groups.G-N.profiles.${index}`], `${index} has no object`);
+        }
+        assert.ok(adapter.objects['groups.G-N.activeProfileName']);
+
+        // and the names arrive as soon as a payload carries them, onto objects that already exist
+        await adapter._updateGroupStates({
+            id: 'G-N',
+            type: 'HEATING',
+            label: 'Hall',
+            activeProfile: 'PROFILE_2',
+            profiles: JSON.parse(JSON.stringify(PROFILES)),
+        });
+        assert.deepStrictEqual(adapter.states['groups.G-N.profiles.PROFILE_2'], { val: 'Homeoffice', ack: true });
+    });
+
+    it('leaves the profile names alone when a payload carries no profiles', async () => {
+        const adapter = createHarness();
+        const group = heatingGroupWithProfiles();
+        await adapter._createObjectsForGroup(group);
+        await adapter._updateGroupStates(group);
+        await adapter._updateGroupStates({ id: 'G-P', type: 'HEATING', label: 'Living' });
+
+        assert.deepStrictEqual(adapter.states['groups.G-P.profiles.PROFILE_2'], { val: 'Homeoffice', ack: true });
+        assert.deepStrictEqual(adapter.states['groups.G-P.activeProfileName'], { val: 'Homeoffice', ack: true });
+    });
+
+    it('survives a profile the cloud answers for with nothing', async () => {
+        const adapter = createHarness();
+        const group = heatingGroupWithProfiles({ profiles: { PROFILE_1: null }, activeProfile: 'PROFILE_1' });
+        await adapter._createObjectsForGroup(group);
+        await adapter._updateGroupStates(group);
+
+        assert.deepStrictEqual(adapter.states['groups.G-P.profiles.PROFILE_1'], {
+            val: 'Standard profile',
+            ack: true,
+        });
+        assert.deepStrictEqual(adapter.states['groups.G-P.activeProfileName'], {
+            val: 'Standard profile',
+            ack: true,
+        });
+    });
+
     it('drives a shutter profile with the switching commands the cloud accepts for it', async () => {
         const adapter = createHarness();
         const group = { id: 'G-SP', type: 'SHUTTER_PROFILE', label: 'Blinds', shutterLevel: 0.5, slatsLevel: 0.25 };

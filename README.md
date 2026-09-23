@@ -75,6 +75,11 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 - Added the names of all available profiles for each group (= room). The profile names are stored in the profiles folder. Profiles 1–3 are heating profiles, while profiles 4–6 are cooling profiles. Please note: if a profile has not been renamed, its default name is used.
 -->
 ## Changelog
+### **WORK IN PROGRESS**
+- (@petermeter2000) Every heating group now has a profiles folder with the names of its six profiles, so a profile can be recognised by the name it carries in the app instead of by its index. Profiles 1-3 are the heating profiles, 4-6 the cooling profiles
+- (@petermeter2000) Added activeProfileName next to activeProfile, so the name of the profile that is active now is readable without looking it up (closes #437)
+- (@GermanBluefox) A profile nobody renamed answers with an empty name, so the adapter publishes the default name the app shows for it, in German or English following the ioBroker system language
+
 ### 3.2.0 (2026-09-08)
 - (@Apollon77) Added the DISTANCE_SENSOR_CHANNEL, so the ELV-SH-DUSI ultrasonic distance sensor interface reports distance, calculatedHeight and referenceHeight in cm, measuringInterval in minutes, heightActivated and distanceSensorVoltage
 - (@Apollon77) Added the FLOOR_TERMINAL_BLOCK_CHANNEL of the floor heating actuators (HmIP-FAL230-C6/C10, HmIP-FALMOT-C12), reporting valvePosition and the humidity limiter, dew point, external clock, emergency operation and frost protection states
