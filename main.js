@@ -110,21 +110,6 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }
     }
 
-    async updateNonCoolingGroups() {
-        const states = await this.getStatesAsync('groups.*.coolingIgnored');
-        const nonCoolingGroups = [];
-        for (const id of Object.keys(states)) {
-            const state = states[id];
-            if (state && state.val === true) {
-                // hmip.0.groups.<UUID>.coolingIgnored
-                const roomId = id.split('.')[3];
-                nonCoolingGroups.push(roomId);
-            }
-        }
-        this.log.debug(`Sending nonCoolingGroups: ${JSON.stringify(nonCoolingGroups)}`);
-        await this._api.homeHeatingNonCoolingGroups(nonCoolingGroups);
-    }
-
     async _startTokenRequest(msg) {
         try {
             this.log.info('started token request');
