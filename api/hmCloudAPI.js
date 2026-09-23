@@ -911,9 +911,9 @@ class HmCloudAPI {
         let data = { cooling };
         await this.callRestApi('home/heating/setCooling', data);
     }
-
+    
     async homeHeatingCoolingEnabled(coolingEnabled) {
-        let data = { coolingEnabled };     
+        let data = { coolingEnabled };
         await this.callRestApi('home/heating/setCoolingEnabled', data);
     }
        
