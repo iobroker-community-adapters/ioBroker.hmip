@@ -110,6 +110,21 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }
     }
 
+    async updateNonCoolingGroups() {
+        const states = await this.getStatesAsync('groups.*.coolingIgnored');
+        const nonCoolingGroups = [];
+        for (const id of Object.keys(states)) {
+            const state = states[id];
+            if (state && state.val === true) {
+                // hmip.0.groups.<UUID>.coolingIgnored
+                const roomId = id.split('.')[3];
+                nonCoolingGroups.push(roomId);
+            }
+        }
+        this.log.debug(`Sending nonCoolingGroups: ${JSON.stringify(nonCoolingGroups)}`);
+        await this._api.homeHeatingNonCoolingGroups(nonCoolingGroups);
+    }
+
     async _startTokenRequest(msg) {
         try {
             this.log.info('started token request');
@@ -1612,6 +1627,44 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     promises.push(
                         this.secureSetStateAsync(`groups.${group.id}.activeProfile`, group.activeProfile, true),
                     );
+                    // Profilnamen aus der REST-API übernehmen
+                    if (group.profiles && typeof group.profiles === 'object') {
+                        const defaultProfileNames = {
+                            PROFILE_1: 'Standardprofil',
+                            PROFILE_2: 'Alternativprofil 1',
+                            PROFILE_3: 'Alternativprofil 2',
+                            PROFILE_4: 'Kühlprofil',
+                            PROFILE_5: 'Kühlprofil 2',
+                            PROFILE_6: 'Kühlprofil 3',
+                        };
+
+                        for (const profileId of Object.keys(group.profiles)) {
+                            const profile = group.profiles[profileId];
+                            const profileName = profile.name || defaultProfileNames[profileId] || '';
+
+                            promises.push(
+                                this.secureSetStateAsync(
+                                    `groups.${group.id}.profiles.${profileId}`,
+                                    profileName,
+                                    true,
+                                ),
+                            );
+                        }
+
+                        // Name des aktuell aktiven Profils ermitteln
+                        const activeProfile = group.profiles[group.activeProfile];
+                        const activeProfileName = activeProfile
+                            ? activeProfile.name || defaultProfileNames[group.activeProfile] || ''
+                            : '';
+
+                        promises.push(
+                            this.secureSetStateAsync(
+                                `groups.${group.id}.activeProfileName`,
+                                activeProfileName,
+                                true,
+                            ),
+                        );
+                    }
                     promises.push(this.secureSetStateAsync(`groups.${group.id}.boostMode`, group.boostMode, true));
                     promises.push(
                         this.secureSetStateAsync(`groups.${group.id}.boostDuration`, group.boostDuration, true),
@@ -2296,6 +2349,48 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         type: 'state',
                         common: { name: 'activeProfile', type: 'string', role: 'text', read: true, write: true },
                         native: { id: [group.id], parameter: 'setActiveProfile' },
+                    }),
+                );
+                // Namen der HmIP-Profile
+                if (group.profiles && typeof group.profiles === 'object') {
+                    const defaultProfileNames = {
+                        PROFILE_1: 'Standardprofil',
+                        PROFILE_2: 'Alternativprofil 1',
+                        PROFILE_3: 'Alternativprofil 2',
+                        PROFILE_4: 'Kühlprofil',
+                        PROFILE_5: 'Kühlprofil 2',
+                        PROFILE_6: 'Kühlprofil 3',
+                    };
+                    for (const profileId of Object.keys(group.profiles)) {
+                        const profile = group.profiles[profileId];
+                        promises.push(
+                            this.extendObject(`groups.${group.id}.profiles.${profileId}`, {
+                                type: 'state',
+                                common: {
+                                    name: profile.name || defaultProfileNames[profileId] || profileId,
+                                    type: 'string',
+                                    role: 'text',
+                                    read: true,
+                                    write: false,
+                                },
+                                native: {},
+                            }),
+                        );
+                    }
+                }
+
+                // Name des aktuell aktiven Profils
+                promises.push(
+                    this.extendObject(`groups.${group.id}.activeProfileName`, {
+                        type: 'state',
+                        common: {
+                            name: 'activeProfileName',
+                            type: 'string',
+                            role: 'text',
+                            read: true,
+                            write: false,
+                        },
+                        native: {},
                     }),
                 );
                 promises.push(
