@@ -69,6 +69,8 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 <!--
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
+- adds write support for coolingEnabled and coolingIgnored properties. You can now toggle the groups (=rooms) which will be taken in account for cooling (switching coolingignored) - like in the app. Please keep in mind that setting this value to `true` means that this room will not be taken into account when cooling.
+The functionality was tested with a Homematic IP installation and both cooling, coolingEnabled and coolingIgnored in all groups (=rooms) can be changed successfully.
 -->
 ## Changelog
 ### 3.2.0 (2026-09-08)
