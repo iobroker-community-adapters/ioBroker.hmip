@@ -32,6 +32,31 @@ const SECURITY_ZONE_MODES = Object.assign(Object.create(null), {
     INTERNAL_AND_EXTERNAL: { internal: true, external: true },
 });
 
+// every heating group carries these six, whether or not the payload of the moment lists them;
+// HmIP drives 1-3 as the heating profiles and 4-6 as the cooling profiles
+const PROFILE_INDEXES = ['PROFILE_1', 'PROFILE_2', 'PROFILE_3', 'PROFILE_4', 'PROFILE_5', 'PROFILE_6'];
+
+// a profile nobody renamed answers with an empty name, while the app shows the default the
+// manufacturer gives it, so the adapter publishes what the user sees rather than an empty string
+const DEFAULT_PROFILE_NAMES = {
+    de: {
+        PROFILE_1: 'Standardprofil',
+        PROFILE_2: 'Alternativprofil 1',
+        PROFILE_3: 'Alternativprofil 2',
+        PROFILE_4: 'Kühlprofil',
+        PROFILE_5: 'Kühlprofil 2',
+        PROFILE_6: 'Kühlprofil 3',
+    },
+    en: {
+        PROFILE_1: 'Standard profile',
+        PROFILE_2: 'Alternative profile 1',
+        PROFILE_3: 'Alternative profile 2',
+        PROFILE_4: 'Cooling profile',
+        PROFILE_5: 'Cooling profile 2',
+        PROFILE_6: 'Cooling profile 3',
+    },
+};
+
 class HmIpCloudAccesspointAdapter extends Adapter {
     constructor(options) {
         super({ ...options, name: adapterName });
@@ -72,6 +97,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         this.delayTimeouts = {};
         this.initializedChannels = {};
         this.reInitDataTimeout = null;
+        this.profileNameLanguage = 'en';
     }
 
     _unload(callback) {
@@ -148,6 +174,11 @@ class HmIpCloudAccesspointAdapter extends Adapter {
 
         this.reInitTimeout && clearTimeout(this.reInitTimeout);
         this.log.debug('ready');
+
+        // the default profile names are published in the language the user reads the rest of ioBroker in
+        const systemConfig = await this.getForeignObjectAsync('system.config');
+        const language = systemConfig && systemConfig.common && systemConfig.common.language;
+        this.profileNameLanguage = DEFAULT_PROFILE_NAMES[language] ? language : 'en';
         await this.setState('info.connection', false, true);
 
         if (!this.Sentry && this.supportsFeature && this.supportsFeature('PLUGINS')) {
@@ -1572,6 +1603,20 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         return promises;
     }
 
+    /**
+     * The name a profile carries in the app: what the user called it, or the manufacturer's default
+     * for the profiles nobody ever renamed, which the cloud answers for with an empty name.
+     *
+     * @param {object} group the group the profile belongs to
+     * @param {string} profileIndex PROFILE_1 .. PROFILE_6
+     * @returns {string} the name to publish
+     */
+    _profileName(group, profileIndex) {
+        const profile = group.profiles && group.profiles[profileIndex];
+        const defaults = DEFAULT_PROFILE_NAMES[this.profileNameLanguage] || DEFAULT_PROFILE_NAMES.en;
+        return (profile && profile.name) || defaults[profileIndex] || profileIndex;
+    }
+
     _updateGroupStates(group) {
         this.log.silly(`_updateGroupStates - ${JSON.stringify(group)}`);
 
@@ -1612,40 +1657,21 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     promises.push(
                         this.secureSetStateAsync(`groups.${group.id}.activeProfile`, group.activeProfile, true),
                     );
-                    // Profilnamen aus der REST-API übernehmen
+                    // a payload that carries no profiles cannot name them, so the last known names stay
                     if (group.profiles && typeof group.profiles === 'object') {
-                        const defaultProfileNames = {
-                            PROFILE_1: 'Standardprofil',
-                            PROFILE_2: 'Alternativprofil 1',
-                            PROFILE_3: 'Alternativprofil 2',
-                            PROFILE_4: 'Kühlprofil',
-                            PROFILE_5: 'Kühlprofil 2',
-                            PROFILE_6: 'Kühlprofil 3',
-                        };
-
-                        for (const profileId of Object.keys(group.profiles)) {
-                            const profile = group.profiles[profileId];
-                            const profileName = profile.name || defaultProfileNames[profileId] || '';
-
+                        for (const profileIndex of PROFILE_INDEXES) {
                             promises.push(
                                 this.secureSetStateAsync(
-                                    `groups.${group.id}.profiles.${profileId}`,
-                                    profileName,
+                                    `groups.${group.id}.profiles.${profileIndex}`,
+                                    this._profileName(group, profileIndex),
                                     true,
                                 ),
                             );
                         }
-
-                        // Name des aktuell aktiven Profils ermitteln
-                        const activeProfile = group.profiles[group.activeProfile];
-                        const activeProfileName = activeProfile
-                            ? activeProfile.name || defaultProfileNames[group.activeProfile] || ''
-                            : '';
-
                         promises.push(
                             this.secureSetStateAsync(
                                 `groups.${group.id}.activeProfileName`,
-                                activeProfileName,
+                                group.activeProfile ? this._profileName(group, group.activeProfile) : null,
                                 true,
                             ),
                         );
@@ -2336,35 +2362,22 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         native: { id: [group.id], parameter: 'setActiveProfile' },
                     }),
                 );
-                // Namen der HmIP-Profile
-                if (group.profiles && typeof group.profiles === 'object') {
-                    const defaultProfileNames = {
-                        PROFILE_1: 'Standardprofil',
-                        PROFILE_2: 'Alternativprofil 1',
-                        PROFILE_3: 'Alternativprofil 2',
-                        PROFILE_4: 'Kühlprofil',
-                        PROFILE_5: 'Kühlprofil 2',
-                        PROFILE_6: 'Kühlprofil 3',
-                    };
-                    for (const profileId of Object.keys(group.profiles)) {
-                        const profile = group.profiles[profileId];
-                        promises.push(
-                            this.extendObject(`groups.${group.id}.profiles.${profileId}`, {
-                                type: 'state',
-                                common: {
-                                    name: profile.name || defaultProfileNames[profileId] || profileId,
-                                    type: 'string',
-                                    role: 'text',
-                                    read: true,
-                                    write: false,
-                                },
-                                native: {},
-                            }),
-                        );
-                    }
+                promises.push(
+                    this.extendObject(`groups.${group.id}.profiles`, {
+                        type: 'channel',
+                        common: { name: 'profiles' },
+                        native: {},
+                    }),
+                );
+                for (const profileIndex of PROFILE_INDEXES) {
+                    promises.push(
+                        this.extendObject(`groups.${group.id}.profiles.${profileIndex}`, {
+                            type: 'state',
+                            common: { name: profileIndex, type: 'string', role: 'text', read: true, write: false },
+                            native: {},
+                        }),
+                    );
                 }
-
-                // Name des aktuell aktiven Profils
                 promises.push(
                     this.extendObject(`groups.${group.id}.activeProfileName`, {
                         type: 'state',
