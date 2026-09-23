@@ -69,6 +69,8 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 <!--
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
+- Added activeProfileName, so the name of the active profile is now also available in addition to activeProfile.
+- Added the names of all available profiles for each group (= room). The profile names are stored in the profiles folder. Profiles 1–3 are heating profiles, while profiles 4–6 are cooling profiles. Please note: if a profile has not been renamed, its default name is used.
 -->
 ## Changelog
 ### 3.2.0 (2026-09-08)
