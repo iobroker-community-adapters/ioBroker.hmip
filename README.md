@@ -69,13 +69,11 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 <!--
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
-- Added/Fixed cooling and coolingEnabled, so these two states can be toggled like in the app
-- Added coolingIgnored, so now you can toggle the groups (=rooms) to be cooled. Please keep in mind that setting this value to true means that this room will not be taken into account when cooling.
-- Added activeProfileName, so the name of the active profile is now also available in addition to activeProfile.
-- Added the names of all available profiles for each group (= room). The profile names are stored in the profiles folder. Profiles 1–3 are heating profiles, while profiles 4–6 are cooling profiles. Please note: if a profile has not been renamed, its default name is used.
 -->
 ## Changelog
 ### **WORK IN PROGRESS**
+- (@petermeter2000) coolingEnabled on the home can now be written, so the cooling of the whole installation is switched from ioBroker the way the app does it
+- (@petermeter2000) coolingIgnored on a heating group can now be written, so a room can be left out of cooling. Note that true means the room is **not** cooled, matching what the app shows
 - (@petermeter2000) Every heating group now has a profiles folder with the names of its six profiles, so a profile can be recognised by the name it carries in the app instead of by its index. Profiles 1-3 are the heating profiles, 4-6 the cooling profiles
 - (@petermeter2000) Added activeProfileName next to activeProfile, so the name of the profile that is active now is readable without looking it up (closes #437)
 - (@GermanBluefox) A profile nobody renamed answers with an empty name, so the adapter publishes the default name the app shows for it, in German or English following the ioBroker system language

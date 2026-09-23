@@ -60,6 +60,18 @@ class AdapterStub {
         return Promise.resolve(this.states[id]);
     }
 
+    // a controller answers a pattern with fully qualified ids, whatever the pattern left out
+    getStatesAsync(pattern) {
+        const matches = new RegExp(`^${pattern.replace(/\./g, '\\.').replace(/\*/g, '[^.]*')}$`);
+        const states = {};
+        for (const id of Object.keys(this.states)) {
+            if (matches.test(id)) {
+                states[`${this.namespace}.${id}`] = this.states[id];
+            }
+        }
+        return Promise.resolve(states);
+    }
+
     getObjectAsync(id) {
         return Promise.resolve(this.objects[id]);
     }
@@ -117,6 +129,9 @@ function createHarness(apiOverrides) {
         groupSwitchingSetSlatsLevel: record('groupSwitchingSetSlatsLevel'),
         groupSwitchingStop: record('groupSwitchingStop'),
         homeSetPowerMeterUnitPrice: record('homeSetPowerMeterUnitPrice'),
+        homeHeatingSetCooling: record('homeHeatingSetCooling'),
+        homeHeatingSetCoolingEnabled: record('homeHeatingSetCoolingEnabled'),
+        homeHeatingSetNonCoolingGroups: record('homeHeatingSetNonCoolingGroups'),
         homeHeatingActivateVacation: record('homeHeatingActivateVacation'),
         ruleEnableSimpleRule: record('ruleEnableSimpleRule'),
         ruleSetRuleLabel: record('ruleSetRuleLabel'),
@@ -425,6 +440,66 @@ describe('group objects', () => {
         assert.deepStrictEqual(adapter.states['groups.G-SP.shutterLevel'], { val: 0.5, ack: true });
         await change(adapter, 'groups.G-SP.shutterLevel', 0.75);
         assert.deepStrictEqual(adapter.calls, [{ method: 'groupSwitchingSetShutterLevel', args: ['G-SP', 0.75] }]);
+    });
+
+    // writable is not enough: _stateChange looks the object up and returns unless native.parameter
+    // names a case, so a datapoint that declares none is one the user can set and nothing acts on
+    it('declares a parameter for every datapoint it lets the user write', async () => {
+        const adapter = createHarness();
+        for (const type of [
+            'HEATING',
+            'SWITCHING',
+            'SWITCHING_PROFILE',
+            'SECURITY_ZONE',
+            'HOT_WATER',
+            'SHUTTER_PROFILE',
+            'ALARM_SWITCHING',
+            'ENVIRONMENT',
+        ]) {
+            await adapter._createObjectsForGroup({ id: `G-${type}`, type, label: type });
+        }
+        await adapter._createObjectsForHome(HOME);
+        await adapter._createObjectsForRule({ id: 'R1', type: 'SIMPLE', label: 'Rule' });
+        await adapter._createObjectsForClient({ id: 'C1', label: 'Client' });
+
+        // activateVacation reads this one rather than dispatching on it
+        const readOnDemand = ['homes.HOME.functionalHomes.indoorClimate.vacationTemperature'];
+        const writable = Object.entries(adapter.objects).filter(
+            ([id, o]) => o.common && o.common.write === true && !readOnDemand.includes(id),
+        );
+
+        assert.ok(writable.length > 40, `only ${writable.length} writable objects found`);
+        for (const [id, o] of writable) {
+            assert.ok(o.native && o.native.parameter, `${id} is writable but dispatches on nothing`);
+        }
+    });
+
+    // setNonCoolingGroups takes the whole set, so the command carries every ignored group
+    it('sends every group that is left out of cooling, not the one that changed', async () => {
+        const adapter = createHarness();
+        for (const id of ['G-A', 'G-B', 'G-C']) {
+            await adapter._createObjectsForGroup({ id, type: 'HEATING', label: id });
+        }
+        await adapter._updateGroupStates({ id: 'G-A', type: 'HEATING', coolingIgnored: true });
+        await adapter._updateGroupStates({ id: 'G-B', type: 'HEATING', coolingIgnored: false });
+        await adapter._updateGroupStates({ id: 'G-C', type: 'HEATING', coolingIgnored: false });
+
+        // the value being written is already in the database, unacknowledged, at this point
+        adapter.states['groups.G-C.coolingIgnored'] = { val: true, ack: false };
+        await change(adapter, 'groups.G-C.coolingIgnored', true);
+
+        assert.deepStrictEqual(adapter.calls, [
+            { method: 'homeHeatingSetNonCoolingGroups', args: [['G-A', 'G-C']] },
+        ]);
+    });
+
+    it('does not send the cooling groups again when nothing changed', async () => {
+        const adapter = createHarness();
+        await adapter._createObjectsForGroup({ id: 'G-A', type: 'HEATING', label: 'A' });
+        await adapter._updateGroupStates({ id: 'G-A', type: 'HEATING', coolingIgnored: true });
+
+        await change(adapter, 'groups.G-A.coolingIgnored', true);
+        assert.deepStrictEqual(adapter.calls, []);
     });
 
     it('publishes what a security zone reports besides its armed state', async () => {
@@ -1003,6 +1078,24 @@ describe('cleanups that prevent a silent failure', () => {
         assert.strictEqual(cooling.common.role, 'switch');
         assert.strictEqual(cooling.common.read, true);
         assert.strictEqual(cooling.common.write, true);
+    });
+
+    it('turns the cooling of the whole home on and off', async () => {
+        const adapter = createHarness();
+        await adapter._createObjectsForHome(HOME);
+
+        await change(adapter, 'homes.HOME.functionalHomes.indoorClimate.coolingEnabled', true);
+        assert.deepStrictEqual(adapter.calls, [{ method: 'homeHeatingSetCoolingEnabled', args: [true] }]);
+    });
+
+    it('does not turn the cooling of the whole home on when it is on already', async () => {
+        const adapter = createHarness();
+        await adapter._createObjectsForHome(HOME);
+        const id = 'homes.HOME.functionalHomes.indoorClimate.coolingEnabled';
+        await adapter.secureSetStateAsync(id, true, true);
+
+        await change(adapter, id, true);
+        assert.deepStrictEqual(adapter.calls, []);
     });
 });
 

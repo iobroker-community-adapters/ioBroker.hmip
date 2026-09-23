@@ -911,14 +911,19 @@ class HmCloudAPI {
         let data = { cooling };
         await this.callRestApi('home/heating/setCooling', data);
     }
-    
-    async homeHeatingCoolingEnabled(coolingEnabled) {
+
+    async homeHeatingSetCoolingEnabled(coolingEnabled) {
         let data = { coolingEnabled };
         await this.callRestApi('home/heating/setCoolingEnabled', data);
     }
-       
-    async homeHeatingNonCoolingGroups(nonCoolingGroups) {
-        let data = { nonCoolingGroups };  
+
+    /**
+     * The cloud takes the whole set of groups that are left out of cooling, not one group at a time.
+     *
+     * @param {string[]} nonCoolingGroups the ids of every group that is not to be cooled
+     */
+    async homeHeatingSetNonCoolingGroups(nonCoolingGroups) {
+        let data = { nonCoolingGroups };
         await this.callRestApi('home/heating/setNonCoolingGroups', data);
     }
 

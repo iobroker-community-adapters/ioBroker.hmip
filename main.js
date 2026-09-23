@@ -136,21 +136,28 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }
     }
 
-    async updateNonCoolingGroups() {
+    /**
+     * setNonCoolingGroups takes the whole set rather than the group that just changed, so every
+     * group that is ignored for cooling is collected, the one being written among them: it is
+     * already in the states database, unacknowledged, by the time the change reaches the adapter.
+     */
+    async _updateNonCoolingGroups() {
         const states = await this.getStatesAsync('groups.*.coolingIgnored');
+        const prefix = `${this.namespace}.`;
         const nonCoolingGroups = [];
         for (const id of Object.keys(states)) {
             const state = states[id];
-            if (state && state.val === true) {
-                // hmip.0.groups.<UUID>.coolingIgnored
-                const roomId = id.split('.')[3];
-                nonCoolingGroups.push(roomId);
+            if (!state || state.val !== true) {
+                continue;
             }
+            // <namespace>.groups.<groupId>.coolingIgnored, and a controller that answers without one
+            const path = id.startsWith(prefix) ? id.substring(prefix.length) : id;
+            nonCoolingGroups.push(path.split('.')[1]);
         }
         this.log.debug(`Sending nonCoolingGroups: ${JSON.stringify(nonCoolingGroups)}`);
-        await this._api.homeHeatingNonCoolingGroups(nonCoolingGroups);
+        await this._api.homeHeatingSetNonCoolingGroups(nonCoolingGroups);
     }
-    
+
     async _startTokenRequest(msg) {
         try {
             this.log.info('started token request');
@@ -879,14 +886,21 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 case 'setAbsencePermanent':
                     await this._api.homeHeatingActivateAbsencePermanent();
                     break;
-                case 'cooling':
-                    await this._api.homeHeatingSetCooling(state.val);
-                    break;
                 case 'coolingEnabled':
-                    await this._api.homeHeatingCoolingEnabled(state.val);
-                    break;            
+                    if (state.val === this.currentValues[id]) {
+                        this.log.info(`Value unchanged, do not send this value`);
+                        await this.secureSetStateAsync(id, this.currentValues[id], true);
+                        return;
+                    }
+                    await this._api.homeHeatingSetCoolingEnabled(state.val);
+                    break;
                 case 'coolingIgnored':
-                    await this.updateNonCoolingGroups();
+                    if (state.val === this.currentValues[id]) {
+                        this.log.info(`Value unchanged, do not send this value`);
+                        await this.secureSetStateAsync(id, this.currentValues[id], true);
+                        return;
+                    }
+                    await this._updateNonCoolingGroups();
                     break;
                 case 'setIntrusionAlertThroughSmokeDetectors':
                     if (state.val === this.currentValues[id]) {
@@ -2474,13 +2488,14 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     this.extendObject(`groups.${group.id}.coolingIgnored`, {
                         type: 'state',
                         common: {
+                            // true leaves the group out of cooling, the way the app reads it
                             name: 'coolingIgnored',
                             type: 'boolean',
                             role: 'switch',
                             read: true,
                             write: true,
                         },
-                        native: {},
+                        native: { id: [group.id], parameter: 'coolingIgnored' },
                     }),
                 );
                 promises.push(
@@ -3975,7 +3990,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             this.extendObject(`homes.${home.id}.functionalHomes.indoorClimate.coolingEnabled`, {
                 type: 'state',
                 common: { name: 'coolingEnabled', type: 'boolean', role: 'switch', read: true, write: true },
-                native: {},
+                native: { id: home.id, parameter: 'coolingEnabled' },
             }),
         );
         promises.push(
