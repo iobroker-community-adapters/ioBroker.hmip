@@ -911,6 +911,16 @@ class HmCloudAPI {
         let data = { cooling };
         await this.callRestApi('home/heating/setCooling', data);
     }
+    
+    async homeHeatingCoolingEnabled(coolingEnabled) {
+        let data = { coolingEnabled };
+        await this.callRestApi('home/heating/setCoolingEnabled', data);
+    }
+       
+    async homeHeatingNonCoolingGroups(nonCoolingGroups) {
+        let data = { nonCoolingGroups };  
+        await this.callRestApi('home/heating/setNonCoolingGroups', data);
+    }
 
     /**
      * @param {boolean} internal silence the internal zone

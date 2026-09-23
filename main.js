@@ -136,6 +136,21 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }
     }
 
+    async updateNonCoolingGroups() {
+        const states = await this.getStatesAsync('groups.*.coolingIgnored');
+        const nonCoolingGroups = [];
+        for (const id of Object.keys(states)) {
+            const state = states[id];
+            if (state && state.val === true) {
+                // hmip.0.groups.<UUID>.coolingIgnored
+                const roomId = id.split('.')[3];
+                nonCoolingGroups.push(roomId);
+            }
+        }
+        this.log.debug(`Sending nonCoolingGroups: ${JSON.stringify(nonCoolingGroups)}`);
+        await this._api.homeHeatingNonCoolingGroups(nonCoolingGroups);
+    }
+    
     async _startTokenRequest(msg) {
         try {
             this.log.info('started token request');
@@ -863,6 +878,15 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     break;
                 case 'setAbsencePermanent':
                     await this._api.homeHeatingActivateAbsencePermanent();
+                    break;
+                case 'cooling':
+                    await this._api.homeHeatingSetCooling(state.val);
+                    break;
+                case 'coolingEnabled':
+                    await this._api.homeHeatingCoolingEnabled(state.val);
+                    break;            
+                case 'coolingIgnored':
+                    await this.updateNonCoolingGroups();
                     break;
                 case 'setIntrusionAlertThroughSmokeDetectors':
                     if (state.val === this.currentValues[id]) {
@@ -2452,9 +2476,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         common: {
                             name: 'coolingIgnored',
                             type: 'boolean',
-                            role: 'indicator',
+                            role: 'switch',
                             read: true,
-                            write: false,
+                            write: true,
                         },
                         native: {},
                     }),
@@ -3950,7 +3974,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         promises.push(
             this.extendObject(`homes.${home.id}.functionalHomes.indoorClimate.coolingEnabled`, {
                 type: 'state',
-                common: { name: 'coolingEnabled', type: 'boolean', role: 'indicator', read: true, write: false },
+                common: { name: 'coolingEnabled', type: 'boolean', role: 'switch', read: true, write: true },
                 native: {},
             }),
         );
