@@ -109,7 +109,8 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 break;
         }
     }
-        async updateNonCoolingGroups() {
+    
+    async updateNonCoolingGroups() {
         const states = await this.getStatesAsync('groups.*.coolingIgnored');
         const nonCoolingGroups = [];
         for (const id of Object.keys(states)) {
