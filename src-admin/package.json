@@ -1,7 +1,7 @@
 {
     "name": "iobroker-admin-component-hmip",
     "private": true,
-    "version": "3.3.0",
+    "version": "4.0.0",
     "scripts": {
         "start": "vite --port 4173",
         "build": "tsc && vite build",

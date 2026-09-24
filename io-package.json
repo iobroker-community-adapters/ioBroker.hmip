@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "hmip",
-    "version": "3.3.0",
+    "version": "4.0.0",
     "news": {
+      "4.0.0": {
+        "en": "The adapter was refactored to TypeScript. The sources now live in src/ and are compiled to build/, which is what the npm package ships; nothing about the objects, states or commands changed\nuuid was replaced by the randomUUID built into Node, which removes a dependency that could no longer be required from this build at all\nFixed an unusable dependency tree: package.json asked for a TypeScript no version of the eslint stack accepts, so npm ci installed nothing at all",
+        "de": "Der Adapter wurde auf TypeScript umgestellt. Die Quellen leben jetzt in src/ und sind zu build/ kompiliert, was das npm-Paket enthält; nichts an Objekten, Zuständen oder Befehlen geändert\nUUID wurde durch RandomUUID in Node ersetzt, was eine nicht mehr benötigte Abhängigkeit von diesem Build entfernt\nUnbrauchbarer Abhängigkeitsbaum behoben: package.json fragte nach TypeScript, kein Eslint-Stack akzeptiert, also installierte npm ci nichts",
+        "ru": "Адаптер был переработан на TypeScript. Исходники теперь находятся в src/ и скомпилированы в build/, как и поставляется пакет npm; в объектах, состояниях или командах ничего не изменилось\nuuid был заменен встроенным в Node RandomUUID, который устраняет зависимость, которая больше не могла требоваться в этой сборке\nИсправлено непригодное для использования дерево зависимостей: package.json запрашивал TypeScript, который не принимает стек eslint, поэтому npm ci вообще ничего не установил",
+        "pt": "O adaptador foi adaptado ao TypeScript. As fontes agora estão em src/ e são compiladas em build/, que é o pacote npm; nada mudou nos objetos, estados ou comandos\nuuid foi substituído pelo RandomUUID embutido no Node, que remove uma dependência que não pode mais ser exigida\nCorrigido um erro: package.json pediu um TypeScript que nenhuma versão da pilha eslint aceita, então npm ci não instalou nada",
+        "nl": "De adapter is omgevormd naar TypeScript. De bronnen bevinden zich nu in src/ en zijn gecompileerd naar build/, wat het npm-pakket bevat; er is niets veranderd aan de objecten, staten of commando's\nuuid werd vervangen door de RandomUUID die in Node is ingebouwd, waardoor een afhankelijkheid wordt verwijderd die helemaal niet langer nodig was voor deze build\nEen onbruikbare afhankelijkheidsstructuur opgelost: package.json vroeg om een TypeScript dat geen enkele versie van de eslint-stack accepteert, dus npm ci heeft helemaal niets geïnstalleerd",
+        "fr": "L'adaptateur a été modifié en TypeScript. Les sources sont désormais dans src/ et compilées dans build/, fourni par le package npm ; rien n'a changé sur les objets, les états ou les commandes\nuuid a été remplacé par le RandomUUID intégré à Node, qui supprime une dépendance qui n'était plus du tout requise dans cette version\nCorrection d'un arbre de dépendances inutilisable : package.json demandait un TypeScript, aucune version de la pile eslint n'est acceptée, donc npm ci n'a rien installé",
+        "it": "L'adattatore è stato rifatto in TypeScript. I sorgenti ora vivono in src/ e sono compilati per build/, che è il pacchetto npm; non è cambiato nulla su oggetti, stati o comandi\nuuid è stato sostituito dal RandomUUID integrato in Node, che rimuove una dipendenza non più richiesta da questa build\nRisolto un albero delle dipendenze inutilizzabile: package.json richiedeva un TypeScript che non accettava",
+        "es": "El adaptador se refactorizó a TypeScript. Las fuentes ahora están en src/ y se compilan para compilar/, que es lo que incluye el paquete npm; no ha cambiado nada de los objetos, estados o comandos\nuuid se sustituyó por el randomUUID integrado en Node, lo que elimina una dependencia que ya no se podía necesitar en esta versión\nSe corrigió un árbol de dependencias inutilizable: package.json pidió un TypeScript que no acepta ninguna versión de la pila de eslint, así que npm ci no instaló nada",
+        "pl": "Adapter został zmieniony do TypeScript. Źródła żyją teraz w src/ i są kompilowane do build/, co dostarcza pakiet npm; nic o obiektach, stanach ani poleceniach nie zmieniło się\nuuid został zastąpiony przez randomUUID wbudowany w węzeł, który usuwa zależność, która w ogóle nie mogła być wymagana z tej kompilacji\nNaprawiono bezużyteczne drzewo zależności: package.json poprosił o TypeScript, której wersja stosu eslint nie akceptuje, więc npm ci nic nie zainstalował",
+        "uk": "Адаптер був перероблений на TypeScript. Джерела тепер живуть у src/ і компілюються для build/, що є тим, що надсилається пакет npm; нічого про об'єкти, стани чи команди не змінилося\nuuid був замінений randomUUID, вбудованим у Node, який видаляє залежність, яка більше не може бути потрібна від цієї збірки\nВиправлено непридатне дерево залежностей: package.json запитав TypeScript, жодна версія стека eslint не приймає, тому npm ci взагалі нічого не встановив",
+        "zh-cn": "该适配器已重构为 TypeScript。源代码现在位于 src/ 中，编译为 build/，这就是 npm 包附带的；对象、状态或命令没有任何变化\nuuid 被 Node 中内置的 randomUUID 所取代，它消除了此版本中根本不再需要的依赖关系\n修复了无法使用的依赖树：package.json 要求一个 TypeScript，eslint 堆栈的版本不接受，所以 npm ci 根本没有安装任何东西"
+      },
       "3.3.0": {
         "en": "coolingEnabled on the home can now be written, so the cooling of the whole installation is switched from ioBroker the way the app does it\ncoolingIgnored on a heating group can now be written, so a room can be left out of cooling. Note that true means the room is **not** cooled, matching what the app shows\nEvery heating group now has a profiles folder with the names of its six profiles, so a profile can be recognised by the name it carries in the app instead of by its index. Profiles 1-3 are the heating profiles, 4-6 the cooling profiles\nAdded activeProfileName next to activeProfile, so the name of the profile that is active now is readable without looking it up (closes #437)\nA profile nobody renamed answers with an empty name, so the adapter publishes the default name the app shows for it, in German or English following the ioBroker system language",
         "de": "CoolingEnabled on the Home kann jetzt geschrieben werden, sodass die gesamte Anlage von ioBroker aus gekühlt wird\nCoolingIgnored kann jetzt für eine Heizgruppe geschrieben werden, ohne zu kühlen. Beachten Sie, dass der Raum **nicht** gekühlt ist, wie in der App\nJede Heizgruppe hat jetzt einen Profilordner mit den Namen ihrer sechs Profile, sodass ein Profil am Namen in der App statt am Index erkannt wird. Profile 1—3 sind die Heizprofile, 4—6 die Kühlprofile\nActiveProfileName neben ActiveProfile hinzugefügt, sodass der Profilname ohne Nachschlagen lesbar ist (schließt #437)\nEin Profil, das niemand umbenannt hat, ist leer, also gibt der Adapter den Standardnamen der App auf Deutsch oder Englisch in der ioBroker-Systemsprache",
@@ -80,19 +93,6 @@
         "pl": "Adapter wymaga admin 7.6.3, kontroler js- 6.0.11 i node.js 20 teraz.\nInterfejs użytkownika został przeniesiony do TypeScript (Admin 7.6)\nObsługa sterowania optycznego Dodano SignalBehaviour dla HMIP- BSL.\nUsunięto logowanie PIN\nZaktualizowano zależność.",
         "uk": "Адаптер вимагає адміністратора 7.6.3, js-controller 6.0.11 і node.js 20 тепер.\nGUI був мігрований до TypeScript (Admin 7.6)\nПідтримка контролю оптичної Додано SignalBehaviour для HMIP-BSL.\nЗняття ПІН\nОновлено залежність.",
         "zh-cn": "适配器需要admin 7.6.3,js控制器 6.0.11和节点.js现在20.\nGUI 已迁移到 TypeScript (Admin 7.6)\n支持控制光学 增加了HMIP-BSL的信号行为.\n已删除 PIN 日志\n附属关系已经更新."
-      },
-      "1.26.5": {
-        "en": "Fixed Websocket disconnect cases",
-        "de": "Feste Websocket Trennfälle",
-        "ru": "Фиксированные случаи отключения Websocket",
-        "pt": "Casos fixos de desconexão Websocket",
-        "nl": "Vaste Websocket loskoppelen gevallen",
-        "fr": "Cas de déconnexion de la poche Web corrigés",
-        "it": "Risolto Websocket casi di disconnessione",
-        "es": "Casos de desconexión Websocket fijos",
-        "pl": "Stałe obudowy rozłączenia websocket",
-        "uk": "Виправлені випадки відключення Websocket",
-        "zh-cn": "固定 Websocket 断开大小写"
       }
     },
     "titleLang": {
