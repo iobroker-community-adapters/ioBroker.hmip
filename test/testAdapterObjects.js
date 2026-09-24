@@ -76,6 +76,24 @@ class AdapterStub {
         return Promise.resolve(this.objects[id]);
     }
 
+    // adapter-core owns the timers so it can stop what is left running on unload; the stub just
+    // has to offer the same four calls
+    setTimeout(handler, timeout, ...args) {
+        return global.setTimeout(handler, timeout, ...args);
+    }
+
+    clearTimeout(timer) {
+        global.clearTimeout(timer);
+    }
+
+    setInterval(handler, interval, ...args) {
+        return global.setInterval(handler, interval, ...args);
+    }
+
+    clearInterval(timer) {
+        global.clearInterval(timer);
+    }
+
     subscribeStates() {}
 
     supportsFeature() {

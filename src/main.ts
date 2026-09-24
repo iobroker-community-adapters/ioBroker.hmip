@@ -94,7 +94,7 @@ interface RequestFailure {
 
 /** one entry of the per-datapoint write throttle */
 interface DelayTimeout {
-    timeout?: NodeJS.Timeout | null;
+    timeout?: ioBroker.Timeout;
     lastVal?: ioBroker.StateValue;
 }
 
@@ -120,11 +120,11 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     private _journalReadPending = false;
 
     private wsConnected = false;
-    private wsConnectionStableTimeout: NodeJS.Timeout | null = null;
+    private wsConnectionStableTimeout: ioBroker.Timeout | undefined;
     private wsConnectionErrorCounter = 0;
-    private expectWsError: NodeJS.Timeout | null = null;
-    private reInitTimeout: NodeJS.Timeout | null = null;
-    private reInitDataTimeout: NodeJS.Timeout | null = null;
+    private expectWsError: ioBroker.Timeout | undefined;
+    private reInitTimeout: ioBroker.Timeout | undefined;
+    private reInitDataTimeout: ioBroker.Timeout | undefined;
 
     /** channel types already reported as unknown, so each one is reported once */
     private sendUnknownInfos: Record<string, boolean> = {};
@@ -160,11 +160,11 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     _unload(callback: () => void): void {
         this._unloaded = true;
-        this.expectWsError && clearTimeout(this.expectWsError);
-        this.reInitTimeout && clearTimeout(this.reInitTimeout);
-        this.reInitDataTimeout && clearTimeout(this.reInitDataTimeout);
+        this.expectWsError && this.clearTimeout(this.expectWsError);
+        this.reInitTimeout && this.clearTimeout(this.reInitTimeout);
+        this.reInitDataTimeout && this.clearTimeout(this.reInitDataTimeout);
         for (const pending of Object.values(this.delayTimeouts)) {
-            pending && pending.timeout && clearTimeout(pending.timeout);
+            pending && pending.timeout && this.clearTimeout(pending.timeout);
         }
         this.delayTimeouts = {};
         this._api.dispose();
@@ -254,7 +254,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             return;
         }
 
-        this.reInitTimeout && clearTimeout(this.reInitTimeout);
+        this.reInitTimeout && this.clearTimeout(this.reInitTimeout);
         this.log.debug('ready');
 
         // the default profile names are published in the language the user reads the rest of ioBroker in
@@ -290,8 +290,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             } catch (err) {
                 this.log.error(`error starting Homematic: ${String(err)}`);
                 this.log.error('Try reconnect in 30s');
-                this.reInitTimeout && clearTimeout(this.reInitTimeout);
-                this.reInitTimeout = setTimeout(() => {
+                this.reInitTimeout && this.clearTimeout(this.reInitTimeout);
+                this.reInitTimeout = this.setTimeout(() => {
                     this.reInitTimeout = null;
                     void this._ready();
                 }, 30000);
@@ -1184,19 +1184,19 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             this.delayTimeouts[id] = this.delayTimeouts[id] || {};
             // clear timeout if one is running
             if (this.delayTimeouts[id].timeout) {
-                clearTimeout(this.delayTimeouts[id].timeout);
+                this.clearTimeout(this.delayTimeouts[id].timeout);
                 delete this.delayTimeouts[id].timeout;
             }
             if (o.native.debounce) {
                 // debounce, delay sending command
                 this.delayTimeouts[id].lastVal = state.val;
-                this.delayTimeouts[id].timeout = setTimeout(
+                this.delayTimeouts[id].timeout = this.setTimeout(
                     (id, o, state) => {
                         this.delayTimeouts[id].timeout = null;
                         this.log.debug(
                             `${o.native.parameter} - id ${o.native.id ? JSON.stringify(o.native.id) : ''} - Send debounced value ${state.val} now to HMIP`,
                         );
-                        void this._doStateChange(id, o as unknown as DispatchObject, state);
+                        void this._doStateChange(id, o, state);
                     },
                     o.native.debounce,
                     id,
@@ -1204,7 +1204,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
                     state,
                 );
             } else {
-                this.delayTimeouts[id].timeout = setTimeout(() => {
+                this.delayTimeouts[id].timeout = this.setTimeout(() => {
                     this.delayTimeouts[id].timeout = null;
                 }, o.native.throttle || 1000);
                 await this._doStateChange(id, o as unknown as DispatchObject, state);
@@ -1219,8 +1219,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
     _opened(): void {
         this.log.info('ws connection opened');
         this.wsConnected = true;
-        this.wsConnectionStableTimeout && clearTimeout(this.wsConnectionStableTimeout);
-        this.wsConnectionStableTimeout = setTimeout(() => {
+        this.wsConnectionStableTimeout && this.clearTimeout(this.wsConnectionStableTimeout);
+        this.wsConnectionStableTimeout = this.setTimeout(() => {
             this.wsConnectionStableTimeout = null;
             this.wsConnectionErrorCounter = 0;
         }, 5000); // set null when connection is stable
@@ -1241,17 +1241,17 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             );
         }
         this.wsConnected = false;
-        this.expectWsError && clearTimeout(this.expectWsError);
+        this.expectWsError && this.clearTimeout(this.expectWsError);
         if (!forced && !this.reInitTimeout) {
             // When no error happens within 5 seconds, we refresh our self
-            this.expectWsError = setTimeout(() => this._closed(code, reason, true), 5000);
+            this.expectWsError = this.setTimeout(() => this._closed(code, reason, true), 5000);
         }
         if ((forced || this.wsConnectionErrorCounter > 6) && !this._unloaded) {
             this._api.dispose();
             this.log.error(`close on websocket connection: ${code} - ${reason}`);
             this.log.error('Try reconnect in 30s');
-            this.reInitTimeout && clearTimeout(this.reInitTimeout);
-            this.reInitTimeout = setTimeout(async () => {
+            this.reInitTimeout && this.clearTimeout(this.reInitTimeout);
+            this.reInitTimeout = this.setTimeout(async () => {
                 this.reInitTimeout = null;
                 await this._ready();
             }, 30000);
@@ -1272,8 +1272,8 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
             this._api.dispose();
             this.log.error(`error on websocket connection: ${reason}`);
             this.log.error('Try reconnect in 30s');
-            this.reInitTimeout && clearTimeout(this.reInitTimeout);
-            this.reInitTimeout = setTimeout(() => {
+            this.reInitTimeout && this.clearTimeout(this.reInitTimeout);
+            this.reInitTimeout = this.setTimeout(() => {
                 this.reInitTimeout = null;
                 void this._ready();
             }, 30000);
@@ -1661,15 +1661,15 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
         // a read still in flight answers for the configuration this replaces
         this._dataEpoch++;
         this._api.dispose();
-        this.reInitDataTimeout = setTimeout(async () => {
+        this.reInitDataTimeout = this.setTimeout(async () => {
             this.reInitDataTimeout = null;
             try {
                 await this._initData();
             } catch (err) {
                 this.log.error(`error updating Homematic ip for unknown states: ${String(err)}`);
                 this.log.error('Try reconnect in 30s');
-                this.reInitTimeout && clearTimeout(this.reInitTimeout);
-                this.reInitTimeout = setTimeout(() => {
+                this.reInitTimeout && this.clearTimeout(this.reInitTimeout);
+                this.reInitTimeout = this.setTimeout(() => {
                     this.reInitTimeout = null;
                     void this._ready();
                 }, 30000);
