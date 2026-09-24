@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('node:assert');
-const HmCloudAPI = require('../api/hmCloudAPI');
+const HmCloudAPI = require('../build/lib/hmCloudAPI').HmCloudAPI;
 
 const CLASSIC_GROUPS = {
     g1: { id: 'g1', type: 'SECURITY_ZONE', label: 'INTERNAL', channels: [{ deviceId: 'DEV-1', channelIndex: 0 }] },

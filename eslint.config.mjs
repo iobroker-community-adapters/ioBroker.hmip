@@ -27,6 +27,8 @@ export default [
             'admin/',
             'src-admin',
             'build/',
+            // manual smoke tests, run by hand against the build output
+            'tools/',
         ],
     },
 

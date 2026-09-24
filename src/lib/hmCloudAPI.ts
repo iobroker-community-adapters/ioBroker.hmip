@@ -11,20 +11,10 @@ import type {
     HmIpGroup,
     HmIpHome,
     HmIpRule,
+    CloudEvent,
     SecurityZonesArmedState,
     ZonesActivationOutcome,
 } from './types';
-
-/** one entry of a websocket frame; the cloud names the kind and carries the entity that changed */
-interface CloudEvent {
-    pushEventType?: string;
-    device?: HmIpDevice;
-    group?: HmIpGroup;
-    client?: HmIpClient;
-    home?: HmIpHome;
-    id?: string;
-    [key: string]: unknown;
-}
 
 const WS_PING_INTERVAL = 5000;
 // four unanswered pings. The cloud drops a connection silently often enough that this deadline is
@@ -56,7 +46,8 @@ export class HmCloudAPI {
     private _pin: string | null | undefined;
     private _urlREST = '';
     private _urlWebSocket = '';
-    private _clientCharacteristics: ClientCharacteristics | null = null;
+    // the adapter reads this for the full home read it drives itself
+    public _clientCharacteristics: ClientCharacteristics | null = null;
 
     private _ws: WebSocket | null = null;
     private _pingInterval: NodeJS.Timeout | null = null;
@@ -76,7 +67,7 @@ export class HmCloudAPI {
     public dataReceived: ((data: string) => void) | null = null;
     public opened: (() => void) | null = null;
     public closed: ((code: number, reason: string) => void) | null = null;
-    public errored: ((error: unknown) => void) | null = null;
+    public errored: ((error: Error) => void) | null = null;
     public requestError: ((error: unknown) => void) | null = null;
     public unexpectedResponse: ((request: ClientRequest, response: IncomingMessage) => void) | null = null;
     public staleConnection: ((silentFor: number) => void) | null = null;
@@ -455,7 +446,7 @@ export class HmCloudAPI {
     // =========== API for HM Devices ===========
 
     // boolean
-    async deviceControlSetSwitchState(deviceId: string, on: boolean, channelIndex = 1): Promise<void> {
+    async deviceControlSetSwitchState(deviceId: string, on: boolean, channelIndex: string | number = 1): Promise<void> {
         const data = {
             deviceId,
             on,
@@ -476,16 +467,21 @@ export class HmCloudAPI {
     //     STOP = auto()
     //     CLOSE = auto()
     //     PARTIAL_OPEN = auto()
-    async deviceControlSendDoorCommand(deviceId: string, doorCommand: number, channelIndex = 1): Promise<void> {
+    async deviceControlSendDoorCommand(
+        deviceId: string,
+        doorCommand: number,
+        channelIndex: string | number = 1,
+    ): Promise<void> {
         const data = { deviceId, channelIndex, doorCommand };
         await this.callRestApi('device/control/sendDoorCommand', data);
     }
 
     async deviceControlSetLockState(
         deviceId: string,
-        lockState: number,
+        // the dispatcher rewrites 1/2/3 to OPEN/LOCKED/UNLOCKED before this is called
+        lockState: string,
         pin: string | null | undefined,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = {
             deviceId,
@@ -496,7 +492,7 @@ export class HmCloudAPI {
         await this.callRestApi('device/control/setLockState', data);
     }
 
-    async deviceControlResetEnergyCounter(deviceId: string, channelIndex = 1): Promise<void> {
+    async deviceControlResetEnergyCounter(deviceId: string, channelIndex: string | number = 1): Promise<void> {
         const data = { deviceId, channelIndex };
         await this.callRestApi('device/control/resetEnergyCounter', data);
     }
@@ -504,7 +500,7 @@ export class HmCloudAPI {
     async deviceConfigurationSetOperationLock(
         deviceId: string,
         operationLock: boolean,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, channelIndex, operationLock: operationLock };
         await this.callRestApi('device/configuration/setOperationLock', data);
@@ -517,7 +513,7 @@ export class HmCloudAPI {
     async deviceConfigurationSetClimateControlDisplay(
         deviceId: string,
         display: string,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, channelIndex, display };
         await this.callRestApi('device/configuration/setClimateControlDisplay', data);
@@ -527,14 +523,18 @@ export class HmCloudAPI {
     async deviceConfigurationSetMinimumFloorHeatingValvePosition(
         deviceId: string,
         minimumFloorHeatingValvePosition: number,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, channelIndex, minimumFloorHeatingValvePosition };
         await this.callRestApi('device/configuration/setMinimumFloorHeatingValvePosition', data);
     }
 
     // float 0.0-1.0??
-    async deviceControlSetDimLevel(deviceId: string, dimLevel: number, channelIndex = 1): Promise<void> {
+    async deviceControlSetDimLevel(
+        deviceId: string,
+        dimLevel: number,
+        channelIndex: string | number = 1,
+    ): Promise<void> {
         const data = { deviceId, channelIndex, dimLevel };
         await this.callRestApi('device/control/setDimLevel', data);
     }
@@ -544,7 +544,7 @@ export class HmCloudAPI {
         deviceId: string,
         rgb: string,
         dimLevel: number,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, channelIndex, simpleRGBColorState: rgb, dimLevel };
         await this.callRestApi('device/control/setSimpleRGBColorDimLevel', data);
@@ -558,7 +558,7 @@ export class HmCloudAPI {
         dimLevel: number,
         onTime: number,
         rampTime: number,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, channelIndex, simpleRGBColorState: rgb, dimLevel, onTime, rampTime };
         await this.callRestApi('device/control/setSimpleRGBColorDimLevelWithTime', data);
@@ -577,7 +577,11 @@ export class HmCloudAPI {
     }
 
     // float 0.0 = open - 1.0 = closed
-    async deviceControlPullLatch(deviceId: string, authorizationPin: string = '', channelIndex = 1): Promise<void> {
+    async deviceControlPullLatch(
+        deviceId: string,
+        authorizationPin: string = '',
+        channelIndex: string | number = 1,
+    ): Promise<void> {
         const data = {
             deviceId,
             channelIndex,
@@ -586,17 +590,17 @@ export class HmCloudAPI {
         await this.callRestApi('device/control/pullLatch', data);
     }
 
-    async deviceControlResetPassageCounter(deviceId: string, channelIndex = 1): Promise<void> {
+    async deviceControlResetPassageCounter(deviceId: string, channelIndex: string | number = 1): Promise<void> {
         const data = { deviceId, channelIndex };
         await this.callRestApi('device/control/resetPassageCounter', data);
     }
 
-    async deviceControlResetWaterVolume(deviceId: string, channelIndex = 1): Promise<void> {
+    async deviceControlResetWaterVolume(deviceId: string, channelIndex: string | number = 1): Promise<void> {
         const data = { deviceId, channelIndex };
         await this.callRestApi('device/control/resetWaterVolume', data);
     }
 
-    async deviceControlToggleWateringState(deviceId: string, channelIndex = 1): Promise<void> {
+    async deviceControlToggleWateringState(deviceId: string, channelIndex: string | number = 1): Promise<void> {
         const data = { deviceId, channelIndex };
         await this.callRestApi('device/control/toggleWateringState', data);
     }
@@ -605,13 +609,13 @@ export class HmCloudAPI {
         deviceId: string,
         wateringActive: boolean,
         wateringTime: number,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, channelIndex, wateringActive, wateringTime };
         await this.callRestApi('device/control/setWateringSwitchStateWithTime', data);
     }
 
-    async deviceControlSetFavoriteShadingPosition(deviceId: string, channelIndex = 1): Promise<void> {
+    async deviceControlSetFavoriteShadingPosition(deviceId: string, channelIndex: string | number = 1): Promise<void> {
         const data = { deviceId, channelIndex };
         await this.callRestApi('device/control/setFavoriteShadingPosition', data);
     }
@@ -619,7 +623,7 @@ export class HmCloudAPI {
     async deviceControlSetMotionDetectionActive(
         deviceId: string,
         motionDetectionActive: boolean,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, channelIndex, motionDetectionActive };
         await this.callRestApi('device/control/setMotionDetectionActive', data);
@@ -629,7 +633,7 @@ export class HmCloudAPI {
         deviceId: string,
         soundFile: string,
         volumeLevel: number,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, channelIndex, soundFile, volumeLevel };
         await this.callRestApi('device/control/setSoundFileVolumeLevel', data);
@@ -639,7 +643,7 @@ export class HmCloudAPI {
         deviceId: string,
         id: number,
         dimLevel: number,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, channelIndex, id, dimLevel };
         await this.callRestApi('device/control/startLightScene', data);
@@ -650,7 +654,7 @@ export class HmCloudAPI {
         dimLevel: number,
         onTime: number,
         rampTime: number,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, channelIndex, dimLevel, onTime, rampTime };
         await this.callRestApi('device/control/setDimLevelWithTime', data);
@@ -663,7 +667,7 @@ export class HmCloudAPI {
         dimLevel: number,
         onTime: number,
         rampTime: number,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, channelIndex, hue, saturationLevel, dimLevel, onTime, rampTime };
         await this.callRestApi('device/control/setHueSaturationDimLevelWithTime', data);
@@ -675,7 +679,7 @@ export class HmCloudAPI {
         dimLevel: number,
         onTime: number,
         rampTime: number,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, channelIndex, colorTemperature, dimLevel, onTime, rampTime };
         await this.callRestApi('device/control/setColorTemperatureDimLevelWithTime', data);
@@ -688,7 +692,7 @@ export class HmCloudAPI {
         dimLevel: number,
         onTime: number,
         rampTime: number,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = {
             deviceId,
@@ -705,7 +709,7 @@ export class HmCloudAPI {
     async deviceControlSetWateringSwitchState(
         deviceId: string,
         wateringActive: boolean,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, channelIndex, wateringActive };
         await this.callRestApi('device/control/setWateringSwitchState', data);
@@ -716,7 +720,7 @@ export class HmCloudAPI {
         hue: number,
         saturationLevel: number,
         dimLevel: number,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, channelIndex, hue, saturationLevel, dimLevel };
         await this.callRestApi('device/control/setHueSaturationDimLevel', data);
@@ -726,18 +730,22 @@ export class HmCloudAPI {
         deviceId: string,
         colorTemperature: number,
         dimLevel: number,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, channelIndex, colorTemperature, dimLevel };
         await this.callRestApi('device/control/setColorTemperatureDimLevel', data);
     }
 
-    async deviceControlSetShutterLevel(deviceId: string, shutterLevel: number, channelIndex = 1): Promise<void> {
+    async deviceControlSetShutterLevel(
+        deviceId: string,
+        shutterLevel: number,
+        channelIndex: string | number = 1,
+    ): Promise<void> {
         const data = { deviceId, channelIndex, shutterLevel };
         await this.callRestApi('device/control/setShutterLevel', data);
     }
 
-    async deviceControlStartImpulse(deviceId: string, channelIndex = 1): Promise<void> {
+    async deviceControlStartImpulse(deviceId: string, channelIndex: string | number = 1): Promise<void> {
         const data = { deviceId, channelIndex };
         await this.callRestApi('device/control/startImpulse', data);
     }
@@ -747,13 +755,13 @@ export class HmCloudAPI {
         deviceId: string,
         slatsLevel: number,
         shutterLevel: number,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, channelIndex, slatsLevel, shutterLevel };
         await this.callRestApi('device/control/setSlatsLevel', data);
     }
 
-    async deviceControlStop(deviceId: string, channelIndex = 1): Promise<void> {
+    async deviceControlStop(deviceId: string, channelIndex: string | number = 1): Promise<void> {
         const data = { deviceId, channelIndex };
         await this.callRestApi('device/control/stop', data);
     }
@@ -761,7 +769,7 @@ export class HmCloudAPI {
     async deviceControlSetPrimaryShadingLevel(
         deviceId: string,
         primaryShadingLevel: number,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, channelIndex, primaryShadingLevel: primaryShadingLevel };
         await this.callRestApi('device/control/setPrimaryShadingLevel', data);
@@ -771,7 +779,7 @@ export class HmCloudAPI {
         deviceId: string,
         primaryShadingLevel: number,
         secondaryShadingLevel: number,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, channelIndex, primaryShadingLevel, secondaryShadingLevel };
         await this.callRestApi('device/control/setSecondaryShadingLevel', data);
@@ -799,7 +807,7 @@ export class HmCloudAPI {
     async deviceConfigurationSetAcousticAlarmSignal(
         deviceId: string,
         acousticAlarmSignal: string,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, acousticAlarmSignal, channelIndex };
         await this.callRestApi('device/configuration/setAcousticAlarmSignal', data);
@@ -813,7 +821,7 @@ export class HmCloudAPI {
     async deviceConfigurationSetAcousticAlarmTiming(
         deviceId: string,
         acousticAlarmTiming: string,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, acousticAlarmTiming, channelIndex };
         await this.callRestApi('device/configuration/setAcousticAlarmTiming', data);
@@ -827,7 +835,7 @@ export class HmCloudAPI {
     async deviceConfigurationSetAcousticWaterAlarmTrigger(
         deviceId: string,
         acousticWaterAlarmTrigger: string,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, acousticWaterAlarmTrigger, channelIndex };
         await this.callRestApi('device/configuration/setAcousticWaterAlarmTrigger', data);
@@ -841,7 +849,7 @@ export class HmCloudAPI {
     async deviceConfigurationSetInAppWaterAlarmTrigger(
         deviceId: string,
         inAppWaterAlarmTrigger: string,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, inAppWaterAlarmTrigger, channelIndex };
         await this.callRestApi('device/configuration/setInAppWaterAlarmTrigger', data);
@@ -855,7 +863,7 @@ export class HmCloudAPI {
     async deviceConfigurationSetSirenWaterAlarmTrigger(
         deviceId: string,
         sirenWaterAlarmTrigger: string,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, sirenWaterAlarmTrigger, channelIndex };
         await this.callRestApi('device/configuration/setSirenWaterAlarmTrigger', data);
@@ -867,7 +875,7 @@ export class HmCloudAPI {
     async deviceConfigurationSetAccelerationSensorMode(
         deviceId: string,
         accelerationSensorMode: string,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, accelerationSensorMode, channelIndex };
         await this.callRestApi('device/configuration/setAccelerationSensorMode', data);
@@ -879,7 +887,7 @@ export class HmCloudAPI {
     async deviceConfigurationSetAccelerationSensorNeutralPosition(
         deviceId: string,
         accelerationSensorNeutralPosition: string,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, accelerationSensorNeutralPosition, channelIndex };
         await this.callRestApi('device/configuration/setAccelerationSensorNeutralPosition', data);
@@ -889,7 +897,7 @@ export class HmCloudAPI {
     async deviceConfigurationSetAccelerationSensorTriggerAngle(
         deviceId: string,
         accelerationSensorTriggerAngle: number,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, accelerationSensorTriggerAngle, channelIndex };
         await this.callRestApi('device/configuration/setAccelerationSensorTriggerAngle', data);
@@ -905,7 +913,7 @@ export class HmCloudAPI {
     async deviceConfigurationSetAccelerationSensorSensitivity(
         deviceId: string,
         accelerationSensorSensitivity: string,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, accelerationSensorSensitivity, channelIndex };
         await this.callRestApi('device/configuration/setAccelerationSensorSensitivity', data);
@@ -915,7 +923,7 @@ export class HmCloudAPI {
     async deviceConfigurationSetAccelerationSensorEventFilterPeriod(
         deviceId: string,
         accelerationSensorEventFilterPeriod: number,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, accelerationSensorEventFilterPeriod, channelIndex };
         await this.callRestApi('device/configuration/setAccelerationSensorEventFilterPeriod', data);
@@ -930,7 +938,7 @@ export class HmCloudAPI {
         deviceId: string,
         notificationSoundType: string,
         isHighToLow: boolean,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, notificationSoundType, isHighToLow, channelIndex };
         await this.callRestApi('device/configuration/setNotificationSoundType', data);
@@ -939,7 +947,7 @@ export class HmCloudAPI {
     async deviceConfigurationSetRouterModuleEnabled(
         deviceId: string,
         routerModuleEnabled: boolean,
-        channelIndex = 1,
+        channelIndex: string | number = 1,
     ): Promise<void> {
         const data = { deviceId, routerModuleEnabled, channelIndex };
         await this.callRestApi('device/configuration/setRouterModuleEnabled', data);

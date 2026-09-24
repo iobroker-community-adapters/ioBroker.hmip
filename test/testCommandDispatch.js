@@ -3,15 +3,16 @@
 const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
-const HmCloudAPI = require('../api/hmCloudAPI');
-const { CHANNEL_STATES } = require('../lib/channelStates');
+const HmCloudAPI = require('../build/lib/hmCloudAPI').HmCloudAPI;
+const { CHANNEL_STATES } = require('../build/lib/channelStates');
 
-const mainSource = fs.readFileSync(path.join(__dirname, '..', 'main.js'), 'utf8');
+// the dispatcher is checked as source, not as behaviour, so this reads the TypeScript
+const mainSource = fs.readFileSync(path.join(__dirname, '..', 'src', 'main.ts'), 'utf8');
 
 /** the body of _doStateChange, which is the adapter's only command dispatcher */
 function dispatcherBody() {
-    const start = mainSource.indexOf('async _doStateChange(id, o, state) {');
-    assert.notStrictEqual(start, -1, 'main.js no longer has a _doStateChange');
+    const start = mainSource.indexOf('async _doStateChange(');
+    assert.notStrictEqual(start, -1, 'main.ts no longer has a _doStateChange');
     const end = mainSource.indexOf('\n    async _stateChange(', start);
     assert.notStrictEqual(end, -1, 'could not find the end of _doStateChange');
     // a commented-out call is not a call, and would otherwise pass for one

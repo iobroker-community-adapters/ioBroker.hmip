@@ -9,7 +9,7 @@ const {
     DERIVERS,
     channelStateObjects,
     channelStateValues,
-} = require('../lib/channelStates');
+} = require('../build/lib/channelStates');
 
 const VALID_TYPES = ['boolean', 'number', 'string'];
 const SPEC_KEYS = [

@@ -117,8 +117,17 @@ export interface HmIpClient {
     [key: string]: unknown;
 }
 
+/**
+ * The functional homes a home is divided into: SECURITY_AND_ALARM, INDOOR_CLIMATE,
+ * WEATHER_AND_ENVIRONMENT, LIGHT_AND_SHADOW and whatever else a firmware adds. Each one is a
+ * flat map the adapter publishes field by field, so its values stay unknown until they are read.
+ */
+export type HmIpFunctionalHomes = Record<string, Record<string, unknown> | undefined>;
+
 export interface HmIpHome {
     id: string;
+    functionalHomes?: HmIpFunctionalHomes;
+    weather?: Record<string, unknown>;
     ruleMetaDatas?: Record<string, HmIpRule>;
     [key: string]: unknown;
 }
@@ -170,4 +179,46 @@ export interface ZonesActivationOutcome {
     problems: Record<string, string[]> | null;
     lowBatteryDevices: string[];
     lowBatteryLookupIncomplete: boolean;
+}
+
+/** one entry of a websocket frame; the cloud names the kind and carries the entity that changed */
+export interface CloudEvent {
+    pushEventType?: string;
+    device?: HmIpDevice;
+    group?: HmIpGroup;
+    client?: HmIpClient;
+    home?: HmIpHome;
+    id?: string;
+    [key: string]: unknown;
+}
+
+/** a DEVICE_CHANNEL_EVENT: a button press, a door bell, ... */
+export interface ChannelEvent {
+    deviceId?: string;
+    channelIndex?: number | string;
+    functionalChannelIndex?: number | string;
+    channelEventType?: string;
+    [key: string]: unknown;
+}
+
+/** a DEVICE_CODE_STATE_EVENT, raised by the keypads */
+export interface CodeStateEvent {
+    deviceId?: string;
+    codeState?: string;
+    codeId?: string;
+    [key: string]: unknown;
+}
+
+/** one entry of the security journal */
+export interface SecurityJournalEntry {
+    eventTimestamp?: number;
+    eventType?: string;
+    label?: string;
+    homeId?: string;
+    [key: string]: unknown;
+}
+
+/** the state object _doStateChange dispatches on: its native names the command to send */
+export interface DispatchObject extends ioBroker.BaseObject {
+    native: ChannelStateNative & Record<string, unknown>;
 }

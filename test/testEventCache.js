@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('node:assert');
-const HmCloudAPI = require('../api/hmCloudAPI');
+const HmCloudAPI = require('../build/lib/hmCloudAPI').HmCloudAPI;
 
 describe('hmCloudAPI event cache maintenance', () => {
     function createApiWithCaches() {

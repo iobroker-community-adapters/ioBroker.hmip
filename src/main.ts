@@ -1,7 +1,7 @@
-const { Adapter } = require('@iobroker/adapter-core'); // Get common adapter utils
-const { v4: uuidv4 } = require('uuid');
-const apiClass = require('./api/hmCloudAPI');
-const {
+import * as utils from '@iobroker/adapter-core';
+import { randomUUID } from 'node:crypto';
+import { HmCloudAPI } from './lib/hmCloudAPI';
+import {
     CHANNEL_STATES,
     STATELESS_CHANNELS,
     CHANNEL_EVENTS,
@@ -10,9 +10,26 @@ const {
     EVENT_CHANNELS,
     channelStateObjects,
     channelStateValues,
-} = require('./lib/channelStates');
+} from './lib/channelStates';
+import type { ClientRequest, IncomingMessage } from 'node:http';
+import type {
+    ChannelEvent,
+    ChannelStateNative,
+    CloudEvent,
+    CodeStateEvent,
+    DispatchObject,
+    HmIpClient,
+    HmIpDevice,
+    HmIpGroup,
+    HmIpHome,
+    HmIpRule,
+    HmIpCurrentState,
+    SecurityJournalEntry,
+} from './lib/types';
 
-const adapterName = require('./package.json').name.split('.').pop();
+// the compiled adapter lives in build/, so package.json is no longer a sibling of this file;
+// the name it used to be read from is fixed and matches common.name in io-package.json
+const adapterName = 'hmip';
 
 // the home's alarm fields only arrive with a full read, which answers with every device in the
 // home, so a panel raising the security journal event every few minutes must not drive one each time
@@ -57,12 +74,75 @@ const DEFAULT_PROFILE_NAMES = {
     },
 };
 
-class HmIpCloudAccesspointAdapter extends Adapter {
-    constructor(options) {
+/** the part of the Sentry plugin object this adapter uses */
+interface SentryLike {
+    withScope: (
+        callback: (scope: {
+            setLevel: (level: string) => void;
+            setExtra: (key: string, value: string) => void;
+        }) => void,
+    ) => void;
+    captureMessage: (message: string, level?: string) => void;
+}
+
+/** what axios hands over when a request failed */
+interface RequestFailure {
+    response?: { data?: unknown; status?: number };
+    request?: unknown;
+    message?: string;
+}
+
+/** one entry of the per-datapoint write throttle */
+interface DelayTimeout {
+    timeout?: NodeJS.Timeout | null;
+    lastVal?: ioBroker.StateValue;
+}
+
+/** where a pairing attempt stands, as the admin dialog polls it */
+interface RequestTokenState {
+    state: 'idle' | 'startedTokenCreation' | 'waitForBlueButton' | 'confirmToken' | 'tokenCreated' | 'errorOccurred';
+    error?: unknown;
+}
+
+class HmIpCloudAccesspointAdapter extends utils.Adapter {
+    private readonly _api: HmCloudAPI;
+
+    private _unloaded = false;
+    private _requestTokenState: RequestTokenState = { state: 'idle' };
+    private _homeReadInterval = HOME_REREAD_INTERVAL;
+    private _homeReadRetryInterval = HOME_READ_RETRY_INTERVAL;
+    private _nextHomeRead = 0;
+    private _homeReadRunning = false;
+    private _homeReadPending = false;
+    private _homePublishSeq = 0;
+    private _dataEpoch = 0;
+    private _journalReadRunning = false;
+    private _journalReadPending = false;
+
+    private wsConnected = false;
+    private wsConnectionStableTimeout: NodeJS.Timeout | null = null;
+    private wsConnectionErrorCounter = 0;
+    private expectWsError: NodeJS.Timeout | null = null;
+    private reInitTimeout: NodeJS.Timeout | null = null;
+    private reInitDataTimeout: NodeJS.Timeout | null = null;
+
+    /** channel types already reported as unknown, so each one is reported once */
+    private sendUnknownInfos: Record<string, boolean> = {};
+    /** the acknowledged value of every datapoint, so an unchanged write is not sent on */
+    private currentValues: Record<string, ioBroker.StateValue> = {};
+    private delayTimeouts: Record<string, DelayTimeout> = {};
+    /** objects that have been built, so states are only written onto objects that exist */
+    private initializedChannels: Record<string, boolean> = {};
+    /** the language the default profile names are published in */
+    private profileNameLanguage: keyof typeof DEFAULT_PROFILE_NAMES = 'en';
+
+    private Sentry: SentryLike | null = null;
+
+    public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({ ...options, name: adapterName });
 
-        this._api = new apiClass();
-        this._api.eventRaised = this._eventRaised.bind(this);
+        this._api = new HmCloudAPI();
+        this._api.eventRaised = event => void this._eventRaised(event as CloudEvent);
         // this._api.dataReceived = this._dataReceived.bind(this);
         this._api.opened = this._opened.bind(this);
         this._api.closed = this._closed.bind(this);
@@ -76,31 +156,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         this.on('stateChange', this._stateChange);
         this.on('message', this._message);
         this.on('ready', this._ready);
-
-        this._unloaded = false;
-        this._requestTokenState = { state: 'idle' };
-        this._homeReadInterval = HOME_REREAD_INTERVAL;
-        this._homeReadRetryInterval = HOME_READ_RETRY_INTERVAL;
-        this._nextHomeRead = 0;
-        this._homeReadRunning = false;
-        this._homeReadPending = false;
-        this._homePublishSeq = 0;
-        this._dataEpoch = 0;
-
-        this.wsConnected = false;
-        this.wsConnectionStableTimeout = null;
-        this.wsConnectionErrorCounter = 0;
-
-        this.sendUnknownInfos = {};
-
-        this.currentValues = {};
-        this.delayTimeouts = {};
-        this.initializedChannels = {};
-        this.reInitDataTimeout = null;
-        this.profileNameLanguage = 'en';
     }
 
-    _unload(callback) {
+    _unload(callback: () => void): void {
         this._unloaded = true;
         this.expectWsError && clearTimeout(this.expectWsError);
         this.reInitTimeout && clearTimeout(this.reInitTimeout);
@@ -118,11 +176,11 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }
     }
 
-    _objectChange(id, obj) {
+    _objectChange(id: string, obj: ioBroker.Object | null | undefined): void {
         this.log.info(`objectChange ${id} ${JSON.stringify(obj)}`);
     }
 
-    async _message(msg) {
+    async _message(msg: ioBroker.Message): Promise<void> {
         this.log.debug(`message received - ${JSON.stringify(msg)}`);
         switch (msg.command) {
             case 'requestToken':
@@ -141,7 +199,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
      * group that is ignored for cooling is collected, the one being written among them: it is
      * already in the states database, unacknowledged, by the time the change reaches the adapter.
      */
-    async _updateNonCoolingGroups() {
+    async _updateNonCoolingGroups(): Promise<void> {
         const states = await this.getStatesAsync('groups.*.coolingIgnored');
         const prefix = `${this.namespace}.`;
         const nonCoolingGroups = [];
@@ -158,10 +216,10 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         await this._api.homeHeatingSetNonCoolingGroups(nonCoolingGroups);
     }
 
-    async _startTokenRequest(msg) {
+    async _startTokenRequest(msg: ioBroker.Message): Promise<void> {
         try {
             this.log.info('started token request');
-            let config = msg.message;
+            const config = msg.message;
             this._api.parseConfigData(config.accessPointSgtin, config.pin, config.clientId);
             await this._api.getHomematicHosts();
             this.log.info('auth step 1');
@@ -175,21 +233,23 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 this._requestTokenState = { state: 'confirmToken' };
                 this.log.info('auth step 3');
                 await this._api.auth3requestAuthToken();
-                let saveData = this._api.getSaveData();
-                saveData.state = 'tokenCreated';
-                this._requestTokenState = saveData;
+                this._requestTokenState = { ...this._api.getSaveData(), state: 'tokenCreated' };
             }
         } catch (err) {
             this._requestTokenState = { state: 'errorOccurred' };
-            this.log.error(`error requesting token: ${err}`);
+            this.log.error(`error requesting token: ${String(err)}`);
         }
     }
 
-    async _ready() {
+    async _ready(): Promise<void> {
         // set UUID if not set
         if (!this.config.deviceId) {
             const config = await this.getForeignObjectAsync(`system.adapter.${this.namespace}`);
-            config.native.deviceId = uuidv4();
+            if (!config) {
+                this.log.error(`Cannot read system.adapter.${this.namespace}`);
+                return;
+            }
+            config.native.deviceId = randomUUID();
             await this.setForeignObjectAsync(config._id, config);
             return;
         }
@@ -199,8 +259,8 @@ class HmIpCloudAccesspointAdapter extends Adapter {
 
         // the default profile names are published in the language the user reads the rest of ioBroker in
         const systemConfig = await this.getForeignObjectAsync('system.config');
-        const language = systemConfig && systemConfig.common && systemConfig.common.language;
-        this.profileNameLanguage = DEFAULT_PROFILE_NAMES[language] ? language : 'en';
+        const language = systemConfig?.common?.language;
+        this.profileNameLanguage = language === 'de' ? 'de' : 'en';
         await this.setState('info.connection', false, true);
 
         if (!this.Sentry && this.supportsFeature && this.supportsFeature('PLUGINS')) {
@@ -228,12 +288,12 @@ class HmIpCloudAccesspointAdapter extends Adapter {
 
                 await this._initData();
             } catch (err) {
-                this.log.error(`error starting Homematic: ${err}`);
+                this.log.error(`error starting Homematic: ${String(err)}`);
                 this.log.error('Try reconnect in 30s');
                 this.reInitTimeout && clearTimeout(this.reInitTimeout);
                 this.reInitTimeout = setTimeout(() => {
                     this.reInitTimeout = null;
-                    this._ready();
+                    void this._ready();
                 }, 30000);
                 return;
             }
@@ -247,7 +307,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }
     }
 
-    async _initData() {
+    async _initData(): Promise<void> {
         await this._api.loadCurrentConfig();
         // a read that started before this snapshot answers for the configuration it replaces
         this._dataEpoch++;
@@ -266,7 +326,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         this._api.connectWebsocket();
         this.log.debug('updateDeviceStates');
         if (this._api.devices) {
-            for (let d in this._api.devices) {
+            for (const d in this._api.devices) {
                 if (!Object.prototype.hasOwnProperty.call(this._api.devices, d)) {
                     continue;
                 }
@@ -276,7 +336,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             this.log.debug('No devices');
         }
         if (this._api.groups) {
-            for (let g in this._api.groups) {
+            for (const g in this._api.groups) {
                 if (!Object.prototype.hasOwnProperty.call(this._api.groups, g)) {
                     continue;
                 }
@@ -286,7 +346,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             this.log.debug('No groups');
         }
         if (this._api.clients) {
-            for (let c in this._api.clients) {
+            for (const c in this._api.clients) {
                 if (!Object.prototype.hasOwnProperty.call(this._api.clients, c)) {
                     continue;
                 }
@@ -296,7 +356,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             this.log.debug('No clients');
         }
         if (this._api.rules) {
-            for (let r in this._api.rules) {
+            for (const r in this._api.rules) {
                 if (!Object.prototype.hasOwnProperty.call(this._api.rules, r)) {
                     continue;
                 }
@@ -313,13 +373,17 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }
     }
 
-    round(value, step) {
+    round(value: number, step: number): number {
         step = step || 1.0;
         const inv = 1.0 / step;
         return Math.round(value * inv) / inv;
     }
 
-    async _doStateChange(id, o, state) {
+    async _doStateChange(id: string, o: DispatchObject, state: ioBroker.State): Promise<void> {
+        // a device command addresses one device and one channel; the states that act on the
+        // channel's groups carry a list of group ids in native.id and go through _targetGroups
+        const deviceId = o.native.id as string;
+        const channel = o.native.channel;
         try {
             switch (o.native.parameter) {
                 case 'switchState':
@@ -328,7 +392,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
-                    await this._api.deviceControlSetSwitchState(o.native.id, state.val, o.native.channel);
+                    await this._api.deviceControlSetSwitchState(deviceId, state.val as boolean, channel);
                     break;
                 case 'sendDoorCommand':
                     //door commands as number: 1 = open; 2 = stop; 3 = close; 4 = ventilation position
@@ -342,7 +406,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                             this.log.info('Ignore invalid value for doorCommand.');
                             return;
                     }
-                    await this._api.deviceControlSendDoorCommand(o.native.id, state.val, o.native.channel);
+                    await this._api.deviceControlSendDoorCommand(deviceId, state.val, channel);
                     break;
                 case 'setLockState':
                     {
@@ -363,14 +427,19 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         }
                         const pin = await this._channelState(o.native, 'pin');
                         this.log.info(`Call setLockState for ${state.val} ${pin.val ? 'with' : 'without'} PIN`);
-                        await this._api.deviceControlSetLockState(o.native.id, state.val, pin.val, o.native.channel);
+                        await this._api.deviceControlSetLockState(
+                            deviceId,
+                            state.val,
+                            pin.val as string | null | undefined,
+                            channel,
+                        );
                     }
                     break;
                 case 'resetEnergyCounter':
-                    await this._api.deviceControlResetEnergyCounter(o.native.id, o.native.channel);
+                    await this._api.deviceControlResetEnergyCounter(deviceId, channel);
                     break;
                 case 'startImpulse':
-                    await this._api.deviceControlStartImpulse(o.native.id, o.native.channel);
+                    await this._api.deviceControlStartImpulse(deviceId, channel);
                     break;
                 case 'shutterlevel':
                     if (state.val === this.currentValues[id]) {
@@ -379,9 +448,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         return;
                     }
                     await this._api.deviceControlSetShutterLevel(
-                        o.native.id,
-                        this._levelFraction(state.val),
-                        o.native.channel,
+                        deviceId,
+                        this._levelFraction(state.val) as number,
+                        channel,
                     );
                     break;
                 case 'slatsLevel':
@@ -397,10 +466,10 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                             return;
                         }
                         await this._api.deviceControlSetSlatsLevel(
-                            o.native.id,
-                            this._levelFraction(slats.val),
-                            this._levelFraction(shutter.val),
-                            o.native.channel,
+                            deviceId,
+                            this._levelFraction(slats.val) as number,
+                            this._levelFraction(shutter.val) as number,
+                            channel,
                         );
                     }
                     break;
@@ -411,9 +480,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         return;
                     }
                     await this._api.deviceControlSetPrimaryShadingLevel(
-                        o.native.id,
-                        this._levelFraction(state.val),
-                        o.native.channel,
+                        deviceId,
+                        this._levelFraction(state.val) as number,
+                        channel,
                     );
                     break;
                 case 'setSecondaryShadingLevel':
@@ -429,15 +498,15 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                             return;
                         }
                         await this._api.deviceControlSetSecondaryShadingLevel(
-                            o.native.id,
-                            this._levelFraction(primary.val),
-                            this._levelFraction(secondary.val),
-                            o.native.channel,
+                            deviceId,
+                            this._levelFraction(primary.val) as number,
+                            this._levelFraction(secondary.val) as number,
+                            channel,
                         );
                     }
                     break;
                 case 'stop':
-                    await this._api.deviceControlStop(o.native.id, o.native.channel);
+                    await this._api.deviceControlStop(deviceId, channel);
                     break;
                 case 'setPointTemperature':
                     if (state.val === this.currentValues[id]) {
@@ -445,8 +514,8 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
-                    for (let id of this._targetGroups(o.native, o.native.parameter)) {
-                        await this._api.groupHeatingSetPointTemperature(id, state.val);
+                    for (const id of this._targetGroups(o.native, o.native.parameter)) {
+                        await this._api.groupHeatingSetPointTemperature(id, state.val as number);
                     }
                     break;
                 case 'setBoost':
@@ -455,8 +524,8 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
-                    for (let id of this._targetGroups(o.native, o.native.parameter)) {
-                        await this._api.groupHeatingSetBoost(id, state.val);
+                    for (const id of this._targetGroups(o.native, o.native.parameter)) {
+                        await this._api.groupHeatingSetBoost(id, state.val as boolean);
                     }
                     break;
                 case 'setBoostDuration':
@@ -465,8 +534,8 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
-                    for (let id of this._targetGroups(o.native, o.native.parameter)) {
-                        await this._api.groupHeatingSetBoostDuration(id, state.val);
+                    for (const id of this._targetGroups(o.native, o.native.parameter)) {
+                        await this._api.groupHeatingSetBoostDuration(id, state.val as number);
                     }
                     break;
                 case 'setActiveProfile':
@@ -475,8 +544,8 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
-                    for (let id of this._targetGroups(o.native, o.native.parameter)) {
-                        await this._api.groupHeatingSetActiveProfile(id, state.val);
+                    for (const id of this._targetGroups(o.native, o.native.parameter)) {
+                        await this._api.groupHeatingSetActiveProfile(id, state.val as string);
                     }
                     break;
                 case 'setControlMode':
@@ -485,8 +554,8 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
-                    for (let id of this._targetGroups(o.native, o.native.parameter)) {
-                        await this._api.groupHeatingSetControlMode(id, state.val);
+                    for (const id of this._targetGroups(o.native, o.native.parameter)) {
+                        await this._api.groupHeatingSetControlMode(id, state.val as string);
                     }
                     break;
                 case 'setOperationLock':
@@ -495,7 +564,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
-                    await this._api.deviceConfigurationSetOperationLock(o.native.id, state.val, o.native.channel);
+                    await this._api.deviceConfigurationSetOperationLock(deviceId, state.val as boolean, channel);
                     break;
                 case 'setClimateControlDisplay':
                     if (state.val === this.currentValues[id]) {
@@ -503,11 +572,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
-                    await this._api.deviceConfigurationSetClimateControlDisplay(
-                        o.native.id,
-                        state.val,
-                        o.native.channel,
-                    );
+                    await this._api.deviceConfigurationSetClimateControlDisplay(deviceId, state.val as string, channel);
                     break;
                 case 'setMinimumFloorHeatingValvePosition':
                     if (state.val === this.currentValues[id]) {
@@ -516,9 +581,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         return;
                     }
                     await this._api.deviceConfigurationSetMinimumFloorHeatingValvePosition(
-                        o.native.id,
-                        this._levelFraction(state.val),
-                        o.native.channel,
+                        deviceId,
+                        this._levelFraction(state.val) as number,
+                        channel,
                     );
                     break;
                 case 'setDimLevel':
@@ -532,14 +597,14 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         const dimLevel = this._levelFraction(state.val);
                         if (times.timed) {
                             await this._api.deviceControlSetDimLevelWithTime(
-                                o.native.id,
-                                dimLevel,
+                                deviceId,
+                                dimLevel as number,
                                 times.onTime,
                                 times.rampTime,
-                                o.native.channel,
+                                channel,
                             );
                         } else {
-                            await this._api.deviceControlSetDimLevel(o.native.id, dimLevel, o.native.channel);
+                            await this._api.deviceControlSetDimLevel(deviceId, dimLevel as number, channel);
                         }
                     }
                     break;
@@ -560,73 +625,73 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         const dimLevelValue = this._levelFraction(dimLevel.val);
                         if (times.timed) {
                             await this._api.deviceControlSetRgbDimLevelWithTime(
-                                o.native.id,
-                                rgb.val,
-                                dimLevelValue,
+                                deviceId,
+                                rgb.val as string,
+                                dimLevelValue as number,
                                 times.onTime,
                                 times.rampTime,
-                                o.native.channel,
+                                channel,
                             );
                         } else {
                             await this._api.deviceControlSetRgbDimLevel(
-                                o.native.id,
-                                rgb.val,
-                                dimLevelValue,
-                                o.native.channel,
+                                deviceId,
+                                rgb.val as string,
+                                dimLevelValue as number,
+                                channel,
                             );
                         }
                     }
                     break;
                 case 'toggleWateringState':
-                    await this._api.deviceControlToggleWateringState(o.native.id, o.native.channel);
+                    await this._api.deviceControlToggleWateringState(deviceId, channel);
                     break;
                 case 'resetWaterVolume':
-                    await this._api.deviceControlResetWaterVolume(o.native.id, o.native.channel);
+                    await this._api.deviceControlResetWaterVolume(deviceId, channel);
                     break;
                 case 'resetPassageCounter':
-                    await this._api.deviceControlResetPassageCounter(o.native.id, o.native.channel);
+                    await this._api.deviceControlResetPassageCounter(deviceId, channel);
                     break;
                 case 'setFavoriteShadingPosition':
-                    await this._api.deviceControlSetFavoriteShadingPosition(o.native.id, o.native.channel);
+                    await this._api.deviceControlSetFavoriteShadingPosition(deviceId, channel);
                     break;
                 case 'setMotionDetectionActive':
-                    await this._api.deviceControlSetMotionDetectionActive(o.native.id, state.val, o.native.channel);
+                    await this._api.deviceControlSetMotionDetectionActive(deviceId, state.val as boolean, channel);
                     break;
                 case 'pullLatch':
                     {
                         const latchPin = await this.getStateAsync(
-                            `devices.${o.native.id}.channels.${o.native.channel}.pin`,
+                            `devices.${String(o.native.id)}.channels.${channel}.pin`,
                         );
                         await this._api.deviceControlPullLatch(
-                            o.native.id,
-                            latchPin ? latchPin.val : '',
-                            o.native.channel,
+                            deviceId,
+                            (latchPin ? latchPin.val : '') as string | undefined,
+                            channel,
                         );
                     }
                     break;
                 case 'setSoundFileVolumeLevel':
                     {
-                        const base = `devices.${o.native.id}.channels.${o.native.channel}`;
+                        const base = `devices.${String(o.native.id)}.channels.${channel}`;
                         const soundFile = await this.getStateAsync(`${base}.soundFile`);
                         const volumeLevel = await this.getStateAsync(`${base}.volumeLevel`);
                         await this._api.deviceControlSetSoundFileVolumeLevel(
-                            o.native.id,
-                            soundFile ? soundFile.val : null,
-                            volumeLevel ? volumeLevel.val : null,
-                            o.native.channel,
+                            deviceId,
+                            (soundFile ? soundFile.val : null) as string,
+                            (volumeLevel ? volumeLevel.val : null) as number,
+                            channel,
                         );
                     }
                     break;
                 case 'startLightScene':
                     {
-                        const base = `devices.${o.native.id}.channels.${o.native.channel}`;
+                        const base = `devices.${String(o.native.id)}.channels.${channel}`;
                         const sceneId = await this.getStateAsync(`${base}.lightSceneId`);
                         const sceneDimLevel = await this.getStateAsync(`${base}.dimLevel`);
                         await this._api.deviceControlStartLightScene(
-                            o.native.id,
-                            sceneId ? sceneId.val : null,
-                            this._levelFraction(sceneDimLevel ? sceneDimLevel.val : null),
-                            o.native.channel,
+                            deviceId,
+                            (sceneId ? sceneId.val : null) as number,
+                            this._levelFraction(sceneDimLevel ? sceneDimLevel.val : null) as number,
+                            channel,
                         );
                     }
                     break;
@@ -635,23 +700,23 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         const times = await this._controlTimes(o.native);
                         if (times.onTime > 0) {
                             await this._api.deviceControlSetWateringSwitchStateWithTime(
-                                o.native.id,
-                                state.val,
+                                deviceId,
+                                state.val as boolean,
                                 times.onTime,
-                                o.native.channel,
+                                channel,
                             );
                         } else {
                             await this._api.deviceControlSetWateringSwitchState(
-                                o.native.id,
-                                state.val,
-                                o.native.channel,
+                                deviceId,
+                                state.val as boolean,
+                                channel,
                             );
                         }
                     }
                     break;
                 case 'setHueSaturationDimLevel':
                     {
-                        const base = `devices.${o.native.id}.channels.${o.native.channel}`;
+                        const base = `devices.${String(o.native.id)}.channels.${channel}`;
                         const hue = await this.getStateAsync(`${base}.hue`);
                         const saturation = await this.getStateAsync(`${base}.saturationLevel`);
                         const dimLevel = await this.getStateAsync(`${base}.dimLevel`);
@@ -659,47 +724,47 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         const times = await this._controlTimes(o.native);
                         if (times.timed) {
                             await this._api.deviceControlSetHueSaturationDimLevelWithTime(
-                                o.native.id,
-                                hue ? hue.val : null,
-                                saturation ? saturation.val : null,
-                                dimLevelValue,
+                                deviceId,
+                                (hue ? hue.val : null) as number,
+                                (saturation ? saturation.val : null) as number,
+                                dimLevelValue as number,
                                 times.onTime,
                                 times.rampTime,
-                                o.native.channel,
+                                channel,
                             );
                         } else {
                             await this._api.deviceControlSetHueSaturationDimLevel(
-                                o.native.id,
-                                hue ? hue.val : null,
-                                saturation ? saturation.val : null,
-                                dimLevelValue,
-                                o.native.channel,
+                                deviceId,
+                                (hue ? hue.val : null) as number,
+                                (saturation ? saturation.val : null) as number,
+                                dimLevelValue as number,
+                                channel,
                             );
                         }
                     }
                     break;
                 case 'setColorTemperatureDimLevel':
                     {
-                        const base = `devices.${o.native.id}.channels.${o.native.channel}`;
+                        const base = `devices.${String(o.native.id)}.channels.${channel}`;
                         const colorTemperature = await this.getStateAsync(`${base}.colorTemperature`);
                         const dimLevel = await this.getStateAsync(`${base}.dimLevel`);
                         const dimLevelValue = this._levelFraction(dimLevel ? dimLevel.val : null);
                         const times = await this._controlTimes(o.native);
                         if (times.timed) {
                             await this._api.deviceControlSetColorTemperatureDimLevelWithTime(
-                                o.native.id,
-                                colorTemperature ? colorTemperature.val : null,
-                                dimLevelValue,
+                                deviceId,
+                                (colorTemperature ? colorTemperature.val : null) as number,
+                                dimLevelValue as number,
                                 times.onTime,
                                 times.rampTime,
-                                o.native.channel,
+                                channel,
                             );
                         } else {
                             await this._api.deviceControlSetColorTemperatureDimLevel(
-                                o.native.id,
-                                colorTemperature ? colorTemperature.val : null,
-                                dimLevelValue,
-                                o.native.channel,
+                                deviceId,
+                                (colorTemperature ? colorTemperature.val : null) as number,
+                                dimLevelValue as number,
+                                channel,
                             );
                         }
                     }
@@ -722,21 +787,21 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         const dimLevelValue = this._levelFraction(dimLevel.val);
                         if (times.timed) {
                             await this._api.deviceControlSetOpticalSignalWithTime(
-                                o.native.id,
-                                opticalSignal.val,
-                                rgb.val,
-                                dimLevelValue,
+                                deviceId,
+                                opticalSignal.val as string,
+                                rgb.val as string,
+                                dimLevelValue as number,
                                 times.onTime,
                                 times.rampTime,
-                                o.native.channel,
+                                channel,
                             );
                         } else {
                             await this._api.deviceControlOpticalSignalBehaviour(
-                                o.native.id,
-                                rgb.val,
-                                dimLevelValue,
-                                o.native.channel,
-                                opticalSignal.val,
+                                deviceId,
+                                rgb.val as string,
+                                dimLevelValue as number,
+                                channel as number | undefined,
+                                opticalSignal.val as string,
                             );
                         }
                     }
@@ -747,7 +812,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
-                    await this._api.deviceConfigurationSetAcousticAlarmSignal(o.native.id, state.val, o.native.channel);
+                    await this._api.deviceConfigurationSetAcousticAlarmSignal(deviceId, state.val as string, channel);
                     break;
                 case 'setAcousticAlarmTiming':
                     if (state.val === this.currentValues[id]) {
@@ -755,7 +820,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
-                    await this._api.deviceConfigurationSetAcousticAlarmTiming(o.native.id, state.val, o.native.channel);
+                    await this._api.deviceConfigurationSetAcousticAlarmTiming(deviceId, state.val as string, channel);
                     break;
                 case 'setAcousticWaterAlarmTrigger':
                     if (state.val === this.currentValues[id]) {
@@ -764,9 +829,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         return;
                     }
                     await this._api.deviceConfigurationSetAcousticWaterAlarmTrigger(
-                        o.native.id,
-                        state.val,
-                        o.native.channel,
+                        deviceId,
+                        state.val as string,
+                        channel,
                     );
                     break;
                 case 'setInAppWaterAlarmTrigger':
@@ -776,9 +841,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         return;
                     }
                     await this._api.deviceConfigurationSetInAppWaterAlarmTrigger(
-                        o.native.id,
-                        state.val,
-                        o.native.channel,
+                        deviceId,
+                        state.val as string,
+                        channel,
                     );
                     break;
                 case 'setSirenWaterAlarmTrigger':
@@ -788,9 +853,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         return;
                     }
                     await this._api.deviceConfigurationSetSirenWaterAlarmTrigger(
-                        o.native.id,
-                        state.val,
-                        o.native.channel,
+                        deviceId,
+                        state.val as string,
+                        channel,
                     );
                     break;
                 case 'setAccelerationSensorMode':
@@ -800,9 +865,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         return;
                     }
                     await this._api.deviceConfigurationSetAccelerationSensorMode(
-                        o.native.id,
-                        state.val,
-                        o.native.channel,
+                        deviceId,
+                        state.val as string,
+                        channel,
                     );
                     break;
                 case 'setAccelerationSensorNeutralPosition':
@@ -812,9 +877,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         return;
                     }
                     await this._api.deviceConfigurationSetAccelerationSensorNeutralPosition(
-                        o.native.id,
-                        state.val,
-                        o.native.channel,
+                        deviceId,
+                        state.val as string,
+                        channel,
                     );
                     break;
                 case 'setAccelerationSensorTriggerAngle':
@@ -824,9 +889,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         return;
                     }
                     await this._api.deviceConfigurationSetAccelerationSensorTriggerAngle(
-                        o.native.id,
-                        state.val,
-                        o.native.channel,
+                        deviceId,
+                        state.val as number,
+                        channel,
                     );
                     break;
                 case 'setAccelerationSensorSensitivity':
@@ -836,9 +901,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         return;
                     }
                     await this._api.deviceConfigurationSetAccelerationSensorSensitivity(
-                        o.native.id,
-                        state.val,
-                        o.native.channel,
+                        deviceId,
+                        state.val as string,
+                        channel,
                     );
                     break;
                 case 'setAccelerationSensorEventFilterPeriod':
@@ -848,9 +913,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         return;
                     }
                     await this._api.deviceConfigurationSetAccelerationSensorEventFilterPeriod(
-                        o.native.id,
-                        state.val,
-                        o.native.channel,
+                        deviceId,
+                        state.val as number,
+                        channel,
                     );
                     break;
                 case 'setNotificationSoundType':
@@ -860,10 +925,10 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         return;
                     }
                     await this._api.deviceConfigurationSetNotificationSoundType(
-                        o.native.id,
-                        state.val,
+                        deviceId,
+                        state.val as string,
                         id.endsWith('HighToLow'),
-                        o.native.channel,
+                        channel,
                     );
                     break;
                 case 'setRouterModuleEnabled':
@@ -872,13 +937,13 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
-                    await this._api.deviceConfigurationSetRouterModuleEnabled(o.native.id, state.val, o.native.channel);
+                    await this._api.deviceConfigurationSetRouterModuleEnabled(deviceId, state.val as boolean, channel);
                     break;
                 case 'setAbsenceEndTime':
-                    await this._api.homeHeatingActivateAbsenceWithPeriod(state.val);
+                    await this._api.homeHeatingActivateAbsenceWithPeriod(state.val as string);
                     break;
                 case 'setAbsenceDuration':
-                    await this._api.homeHeatingActivateAbsenceWithDuration(state.val);
+                    await this._api.homeHeatingActivateAbsenceWithDuration(state.val as number);
                     break;
                 case 'deactivateAbsence':
                     await this._api.homeHeatingDeactivateAbsence();
@@ -892,7 +957,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
-                    await this._api.homeHeatingSetCoolingEnabled(state.val);
+                    await this._api.homeHeatingSetCoolingEnabled(state.val as boolean);
                     break;
                 case 'coolingIgnored':
                     if (state.val === this.currentValues[id]) {
@@ -908,12 +973,12 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
-                    await this._api.homeSetIntrusionAlertThroughSmokeDetectors(state.val);
+                    await this._api.homeSetIntrusionAlertThroughSmokeDetectors(state.val as boolean);
                     break;
                 case 'activateVacation':
                     {
                         const vacTemp = await this.getStateAsync(
-                            `homes.${o.native.id}.functionalHomes.indoorClimate.vacationTemperature`,
+                            `homes.${String(o.native.id)}.functionalHomes.indoorClimate.vacationTemperature`,
                         );
                         if (!vacTemp || vacTemp.val === null || vacTemp.val === undefined) {
                             this.log.warn(
@@ -921,7 +986,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                             );
                             return;
                         }
-                        await this._api.homeHeatingActivateVacation(vacTemp.val, state.val);
+                        await this._api.homeHeatingActivateVacation(vacTemp.val as number, state.val as string);
                     }
                     break;
                 case 'deactivateVacation':
@@ -950,53 +1015,53 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     await this._setSecurityZonesActivation(true, true);
                     break;
                 case 'groupSwitchState':
-                    await this._api.groupSwitchingSetState(o.native.id, state.val);
+                    await this._api.groupSwitchingSetState(deviceId, state.val as boolean);
                     break;
                 case 'groupShutterLevel':
-                    await this._api.groupSwitchingSetShutterLevel(o.native.id, state.val);
+                    await this._api.groupSwitchingSetShutterLevel(deviceId, state.val as number);
                     break;
                 case 'groupSlatsLevel':
                     {
-                        const groupShutter = await this.getStateAsync(`groups.${o.native.id}.shutterLevel`);
+                        const groupShutter = await this.getStateAsync(`groups.${String(o.native.id)}.shutterLevel`);
                         await this._api.groupSwitchingSetSlatsLevel(
-                            o.native.id,
-                            state.val,
-                            groupShutter ? groupShutter.val : null,
+                            deviceId,
+                            state.val as number,
+                            (groupShutter ? groupShutter.val : null) as number,
                         );
                     }
                     break;
                 case 'groupStop':
-                    await this._api.groupSwitchingStop(o.native.id);
+                    await this._api.groupSwitchingStop(deviceId);
                     break;
                 case 'setCooling':
-                    await this._api.homeHeatingSetCooling(state.val);
+                    await this._api.homeHeatingSetCooling(state.val as boolean);
                     break;
                 case 'setZoneActivationDelay':
-                    await this._api.homeSetZoneActivationDelay(state.val);
+                    await this._api.homeSetZoneActivationDelay(state.val as number);
                     break;
                 case 'setOnTime':
-                    for (let id of this._targetGroups(o.native, o.native.parameter)) {
-                        await this._api.groupSwitchingAlarmSetOnTime(id, state.val);
+                    for (const id of this._targetGroups(o.native, o.native.parameter)) {
+                        await this._api.groupSwitchingAlarmSetOnTime(id, state.val as number);
                     }
                     break;
                 case 'testSignalOptical':
-                    for (let id of this._targetGroups(o.native, o.native.parameter)) {
-                        await this._api.groupSwitchingAlarmTestSignalOptical(id, state.val);
+                    for (const id of this._targetGroups(o.native, o.native.parameter)) {
+                        await this._api.groupSwitchingAlarmTestSignalOptical(id, state.val as string);
                     }
                     break;
                 case 'setSignalOptical':
-                    for (let id of this._targetGroups(o.native, o.native.parameter)) {
-                        await this._api.groupSwitchingAlarmSetSignalOptical(id, state.val);
+                    for (const id of this._targetGroups(o.native, o.native.parameter)) {
+                        await this._api.groupSwitchingAlarmSetSignalOptical(id, state.val as string);
                     }
                     break;
                 case 'testSignalAcoustic':
-                    for (let id of this._targetGroups(o.native, o.native.parameter)) {
-                        await this._api.groupSwitchingAlarmTestSignalAcoustic(id, state.val);
+                    for (const id of this._targetGroups(o.native, o.native.parameter)) {
+                        await this._api.groupSwitchingAlarmTestSignalAcoustic(id, state.val as string);
                     }
                     break;
                 case 'setSignalAcoustic':
-                    for (let id of this._targetGroups(o.native, o.native.parameter)) {
-                        await this._api.groupSwitchingAlarmSetSignalAcoustic(id, state.val);
+                    for (const id of this._targetGroups(o.native, o.native.parameter)) {
+                        await this._api.groupSwitchingAlarmSetSignalAcoustic(id, state.val as string);
                     }
                     break;
                 case 'setZonesSilentAlarmNone':
@@ -1017,7 +1082,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
-                    await this._api.groupHeatingSetProfileMode(o.native.id, state.val);
+                    await this._api.groupHeatingSetProfileMode(deviceId, state.val as string);
                     break;
                 case 'groupLinkedOnTime':
                     if (state.val === this.currentValues[id]) {
@@ -1025,7 +1090,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
-                    await this._api.groupSwitchingLinkedSetOnTime(o.native.id, state.val);
+                    await this._api.groupSwitchingLinkedSetOnTime(deviceId, state.val as number);
                     break;
                 case 'setPowerMeterUnitPrice':
                     if (state.val === this.currentValues[id]) {
@@ -1033,7 +1098,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
-                    await this._api.homeSetPowerMeterUnitPrice(state.val);
+                    await this._api.homeSetPowerMeterUnitPrice(state.val as number);
                     break;
                 case 'getSecurityJournal':
                     await this._updateSecurityJournal();
@@ -1044,11 +1109,11 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
-                    if ((await this._api.ruleEnableSimpleRule(o.native.id, state.val)) === undefined) {
-                        this.log.error(`Could not enable rule ${o.native.id}, it is unchanged.`);
+                    if ((await this._api.ruleEnableSimpleRule(deviceId, state.val as boolean)) === undefined) {
+                        this.log.error(`Could not enable rule ${String(o.native.id)}, it is unchanged.`);
                         return;
                     }
-                    await this._ackRuleValue(o.native.id, 'active', state.val);
+                    await this._ackRuleValue(deviceId, 'active', state.val);
                     break;
                 case 'setRuleLabel':
                     if (state.val === this.currentValues[id]) {
@@ -1056,34 +1121,36 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         await this.secureSetStateAsync(id, this.currentValues[id], true);
                         return;
                     }
-                    if ((await this._api.ruleSetRuleLabel(o.native.id, state.val)) === undefined) {
-                        this.log.error(`Could not relabel rule ${o.native.id}, it is unchanged.`);
+                    if ((await this._api.ruleSetRuleLabel(deviceId, state.val as string)) === undefined) {
+                        this.log.error(`Could not relabel rule ${String(o.native.id)}, it is unchanged.`);
                         return;
                     }
-                    await this._ackRuleValue(o.native.id, 'label', state.val);
+                    await this._ackRuleValue(deviceId, 'label', state.val);
                     break;
                 default:
                     // an object whose native names a parameter nothing handles: the write is lost,
                     // and silence here reads as a broken datapoint rather than a stale object
                     this.log.warn(
-                        `${o.native.parameter} - id ${o.native.id ? JSON.stringify(o.native.id) : ''} - no command is dispatched on this parameter, the value was not sent`,
+                        `${o.native.parameter} - id ${o.native.id ? JSON.stringify(deviceId) : ''} - no command is dispatched on this parameter, the value was not sent`,
                     );
                     break;
             }
         } catch (err) {
-            this.log.warn(`${o.native.parameter} - id ${o.native.id ? o.native.id : ''} - state change error: ${err}`);
+            this.log.warn(
+                `${o.native.parameter} - id ${o.native.id ? String(o.native.id) : ''} - state change error: ${String(err)}`,
+            );
         }
     }
 
-    async _stateChange(id, state) {
+    async _stateChange(id: string, state: ioBroker.State | null | undefined): Promise<void> {
         if (!id || !state || state.ack || this._unloaded) {
             return;
         }
 
-        let o = await this.getObjectAsync(id);
+        const o = await this.getObjectAsync(id);
         if (o && o.native && o.native.parameter) {
             if (o.native.step) {
-                state.val = this.round(state.val, o.native.step);
+                state.val = this.round(state.val as number, o.native.step);
                 this.log.debug(
                     `state change - ${o.native.parameter} - id ${o.native.id ? JSON.stringify(o.native.id) : ''} - value rounded to ${state.val} (step=${o.native.step} )`,
                 );
@@ -1129,7 +1196,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         this.log.debug(
                             `${o.native.parameter} - id ${o.native.id ? JSON.stringify(o.native.id) : ''} - Send debounced value ${state.val} now to HMIP`,
                         );
-                        this._doStateChange(id, o, state);
+                        void this._doStateChange(id, o as unknown as DispatchObject, state);
                     },
                     o.native.debounce,
                     id,
@@ -1140,16 +1207,16 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 this.delayTimeouts[id].timeout = setTimeout(() => {
                     this.delayTimeouts[id].timeout = null;
                 }, o.native.throttle || 1000);
-                await this._doStateChange(id, o, state);
+                await this._doStateChange(id, o as unknown as DispatchObject, state);
             }
         }
     }
 
-    _dataReceived(data) {
+    _dataReceived(data: string): void {
         this.log.silly(`data received - ${data}`);
     }
 
-    _opened() {
+    _opened(): void {
         this.log.info('ws connection opened');
         this.wsConnected = true;
         this.wsConnectionStableTimeout && clearTimeout(this.wsConnectionStableTimeout);
@@ -1159,7 +1226,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }, 5000); // set null when connection is stable
     }
 
-    _closed(code, reason, forced = false) {
+    _closed(code: number, reason: string, forced = false): void {
         this.log.debug(`_onclose( ${code}, ${reason}, ${forced})`);
 
         if (this.wsConnectionStableTimeout || !this.wsConnected) {
@@ -1191,13 +1258,13 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }
     }
 
-    _staleConnection(silentFor) {
+    _staleConnection(silentFor: number): void {
         this.log.warn(`ws connection stopped answering ${Math.round(silentFor / 1000)}s ago, reconnecting`);
     }
 
-    _errored(error) {
-        this.log.warn(`ws connection error (${this.wsConnectionErrorCounter}): ${error}`);
-        const reason = error ? error.toString() : '';
+    _errored(error: Error): void {
+        this.log.warn(`ws connection error (${this.wsConnectionErrorCounter}): ${String(error)}`);
+        const reason = error ? String(error) : '';
         if (!this.wsConnected) {
             this.wsConnectionErrorCounter++;
         }
@@ -1208,57 +1275,62 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             this.reInitTimeout && clearTimeout(this.reInitTimeout);
             this.reInitTimeout = setTimeout(() => {
                 this.reInitTimeout = null;
-                this._ready();
+                void this._ready();
             }, 30000);
         }
     }
 
-    _requestError(error) {
-        if (error.response) {
+    _requestError(error: unknown): void {
+        const failure = error as RequestFailure;
+        if (failure.response) {
             // The request was made and the server responded with a status code
             // that falls out of the range of 2xx
-            this.log.warn(`Request error data: ${error.response.data}, (${JSON.stringify(error.response.data)})`);
-            this.log.warn(`Request error status: ${error.response.status}`);
-        } else if (error.request) {
+            this.log.warn(
+                `Request error data: ${String(failure.response.data)}, (${JSON.stringify(failure.response.data)})`,
+            );
+            this.log.warn(`Request error status: ${failure.response.status}`);
+        } else if (failure.request) {
             // The request was made but no response was received
-            // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+            // `failure.request` is an instance of XMLHttpRequest in the browser and an instance of
             // http.ClientRequest in node.js
-            this.log.warn(`Request error: ${error.request}`);
+            // a ClientRequest has no useful string form, but this line has always said only that
+            // a request was made and nothing came back
+            this.log.warn(`Request error: ${JSON.stringify(failure.request)}`);
         } else {
             // Something happened in setting up the request that triggered an Error
-            this.log.warn(`Request error: ${error.message} (${error}, ${JSON.stringify(error)})`);
+            this.log.warn(`Request error: ${failure.message} (${String(error)}, ${JSON.stringify(error)})`);
         }
     }
 
-    _unexpectedResponse(req, res) {
+    _unexpectedResponse(req: ClientRequest, res: IncomingMessage): void {
         this.log.warn(`ws connection unexpected response: ${res.statusCode}`);
     }
 
-    async _eventRaised(ev) {
+    async _eventRaised(ev: CloudEvent): Promise<void> {
         if (this._unloaded) {
             return;
         }
         switch (ev.pushEventType) {
             case 'DEVICE_ADDED':
-                await this._createObjectsForDevice(ev.device);
-                await this._updateDeviceStates(ev.device);
+                await this._createObjectsForDevice(ev.device as HmIpDevice);
+                await this._updateDeviceStates(ev.device as HmIpDevice);
                 break;
             case 'DEVICE_CHANGED':
-                await this._updateDeviceStates(ev.device);
+                await this._updateDeviceStates(ev.device as HmIpDevice);
                 break;
             case 'GROUP_ADDED':
-                await this._createObjectsForGroup(ev.group);
-                await this._updateGroupStates(ev.group);
+                await this._createObjectsForGroup(ev.group as HmIpGroup);
+                await this._updateGroupStates(ev.group as HmIpGroup);
                 break;
             case 'GROUP_CHANGED':
-                await this._updateGroupStates(ev.group);
+                await this._updateGroupStates(ev.group as HmIpGroup);
                 break;
             case 'CLIENT_ADDED':
-                await this._createObjectsForClient(ev.client);
-                await this._updateClientStates(ev.client);
+                await this._createObjectsForClient(ev.client as HmIpClient);
+                await this._updateClientStates(ev.client as HmIpClient);
                 break;
             case 'CLIENT_CHANGED':
-                await this._updateClientStates(ev.client);
+                await this._updateClientStates(ev.client as HmIpClient);
                 break;
             case 'DEVICE_REMOVED':
                 break;
@@ -1285,7 +1357,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 } else {
                     // the read waits out its interval, which must not hold up the journal
                     this._readHomeForAlarmFields().catch(err =>
-                        this.log.warn(`Could not read the home for its alarm fields: ${err}`),
+                        this.log.warn(`Could not read the home for its alarm fields: ${String(err)}`),
                     );
                 }
                 await this._updateSecurityJournal();
@@ -1304,11 +1376,11 @@ class HmIpCloudAccesspointAdapter extends Adapter {
     /**
      * An indicator for something the cloud reports as a moment rather than as a state.
      *
-     * @param {string} id the state to create
-     * @param {string} name the event the state stands for
-     * @returns {Promise<void>} when the object exists
+     * @param id the state to create
+     * @param name the event the state stands for
+     * @returns when the object exists
      */
-    _createEventState(id, name) {
+    _createEventState(id: string, name: string): Promise<unknown> {
         return this.extendObject(id, {
             type: 'state',
             common: { name, type: 'boolean', role: 'indicator', read: true, write: false },
@@ -1322,11 +1394,11 @@ class HmIpCloudAccesspointAdapter extends Adapter {
      * The datapoint is never reset: ioBroker notifies subscribers of every write whether or not
      * the value changed, so every press stays an update and `lc` carries when it last happened.
      *
-     * @param {string} id the state to raise
-     * @param {string} name the event the state stands for
-     * @returns {Promise<void>} when the event has been published
+     * @param id the state to raise
+     * @param name the event the state stands for
+     * @returns when the event has been published
      */
-    async _raiseEventState(id, name) {
+    async _raiseEventState(id: string, name: string): Promise<void> {
         await this._createEventState(id, name);
         await this.secureSetStateAsync(id, true, true);
     }
@@ -1334,18 +1406,18 @@ class HmIpCloudAccesspointAdapter extends Adapter {
     /**
      * A name the cloud sent that is safe to build a state id from.
      *
-     * @param {unknown} name the name as it arrived
-     * @returns {boolean} whether it is one of the cloud's own upper-case identifiers
+     * @param name the name as it arrived
+     * @returns whether it is one of the cloud's own upper-case identifiers
      */
-    _isEventName(name) {
+    _isEventName(name: unknown): boolean {
         return typeof name === 'string' && /^[A-Z][A-Z0-9_]*$/.test(name);
     }
 
     /**
-     * @param {object} ev the DEVICE_CHANNEL_EVENT as the cloud sent it
-     * @returns {Promise<void>} when the event has been published
+     * @param ev the DEVICE_CHANNEL_EVENT as the cloud sent it
+     * @returns when the event has been published
      */
-    async _channelEventRaised(ev) {
+    async _channelEventRaised(ev: ChannelEvent): Promise<void> {
         // the cloud names the channel either way round
         const channel = ev.channelIndex ?? ev.functionalChannelIndex;
         if (!ev.deviceId || channel === undefined || channel === null || !this._isEventName(ev.channelEventType)) {
@@ -1355,15 +1427,15 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         this.log.debug(`channel event ${ev.channelEventType} on ${ev.deviceId}:${channel}`);
         await this._raiseEventState(
             `devices.${ev.deviceId}.channels.${channel}.events.${ev.channelEventType}`,
-            ev.channelEventType,
+            ev.channelEventType as string,
         );
     }
 
     /**
-     * @param {object} ev the DEVICE_CODE_STATE_EVENT as the cloud sent it
-     * @returns {Promise<void>} when the event has been published
+     * @param ev the DEVICE_CODE_STATE_EVENT as the cloud sent it
+     * @returns when the event has been published
      */
-    async _codeStateEventRaised(ev) {
+    async _codeStateEventRaised(ev: CodeStateEvent): Promise<void> {
         if (!ev.deviceId || !this._isEventName(ev.codeState)) {
             this.log.warn(`Unusable code state event - ${JSON.stringify(ev)}`);
             return;
@@ -1379,7 +1451,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             });
             await this.secureSetStateAsync(`${base}.codeIndex`, ev.codeIndex, true);
         }
-        await this._raiseEventState(`${base}.${ev.codeState}`, ev.codeState);
+        await this._raiseEventState(`${base}.${ev.codeState}`, ev.codeState as string);
     }
 
     /**
@@ -1388,15 +1460,15 @@ class HmIpCloudAccesspointAdapter extends Adapter {
      * Both default to 0, which selects the plain command; anything above 0 selects the cloud's
      * ...WithTime variant, so a channel only ramps once someone asks it to.
      *
-     * @param {object} native the object's native block, carrying the device id and channel
-     * @returns {Promise<{onTime: number, rampTime: number, timed: boolean}>} the configured times
+     * @param native the object's native block, carrying the device id and channel
+     * @returns the configured times
      */
-    async _controlTimes(native) {
-        const base = `devices.${native.id}.channels.${native.channel}`;
+    async _controlTimes(native: ChannelStateNative): Promise<{ onTime: number; rampTime: number; timed: boolean }> {
+        const base = `devices.${String(native.id)}.channels.${native.channel}`;
         const onTimeState = await this.getStateAsync(`${base}.controlOnTime`);
         const rampTimeState = await this.getStateAsync(`${base}.controlRampTime`);
-        const onTime = onTimeState && onTimeState.val ? onTimeState.val : 0;
-        const rampTime = rampTimeState && rampTimeState.val ? rampTimeState.val : 0;
+        const onTime = (onTimeState?.val as number) || 0;
+        const rampTime = (rampTimeState?.val as number) || 0;
         return { onTime, rampTime, timed: onTime > 0 || rampTime > 0 };
     }
 
@@ -1423,11 +1495,11 @@ class HmIpCloudAccesspointAdapter extends Adapter {
     /**
      * The groups a command targets, for a state that is set on the channel's groups.
      *
-     * @param {object} native the object's native block
-     * @param {string} parameter the command being dispatched, for the log line
-     * @returns {string[]} the group ids, empty when the channel belongs to none
+     * @param native the object's native block
+     * @param parameter the command being dispatched, for the log line
+     * @returns the group ids, empty when the channel belongs to none
      */
-    _targetGroups(native, parameter) {
+    _targetGroups(native: ChannelStateNative, parameter: string): string[] {
         const groups = Array.isArray(native.id) ? native.id : [];
         if (!groups.length) {
             this.log.warn(`${parameter} has no group to act on - assign the channel to a group first`);
@@ -1435,24 +1507,24 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         return groups;
     }
 
-    _levelFraction(value) {
-        return typeof value === 'number' && value > 1 ? value / 100 : value;
+    _levelFraction(value: ioBroker.StateValue): number | null | undefined {
+        return typeof value === 'number' && value > 1 ? value / 100 : (value as number | null | undefined);
     }
 
     /**
      * Reads a state of the given channel together with the id it is cached under.
      *
-     * @param {object} native the object's native block, carrying the device id and channel
-     * @param {string} field the state below the channel
-     * @returns {Promise<{id: string, val: boolean|number|string|null}>} the cache id and the value
+     * @param native the object's native block, carrying the device id and channel
+     * @param field the state below the channel
+     * @returns the cache id and the value
      */
-    async _channelState(native, field) {
-        const path = `devices.${native.id}.channels.${native.channel}.${field}`;
+    async _channelState(native: ChannelStateNative, field: string): Promise<{ id: string; val: ioBroker.StateValue }> {
+        const path = `devices.${String(native.id)}.channels.${native.channel}.${field}`;
         const state = await this.getStateAsync(path);
         return { id: `${this.namespace}.${path}`, val: state ? state.val : null };
     }
 
-    async _setZonesSilentAlarm(internal, external) {
+    async _setZonesSilentAlarm(internal: boolean, external: boolean): Promise<void> {
         if ((await this._api.homeSetZonesSilentAlarm(internal, external)) === undefined) {
             this.log.error(
                 `Could not set the silent alarm to internal=${internal}, external=${external}, it is unchanged.`,
@@ -1460,7 +1532,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }
     }
 
-    async _setSecurityZonesActivation(internal, external) {
+    async _setSecurityZonesActivation(internal: boolean, external: boolean): Promise<void> {
         const requested = `internal=${internal}, external=${external}`;
         const outcome = await this._api.homeSetZonesActivation(internal, external);
 
@@ -1508,25 +1580,25 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }
     }
 
-    async secureSetStateAsync(id, value, ack) {
+    async secureSetStateAsync(id: string, value: unknown, ack: boolean): Promise<void> {
         if (value && typeof value === 'object') {
-            value = value.val;
+            value = (value as ioBroker.State).val;
         }
         if (value === undefined) {
             value = null;
         }
-        await this.setStateAsync(id, value, ack);
+        await this.setStateAsync(id, value as ioBroker.StateValue, ack);
         if (ack) {
             const prefix = `${this.namespace}.`;
-            this.currentValues[id.startsWith(prefix) ? id : `${prefix}${id}`] = value;
+            this.currentValues[id.startsWith(prefix) ? id : `${prefix}${id}`] = value as ioBroker.StateValue;
         }
     }
 
-    async _updateDeviceStates(device) {
+    async _updateDeviceStates(device: HmIpDevice): Promise<void> {
         this.log.silly(`updateDeviceStates - ${device.type} - ${JSON.stringify(device)}`);
         let unknownChannelDetected = false;
         if (this.initializedChannels[`devices.${device.id}`]) {
-            let promises = [];
+            const promises = [];
             promises.push(this.secureSetStateAsync(`devices.${device.id}.info.type`, device.type, true));
             promises.push(this.secureSetStateAsync(`devices.${device.id}.info.modelType`, device.modelType, true));
             promises.push(this.secureSetStateAsync(`devices.${device.id}.info.label`, device.label, true));
@@ -1544,11 +1616,11 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                 }
             }
 
-            for (let i in device.functionalChannels) {
+            for (const i in device.functionalChannels) {
                 if (!Object.prototype.hasOwnProperty.call(device.functionalChannels, i)) {
                     continue;
                 }
-                let fc = device.functionalChannels[i];
+                const fc = device.functionalChannels[i];
                 promises.push(
                     this.secureSetStateAsync(
                         `devices.${device.id}.channels.${i}.functionalChannelType`,
@@ -1561,14 +1633,14 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     continue;
                 }
 
-                if (CHANNEL_STATES[fc.functionalChannelType]) {
-                    promises.push(...this._updateChannelStates(device, i, fc.functionalChannelType));
-                } else if (STATELESS_CHANNELS.includes(fc.functionalChannelType)) {
+                if (CHANNEL_STATES[fc.functionalChannelType as string]) {
+                    promises.push(...this._updateChannelStates(device, i, fc.functionalChannelType as string));
+                } else if (STATELESS_CHANNELS.includes(fc.functionalChannelType as string)) {
                     this.log.silly(`Ignore channel type ${fc.functionalChannelType} - ${device.id}`);
                 } else if (Object.keys(fc).length > 6) {
                     // fewer fields than that is a stub channel with nothing to report
                     this.log.info(`unknown channel type - ${fc.functionalChannelType} - ${JSON.stringify(device)}`);
-                    this._reportUnknownChannel(device, fc.functionalChannelType);
+                    this._reportUnknownChannel(device, fc.functionalChannelType as string);
                 }
             }
             await Promise.all(promises);
@@ -1581,7 +1653,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }
     }
 
-    _reinitializeData(id) {
+    _reinitializeData(id: string): void {
         if (this.reInitDataTimeout) {
             return;
         }
@@ -1594,34 +1666,34 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             try {
                 await this._initData();
             } catch (err) {
-                this.log.error(`error updating Homematic ip for unknown states: ${err}`);
+                this.log.error(`error updating Homematic ip for unknown states: ${String(err)}`);
                 this.log.error('Try reconnect in 30s');
                 this.reInitTimeout && clearTimeout(this.reInitTimeout);
                 this.reInitTimeout = setTimeout(() => {
                     this.reInitTimeout = null;
-                    this._ready();
+                    void this._ready();
                 }, 30000);
             }
         }, 5000);
     }
 
-    _reportUnknownChannel(device, channelType) {
+    _reportUnknownChannel(device: HmIpDevice, channelType: string): void {
         if (this.sendUnknownInfos[channelType]) {
             return;
         }
         this.sendUnknownInfos[channelType] = true;
-        this.Sentry &&
-            this.Sentry.withScope(scope => {
-                scope.setLevel('info');
-                scope.setExtra('channelData', JSON.stringify(device));
-                this.Sentry.captureMessage(`Unknown Channel type ${channelType}`, 'info');
-            });
+        const sentry = this.Sentry;
+        sentry?.withScope(scope => {
+            scope.setLevel('info');
+            scope.setExtra('channelData', JSON.stringify(device));
+            sentry.captureMessage(`Unknown Channel type ${channelType}`, 'info');
+        });
     }
 
-    _createChannel(device, channel, channelType) {
+    _createChannel(device: HmIpDevice, channel: string, channelType: string): Promise<unknown>[] {
         const entry = CHANNEL_STATES[channelType];
-        let promises = entry.extends ? this._createChannel(device, channel, entry.extends) : [];
-        const functionalChannel = device.functionalChannels[channel];
+        const promises = entry.extends ? this._createChannel(device, channel, entry.extends) : [];
+        const functionalChannel = device.functionalChannels?.[channel];
         for (const { field, common, native } of channelStateObjects(
             entry.states,
             device.id,
@@ -1639,10 +1711,10 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         return promises;
     }
 
-    _updateChannelStates(device, channel, channelType) {
+    _updateChannelStates(device: HmIpDevice, channel: string, channelType: string): Promise<unknown>[] {
         const entry = CHANNEL_STATES[channelType];
-        let promises = entry.extends ? this._updateChannelStates(device, channel, entry.extends) : [];
-        for (const { field, value } of channelStateValues(entry.states, device.functionalChannels[channel])) {
+        const promises = entry.extends ? this._updateChannelStates(device, channel, entry.extends) : [];
+        for (const { field, value } of channelStateValues(entry.states, device.functionalChannels?.[channel])) {
             promises.push(this.secureSetStateAsync(`devices.${device.id}.channels.${channel}.${field}`, value, true));
         }
         return promises;
@@ -1652,21 +1724,23 @@ class HmIpCloudAccesspointAdapter extends Adapter {
      * The name a profile carries in the app: what the user called it, or the manufacturer's default
      * for the profiles nobody ever renamed, which the cloud answers for with an empty name.
      *
-     * @param {object} group the group the profile belongs to
-     * @param {string} profileIndex PROFILE_1 .. PROFILE_6
-     * @returns {string} the name to publish
+     * @param group the group the profile belongs to
+     * @param profileIndex PROFILE_1 .. PROFILE_6
+     * @returns the name to publish
      */
-    _profileName(group, profileIndex) {
-        const profile = group.profiles && group.profiles[profileIndex];
-        const defaults = DEFAULT_PROFILE_NAMES[this.profileNameLanguage] || DEFAULT_PROFILE_NAMES.en;
-        return (profile && profile.name) || defaults[profileIndex] || profileIndex;
+    _profileName(group: HmIpGroup, profileIndex: string): string {
+        const profiles = group.profiles as Record<string, { name?: string } | null> | undefined;
+        const profile = profiles?.[profileIndex];
+        const defaults: Record<string, string> =
+            DEFAULT_PROFILE_NAMES[this.profileNameLanguage] || DEFAULT_PROFILE_NAMES.en;
+        return profile?.name || defaults[profileIndex] || profileIndex;
     }
 
-    _updateGroupStates(group) {
+    _updateGroupStates(group: HmIpGroup): Promise<unknown[]> | undefined {
         this.log.silly(`_updateGroupStates - ${JSON.stringify(group)}`);
 
         if (this.initializedChannels[`groups.${group.id}`]) {
-            let promises = [];
+            const promises = [];
             promises.push(this.secureSetStateAsync(`groups.${group.id}.info.type`, group.type, true));
             promises.push(this.secureSetStateAsync(`groups.${group.id}.info.label`, group.label, true));
 
@@ -1716,7 +1790,7 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                         promises.push(
                             this.secureSetStateAsync(
                                 `groups.${group.id}.activeProfileName`,
-                                group.activeProfile ? this._profileName(group, group.activeProfile) : null,
+                                group.activeProfile ? this._profileName(group, group.activeProfile as string) : null,
                                 true,
                             ),
                         );
@@ -1896,10 +1970,10 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         this._reinitializeData(`Group ${group.id}`);
     }
 
-    _updateClientStates(client) {
+    _updateClientStates(client: HmIpClient): Promise<unknown[]> | undefined {
         this.log.silly(`_updateClientStates - ${JSON.stringify(client)}`);
         if (this.initializedChannels[`clients.${client.id}`]) {
-            let promises = [];
+            const promises = [];
             promises.push(this.secureSetStateAsync(`clients.${client.id}.info.label`, client.label, true));
             return Promise.all(promises);
         }
@@ -1912,10 +1986,10 @@ class HmIpCloudAccesspointAdapter extends Adapter {
      * The zone groups carry the armed flag, but their labels differ between panel generations
      * and their ids are opaque, so the home is the only place a script can read it reliably.
      *
-     * @param {string} homeId the home the security zones belong to
-     * @returns {Promise<void>[]} one promise per published state
+     * @param homeId the home the security zones belong to
+     * @returns one promise per published state
      */
-    _updateSecurityZonesArmed(homeId) {
+    _updateSecurityZonesArmed(homeId: string): Promise<unknown>[] {
         const armed = this._api.securityZonesArmedState();
         const base = `homes.${homeId}.functionalHomes.securityAndAlarm`;
         return [
@@ -1925,9 +1999,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         ];
     }
 
-    _updateHomeStates(home) {
+    _updateHomeStates(home: HmIpHome): Promise<unknown[]> {
         this.log.silly(`_updateHomeStates - ${JSON.stringify(home)}`);
-        let promises = [];
+        const promises = [];
 
         promises.push(this.secureSetStateAsync(`homes.${home.id}.powerMeterCurrency`, home.powerMeterCurrency, true));
         promises.push(this.secureSetStateAsync(`homes.${home.id}.powerMeterUnitPrice`, home.powerMeterUnitPrice, true));
@@ -1962,8 +2036,11 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         const functionalHomes = home.functionalHomes || {};
         // the cloud names the device that raised the alarm only inside alarmEventDeviceChannel,
         // and there is no alarmEventDeviceId beside it
-        const alarmEventChannel = (functionalHomes.SECURITY_AND_ALARM || {}).alarmEventDeviceChannel || {};
-        const alarmEventDevice = (this._api.devices || {})[alarmEventChannel.deviceId];
+        const alarmEventChannel = ((functionalHomes.SECURITY_AND_ALARM || {}).alarmEventDeviceChannel || {}) as {
+            deviceId?: string;
+            channelIndex?: number;
+        };
+        const alarmEventDevice = alarmEventChannel.deviceId ? this._api.devices[alarmEventChannel.deviceId] : undefined;
         if (functionalHomes.SECURITY_AND_ALARM) {
             promises.push(
                 this.secureSetStateAsync(
@@ -2138,9 +2215,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         return Promise.all(promises);
     }
 
-    async _createObjectsForDevices() {
+    async _createObjectsForDevices(): Promise<void> {
         this.log.silly(`Devices: ${JSON.stringify(this._api.devices)}`);
-        for (let i in this._api.devices) {
+        for (const i in this._api.devices) {
             if (!Object.prototype.hasOwnProperty.call(this._api.devices, i)) {
                 continue;
             }
@@ -2148,9 +2225,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }
     }
 
-    async _createObjectsForGroups() {
+    async _createObjectsForGroups(): Promise<void> {
         this.log.silly(`Groups: ${JSON.stringify(this._api.groups)}`);
-        for (let i in this._api.groups) {
+        for (const i in this._api.groups) {
             if (!Object.prototype.hasOwnProperty.call(this._api.groups, i)) {
                 continue;
             }
@@ -2158,9 +2235,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }
     }
 
-    async _createObjectsForClients() {
+    async _createObjectsForClients(): Promise<void> {
         this.log.silly(`Clients: ${JSON.stringify(this._api.clients)}`);
-        for (let i in this._api.clients) {
+        for (const i in this._api.clients) {
             if (!Object.prototype.hasOwnProperty.call(this._api.clients, i)) {
                 continue;
             }
@@ -2168,14 +2245,14 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }
     }
 
-    async _createObjectsForHomes() {
+    async _createObjectsForHomes(): Promise<void> {
         this.log.silly(`Home: ${JSON.stringify(this._api.home)}`);
-        await this._createObjectsForHome(this._api.home);
+        await this._createObjectsForHome(this._api.home as HmIpHome);
     }
 
-    _createObjectsForDevice(device) {
+    _createObjectsForDevice(device: HmIpDevice): Promise<unknown[]> {
         this.log.silly(`createObjectsForDevice - ${device.type} - ${JSON.stringify(device)}`);
-        let promises = [];
+        const promises = [];
         promises.push(
             this.extendObject(`devices.${device.id}`, {
                 type: 'device',
@@ -2228,15 +2305,15 @@ class HmIpCloudAccesspointAdapter extends Adapter {
             default:
                 break;
         }
-        for (let i in device.functionalChannels) {
+        for (const i in device.functionalChannels) {
             if (!Object.prototype.hasOwnProperty.call(device.functionalChannels, i)) {
                 continue;
             }
-            let fc = device.functionalChannels[i];
+            const fc = device.functionalChannels[i];
             promises.push(
                 this.extendObject(`devices.${device.id}.channels.${i}`, {
                     type: 'channel',
-                    common: { name: fc.label || `Channel ${i}` },
+                    common: { name: (fc.label as string) || `Channel ${i}` },
                     native: {},
                 }),
             );
@@ -2249,23 +2326,23 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     native: {},
                 }),
             );
-            if (EVENT_CHANNELS.includes(fc.functionalChannelType)) {
+            if (EVENT_CHANNELS.includes(fc.functionalChannelType as string)) {
                 promises.push(
                     ...CHANNEL_EVENTS.map(event =>
                         this._createEventState(`devices.${device.id}.channels.${i}.events.${event}`, event),
                     ),
                 );
             }
-            if (CODE_STATE_CHANNELS.includes(fc.functionalChannelType)) {
+            if (CODE_STATE_CHANNELS.includes(fc.functionalChannelType as string)) {
                 promises.push(
                     ...CODE_STATES.map(codeState =>
                         this._createEventState(`devices.${device.id}.events.${codeState}`, codeState),
                     ),
                 );
             }
-            if (CHANNEL_STATES[fc.functionalChannelType]) {
-                promises.push(...this._createChannel(device, i, fc.functionalChannelType));
-            } else if (STATELESS_CHANNELS.includes(fc.functionalChannelType)) {
+            if (CHANNEL_STATES[fc.functionalChannelType as string]) {
+                promises.push(...this._createChannel(device, i, fc.functionalChannelType as string));
+            } else if (STATELESS_CHANNELS.includes(fc.functionalChannelType as string)) {
                 this.log.silly(`Ignore channel type ${fc.functionalChannelType} - ${device.id}`);
             } else {
                 this.log.info(`Unknown channel type - ${fc.functionalChannelType} - ${JSON.stringify(device)}`);
@@ -2278,9 +2355,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
 
     /* End Channel Types */
 
-    _createObjectsForGroup(group) {
+    _createObjectsForGroup(group: HmIpGroup): Promise<unknown[]> {
         this.log.silly(`createObjectsForGroup - ${JSON.stringify(group)}`);
-        let promises = [];
+        const promises = [];
         promises.push(
             this.extendObject(`groups.${group.id}`, { type: 'device', common: { name: group.label }, native: {} }),
         );
@@ -3139,9 +3216,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         return Promise.all(promises);
     }
 
-    async _createObjectsForRules() {
+    async _createObjectsForRules(): Promise<void> {
         this.log.silly(`Rules: ${JSON.stringify(this._api.rules)}`);
-        for (let i in this._api.rules) {
+        for (const i in this._api.rules) {
             if (!Object.prototype.hasOwnProperty.call(this._api.rules, i)) {
                 continue;
             }
@@ -3149,9 +3226,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }
     }
 
-    _createObjectsForRule(rule) {
+    _createObjectsForRule(rule: HmIpRule): Promise<unknown[]> {
         this.log.silly(`createObjectsForRule - ${JSON.stringify(rule)}`);
-        let promises = [];
+        const promises = [];
         promises.push(
             this.extendObject(`rules.${rule.id}`, { type: 'device', common: { name: rule.label }, native: {} }),
         );
@@ -3189,10 +3266,10 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         return Promise.all(promises);
     }
 
-    _updateRuleStates(rule) {
+    _updateRuleStates(rule: HmIpRule): Promise<unknown[]> | undefined {
         this.log.silly(`_updateRuleStates - ${JSON.stringify(rule)}`);
         if (this.initializedChannels[`rules.${rule.id}`]) {
-            let promises = [];
+            const promises = [];
             promises.push(this.secureSetStateAsync(`rules.${rule.id}.info.type`, rule.type, true));
             promises.push(this.secureSetStateAsync(`rules.${rule.id}.info.label`, rule.label, true));
             promises.push(this.secureSetStateAsync(`rules.${rule.id}.active`, rule.active, true));
@@ -3207,11 +3284,11 @@ class HmIpCloudAccesspointAdapter extends Adapter {
      * The cloud raises no push event for a rule, so without this the state would stay unconfirmed
      * until the next full read of the configuration.
      *
-     * @param {string} ruleId the rule that was written to
-     * @param {string} field the rule field that was written
-     * @param {boolean|string} value the value the cloud accepted
+     * @param ruleId the rule that was written to
+     * @param field the rule field that was written
+     * @param value the value the cloud accepted
      */
-    async _ackRuleValue(ruleId, field, value) {
+    async _ackRuleValue(ruleId: string, field: string, value: ioBroker.StateValue): Promise<void> {
         const rule = this._api.rules && this._api.rules[ruleId];
         if (rule) {
             rule[field] = value;
@@ -3228,9 +3305,8 @@ class HmIpCloudAccesspointAdapter extends Adapter {
      * meanwhile are absorbed and answered by one read afterwards. `_updateSecurityJournal` holds
      * its reads apart the same way.
      *
-     * @returns {Promise<void>}
      */
-    async _readHomeForAlarmFields() {
+    async _readHomeForAlarmFields(): Promise<void> {
         if (this._homeReadRunning) {
             this._homeReadPending = true;
             return;
@@ -3261,13 +3337,13 @@ class HmIpCloudAccesspointAdapter extends Adapter {
     /**
      * Reads the configuration and publishes the home out of it.
      *
-     * @returns {Promise<void>}
      */
-    async _publishHomeFromCloud() {
+    async _publishHomeFromCloud(): Promise<void> {
         const epoch = this._dataEpoch;
         const publishSeq = this._homePublishSeq;
         this.log.debug('Read Home for its alarm fields');
-        const state = await this._api.callRestApi('home/getCurrentState', this._api._clientCharacteristics);
+        const state = (await this._api.callRestApi('home/getCurrentState', this._api._clientCharacteristics)) as
+            HmIpCurrentState | undefined;
         if (this._unloaded || this._dataEpoch !== epoch) {
             return;
         }
@@ -3289,10 +3365,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
     }
 
     /**
-     * @param {number} ms how long to wait
-     * @returns {Promise<void>}
+     * @param ms how long to wait
      */
-    _sleep(ms) {
+    _sleep(ms: number): Promise<void> {
         return new Promise(resolve => {
             const timer = setTimeout(resolve, ms);
             timer.unref && timer.unref();
@@ -3306,9 +3381,8 @@ class HmIpCloudAccesspointAdapter extends Adapter {
      * absorbs the ones that arrive while it is in flight and repeats once afterwards, so the
      * published journal and the entry split out of it always come from the same response.
      *
-     * @returns {Promise<void>}
      */
-    async _updateSecurityJournal() {
+    async _updateSecurityJournal(): Promise<void> {
         if (!this._api.home) {
             return;
         }
@@ -3327,12 +3401,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }
     }
 
-    /**
-     * @returns {Promise<void>}
-     */
-    async _publishSecurityJournal() {
-        const base = `homes.${this._api.home.id}.functionalHomes.securityAndAlarm`;
-        const journal = await this._api.homeGetSecurityJournal();
+    async _publishSecurityJournal(): Promise<void> {
+        const base = `homes.${this._api.home?.id}.functionalHomes.securityAndAlarm`;
+        const journal = (await this._api.homeGetSecurityJournal()) as { entries?: SecurityJournalEntry[] } | undefined;
         if (this._unloaded) {
             return;
         }
@@ -3342,8 +3413,8 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         }
         // the cloud documents no order for the entries, so the newest is the latest timestamp
         const newest =
-            journal.entries.reduce(
-                (latest, entry) =>
+            journal.entries.reduce<SecurityJournalEntry | null>(
+                (latest: SecurityJournalEntry | null, entry: SecurityJournalEntry) =>
                     latest && (latest.eventTimestamp ?? 0) >= (entry.eventTimestamp ?? 0) ? latest : entry,
                 null,
             ) || {};
@@ -3353,9 +3424,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         await this.secureSetStateAsync(`${base}.securityJournalLabel`, newest.label ?? null, true);
     }
 
-    _createObjectsForClient(client) {
+    _createObjectsForClient(client: HmIpClient): Promise<unknown[]> {
         this.log.silly(`createObjectsForClient - ${JSON.stringify(client)}`);
-        let promises = [];
+        const promises = [];
         promises.push(
             this.extendObject(`clients.${client.id}`, {
                 type: 'device',
@@ -3374,9 +3445,9 @@ class HmIpCloudAccesspointAdapter extends Adapter {
         return Promise.all(promises);
     }
 
-    _createObjectsForHome(home) {
+    _createObjectsForHome(home: HmIpHome): Promise<unknown[]> {
         this.log.silly(`createObjectsForHome - ${JSON.stringify(home)}`);
-        let promises = [];
+        const promises = [];
         // a home the cloud sent without a security solution still gets its objects
         const securityAndAlarm = (home.functionalHomes || {}).SECURITY_AND_ALARM || {};
         promises.push(this.extendObject(`homes.${home.id}`, { type: 'device', common: {}, native: {} }));
@@ -4112,10 +4183,10 @@ class HmIpCloudAccesspointAdapter extends Adapter {
     }
 }
 
-// If started as allInOne/compact mode => return function to create instance
-if (module && module.parent) {
-    module.exports = options => new HmIpCloudAccesspointAdapter(options);
+if (require.main !== module) {
+    // Export the constructor in compact mode
+    module.exports = (options: Partial<utils.AdapterOptions> | undefined) => new HmIpCloudAccesspointAdapter(options);
 } else {
-    // or start the instance directly
-    new HmIpCloudAccesspointAdapter();
+    // otherwise start the instance directly
+    (() => new HmIpCloudAccesspointAdapter())();
 }

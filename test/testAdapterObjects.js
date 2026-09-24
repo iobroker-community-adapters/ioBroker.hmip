@@ -4,7 +4,7 @@ const assert = require('node:assert');
 const Module = require('node:module');
 
 /**
- * The smallest ioBroker adapter the object builders in main.js need, so they can be exercised
+ * The smallest ioBroker adapter the object builders in main.ts need, so they can be exercised
  * without a running js-controller. Objects and states are kept in memory for the assertions.
  */
 class AdapterStub {
@@ -93,8 +93,8 @@ function loadAdapterFactory() {
         return originalLoad.apply(this, arguments);
     };
     try {
-        delete require.cache[require.resolve('../main.js')];
-        return require('../main.js');
+        delete require.cache[require.resolve('../build/main.js')];
+        return require('../build/main.js');
     } finally {
         Module._load = originalLoad;
     }
@@ -104,7 +104,7 @@ const createAdapter = loadAdapterFactory();
 
 /** an adapter whose api records every command instead of sending it */
 function createHarness(apiOverrides) {
-    assert.strictEqual(typeof createAdapter, 'function', 'main.js must export a factory when it is required');
+    assert.strictEqual(typeof createAdapter, 'function', 'main.ts must export a factory when it is required');
     const adapter = createAdapter({});
     adapter.calls = [];
     const record =
@@ -1019,7 +1019,7 @@ describe('cleanups that prevent a silent failure', () => {
     // an older version of the adapter shipped these datapoints writable, and extendObject merges,
     // so the stored native still dispatches unless the table clears it
     it('clears the parameter an older version left on a datapoint that is now read-only', () => {
-        const { CHANNEL_STATES, channelStateObjects } = require('../lib/channelStates');
+        const { CHANNEL_STATES, channelStateObjects } = require('../build/lib/channelStates');
         const [built] = channelStateObjects(
             { dim2WarmActive: CHANNEL_STATES.UNIVERSAL_LIGHT_CHANNEL.states.dim2WarmActive },
             'DEV',
@@ -1358,7 +1358,7 @@ describe('the device that raised an alarm', () => {
 });
 
 describe('rain counters', () => {
-    const { CHANNEL_STATES, channelStateObjects, channelStateValues } = require('../lib/channelStates');
+    const { CHANNEL_STATES, channelStateObjects, channelStateValues } = require('../build/lib/channelStates');
 
     // the cloud accumulates the counter in floating point and hands the drift over with it
     it('publishes the millimetres the sensor measured, not the accumulated drift', () => {
@@ -1420,7 +1420,7 @@ describe('level scaling', () => {
     });
 
     it('publishes a 0..100 channel on the scale it declares', () => {
-        const { CHANNEL_STATES, channelStateObjects, channelStateValues } = require('../lib/channelStates');
+        const { CHANNEL_STATES, channelStateObjects, channelStateValues } = require('../build/lib/channelStates');
         for (const [channelType, field] of [
             ['SHUTTER_CHANNEL', 'shutterLevel'],
             ['DIMMER_CHANNEL', 'dimLevel'],
@@ -1435,7 +1435,7 @@ describe('level scaling', () => {
     });
 
     it('does not publish a percentage for a channel that has no level yet', () => {
-        const { CHANNEL_STATES, channelStateValues } = require('../lib/channelStates');
+        const { CHANNEL_STATES, channelStateValues } = require('../build/lib/channelStates');
         const states = CHANNEL_STATES.SHUTTER_CHANNEL.states;
         const spec = { shutterLevel: states.shutterLevel };
 
@@ -1545,7 +1545,7 @@ describe('level write paths', () => {
 });
 
 describe('channel and code state events', () => {
-    const { CHANNEL_EVENTS, CODE_STATES } = require('../lib/channelStates');
+    const { CHANNEL_EVENTS, CODE_STATES } = require('../build/lib/channelStates');
 
     function buttonDevice() {
         return {
