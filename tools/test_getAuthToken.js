@@ -1,10 +1,11 @@
-// node --inspect-brk testterminal.js
+// Manual smoke test, run by hand after `npm run build-backend`.
+// node --inspect-brk tools/<this file>
 
 if (!process.argv || !process.argv[2]) {
     console.log('run like this "node test_getAuthToken.js ACCESSPOINTGTIN [PIN]"');
 }
 
-const apiClass = require('./hmCloudAPI.js');
+const apiClass = require('../build/lib/hmCloudAPI').HmCloudAPI;
 const api = new apiClass(process.argv[2], process.argv[3]);
 
 console.log('------ test start --------');

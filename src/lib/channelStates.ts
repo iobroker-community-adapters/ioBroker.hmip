@@ -1,4 +1,11 @@
-'use strict';
+import type {
+    ChannelStateNative,
+    ChannelStateObject,
+    ChannelStateSpec,
+    ChannelStateValue,
+    ChannelStatesEntry,
+    FunctionalChannel,
+} from './types';
 
 /**
  * Every ioBroker state the adapter derives from a device's functional channels.
@@ -19,7 +26,7 @@
  * state.
  */
 
-const CHANNEL_STATES = {
+export const CHANNEL_STATES: Record<string, ChannelStatesEntry> = {
     ACCELERATION_SENSOR_CHANNEL: {
         states: {
             accelerationSensorEventFilterPeriod: {
@@ -1978,7 +1985,7 @@ const CHANNEL_STATES = {
 // channel types whose payloads carry no key of their own, listed so they are not reported
 // as unknown. A key that is merely null is a state with no value yet, not a missing state.
 
-const STATELESS_CHANNELS = [
+export const STATELESS_CHANNELS: string[] = [
     'BLIND_GROUP_REMOTE_CONTROL_CHANNEL',
     'CODE_PROTECTED_SECONDARY_ACTION_CHANNEL',
     'INPUT_QUICK_ACTION_DISPLAY_CHANNEL',
@@ -1990,7 +1997,7 @@ const STATELESS_CHANNELS = [
  * The cloud raises a channel event on any functional channel, so an event for a type not in
  * EVENT_CHANNELS still gets its state - this list only decides which states exist up front.
  */
-const CHANNEL_EVENTS = [
+export const CHANNEL_EVENTS: string[] = [
     'DOOR_BELL_SENSOR_EVENT',
     'KEY_PRESS_SHORT',
     'KEY_PRESS_LONG',
@@ -1999,13 +2006,13 @@ const CHANNEL_EVENTS = [
 ];
 
 /** the codeState values a DEVICE_CODE_STATE_EVENT can carry, raised by the keypads */
-const CODE_STATES = ['KNOWN_CODE_ID_RECEIVED', 'UNKNOWN_CODE_DETECTED'];
+export const CODE_STATES: string[] = ['KNOWN_CODE_ID_RECEIVED', 'UNKNOWN_CODE_DETECTED'];
 
 /**
  * channel types that mark a device as taking a code, so its code states exist before the first
  * one is entered. A code state event names only the device, so the states hang off the device.
  */
-const CODE_STATE_CHANNELS = [
+export const CODE_STATE_CHANNELS: string[] = [
     'DEVICE_BLOCKING_WITH_TEACHABLE_CODE',
     'CODE_PROTECTED_PRIMARY_ACTION_CHANNEL',
     'CODE_PROTECTED_SECONDARY_ACTION_CHANNEL',
@@ -2014,7 +2021,7 @@ const CODE_STATE_CHANNELS = [
 ];
 
 /** channel types known to raise a channel event, so their states exist before the first press */
-const EVENT_CHANNELS = [
+export const EVENT_CHANNELS: string[] = [
     'SINGLE_KEY_CHANNEL',
     'MULTI_MODE_INPUT_CHANNEL',
     'MULTI_MODE_INPUT_SWITCH_CHANNEL',
@@ -2025,28 +2032,39 @@ const EVENT_CHANNELS = [
     'GENERIC_SWITCH_INPUT_CHANNEL',
 ];
 
-const DERIVERS = {
-    windowOpen: channel => channel.windowState === 'OPEN',
+export const DERIVERS = {
+    windowOpen: (channel: FunctionalChannel): boolean => channel.windowState === 'OPEN',
     // a valve with no reported position must not read as fully closed
-    percent: value => (typeof value === 'number' ? value * 100 : value),
+    percent: (value: unknown): unknown => (typeof value === 'number' ? value * 100 : value),
     // the cloud accumulates a rain counter in floating point and hands over the drift with it,
     // so 0.3 mm of rain arrives as 0.3000000000001819. The sensor resolves 0.1 mm.
-    millimetres: value => (typeof value === 'number' ? Math.round(value * 100) / 100 : value),
+    millimetres: (value: unknown): unknown => (typeof value === 'number' ? Math.round(value * 100) / 100 : value),
 };
 
 /**
  * ioBroker object definitions for a table of states.
  *
- * @param {object} states field name -> spec
- * @param {string} deviceId the device the channel belongs to
- * @param {string|number} channel the functional channel index
- * @param {object} functionalChannel the channel as delivered by the cloud
- * @returns {{field: string, common: object, native: object}[]} one entry per state
+ * @param states field name -> spec
+ * @param deviceId the device the channel belongs to
+ * @param channel the functional channel index
+ * @param functionalChannel the channel as delivered by the cloud
+ * @returns one entry per state
  */
-function channelStateObjects(states, deviceId, channel, functionalChannel) {
+export function channelStateObjects(
+    states: Record<string, ChannelStateSpec>,
+    deviceId: string,
+    channel: string | number,
+    functionalChannel?: FunctionalChannel,
+): ChannelStateObject[] {
     return Object.keys(states).map(field => {
         const spec = states[field];
-        const common = { name: spec.name ?? field, type: spec.type, role: spec.role };
+        const common: ioBroker.StateCommon = {
+            name: spec.name ?? field,
+            type: spec.type,
+            role: spec.role,
+            read: spec.read ?? true,
+            write: spec.write ?? false,
+        };
         if (spec.unit !== undefined) {
             common.unit = spec.unit;
         }
@@ -2062,19 +2080,18 @@ function channelStateObjects(states, deviceId, channel, functionalChannel) {
         if (spec.def !== undefined) {
             common.def = spec.def;
         }
-        common.read = spec.read ?? true;
-        common.write = spec.write ?? false;
 
         // extendObject merges into whatever is already stored, so a state that used to dispatch
         // has to have its parameter cleared rather than merely left out - _stateChange dispatches
         // on native.parameter alone and never looks at common.write
-        let native = { parameter: null };
+        let native: ChannelStateNative = { parameter: null };
         if (spec.parameter) {
             // a setpoint is set on the heating groups the channel belongs to, not on the device,
             // and _doStateChange iterates native.id to reach them. A channel in no group yields an
             // empty list, which the dispatcher reports rather than throwing on.
-            native = spec.targetGroups ? { id: (functionalChannel || {}).groups || [] } : { id: deviceId, channel };
-            native.parameter = spec.parameter;
+            native = spec.targetGroups
+                ? { parameter: spec.parameter, id: functionalChannel?.groups ?? [] }
+                : { parameter: spec.parameter, id: deviceId, channel };
             if (spec.step !== undefined) {
                 native.step = spec.step;
             }
@@ -2085,7 +2102,6 @@ function channelStateObjects(states, deviceId, channel, functionalChannel) {
         return { field, common, native };
     });
 }
-
 /**
  * Values for a table of states, read off one functional channel.
  *
@@ -2093,19 +2109,22 @@ function channelStateObjects(states, deviceId, channel, functionalChannel) {
  * adapter's state writer treats a raw object as an ioBroker state wrapper and would keep
  * only its `val`.
  *
- * @param {object} states field name -> spec
- * @param {object} functionalChannel the channel as delivered by the cloud
- * @returns {{field: string, value: boolean|number|string|null|undefined}[]} one entry per state
+ * @param states field name -> spec
+ * @param functionalChannel the channel as delivered by the cloud
+ * @returns one entry per state
  */
-function channelStateValues(states, functionalChannel) {
-    const channel = functionalChannel || {};
-    const out = [];
+export function channelStateValues(
+    states: Record<string, ChannelStateSpec>,
+    functionalChannel?: FunctionalChannel,
+): ChannelStateValue[] {
+    const channel: FunctionalChannel = functionalChannel || {};
+    const out: ChannelStateValue[] = [];
     for (const field of Object.keys(states)) {
         const spec = states[field];
         if (spec.writeOnly) {
             continue;
         }
-        let value;
+        let value: unknown;
         if (Object.prototype.hasOwnProperty.call(spec, 'constant')) {
             value = spec.constant;
         } else if (spec.derive === 'windowOpen') {
@@ -2119,19 +2138,7 @@ function channelStateValues(states, functionalChannel) {
         if (spec.role === 'json' && value !== undefined && value !== null) {
             value = JSON.stringify(value);
         }
-        out.push({ field, value });
+        out.push({ field, value: value as ChannelStateValue['value'] });
     }
     return out;
 }
-
-module.exports = {
-    CHANNEL_STATES,
-    STATELESS_CHANNELS,
-    CHANNEL_EVENTS,
-    CODE_STATES,
-    CODE_STATE_CHANNELS,
-    EVENT_CHANNELS,
-    DERIVERS,
-    channelStateObjects,
-    channelStateValues,
-};
