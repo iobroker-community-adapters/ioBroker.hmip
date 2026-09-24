@@ -1070,6 +1070,21 @@ describe('cleanups that prevent a silent failure', () => {
         assert.match(adapter.logged.warn.join(' '), /no group to act on/);
     });
 
+    // extendObject merges, so a native somebody edited by hand outlives every restart: the write
+    // then reaches a switch with no case for it, and without this it would be lost in silence
+    it('says so when an object dispatches on a parameter nothing handles', async () => {
+        const adapter = createHarness();
+        adapter.objects.stale = { type: 'state', common: {}, native: { id: ['G1'], parameter: 'cooling' } };
+
+        await adapter._doStateChange(`${adapter.namespace}.stale`, adapter.objects.stale, {
+            val: true,
+            ack: false,
+        });
+
+        assert.deepStrictEqual(adapter.calls, []);
+        assert.match(adapter.logged.warn.join(' '), /no command is dispatched on this parameter/);
+    });
+
     it('leaves the whole-home cooling switch readable, so it reads as a switch', async () => {
         const adapter = createHarness();
         await adapter._createObjectsForHome(HOME);

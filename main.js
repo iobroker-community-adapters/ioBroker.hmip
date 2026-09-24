@@ -1062,6 +1062,13 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     }
                     await this._ackRuleValue(o.native.id, 'label', state.val);
                     break;
+                default:
+                    // an object whose native names a parameter nothing handles: the write is lost,
+                    // and silence here reads as a broken datapoint rather than a stale object
+                    this.log.warn(
+                        `${o.native.parameter} - id ${o.native.id ? JSON.stringify(o.native.id) : ''} - no command is dispatched on this parameter, the value was not sent`,
+                    );
+                    break;
             }
         } catch (err) {
             this.log.warn(`${o.native.parameter} - id ${o.native.id ? o.native.id : ''} - state change error: ${err}`);
