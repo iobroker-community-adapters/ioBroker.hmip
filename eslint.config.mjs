@@ -6,8 +6,28 @@ export default [
     ...config,
 
     {
+        languageOptions: {
+            parserOptions: {
+                projectService: {
+                    allowDefaultProject: ['*.mjs', 'tasks.ts'],
+                },
+                tsconfigRootDir: import.meta.dirname,
+            },
+        },
+    },
+
+    {
         // specify files to exclude from linting here
-        ignores: ['*.test.js', '*.config.mjs', 'node_modules', 'tmp/', 'test/', 'admin/', 'src-admin'],
+        ignores: [
+            '*.test.js',
+            '*.config.mjs',
+            'node_modules',
+            'tmp/',
+            'test/',
+            'admin/',
+            'src-admin',
+            'build/',
+        ],
     },
 
     {

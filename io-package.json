@@ -128,6 +128,7 @@
     "platform": "Javascript/Node.js",
     "mode": "daemon",
     "compact": true,
+    "nogit": true,
     "icon": "homematic.png",
     "adminUI": {
       "config": "json"
