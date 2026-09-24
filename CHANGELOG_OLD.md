@@ -1,8 +1,13 @@
 # Older changes
+## 1.27.0 (2025-03-24)
+* (mcm1957) Adapter requires admin 7.6.3, js-controller 6.0.11 and node.js 20 now.
+* (@GermanBluefox) GUI was migrated to TypeScript (Admin 7.6)
+* (SliX185) Support to control opticalSignalBehaviour for HMIP-BSL has been added.
+* (SliX185) Logging of PIN has been removed
+* (mcm1957) Dependencies have been updated.
+
 ## 1.26.5 (2025-01-27)
 * (@Apollon77) Fixed Websocket disconnect cases
-
-
 
 ## 1.26.4 (2025-01-03)
 * (@Apollon77) Optimized Websocket disconnect cases

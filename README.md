@@ -71,7 +71,7 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
-### **WORK IN PROGRESS**
+### 3.3.0 (2026-09-24)
 - (@petermeter2000) coolingEnabled on the home can now be written, so the cooling of the whole installation is switched from ioBroker the way the app does it
 - (@petermeter2000) coolingIgnored on a heating group can now be written, so a room can be left out of cooling. Note that true means the room is **not** cooled, matching what the app shows
 - (@petermeter2000) Every heating group now has a profiles folder with the names of its six profiles, so a profile can be recognised by the name it carries in the app instead of by its index. Profiles 1-3 are the heating profiles, 4-6 the cooling profiles
@@ -142,13 +142,6 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
 - (copilot) Adapter requires admin >= 8.0.0 now
 - (mcm1957) Dependencies have been updated.
 - (@GermanBluefox) Migrated to admin 8
-
-### 1.27.0 (2025-03-24)
-* (mcm1957) Adapter requires admin 7.6.3, js-controller 6.0.11 and node.js 20 now.
-* (@GermanBluefox) GUI was migrated to TypeScript (Admin 7.6)
-* (SliX185) Support to control opticalSignalBehaviour for HMIP-BSL has been added.
-* (SliX185) Logging of PIN has been removed
-* (mcm1957) Dependencies have been updated.
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 
