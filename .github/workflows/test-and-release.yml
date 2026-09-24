@@ -30,6 +30,7 @@ jobs:
               with:
                   node-version: '24.x'
                   type-checking: true
+                  install-command: 'npm run npm'
                   lint: true
 
     # Runs adapter tests on all supported node versions and OSes
@@ -48,6 +49,7 @@ jobs:
               with:
                   node-version: ${{ matrix.node-version }}
                   os: ${{ matrix.os }}
+                  install-command: 'npm run npm'
                   build: true
 
     # Runs admin UI tests on main node version and linux only
@@ -69,6 +71,7 @@ jobs:
                   os: ${{ matrix.os }}
                   build: true
                   extra-tests: npm run test:gui
+                  install-command: 'npm run npm'
                   # Uncomment the following line if your adapter cannot be installed using 'npm ci'
                   # install-command: 'npm install'
             - name: Archive screenshots
@@ -106,4 +109,5 @@ jobs:
               with:
                   node-version: '24.x'
                   build: true
+                  install-command: 'npm run npm'
                   github-token: ${{ secrets.GITHUB_TOKEN }}
