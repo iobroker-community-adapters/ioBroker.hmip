@@ -26,7 +26,6 @@
     "@iobroker/adapter-core": "^3.4.3",
     "axios": "^1.20.0",
     "js-sha512": "^0.9.0",
-    "uuid": "^14.0.2",
     "ws": "^8.21.3"
   },
   "devDependencies": {
@@ -39,6 +38,7 @@
     "@iobroker/eslint-config": "^2.3.4",
     "@iobroker/legacy-testing": "^3.0.1",
     "@iobroker/testing": "^6.2.2",
+    "@iobroker/types": "^7.2.3",
     "@tsconfig/node22": "^22.0.6",
     "@types/node": "^26.6.2",
     "@types/proxyquire": "^1.3.31",
@@ -46,15 +46,14 @@
     "colorette": "^2.0.20",
     "configstore": "^8.0.0",
     "puppeteer": "^25.12.0",
-    "typescript": "~7.0.2"
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.3"
   },
-  "main": "main.js",
+  "main": "build/main.js",
   "files": [
     "admin/",
-    "api/",
+    "build/",
     "docs/",
-    "lib/",
-    "main.js",
     "LICENSE",
     "io-package.json"
   ],
@@ -65,7 +64,11 @@
     "test:integration": "mocha test/integration --exit",
     "test": "npm run test:js && npm run test:package && npm run test:gui",
     "lint": "eslint -c eslint.config.mjs .",
-    "build": "node tasks",
+    "build-backend": "tsc -p tsconfig.build.json",
+    "build-admin": "tsx tasks.ts",
+    "build": "npm run build-backend && npm run build-admin",
+    "watch": "tsc -p tsconfig.build.json --watch",
+    "check": "tsc -p tsconfig.json --noEmit",
     "npm": "npm i && cd src-admin && npm i -f",
     "translate": "translate-adapter",
     "release": "release-script",
@@ -73,11 +76,11 @@
     "release-minor": "release-script minor --yes --no-update-lockfile",
     "release-major": "release-script major --yes --no-update-lockfile",
     "update-packages": "npx -y npm-check-updates --upgrade && cd src-admin && npx -y npm-check-updates --upgrade",
-    "task0clean": "node tasks --0-clean",
-    "task1npm": "node tasks --1-npm",
-    "task2compile": "node tasks --2-compile",
-    "task3copy": "node tasks --3-copy",
-    "taskBuild": "node tasks"
+    "task0clean": "tsx tasks.ts --0-clean",
+    "task1npm": "tsx tasks.ts --1-npm",
+    "task2compile": "tsx tasks.ts --2-compile",
+    "task3copy": "tsx tasks.ts --3-copy",
+    "taskBuild": "tsx tasks.ts"
   },
   "bugs": {
     "url": "https://github.com/iobroker-community-adapters/ioBroker.hmip/issues"

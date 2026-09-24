@@ -1,6 +1,7 @@
-// node --inspect-brk testterminal.js
+// Manual smoke test, run by hand after `npm run build-backend`.
+// node --inspect-brk tools/<this file>
 
-const apiClass = require('./hmCloudAPI.js');
+const apiClass = require('../build/lib/hmCloudAPI').HmCloudAPI;
 const api = new apiClass({
     authToken: 'xxxxxxxxxx',
     clientAuthToken: 'xxxxxxxxxxxxxxxxxxxxxxxx',

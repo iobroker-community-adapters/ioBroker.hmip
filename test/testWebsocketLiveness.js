@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('node:assert');
-const HmCloudAPI = require('../api/hmCloudAPI');
+const HmCloudAPI = require('../build/lib/hmCloudAPI').HmCloudAPI;
 
 /** the parts of a ws socket the api touches, with every call recorded */
 function createSocket() {
@@ -23,21 +23,23 @@ function createSocket() {
  */
 function loadApiWithStubbedSocket() {
     const wsPath = require.resolve('ws');
-    const apiPath = require.resolve('../api/hmCloudAPI');
+    const apiPath = require.resolve('../build/lib/hmCloudAPI');
     const sockets = [];
     const realWs = require.cache[wsPath];
     require.cache[wsPath] = {
         id: wsPath,
         filename: wsPath,
         loaded: true,
-        exports: function () {
-            const socket = createSocket();
-            sockets.push(socket);
-            return socket;
+        exports: {
+            WebSocket: function () {
+                const socket = createSocket();
+                sockets.push(socket);
+                return socket;
+            },
         },
     };
     delete require.cache[apiPath];
-    const StubbedApi = require('../api/hmCloudAPI');
+    const StubbedApi = require('../build/lib/hmCloudAPI').HmCloudAPI;
     if (realWs) {
         require.cache[wsPath] = realWs;
     } else {
