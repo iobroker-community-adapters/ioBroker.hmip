@@ -1,4 +1,4 @@
-import * as utils from '@iobroker/adapter-core';
+import { Adapter, type AdapterOptions } from '@iobroker/adapter-core';
 import { randomUUID } from 'node:crypto';
 import { HmCloudAPI } from './lib/hmCloudAPI';
 import {
@@ -104,7 +104,7 @@ interface RequestTokenState {
     error?: unknown;
 }
 
-class HmIpCloudAccesspointAdapter extends utils.Adapter {
+class HmIpCloudAccesspointAdapter extends Adapter {
     private readonly _api: HmCloudAPI;
 
     private _unloaded = false;
@@ -138,7 +138,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
     private Sentry: SentryLike | null = null;
 
-    public constructor(options: Partial<utils.AdapterOptions> = {}) {
+    public constructor(options: Partial<AdapterOptions> = {}) {
         super({ ...options, name: adapterName });
 
         this._api = new HmCloudAPI();
@@ -4185,7 +4185,7 @@ class HmIpCloudAccesspointAdapter extends utils.Adapter {
 
 if (require.main !== module) {
     // Export the constructor in compact mode
-    module.exports = (options: Partial<utils.AdapterOptions> | undefined) => new HmIpCloudAccesspointAdapter(options);
+    module.exports = (options: Partial<AdapterOptions> | undefined) => new HmIpCloudAccesspointAdapter(options);
 } else {
     // otherwise start the instance directly
     (() => new HmIpCloudAccesspointAdapter())();

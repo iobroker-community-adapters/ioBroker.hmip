@@ -71,7 +71,7 @@ https://forum.iobroker.net/topic/27532/homematic-ip-cloud-access-point-adapter
     ### **WORK IN PROGRESS**
 -->
 ## Changelog
-### 4.0.1 (2026-09-24)
+#### **WORK IN PROGRESS**
 - (@GermanBluefox) The adapter was refactored to TypeScript. The sources now live in src/ and are compiled to build/, which is what the npm package ships; nothing about the objects, states or commands changed
 - (@GermanBluefox) uuid was replaced by the randomUUID built into Node, which removes a dependency that could no longer be required from this build at all
 - (@GermanBluefox) Fixed an unusable dependency tree: package.json asked for a TypeScript no version of the eslint stack accepts, so npm ci installed nothing at all
