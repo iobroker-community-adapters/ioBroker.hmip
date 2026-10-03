@@ -10,7 +10,7 @@
     },
     "type": "module",
     "devDependencies": {
-        "@iobroker/gui-components": "^10.3.3",
+        "@iobroker/gui-components": "^10.3.5",
         "@iobroker/json-config": "^10.0.6",
         "@module-federation/runtime": "^2.9.1",
         "@module-federation/vite": "^1.22.1",
