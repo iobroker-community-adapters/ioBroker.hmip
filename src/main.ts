@@ -1866,6 +1866,13 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     promises.push(this.secureSetStateAsync(`groups.${group.id}.slatsLevel`, group.slatsLevel, true));
                     break;
                 }
+                case 'EXTENDED_LINKED_SHUTTER': {
+                    promises.push(
+                        this.secureSetStateAsync(`groups.${group.id}.shutterLevel`, group.shutterLevel, true),
+                    );
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.processing`, group.processing, true));
+                    break;
+                }
                 case 'SECURITY_ZONE': {
                     // request-based panels omit "active" on a disarmed zone
                     promises.push(this.secureSetStateAsync(`groups.${group.id}.active`, group.active === true, true));
@@ -3086,6 +3093,38 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                             write: false,
                         },
                         native: {},
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.processing`, {
+                        type: 'state',
+                        common: { name: 'processing', type: 'boolean', role: 'indicator', read: true, write: false },
+                        native: {},
+                    }),
+                );
+                break;
+            }
+            case 'EXTENDED_LINKED_SHUTTER': {
+                promises.push(
+                    this.extendObject(`groups.${group.id}.shutterLevel`, {
+                        type: 'state',
+                        common: {
+                            name: 'shutterLevel',
+                            type: 'number',
+                            role: 'level.blind',
+                            min: 0,
+                            max: 1,
+                            read: true,
+                            write: true,
+                        },
+                        native: { id: group.id, parameter: 'groupShutterLevel', step: 0.05, debounce: 5000 },
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.stop`, {
+                        type: 'state',
+                        common: { name: 'stop', type: 'boolean', role: 'button', read: false, write: true },
+                        native: { id: group.id, parameter: 'groupStop' },
                     }),
                 );
                 promises.push(
