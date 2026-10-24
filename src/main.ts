@@ -1870,7 +1870,40 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     promises.push(
                         this.secureSetStateAsync(`groups.${group.id}.shutterLevel`, group.shutterLevel, true),
                     );
+                    // null on a group of roller shutters, which have no slats
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.slatsLevel`, group.slatsLevel, true));
+                    promises.push(
+                        this.secureSetStateAsync(
+                            `groups.${group.id}.primaryShadingLevel`,
+                            group.primaryShadingLevel,
+                            true,
+                        ),
+                    );
+                    promises.push(
+                        this.secureSetStateAsync(
+                            `groups.${group.id}.primaryShadingStateType`,
+                            group.primaryShadingStateType,
+                            true,
+                        ),
+                    );
+                    promises.push(
+                        this.secureSetStateAsync(
+                            `groups.${group.id}.secondaryShadingLevel`,
+                            group.secondaryShadingLevel,
+                            true,
+                        ),
+                    );
+                    promises.push(
+                        this.secureSetStateAsync(
+                            `groups.${group.id}.secondaryShadingStateType`,
+                            group.secondaryShadingStateType,
+                            true,
+                        ),
+                    );
                     promises.push(this.secureSetStateAsync(`groups.${group.id}.processing`, group.processing, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.dutyCycle`, group.dutyCycle, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.lowBat`, group.lowBat, true));
+                    promises.push(this.secureSetStateAsync(`groups.${group.id}.unreach`, group.unreach, true));
                     break;
                 }
                 case 'SECURITY_ZONE': {
@@ -3121,6 +3154,21 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     }),
                 );
                 promises.push(
+                    this.extendObject(`groups.${group.id}.slatsLevel`, {
+                        type: 'state',
+                        common: {
+                            name: 'slatsLevel',
+                            type: 'number',
+                            role: 'level.blind',
+                            min: 0,
+                            max: 1,
+                            read: true,
+                            write: true,
+                        },
+                        native: { id: group.id, parameter: 'groupSlatsLevel', step: 0.05, debounce: 5000 },
+                    }),
+                );
+                promises.push(
                     this.extendObject(`groups.${group.id}.stop`, {
                         type: 'state',
                         common: { name: 'stop', type: 'boolean', role: 'button', read: false, write: true },
@@ -3128,9 +3176,94 @@ class HmIpCloudAccesspointAdapter extends Adapter {
                     }),
                 );
                 promises.push(
+                    this.extendObject(`groups.${group.id}.primaryShadingLevel`, {
+                        type: 'state',
+                        common: {
+                            name: 'primaryShadingLevel',
+                            type: 'number',
+                            role: 'value',
+                            read: true,
+                            write: false,
+                        },
+                        native: {},
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.primaryShadingStateType`, {
+                        type: 'state',
+                        common: {
+                            name: 'primaryShadingStateType',
+                            type: 'string',
+                            role: 'text',
+                            read: true,
+                            write: false,
+                        },
+                        native: {},
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.secondaryShadingLevel`, {
+                        type: 'state',
+                        common: {
+                            name: 'secondaryShadingLevel',
+                            type: 'number',
+                            role: 'value',
+                            read: true,
+                            write: false,
+                        },
+                        native: {},
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.secondaryShadingStateType`, {
+                        type: 'state',
+                        common: {
+                            name: 'secondaryShadingStateType',
+                            type: 'string',
+                            role: 'text',
+                            read: true,
+                            write: false,
+                        },
+                        native: {},
+                    }),
+                );
+                promises.push(
                     this.extendObject(`groups.${group.id}.processing`, {
                         type: 'state',
                         common: { name: 'processing', type: 'boolean', role: 'indicator', read: true, write: false },
+                        native: {},
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.dutyCycle`, {
+                        type: 'state',
+                        common: { name: 'dutyCycle', type: 'boolean', role: 'indicator', read: true, write: false },
+                        native: {},
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.lowBat`, {
+                        type: 'state',
+                        common: {
+                            name: 'lowBat',
+                            type: 'boolean',
+                            role: 'indicator.lowbat',
+                            read: true,
+                            write: false,
+                        },
+                        native: {},
+                    }),
+                );
+                promises.push(
+                    this.extendObject(`groups.${group.id}.unreach`, {
+                        type: 'state',
+                        common: {
+                            name: 'unreach',
+                            type: 'boolean',
+                            role: 'indicator.unreach',
+                            read: true,
+                            write: false,
+                        },
                         native: {},
                     }),
                 );

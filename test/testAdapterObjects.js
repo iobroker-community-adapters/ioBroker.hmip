@@ -460,6 +460,47 @@ describe('group objects', () => {
         assert.deepStrictEqual(adapter.calls, [{ method: 'groupSwitchingSetShutterLevel', args: ['G-SP', 0.75] }]);
     });
 
+    // the payload is the one reported in #418, a group of two roller shutters
+    it('drives an extended linked shutter group and publishes what it reports', async () => {
+        const adapter = createHarness();
+        const group = {
+            id: 'G-LS',
+            type: 'EXTENDED_LINKED_SHUTTER',
+            label: 'Living room',
+            shutterLevel: 0,
+            slatsLevel: null,
+            primaryShadingLevel: 0,
+            primaryShadingStateType: 'POSITION_USED',
+            secondaryShadingLevel: null,
+            secondaryShadingStateType: 'NOT_EXISTENT',
+            processing: false,
+            dutyCycle: false,
+            lowBat: null,
+            unreach: false,
+        };
+        await adapter._createObjectsForGroup(group);
+        await adapter._updateGroupStates(group);
+
+        assert.deepStrictEqual(adapter.states['groups.G-LS.shutterLevel'], { val: 0, ack: true });
+        assert.deepStrictEqual(adapter.states['groups.G-LS.slatsLevel'], { val: null, ack: true });
+        assert.deepStrictEqual(adapter.states['groups.G-LS.processing'], { val: false, ack: true });
+        assert.deepStrictEqual(adapter.states['groups.G-LS.primaryShadingStateType'], {
+            val: 'POSITION_USED',
+            ack: true,
+        });
+        assert.strictEqual(adapter.objects['groups.G-LS.shutterLevel'].common.max, 1);
+        assert.strictEqual(adapter.objects['groups.G-LS.processing'].common.write, false);
+
+        await change(adapter, 'groups.G-LS.shutterLevel', 0.5);
+        await change(adapter, 'groups.G-LS.slatsLevel', 0.25);
+        await change(adapter, 'groups.G-LS.stop', true);
+        assert.deepStrictEqual(adapter.calls, [
+            { method: 'groupSwitchingSetShutterLevel', args: ['G-LS', 0.5] },
+            { method: 'groupSwitchingSetSlatsLevel', args: ['G-LS', 0.25, 0] },
+            { method: 'groupSwitchingStop', args: ['G-LS'] },
+        ]);
+    });
+
     // writable is not enough: _stateChange looks the object up and returns unless native.parameter
     // names a case, so a datapoint that declares none is one the user can set and nothing acts on
     it('declares a parameter for every datapoint it lets the user write', async () => {
@@ -471,6 +512,7 @@ describe('group objects', () => {
             'SECURITY_ZONE',
             'HOT_WATER',
             'SHUTTER_PROFILE',
+            'EXTENDED_LINKED_SHUTTER',
             'ALARM_SWITCHING',
             'ENVIRONMENT',
         ]) {
