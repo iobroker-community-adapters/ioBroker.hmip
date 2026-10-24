@@ -1,4 +1,10 @@
 # Older changes
+## 2.0.0 (2026-08-03)
+- (copilot) Adapter requires node.js >= 22 now
+- (copilot) Adapter requires admin >= 8.0.0 now
+- (mcm1957) Dependencies have been updated.
+- (@GermanBluefox) Migrated to admin 8
+
 ## 1.27.0 (2025-03-24)
 * (mcm1957) Adapter requires admin 7.6.3, js-controller 6.0.11 and node.js 20 now.
 * (@GermanBluefox) GUI was migrated to TypeScript (Admin 7.6)
