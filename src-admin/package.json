@@ -11,7 +11,7 @@
     "type": "module",
     "devDependencies": {
         "@iobroker/gui-components": "^10.3.13",
-        "@iobroker/json-config": "^10.1.7",
+        "@iobroker/json-config": "^10.1.8",
         "@module-federation/runtime": "^2.9.2",
         "@module-federation/vite": "^1.23.5",
         "@mui/icons-material": "^9.5.0",
